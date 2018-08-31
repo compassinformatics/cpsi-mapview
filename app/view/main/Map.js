@@ -18,9 +18,7 @@ Ext.define('CpsiMapview.view.main.Map', {
         dock: 'top',
         items: [{
             xtype: 'basigx-button-zoomtoextent',
-            zoom: 2,
-            center: [0, 0],
-            extent: [-1800244, 6503873, 138198, 7485936]
+            extent: [-1210762, 6688545, -600489, 7490828]
         }]
     }, {
         xtype: 'toolbar',
@@ -36,8 +34,8 @@ Ext.define('CpsiMapview.view.main.Map', {
             // layers will be created from config in initComponent
             layers: [],
             view: new ol.View({
-                center: ol.proj.fromLonLat( [-8.751278, 40.611368] ),
-                zoom: 12
+                center: ol.proj.fromLonLat( [-8, 53.5] ),
+                zoom: 8
             })
         })
     }],
@@ -58,7 +56,6 @@ Ext.define('CpsiMapview.view.main.Map', {
                     var layer = LayerFactory.createLayer(layerConf);
                     if (layer) {
                         me.olMap.addLayer(layer);
-                        // me.olMap.getLayers().insertAt(0, layer);
                     }
                 });
             }
