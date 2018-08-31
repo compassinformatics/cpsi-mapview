@@ -1,7 +1,10 @@
 build/*
 ext/
+node_modules/
+
 bootstrap.css
 bootstrap.js
 bootstrap.json
 bootstrap.jsonp
 
+package-lock.json
