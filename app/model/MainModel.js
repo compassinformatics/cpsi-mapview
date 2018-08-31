@@ -1,7 +1,7 @@
 /**
  * This class is the view model for the Main view of the application.
  */
-Ext.define('CpsiMapview.view.main.MainModel', {
+Ext.define('CpsiMapview.model.MainModel', {
     extend: 'Ext.app.ViewModel',
 
     alias: 'viewmodel.main',

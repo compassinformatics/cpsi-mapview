@@ -1,7 +1,7 @@
 /**
  * This view is an example list of people.
  */
-Ext.define('CpsiMapview.view.main.List', {
+Ext.define('CpsiMapview.view.main.Map', {
     extend: 'Ext.panel.Panel',
     xtype: 'mainlist',
 
@@ -9,11 +9,23 @@ Ext.define('CpsiMapview.view.main.List', {
         'GeoExt.component.Map'
     ],
 
-    title: 'A Map',
+    layout: 'fit',
 
-    height: 200, // will be gone soon
+    dockedItems: [{
+        xtype: 'toolbar',
+        dock: 'top',
+        items: [{
+            text: 'Docked to the top'
+        }]
+    }, {
+        xtype: 'toolbar',
+        dock: 'bottom',
+        items: [{
+          text: 'Docked to the bottom'
+        }]
+    }],
 
-    items: {
+    items: [{
         xtype: 'gx_map',
         map: new ol.Map({
             layers: [
@@ -33,5 +45,5 @@ Ext.define('CpsiMapview.view.main.List', {
                 zoom: 12
             })
         })
-    }
+    }]
 });

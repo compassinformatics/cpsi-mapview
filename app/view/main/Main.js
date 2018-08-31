@@ -6,98 +6,38 @@
  * TODO - Replace this content of this view to suite the needs of your application.
  */
 Ext.define('CpsiMapview.view.main.Main', {
-    extend: 'Ext.tab.Panel',
+    extend: 'Ext.panel.Panel',
     xtype: 'app-main',
 
     requires: [
         'Ext.plugin.Viewport',
         'Ext.window.MessageBox',
 
-        'CpsiMapview.view.main.MainController',
-        'CpsiMapview.view.main.MainModel',
-        'CpsiMapview.view.main.List'
+        'CpsiMapview.controller.MainController',
+        'CpsiMapview.model.MainModel',
+        'CpsiMapview.view.main.Map'
     ],
 
     controller: 'main',
     viewModel: 'main',
 
-    ui: 'navigation',
-
-    tabBarHeaderPosition: 1,
-    titleRotation: 0,
-    tabRotation: 0,
-
-    header: {
-        layout: {
-            align: 'stretchmax'
-        },
-        title: {
-            bind: {
-                text: '{name}'
-            },
-            flex: 0
-        },
-        iconCls: 'fa-th-list'
-    },
-
-    tabBar: {
-        flex: 1,
-        layout: {
-            align: 'stretch',
-            overflowHandler: 'none'
-        }
-    },
-
-    responsiveConfig: {
-        tall: {
-            headerPosition: 'top'
-        },
-        wide: {
-            headerPosition: 'left'
-        }
-    },
-
-    defaults: {
-        bodyPadding: 20,
-        tabConfig: {
-            plugins: 'responsive',
-            responsiveConfig: {
-                wide: {
-                    iconAlign: 'left',
-                    textAlign: 'left'
-                },
-                tall: {
-                    iconAlign: 'top',
-                    textAlign: 'center',
-                    width: 120
-                }
-            }
-        }
-    },
+    layout: 'border',
 
     items: [{
-        title: 'Home',
-        iconCls: 'fa-home',
-        // The following grid shares a store with the classic version's grid as well!
-        items: [{
-            xtype: 'mainlist',
-            layout: 'fit' // we'll be gone soon
-        }]
+        xtype: 'mainlist',
+        region: 'center'
     }, {
-        title: 'Users',
-        iconCls: 'fa-user',
+        title: 'Tools',
+        region: 'west',
+        width: 300,
+        collapsible: true,
         bind: {
             html: '{loremIpsum}'
         }
     }, {
-        title: 'Groups',
-        iconCls: 'fa-users',
-        bind: {
-            html: '{loremIpsum}'
-        }
-    }, {
-        title: 'Settings',
-        iconCls: 'fa-cog',
+        // title: 'Groups',
+        region: 'north',
+        height: 100,
         bind: {
             html: '{loremIpsum}'
         }
