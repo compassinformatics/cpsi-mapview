@@ -16,7 +16,7 @@ Ext.define('CpsiMapview.view.main.Main', {
         'CpsiMapview.controller.MainController',
         'CpsiMapview.model.MainModel',
         'CpsiMapview.view.main.Map',
-
+        'CpsiMapview.view.header.Panel',
         'CpsiMapview.view.LayerTree'
     ],
 
@@ -37,11 +37,6 @@ Ext.define('CpsiMapview.view.main.Main', {
             xtype: 'cmv_layertree'
         }
     }, {
-        // title: 'Groups',
-        region: 'north',
-        height: 100,
-        bind: {
-            html: '{loremIpsum}'
-        }
+        xtype: 'cmv_header'
     }]
 });
