@@ -1,5 +1,7 @@
 # cpsi-mapview [![Build Status](https://travis-ci.org/meggsimum/cpsi-mapview.svg?branch=master)](https://travis-ci.org/meggsimum/cpsi-mapview)
 
+Check out the latest deployed version at https://meggsimum.github.io/cpsi-mapview/ 
+
 ## Project setup
 
 This steps assume you have Sencha CMD v6.6 installed on your system and a copy of ExtJS v6.2.0 downloaded.
