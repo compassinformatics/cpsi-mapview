@@ -3,7 +3,7 @@
  */
 Ext.define('CpsiMapview.view.LayerTree', {
     extend: 'Ext.tree.Panel',
-    xtype: 'layertree',
+    xtype: 'cmv_layertree',
     requires: [
         'BasiGX.util.Map',
         'GeoExt.data.store.LayersTree'
@@ -18,7 +18,7 @@ Ext.define('CpsiMapview.view.LayerTree', {
     },
 
     /**
-     * Costructor which either directly assigns the GeoExt.data.store.LayersTree
+     * Constructor which either directly assigns a GeoExt.data.store.LayersTree
      * or sets up a listener which does this as soon as the application itself
      * fires the `mapready`-event.
      *
@@ -37,7 +37,7 @@ Ext.define('CpsiMapview.view.LayerTree', {
     },
 
     /**
-     * Gueses the mapcomponent and assigns the appropriate layers store, if one
+     * Guesses the mapcomponent and assigns the appropriate layers store, if one
      * could be guessed. This is bound as listener to the mapready event of the
      * application.
      *
