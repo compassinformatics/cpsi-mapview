@@ -1,6 +1,6 @@
 # cpsi-mapview [![Build Status](https://travis-ci.org/meggsimum/cpsi-mapview.svg?branch=master)](https://travis-ci.org/meggsimum/cpsi-mapview)
 
-Check out the latest deployed version at https://meggsimum.github.io/cpsi-mapview/ 
+Check out the latest deployed version at https://meggsimum.github.io/cpsi-mapview/
 
 ## Project setup
 
@@ -27,3 +27,15 @@ sencha app watch
 ```
 
 Open http://localhost:1841 in your browser.
+
+
+## Updating the deployed state
+
+```
+# 1. Build the standalone version
+sencha app build
+# 2. upstream remote should point to canonical repository
+# 3. puplish using black magic
+npx gh-pages -d build/production/CpsiMapview/ -o upstream
+
+```
