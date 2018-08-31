@@ -15,7 +15,9 @@ Ext.define('CpsiMapview.view.main.Main', {
 
         'CpsiMapview.controller.MainController',
         'CpsiMapview.model.MainModel',
-        'CpsiMapview.view.main.Map'
+        'CpsiMapview.view.main.Map',
+
+        'CpsiMapview.view.LayerTree'
     ],
 
     controller: 'main',
@@ -31,8 +33,8 @@ Ext.define('CpsiMapview.view.main.Main', {
         region: 'west',
         width: 300,
         collapsible: true,
-        bind: {
-            html: '{loremIpsum}'
+        items: {
+            xtype: 'layertree'
         }
     }, {
         // title: 'Groups',
