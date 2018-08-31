@@ -1,4 +1,4 @@
-# cpsi-mapview
+# cpsi-mapview [![Build Status](https://travis-ci.org/meggsimum/cpsi-mapview.svg?branch=master)](https://travis-ci.org/meggsimum/cpsi-mapview)
 
 ## Project setup
 
