@@ -1,0 +1,52 @@
+{
+  "layers": [{
+    "layerType": "esrirest",
+    "iconCls": "map",
+    "isBaseLayer": true,
+    "isDefaultBaseLayer": false,
+    "text": "Grey Background",
+    "url": "http://services.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Light_Gray_Base/MapServer/tile/",
+    "openLayers": {
+      "maxResolution": 1222.99245234375,
+      "numZoomLevels": 13,
+      "projection": "EPSG:900913",
+      "visibility": true,
+      "zoomOffset": 7,
+      "transitionEffect": "resize"
+    }
+  }, {
+    "layerType": "osm",
+    "helpPage": "OSM",
+    "iconCls": "map",
+    "isBaseLayer": true,
+    "isDefaultBaseLayer": true,
+    "text": "OpenStreetMap",
+    "openLayers": {
+      "maxResolution": 1222.99245234375,
+      "numZoomLevels": 12,
+      "opacity": 0.7,
+      "projection": "EPSG:900913",
+      "visibility": false,
+      "zoomOffset": 7
+    }
+  }, {
+    "layerType": "wms",
+    "helpPage": "OSM",
+    "iconCls": "map",
+    "isBaseLayer": false,
+    "isDefaultBaseLayer": false,
+    "text": "A WMS",
+    "url": "http://ows.terrestris.de/osm-gray/service",
+    "serverOptions": {
+      "layers": "OSM-WMS"
+    },
+    "openLayers": {
+      "maxResolution": 1222.99245234375,
+      "numZoomLevels": 12,
+      "opacity": 0.7,
+      "projection": "EPSG:900913",
+      "visibility": false,
+      "zoomOffset": 7
+    }
+  }]
+}

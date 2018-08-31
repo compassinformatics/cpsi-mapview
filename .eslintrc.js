@@ -8,7 +8,8 @@ module.exports = {
         "Ext": false,
         "BasiGX": false,
         "GeoExt": false,
-        "CpsiMapview": false
+        "CpsiMapview": false,
+        "LayerFactory": false
     },
     "parserOptions": {
         "ecmaVersion": 5

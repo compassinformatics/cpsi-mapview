@@ -33,18 +33,8 @@ Ext.define('CpsiMapview.view.main.Map', {
     items: [{
         xtype: 'gx_map',
         map: new ol.Map({
-            layers: [
-                new ol.layer.Tile({
-                    source: new ol.source.Stamen({
-                        layer: 'watercolor'
-                    })
-                }),
-                new ol.layer.Tile({
-                    source: new ol.source.Stamen({
-                        layer: 'terrain-labels'
-                    })
-                })
-            ],
+            // layers will be created from config in initComponent
+            layers: [],
             view: new ol.View({
                 center: ol.proj.fromLonLat( [-8.751278, 40.611368] ),
                 zoom: 12
@@ -52,8 +42,34 @@ Ext.define('CpsiMapview.view.main.Map', {
         })
     }],
 
-    initComponent: function() {
-        this.callParent();
-        CpsiMapview.getApplication().fireEvent('mapready', this);
+    /**
+     * @private
+     */
+    initComponent: function () {
+        var me = this;
+
+        // Load layer JSON configuration
+        Ext.Ajax.request({
+            url: 'data/layers/default.json',
+            success: function (response) {
+                var layerJson = Ext.decode(response.responseText);
+
+                Ext.each(layerJson.layers, function (layerConf) {
+                    var layer = LayerFactory.createLayer(layerConf);
+                    if (layer) {
+                        me.olMap.addLayer(layer);
+                        // me.olMap.getLayers().insertAt(0, layer);
+                    }
+                });
+            }
+        });
+
+        me.callParent(arguments);
+
+        // make sub components accessible as members
+        me.mapCmp = me.down('gx_map');
+        me.olMap = me.mapCmp.map;
+
+        CpsiMapview.getApplication().fireEvent('mapready', me);
     }
 });
