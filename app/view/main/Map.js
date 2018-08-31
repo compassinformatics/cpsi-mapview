@@ -21,7 +21,7 @@ Ext.define('CpsiMapview.view.main.Map', {
         xtype: 'toolbar',
         dock: 'bottom',
         items: [{
-          text: 'Docked to the bottom'
+            text: 'Docked to the bottom'
         }]
     }],
 
