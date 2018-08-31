@@ -50,5 +50,10 @@ Ext.define('CpsiMapview.view.main.Map', {
                 zoom: 12
             })
         })
-    }]
+    }],
+
+    initComponent: function() {
+        this.callParent();
+        CpsiMapview.getApplication().fireEvent('mapready', this);
+    }
 });
