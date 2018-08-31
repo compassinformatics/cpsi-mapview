@@ -16,7 +16,8 @@
      *      ]
      */
     "requires": [
-        "font-awesome"
+        "font-awesome",
+        "ux"
     ],
 
     /**
@@ -31,7 +32,10 @@
      * application resides (the same folder in which this file is located).
      */
     "classpath": [
-        "app"
+        "app",
+        "${toolkit.name}/src",
+        "./lib/geoext3/src",
+        "./lib/BasiGX/src"
     ],
 
     /**
@@ -79,7 +83,7 @@
          *         // The file used to save sass variables edited via Sencha Inspector and Sencha Themer.
          *         // This file will automatically be applied to the end of the scss build.
          *         "var": "sass/save.scss",
-         *      
+         *
          *         // The directory used to save generated sass sources.
          *         // This directory will automatically be applied to the end of the scss build.
          *         "src": "sass/save"
@@ -204,6 +208,9 @@
      */
     "js": [
         {
+            "path": "./lib/openlayers/ol.js"
+        },
+        {
             "path": "${framework.dir}/build/ext-all-rtl-debug.js"
         },
         {
@@ -238,6 +245,9 @@
      *      }
      */
     "css": [
+        {
+            "path": "./lib/openlayers/ol.css"
+        },
         {
             // this entry uses an ant variable that is the calculated
             // value of the generated output css file for the app,
@@ -356,7 +366,7 @@
      *          "css": "${app.output.resources}/${app.name}-all.css",
      *          "js": {
      *              "path": "app.js",
-     *              // This setting constrols the output language level.  Set to 'ES6' to 
+     *              // This setting constrols the output language level.  Set to 'ES6' to
      *              // disable the transpiler
      *              "version": "ES5"
      *          },

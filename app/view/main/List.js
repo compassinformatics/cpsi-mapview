@@ -2,26 +2,36 @@
  * This view is an example list of people.
  */
 Ext.define('CpsiMapview.view.main.List', {
-    extend: 'Ext.grid.Panel',
+    extend: 'Ext.panel.Panel',
     xtype: 'mainlist',
 
     requires: [
-        'CpsiMapview.store.Personnel'
+        'GeoExt.component.Map'
     ],
 
-    title: 'Personnel',
+    title: 'A Map',
 
-    store: {
-        type: 'personnel'
-    },
+    height: 200, // will be gone soon
 
-    columns: [
-        { text: 'Name',  dataIndex: 'name' },
-        { text: 'Email', dataIndex: 'email', flex: 1 },
-        { text: 'Phone', dataIndex: 'phone', flex: 1 }
-    ],
-
-    listeners: {
-        select: 'onItemSelected'
+    items: {
+        xtype: 'gx_map',
+        map: new ol.Map({
+            layers: [
+                new ol.layer.Tile({
+                    source: new ol.source.Stamen({
+                        layer: 'watercolor'
+                    })
+                }),
+                new ol.layer.Tile({
+                    source: new ol.source.Stamen({
+                        layer: 'terrain-labels'
+                    })
+                })
+            ],
+            view: new ol.View({
+                center: ol.proj.fromLonLat( [-8.751278, 40.611368] ),
+                zoom: 12
+            })
+        })
     }
 });

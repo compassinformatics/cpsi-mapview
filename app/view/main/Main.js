@@ -80,7 +80,8 @@ Ext.define('CpsiMapview.view.main.Main', {
         iconCls: 'fa-home',
         // The following grid shares a store with the classic version's grid as well!
         items: [{
-            xtype: 'mainlist'
+            xtype: 'mainlist',
+            layout: 'fit' // we'll be gone soon
         }]
     }, {
         title: 'Users',
