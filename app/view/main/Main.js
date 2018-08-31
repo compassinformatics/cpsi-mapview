@@ -34,7 +34,7 @@ Ext.define('CpsiMapview.view.main.Main', {
         width: 300,
         collapsible: true,
         items: {
-            xtype: 'layertree'
+            xtype: 'cmv_layertree'
         }
     }, {
         // title: 'Groups',
