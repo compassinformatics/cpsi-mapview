@@ -24,7 +24,7 @@ Ext.define('CpsiMapview.factory.Layer', {
             mapLayer = LayerFactory.createWms(layerConf);
             break;
         case 'wfs':
-            mapLayer = LayerFactory.createWFS(layerConf);
+            mapLayer = LayerFactory.createWfs(layerConf);
             break;
         case 'esrirest':
             mapLayer = LayerFactory.createEsriRest(layerConf);
@@ -51,16 +51,16 @@ Ext.define('CpsiMapview.factory.Layer', {
             mapLayer = LayerFactory.createGoogle(layerConf, 'google.maps.MapTypeId.SATELLITE');
             break;
         case 'nasa':
-            mapLayer = LayerFactory.createNASA(layerConf);
+            mapLayer = LayerFactory.createNasa(layerConf);
             break;
         case 'os':
-            mapLayer = LayerFactory.createOS(layerConf);
+            mapLayer = LayerFactory.createOs(layerConf);
             break;
         case 'arcgiscache':
-            mapLayer = LayerFactory.createArcGISCache(layerConf);
+            mapLayer = LayerFactory.createArcGisCache(layerConf);
             break;
         case 'arcgisrest':
-            mapLayer = LayerFactory.createArcGISRest(layerConf);
+            mapLayer = LayerFactory.createArcGisRest(layerConf);
             break;
         case 'switchlayer':
             mapLayer = LayerFactory.createSwitchLayer(layerConf);
@@ -106,7 +106,7 @@ Ext.define('CpsiMapview.factory.Layer', {
         });
     },
 
-    createWFS: function(layerConf) {
+    createWfs: function(layerConf) {
 
         Ext.log.info('Not implemented yet', layerConf);
     },
@@ -160,20 +160,20 @@ Ext.define('CpsiMapview.factory.Layer', {
         Ext.log.info('Not implemented yet', layerConf, layerType);
     },
 
-    createNASA: function(layerConf) {
+    createNasa: function(layerConf) {
 
         Ext.log.info('Not implemented yet', layerConf);
     },
 
-    createOS: function(layerConf) {
+    createOs: function(layerConf) {
         Ext.log.info('Not implemented yet', layerConf);
     },
 
-    createArcGISCache: function(layerConf) {
+    createArcGisCache: function(layerConf) {
         Ext.log.info('Not implemented yet', layerConf);
     },
 
-    createArcGISRest: function(layerConf) {
+    createArcGisRest: function(layerConf) {
         Ext.log.info('Not implemented yet', layerConf);
     },
 
