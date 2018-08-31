@@ -1,0 +1,24 @@
+{
+  "name": "cpsi-mapview",
+  "version": "0.0.1",
+  "description": "An application using GeoExt and BasiGX",
+  "directories": {
+    "lib": "lib"
+  },
+  "scripts": {
+    "test": "eslint app"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/meggsimum/cpsi-mapview.git"
+  },
+  "author": "",
+  "license": "GPL-3.0",
+  "bugs": {
+    "url": "https://github.com/meggsimum/cpsi-mapview/issues"
+  },
+  "homepage": "https://github.com/meggsimum/cpsi-mapview#readme",
+  "dependencies": {
+    "eslint": "^5.4.0"
+  }
+}
