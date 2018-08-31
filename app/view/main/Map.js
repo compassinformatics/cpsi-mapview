@@ -6,7 +6,9 @@ Ext.define('CpsiMapview.view.main.Map', {
     xtype: 'mainlist',
 
     requires: [
-        'GeoExt.component.Map'
+        'GeoExt.component.Map',
+
+        'BasiGX.view.button.ZoomToExtent'
     ],
 
     layout: 'fit',
@@ -15,7 +17,10 @@ Ext.define('CpsiMapview.view.main.Map', {
         xtype: 'toolbar',
         dock: 'top',
         items: [{
-            text: 'Docked to the top'
+            xtype: 'basigx-button-zoomtoextent',
+            zoom: 2,
+            center: [0, 0],
+            extent: [-1800244, 6503873, 138198, 7485936]
         }]
     }, {
         xtype: 'toolbar',
