@@ -48,7 +48,7 @@ Ext.define('CpsiMapview.view.main.Map', {
 
         // Load layer JSON configuration
         Ext.Ajax.request({
-            url: 'data/layers/default.json',
+            url: 'resources/data/layers/default.json',
             success: function (response) {
                 var layerJson = Ext.decode(response.responseText);
 
