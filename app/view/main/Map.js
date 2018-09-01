@@ -11,6 +11,8 @@ Ext.define('CpsiMapview.view.main.Map', {
         'CpsiMapview.model.button.MeasureButton',
         'CpsiMapview.controller.button.MeasureButtonController',
 
+        'CpsiMapview.view.toolbar.MapFooter',
+
         'BasiGX.view.button.Measure',
         'BasiGX.view.button.ZoomToExtent'
     ],
@@ -47,11 +49,8 @@ Ext.define('CpsiMapview.view.main.Map', {
             }
         }]
     }, {
-        xtype: 'toolbar',
-        dock: 'bottom',
-        items: [{
-            text: 'Docked to the bottom'
-        }]
+        xtype: 'cmv_mapfooter',
+        dock: 'bottom'
     }],
 
     items: [{
