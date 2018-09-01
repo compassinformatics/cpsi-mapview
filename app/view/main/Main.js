@@ -26,7 +26,7 @@ Ext.define('CpsiMapview.view.main.Main', {
     layout: 'border',
 
     items: [{
-        xtype: 'mainlist',
+        xtype: 'cmv_map',
         region: 'center'
     }, {
         title: 'Tools',
