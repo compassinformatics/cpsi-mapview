@@ -3,7 +3,7 @@
  */
 Ext.define('CpsiMapview.view.main.Map', {
     extend: 'Ext.panel.Panel',
-    xtype: 'mainlist',
+    xtype: 'cmv_map',
 
     requires: [
         'GeoExt.component.Map',
