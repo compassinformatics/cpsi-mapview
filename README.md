@@ -35,7 +35,7 @@ Open http://localhost:1841 in your browser.
 # 1. Build the standalone version
 sencha app build
 # 2. upstream remote should point to canonical repository
-# 3. puplish using black magic
+# 3. publish using black magic
 npx gh-pages -d build/production/CpsiMapview/ -o upstream
 
 ```
