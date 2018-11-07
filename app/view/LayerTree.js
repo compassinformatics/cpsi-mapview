@@ -31,7 +31,7 @@ Ext.define('CpsiMapview.view.LayerTree', {
         if (map) {
             cfg.store = me.makeLayerStore(map);
         } else {
-            CpsiMapview.getApplication().on('mapready', me.autoConnectToMap);
+            Ext.GlobalEvents.on('cmv-mapready', me.autoConnectToMap);
         }
         me.callParent([cfg]);
     },

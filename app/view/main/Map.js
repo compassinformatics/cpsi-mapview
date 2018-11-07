@@ -67,6 +67,6 @@ Ext.define('CpsiMapview.view.main.Map', {
         me.mapCmp = me.down('gx_map');
         me.olMap = me.mapCmp.map;
 
-        CpsiMapview.getApplication().fireEvent('mapready', me);
+        Ext.GlobalEvents.fireEvent('cmv-mapready', me);
     }
 });
