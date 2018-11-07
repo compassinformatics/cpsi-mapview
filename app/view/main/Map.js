@@ -56,6 +56,18 @@ Ext.define('CpsiMapview.view.main.Map', {
      * @param {ol.MapBrowserEvent)} evt The original 'singleclick' event of OpenLayers
      */
 
+
+    inheritableStatics: {
+        /**
+         * Tries to detect the first occurance of this map panel.
+         * @return {CpsiMapview.view.main.Map} The map panel, which is at least
+         *     a GeoExt.component.Map and possibly an instance of this class.
+         */
+        guess: function() {
+            return BasiGX.util.Map.getMapComponent(this.xtype);
+        }
+    },
+
     /**
      * @private
      */
