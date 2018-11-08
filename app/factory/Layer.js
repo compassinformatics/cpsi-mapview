@@ -247,9 +247,22 @@ Ext.define('CpsiMapview.factory.Layer', {
         Ext.log.info('Not implemented yet', layerConf, layerType);
     },
 
+    /**
+     * Creates a World Wind (BlueMarble-200412) layer
+     *
+     * @param  {Object} layerConf  The configuration object for this layer
+     * @return {ol.layer.Tile}     World Wind (BlueMarble-200412) layer
+     */
     createNasa: function(layerConf) {
+        var nasaWms = this.createWms({
+            url: 'https://worldwind25.arc.nasa.gov/wms?',
+            serverOptions: {
+                layers: 'BlueMarble-200412'
+            },
+            openLayers: layerConf.openLayers
+        });
 
-        Ext.log.info('Not implemented yet', layerConf);
+        return nasaWms;
     },
 
     createOs: function(layerConf) {
