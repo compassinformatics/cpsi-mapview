@@ -177,9 +177,30 @@ Ext.define('CpsiMapview.factory.Layer', {
         return wfsLayer;
     },
 
+    /**
+     * Creates a Bing layer
+     *
+     * @param  {Object} layerConf The configuration object for this layer
+     * @param  {String} type      The Bing layer type, e.g. 'Aerial'
+     * @return {ol.layer.Tile}    Bing layer
+     */
     createBing: function(layerConf, type) {
 
-        Ext.log.info('Not implemented yet', layerConf, type);
+        return new ol.layer.Tile({
+            name: layerConf.text,
+            preload: Infinity,
+            source: new ol.source.BingMaps({
+                key: layerConf.token,
+                imagerySet: type
+                // use maxZoom 19 to see stretched tiles instead of the BingMaps
+                // "no photos at this zoom level" tiles
+                // maxZoom: 19
+            }),
+            visible: layerConf.openLayers.visibility,
+            minResolution: layerConf.openLayers.minResolution,
+            maxResolution: layerConf.openLayers.maxResolution,
+            opacity: layerConf.openLayers.opacity
+        });
     },
 
     /**
