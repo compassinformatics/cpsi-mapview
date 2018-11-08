@@ -106,9 +106,75 @@ Ext.define('CpsiMapview.factory.Layer', {
         });
     },
 
+    /**
+     * Creates an OGC WFS layer
+     *
+     * @param  {Object} layerConf The configuration object for this layer
+     * @return {ol.layer.Vector}  WFS layer
+     */
     createWfs: function(layerConf) {
+        var url = layerConf.url;
 
-        Ext.log.info('Not implemented yet', layerConf);
+        var srid = 'EPSG:3857';
+        var mapPanel = CpsiMapview.view.main.Map.guess();
+        if (mapPanel) {
+            srid = mapPanel.olMap.getView().getProjection().getCode();
+        }
+
+        var featureType = layerConf.featureType;
+
+        // assemble fix URL parts
+        var fixUrlParams =
+            'service=WFS&request=GetFeature&version=1.1.0' +
+            '&typename=' + featureType +
+            '&outputFormat=application/json' +
+            '&srsname=' + srid;
+        url = Ext.String.urlAppend(url, fixUrlParams);
+
+        var vectorSource = new ol.source.Vector({
+            format: new ol.format.GeoJSON(),
+            url: function(extent) {
+                // add current map extent
+                return Ext.String.urlAppend(url,
+                    'bbox=' + extent.join(',') + ',' + srid);
+            },
+            strategy: ol.loadingstrategy.bbox
+        });
+
+        // by default use clustering, however we may want to deactivate this for
+        // line features
+        var noCluster = layerConf.noCluster || false;
+        var clusterSource;
+        if (!noCluster) {
+            clusterSource = new ol.source.Cluster({
+                threshold: 5,
+                source: vectorSource
+            });
+        }
+
+        var sldUrl = layerConf.sldUrl;
+        var sld = layerConf.sld;
+        if (sldUrl && sld) {
+            // TODO load and parse style (in whatever format, to be discussed)
+            // this.loadSLD(mapLayer, sld, this.mapFile, sldUrl);
+        }
+
+        var wfsLayer = new ol.layer.Vector({
+            name: layerConf.text,
+            // either clustered or non-clustered source
+            source: clusterSource ? clusterSource : vectorSource,
+            visible: layerConf.openLayers.visibility,
+            minResolution: layerConf.openLayers.minResolution,
+            maxResolution: layerConf.openLayers.maxResolution,
+            opacity: layerConf.openLayers.opacity
+        });
+
+        if (layerConf.tooltipsConfig) {
+            //TODO has to be implemented with
+            //     https://github.com/meggsimum/cpsi-mapview/issues/27
+        }
+
+        return wfsLayer;
     },
 
     createBing: function(layerConf, type) {
