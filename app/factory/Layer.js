@@ -88,22 +88,46 @@ Ext.define('CpsiMapview.factory.Layer', {
      * @return {ol.layer.Tile}    WMS layer
      */
     createWms: function(layerConf) {
-        return new ol.layer.Tile({
-            name: layerConf.text,
-            source: new ol.source.TileWMS({
-                url: layerConf.url,
-                params: {
-                    'LAYERS': layerConf.serverOptions.layers,
-                    'TILED': true,
-                    'TRANSPARENT': true
-                },
-                crossOrigin: 'anonymous'
-            }),
-            visible: layerConf.openLayers.visibility,
-            minResolution: layerConf.openLayers.minResolution,
-            maxResolution: layerConf.openLayers.maxResolution,
-            opacity: layerConf.openLayers.opacity
-        });
+        var layer;
+        var singleTile = layerConf.openLayers.singleTile;
+
+        if (singleTile) {
+            layer = new ol.layer.Image({
+                name: layerConf.text,
+                source: new ol.source.ImageWMS({
+                    url: layerConf.url,
+                    params: {
+                        'LAYERS': layerConf.serverOptions.layers,
+                        'TRANSPARENT': true
+                    },
+                    ratio: 1,
+                    crossOrigin: 'anonymous'
+                }),
+                visible: layerConf.openLayers.visibility,
+                minResolution: layerConf.openLayers.minResolution,
+                maxResolution: layerConf.openLayers.maxResolution,
+                opacity: layerConf.openLayers.opacity
+            });
+        } else {
+            layer = new ol.layer.Tile({
+                name: layerConf.text,
+                source: new ol.source.TileWMS({
+                    url: layerConf.url,
+                    params: {
+                        'LAYERS': layerConf.serverOptions.layers,
+                        'TILED': true,
+                        'TRANSPARENT': true
+                    },
+                    crossOrigin: 'anonymous'
+                }),
+                visible: layerConf.openLayers.visibility,
+                minResolution: layerConf.openLayers.minResolution,
+                maxResolution: layerConf.openLayers.maxResolution,
+                opacity: layerConf.openLayers.opacity
+            });
+        }
+
+        return layer;
     },
 
     createWfs: function(layerConf) {
