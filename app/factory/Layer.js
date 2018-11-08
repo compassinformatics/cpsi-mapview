@@ -177,9 +177,30 @@ Ext.define('CpsiMapview.factory.Layer', {
         return wfsLayer;
     },
 
+    /**
+     * Creates a Bing layer
+     *
+     * @param  {Object} layerConf The configuration object for this layer
+     * @param  {String} type      The Bing layer type, e.g. 'Aerial'
+     * @return {ol.layer.Tile}    Bing layer
+     */
     createBing: function(layerConf, type) {
 
-        Ext.log.info('Not implemented yet', layerConf, type);
+        return new ol.layer.Tile({
+            name: layerConf.text,
+            preload: Infinity,
+            source: new ol.source.BingMaps({
+                key: layerConf.token,
+                imagerySet: type
+                // use maxZoom 19 to see stretched tiles instead of the BingMaps
+                // "no photos at this zoom level" tiles
+                // maxZoom: 19
+            }),
+            visible: layerConf.openLayers.visibility,
+            minResolution: layerConf.openLayers.minResolution,
+            maxResolution: layerConf.openLayers.maxResolution,
+            opacity: layerConf.openLayers.opacity
+        });
     },
 
     /**
@@ -226,9 +247,22 @@ Ext.define('CpsiMapview.factory.Layer', {
         Ext.log.info('Not implemented yet', layerConf, layerType);
     },
 
+    /**
+     * Creates a World Wind (BlueMarble-200412) layer
+     *
+     * @param  {Object} layerConf  The configuration object for this layer
+     * @return {ol.layer.Tile}     World Wind (BlueMarble-200412) layer
+     */
     createNasa: function(layerConf) {
+        var nasaWms = this.createWms({
+            url: 'https://worldwind25.arc.nasa.gov/wms?',
+            serverOptions: {
+                layers: 'BlueMarble-200412'
+            },
+            openLayers: layerConf.openLayers
+        });
 
-        Ext.log.info('Not implemented yet', layerConf);
+        return nasaWms;
     },
 
     createOs: function(layerConf) {
@@ -236,11 +270,46 @@ Ext.define('CpsiMapview.factory.Layer', {
     },
 
     createArcGisCache: function(layerConf) {
+        // Maybe this helps: https://stackoverflow.com/a/41608464
         Ext.log.info('Not implemented yet', layerConf);
     },
 
+    /**
+     * Creates an ArcGIS REST layer
+     *
+     * @param  {Object} layerConf  The configuration object for this layer
+     * @return {ol.layer.Tile}     ArcGIS REST layer
+     */
     createArcGisRest: function(layerConf) {
-        Ext.log.info('Not implemented yet', layerConf);
+        var layer;
+        var singleTile = layerConf.openLayers.singleTile;
+        if (singleTile) {
+            layer = new ol.layer.Image({
+                source: new ol.source.ImageArcGISRest({
+                    url: layerConf.url,
+                    params: layerConf.serverOptions || {},
+                    ratio: 1
+                }),
+                visible: layerConf.openLayers.visibility,
+                minResolution: layerConf.openLayers.minResolution,
+                maxResolution: layerConf.openLayers.maxResolution,
+                opacity: layerConf.openLayers.opacity
+            });
+        } else {
+            layer = new ol.layer.Tile({
+                name: layerConf.text,
+                source: new ol.source.TileArcGISRest({
+                    url: layerConf.url,
+                    params: layerConf.serverOptions || {}
+                }),
+                visible: layerConf.openLayers.visibility,
+                minResolution: layerConf.openLayers.minResolution,
+                maxResolution: layerConf.openLayers.maxResolution,
+                opacity: layerConf.openLayers.opacity
+            });
+        }
+
+        return layer;
     },
 
     createServerArray: function(path) {
