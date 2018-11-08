@@ -41,6 +41,34 @@ Ext.define('CpsiMapview.view.main.Map', {
     }],
 
     /**
+     * Enables a click handler on the map which fires an event
+     * 'cmv-mapclick' with all clicked vector features and their corresponding
+     * layers.
+     * @config {Boolean}
+     */
+    enableMapClick: true,
+
+    /**
+     * @event cmv-mapclick
+     * Fires when the OL map is clicked.
+     * @param {CpsiMapview.view.main.Map} this
+     * @param {Object[]} clickInfo The clicked features and the corresponding layers, like `[{feature: aFeat, layer: aLayer}, ...]`
+     * @param {ol.MapBrowserEvent)} evt The original 'singleclick' event of OpenLayers
+     */
+
+
+    inheritableStatics: {
+        /**
+         * Tries to detect the first occurance of this map panel.
+         * @return {CpsiMapview.view.main.Map} The map panel, which is at least
+         *     a GeoExt.component.Map and possibly an instance of this class.
+         */
+        guess: function() {
+            return BasiGX.util.Map.getMapComponent(this.xtype);
+        }
+    },
+
+    /**
      * @private
      */
     initComponent: function () {
@@ -66,6 +94,21 @@ Ext.define('CpsiMapview.view.main.Map', {
         // make sub components accessible as members
         me.mapCmp = me.down('gx_map');
         me.olMap = me.mapCmp.map;
+
+        if (me.enableMapClick) {
+            me.olMap.on('singleclick', function(evt) {
+                var clickedFeatures = [];
+                me.olMap.forEachFeatureAtPixel(evt.pixel,
+                    function(feature, layer) {
+                        // collect all clicked features and their layers
+                        clickedFeatures.push({feature: feature, layer: layer});
+                    }
+                );
+
+                // fire event to forward click info to subscribers
+                me.fireEvent('cmv-mapclick', clickedFeatures, evt);
+            });
+        }
 
         Ext.GlobalEvents.fireEvent('cmv-mapready', me);
     }
