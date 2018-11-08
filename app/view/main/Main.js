@@ -7,7 +7,7 @@
  */
 Ext.define('CpsiMapview.view.main.Main', {
     extend: 'Ext.panel.Panel',
-    xtype: 'app-main',
+    xtype: 'cmv_main',
 
     requires: [
         'Ext.plugin.Viewport',
@@ -20,8 +20,8 @@ Ext.define('CpsiMapview.view.main.Main', {
         'CpsiMapview.view.LayerTree'
     ],
 
-    controller: 'main',
-    viewModel: 'main',
+    controller: 'cmv_main',
+    viewModel: 'cmv_main',
 
     layout: 'border',
 

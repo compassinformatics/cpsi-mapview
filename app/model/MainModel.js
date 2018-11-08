@@ -4,7 +4,7 @@
 Ext.define('CpsiMapview.model.MainModel', {
     extend: 'Ext.app.ViewModel',
 
-    alias: 'viewmodel.main',
+    alias: 'viewmodel.cmv_main',
 
     data: {
         name: 'CpsiMapview',
