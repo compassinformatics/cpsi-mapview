@@ -270,11 +270,46 @@ Ext.define('CpsiMapview.factory.Layer', {
     },
 
     createArcGisCache: function(layerConf) {
+        // Maybe this helps: https://stackoverflow.com/a/41608464
         Ext.log.info('Not implemented yet', layerConf);
     },
 
+    /**
+     * Creates an ArcGIS REST layer
+     *
+     * @param  {Object} layerConf  The configuration object for this layer
+     * @return {ol.layer.Tile}     ArcGIS REST layer
+     */
     createArcGisRest: function(layerConf) {
-        Ext.log.info('Not implemented yet', layerConf);
+        var layer;
+        var singleTile = layerConf.openLayers.singleTile;
+        if (singleTile) {
+            layer = new ol.layer.Image({
+                source: new ol.source.ImageArcGISRest({
+                    url: layerConf.url,
+                    params: layerConf.serverOptions || {},
+                    ratio: 1
+                }),
+                visible: layerConf.openLayers.visibility,
+                minResolution: layerConf.openLayers.minResolution,
+                maxResolution: layerConf.openLayers.maxResolution,
+                opacity: layerConf.openLayers.opacity
+            });
+        } else {
+            layer = new ol.layer.Tile({
+                name: layerConf.text,
+                source: new ol.source.TileArcGISRest({
+                    url: layerConf.url,
+                    params: layerConf.serverOptions || {}
+                }),
+                visible: layerConf.openLayers.visibility,
+                minResolution: layerConf.openLayers.minResolution,
+                maxResolution: layerConf.openLayers.maxResolution,
+                opacity: layerConf.openLayers.opacity
+            });
+        }
+
+        return layer;
     },
 
     createServerArray: function(path) {
