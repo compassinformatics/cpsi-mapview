@@ -48,5 +48,32 @@
       "visibility": false,
       "zoomOffset": 7
     }
+  }, {
+    "layerType": "wfs",
+    "text": "Country WFS",
+    "url": "http://ows.terrestris.de/geoserver/osm/wfs",
+    "featureType": "osm:osm-country-borders",
+    "serverOptions": {},
+    "noCluster": true,
+    "openLayers": {
+      "maxResolution": 1222.99245234375,
+      "numZoomLevels": 12,
+      "opacity": 0.7,
+      "projection": "EPSG:900913",
+      "visibility": false
+    }
+  }, {
+    "layerType": "wfs",
+    "text": "GAS WFS",
+    "url": "http://ows.terrestris.de/geoserver/osm/wfs",
+    "featureType": "osm:osm-fuel",
+    "serverOptions": {},
+    "openLayers": {
+      "maxResolution": 1222.99245234375,
+      "numZoomLevels": 12,
+      "opacity": 0.7,
+      "projection": "EPSG:900913",
+      "visibility": true
+    }
   }]
 }
