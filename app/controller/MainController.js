@@ -7,5 +7,5 @@
 Ext.define('CpsiMapview.controller.MainController', {
     extend: 'Ext.app.ViewController',
 
-    alias: 'controller.main'
+    alias: 'controller.cmv_main'
 });
