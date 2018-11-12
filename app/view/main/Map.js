@@ -17,6 +17,8 @@ Ext.define('CpsiMapview.view.main.Map', {
 
     layout: 'fit',
 
+    controller: 'cmv_map',
+
     dockedItems: [{
         xtype: 'toolbar',
         dock: 'top',
@@ -74,7 +76,10 @@ Ext.define('CpsiMapview.view.main.Map', {
                 center: ol.proj.fromLonLat( [-8, 53.5] ),
                 zoom: 8
             })
-        })
+        }),
+        listeners: {
+            afterrender: 'afterMapRender'
+        }
     }],
 
     /**
@@ -84,6 +89,12 @@ Ext.define('CpsiMapview.view.main.Map', {
      * @config {Boolean}
      */
     enableMapClick: true,
+
+    /**
+     * Flag that to add a scale bar to the map or not
+     * @config {Boolean}
+     */
+    addScaleBarToMap: true,
 
     /**
      * @event cmv-mapclick
