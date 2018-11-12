@@ -9,12 +9,12 @@ Ext.define('CpsiMapview.model.button.MeasureButton', {
     data: {
         measureTooltext: null, // don't show text
         lineMeasureTooltip: 'Measure a distance',
-        polygonMeasureAreaTooltip: 'Measure an area',
         textline: 'Measure distance',
-        textpoly: 'Measure area',
         tooltipLine: 'Measure distance',
+        continueLineMsg: 'Click to measure a distance',
+        textpoly: 'Measure area',
         tooltipPoly: 'Measure area',
-        continuePolygonMsg: 'Click to measure a distance',
-        continueLineMsg: 'Click to measure an area'
+        polygonMeasureAreaTooltip: 'Measure an area',
+        continuePolygonMsg: 'Click to measure an area'
     }
 });
