@@ -33,13 +33,7 @@ Ext.define('CpsiMapview.view.main.Map', {
             controller: 'cmv_btn_measure',
             glyph: 'xf068@FontAwesome',
             listeners: {
-                afterrender: function (btn) {
-                    btn.setBind({
-                        text: '{measureTooltext}',
-                        tooltip: '{lineMeasureTooltip}'
-                    });
-                    btn.tooltipStr = this.lookupViewModel().get('lineMeasureTooltip');
-                }
+                afterrender: 'initializeMeasureBtn'
             }
         }, {
             xtype: 'basigx-button-measure',
@@ -48,15 +42,8 @@ Ext.define('CpsiMapview.view.main.Map', {
             glyph: 'xf044@FontAwesome',
             viewModel: 'cmw_btn_measure',
             controller: 'cmv_btn_measure',
-            enableToggle: true,
             listeners: {
-                afterrender: function (btn) {
-                    btn.setBind({
-                        text: '{measureTooltext}',
-                        tooltip: '{polygonMeasureAreaTooltip}'
-                    });
-                    btn.tooltipStr = this.lookupViewModel().get('polygonMeasureAreaTooltip');
-                }
+                afterrender: 'initializeMeasureBtn'
             }
         }]
     }, {
