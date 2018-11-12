@@ -8,6 +8,10 @@ Ext.define('CpsiMapview.view.main.Map', {
     requires: [
         'GeoExt.component.Map',
 
+        'CpsiMapview.model.button.MeasureButton',
+        'CpsiMapview.controller.button.MeasureButtonController',
+
+        'BasiGX.view.button.Measure',
         'BasiGX.view.button.ZoomToExtent'
     ],
 
@@ -19,6 +23,39 @@ Ext.define('CpsiMapview.view.main.Map', {
         items: [{
             xtype: 'basigx-button-zoomtoextent',
             extent: [-1210762, 6688545, -600489, 7490828]
+        }, {
+            xtype: 'basigx-button-measure',
+            measureType: 'line',
+            toggleGroup: 'measure-tools',
+            viewModel: 'cmw_btn_measure',
+            controller: 'cmv_btn_measure',
+            glyph: 'xf068@FontAwesome',
+            listeners: {
+                afterrender: function (btn) {
+                    btn.setBind({
+                        text: '{measureTooltext}',
+                        tooltip: '{lineMeasureTooltip}'
+                    });
+                    btn.tooltipStr = this.lookupViewModel().get('lineMeasureTooltip');
+                }
+            }
+        }, {
+            xtype: 'basigx-button-measure',
+            measureType: 'polygon',
+            toggleGroup: 'measure-tools',
+            glyph: 'xf044@FontAwesome',
+            viewModel: 'cmw_btn_measure',
+            controller: 'cmv_btn_measure',
+            enableToggle: true,
+            listeners: {
+                afterrender: function (btn) {
+                    btn.setBind({
+                        text: '{measureTooltext}',
+                        tooltip: '{polygonMeasureAreaTooltip}'
+                    });
+                    btn.tooltipStr = this.lookupViewModel().get('polygonMeasureAreaTooltip');
+                }
+            }
         }]
     }, {
         xtype: 'toolbar',
