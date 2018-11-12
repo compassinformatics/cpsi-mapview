@@ -17,6 +17,8 @@ Ext.define('CpsiMapview.view.main.Map', {
 
     layout: 'fit',
 
+    controller: 'cmv_map',
+
     dockedItems: [{
         xtype: 'toolbar',
         dock: 'top',
@@ -31,13 +33,7 @@ Ext.define('CpsiMapview.view.main.Map', {
             controller: 'cmv_btn_measure',
             glyph: 'xf068@FontAwesome',
             listeners: {
-                afterrender: function (btn) {
-                    btn.setBind({
-                        text: '{measureTooltext}',
-                        tooltip: '{lineMeasureTooltip}'
-                    });
-                    btn.tooltipStr = this.lookupViewModel().get('lineMeasureTooltip');
-                }
+                afterrender: 'initializeMeasureBtn'
             }
         }, {
             xtype: 'basigx-button-measure',
@@ -46,15 +42,8 @@ Ext.define('CpsiMapview.view.main.Map', {
             glyph: 'xf044@FontAwesome',
             viewModel: 'cmw_btn_measure',
             controller: 'cmv_btn_measure',
-            enableToggle: true,
             listeners: {
-                afterrender: function (btn) {
-                    btn.setBind({
-                        text: '{measureTooltext}',
-                        tooltip: '{polygonMeasureAreaTooltip}'
-                    });
-                    btn.tooltipStr = this.lookupViewModel().get('polygonMeasureAreaTooltip');
-                }
+                afterrender: 'initializeMeasureBtn'
             }
         }]
     }, {
@@ -74,7 +63,10 @@ Ext.define('CpsiMapview.view.main.Map', {
                 center: ol.proj.fromLonLat( [-8, 53.5] ),
                 zoom: 8
             })
-        })
+        }),
+        listeners: {
+            afterrender: 'afterMapRender'
+        }
     }],
 
     /**
@@ -84,6 +76,12 @@ Ext.define('CpsiMapview.view.main.Map', {
      * @config {Boolean}
      */
     enableMapClick: true,
+
+    /**
+     * Flag that to add a scale bar to the map or not
+     * @config {Boolean}
+     */
+    addScaleBarToMap: true,
 
     /**
      * @event cmv-mapclick
