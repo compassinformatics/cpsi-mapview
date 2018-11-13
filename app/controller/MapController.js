@@ -38,6 +38,7 @@ Ext.define('CpsiMapview.controller.MapController', {
 
     /**
      * Initialize measure buttons
+     * @param {Ext.button.Button} btn The measure button
      */
     initializeMeasureBtn: function (btn) {
         btn.setBind({
@@ -49,4 +50,5 @@ Ext.define('CpsiMapview.controller.MapController', {
             btn.getViewModel().get('polygonMeasureAreaTooltip');
         btn.tooltipStr = tTipStr;
     }
+
 });
