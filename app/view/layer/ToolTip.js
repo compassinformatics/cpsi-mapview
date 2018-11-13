@@ -50,6 +50,18 @@ Ext.define('CpsiMapview.view.layer.ToolTip', {
      */
     opacity: null,
 
+    statics: {
+        /**
+         * Hides all layer tooltips.
+         */
+        clear: function () {
+            var ttips = Ext.ComponentQuery.query('cmv_layer_tooltip');
+            Ext.each(ttips, function (tip) {
+                tip.hide();
+            });
+        }
+    },
+
     /**
      * @private
      */
