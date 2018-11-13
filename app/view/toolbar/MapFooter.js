@@ -12,6 +12,10 @@ Ext.define('CpsiMapview.view.toolbar.MapFooter', {
     items: [
         {
             xtype: 'basigx-combo-scale'
+        }, {
+            xtype: 'basigx-panel-coordinatemouseposition',
+            epsgCodeArray: ['EPSG:4326', 'EPSG:29902', 'EPSG:2157'],
+            segmentedButtonLimit: 3
         }
     ]
 });
