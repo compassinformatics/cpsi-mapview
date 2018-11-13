@@ -27,12 +27,47 @@ Ext.define('CpsiMapview.view.layer.ToolTip', {
     layer: null,
 
     /**
+     * Custom background color of this tooltip
+     * @type {String} Color
+     */
+    bgColor: null,
+
+    /**
+     * Custom text color of this tooltip
+     * @type {String} Color
+     */
+    textColor: null,
+
+    /**
+     * Custom bold font weight of this tooltip
+     * @type {Boolean} true=bold
+     */
+    bold: false,
+
+    /**
+     * Custom background opacity of this tooltip
+     * @type {Number} Opacity between 0 and 1
+     */
+    opacity: null,
+
+    /**
      * @private
      */
     initComponent: function () {
         var me = this;
 
         me.callParent();
+
+        // adjust style with custom values
+        me.on('afterrender', function () {
+            var domEl = me.getEl();
+            domEl.applyStyles({
+                backgroundColor: me.bgColor,
+                color: me.textColor,
+                fontWeight: me.bold ? 'bold' : null
+            });
+            domEl.setOpacity(me.opacity);
+        });
     },
 
     /**
