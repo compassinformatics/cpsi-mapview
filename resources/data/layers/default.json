@@ -68,7 +68,7 @@
     "url": "http://ows.terrestris.de/geoserver/osm/wfs",
     "featureType": "osm:osm-fuel",
     "serverOptions": {},
-    "noCluster": true,
+    "noCluster": false,
     "tooltipsConfig": [
         {
             "property": "id"

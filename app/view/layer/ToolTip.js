@@ -35,8 +35,18 @@ Ext.define('CpsiMapview.view.layer.ToolTip', {
      */
     draw: function (feature, evt) {
         var me = this;
+        var featureCluster = feature.getProperties().features;
 
-        //TODO care about clustered features
+        // care about clustered features
+        if (featureCluster) {
+            // in this case take the first feature in the cluster to define the
+            // tooltop text
+            if (featureCluster.length > 0) {
+                feature = featureCluster[0];
+            } else {
+                Ext.log.error('No cluster features found');
+            }
+        }
 
         //TODO check for layer's formatFunction
         var html = me.formatFunction(feature);
