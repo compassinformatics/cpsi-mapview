@@ -8,10 +8,18 @@ Ext.define('CpsiMapview.view.main.Map', {
     requires: [
         'GeoExt.component.Map',
 
+        'CpsiMapview.model.button.MeasureButton',
+        'CpsiMapview.controller.button.MeasureButtonController',
+
+        'CpsiMapview.view.toolbar.MapFooter',
+
+        'BasiGX.view.button.Measure',
         'BasiGX.view.button.ZoomToExtent'
     ],
 
     layout: 'fit',
+
+    controller: 'cmv_map',
 
     dockedItems: [{
         xtype: 'toolbar',
@@ -19,13 +27,30 @@ Ext.define('CpsiMapview.view.main.Map', {
         items: [{
             xtype: 'basigx-button-zoomtoextent',
             extent: [-1210762, 6688545, -600489, 7490828]
+        }, {
+            xtype: 'basigx-button-measure',
+            measureType: 'line',
+            toggleGroup: 'measure-tools',
+            viewModel: 'cmw_btn_measure',
+            controller: 'cmv_btn_measure',
+            glyph: 'xf068@FontAwesome',
+            listeners: {
+                afterrender: 'initializeMeasureBtn'
+            }
+        }, {
+            xtype: 'basigx-button-measure',
+            measureType: 'polygon',
+            toggleGroup: 'measure-tools',
+            glyph: 'xf044@FontAwesome',
+            viewModel: 'cmw_btn_measure',
+            controller: 'cmv_btn_measure',
+            listeners: {
+                afterrender: 'initializeMeasureBtn'
+            }
         }]
     }, {
-        xtype: 'toolbar',
-        dock: 'bottom',
-        items: [{
-            text: 'Docked to the bottom'
-        }]
+        xtype: 'cmv_mapfooter',
+        dock: 'bottom'
     }],
 
     items: [{
@@ -39,7 +64,10 @@ Ext.define('CpsiMapview.view.main.Map', {
                 center: ol.proj.fromLonLat( [-8, 53.5] ),
                 zoom: 8
             })
-        })
+        }),
+        listeners: {
+            afterrender: 'afterMapRender'
+        }
     }],
 
     /**
@@ -57,6 +85,12 @@ Ext.define('CpsiMapview.view.main.Map', {
      * @config {Boolean}
      */
     enableMapHover: true,
+
+    /*
+     * Flag that to add a scale bar to the map or not
+     * @config {Boolean}
+     */
+    addScaleBarToMap: true,
 
     /**
      * @event cmv-mapclick
