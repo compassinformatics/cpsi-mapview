@@ -197,7 +197,8 @@ Ext.define('CpsiMapview.factory.Layer', {
         if (layerConf.tooltipsConfig) {
             // create a custom toolitp for this layer
             var toolTip = Ext.create('CpsiMapview.view.layer.ToolTip', {
-                toolTipConfig: layerConf.tooltipsConfig
+                toolTipConfig: layerConf.tooltipsConfig,
+                layer: wfsLayer
             });
             wfsLayer.toolTip = toolTip;
 

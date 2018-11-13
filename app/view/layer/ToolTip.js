@@ -14,8 +14,17 @@ Ext.define('CpsiMapview.view.layer.ToolTip', {
     /** @cfg The offset from the event's mouse y-position */
     offsetY: 10,
 
-    /** @cfg The config object for this tooltip instance */
+    /**
+     * The tooltip configuration from the layer JSON-configuration
+     * @cfg {Object}
+     */
     toolTipConfig: null,
+
+    /**
+     * Layer refrence for which this tooltip shows the content
+     * @cfg {ol.layer.Base}
+     */
+    layer: null,
 
     /**
      * @private
@@ -48,8 +57,16 @@ Ext.define('CpsiMapview.view.layer.ToolTip', {
             }
         }
 
-        //TODO check for layer's formatFunction
-        var html = me.formatFunction(feature);
+        // check for layer's formatFunction
+        var html;
+        if (me.layer && Ext.isFunction(me.layer.formatFunction)) {
+            // the layer has its own formatFunction, do not use the default one
+            html = me.layer.formatFunction(feature);
+        } else {
+            html = me.formatFunction(feature);
+        }
+
+        // set HTML content
         me.setHtml(html);
 
         // show tooltip near mouse pointer
