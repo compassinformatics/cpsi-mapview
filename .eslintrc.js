@@ -6,6 +6,7 @@ module.exports = {
     "globals": {
         "ol": false,
         "Ext": false,
+        "proj4": false,
         "BasiGX": false,
         "GeoExt": false,
         "CpsiMapview": false,

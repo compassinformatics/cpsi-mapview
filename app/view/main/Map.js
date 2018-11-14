@@ -14,7 +14,8 @@ Ext.define('CpsiMapview.view.main.Map', {
         'CpsiMapview.view.toolbar.MapFooter',
 
         'BasiGX.view.button.Measure',
-        'BasiGX.view.button.ZoomToExtent'
+        'BasiGX.view.button.ZoomToExtent',
+        'BasiGX.util.Projection'
     ],
 
     layout: 'fit',
