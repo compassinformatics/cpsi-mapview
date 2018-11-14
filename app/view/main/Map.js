@@ -170,6 +170,10 @@ Ext.define('CpsiMapview.view.main.Map', {
             me.mapCmp.on('pointerrestout', function () {
                 me.fireEvent('cmv-map-pointerrestout');
             });
+
+            me.olMap.on('pointermove', function () {
+                me.fireEvent('cmv-map-pointermove');
+            });
         }
 
         Ext.GlobalEvents.fireEvent('cmv-mapready', me);

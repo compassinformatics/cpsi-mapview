@@ -204,10 +204,6 @@ Ext.define('CpsiMapview.factory.Layer', {
 
             // show / hide on appropriate events
             mapPanel.on('cmv-map-pointerrest', function(hoveredObjs, evt) {
-                // hide if no feature was hit on pointerrest
-                if (hoveredObjs.length === 0) {
-                    toolTip.hide();
-                }
                 // show tooltip with feature attribute information
                 Ext.each(hoveredObjs, function (hoveredObj) {
                     if (hoveredObj.layer &&
@@ -218,8 +214,14 @@ Ext.define('CpsiMapview.factory.Layer', {
                 });
             });
 
-            mapPanel.on('cmv-map-pointerrestout', function () {
+            // hide tooltip if mouse moves again
+            mapPanel.on('cmv-map-pointermove', function () {
                 toolTip.hide();
+            });
+
+            // hide all tooltips if cursor leaves map
+            mapPanel.on('cmv-map-pointerrestout', function () {
+                CpsiMapview.view.layer.ToolTip.clear();
             });
         }
 
