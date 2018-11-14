@@ -210,7 +210,9 @@ Ext.define('CpsiMapview.factory.Layer', {
                 }
                 // show tooltip with feature attribute information
                 Ext.each(hoveredObjs, function (hoveredObj) {
-                    if (hoveredObj.layer.toolTip) {
+                    if (hoveredObj.layer &&
+                          hoveredObj.layer.id === wfsLayer.id &&
+                          hoveredObj.layer.toolTip) {
                         hoveredObj.layer.toolTip.draw(hoveredObj.feature, evt);
                     }
                 });

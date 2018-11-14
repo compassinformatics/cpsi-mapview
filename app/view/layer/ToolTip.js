@@ -117,7 +117,7 @@ Ext.define('CpsiMapview.view.layer.ToolTip', {
         me.setHtml(html);
 
         // show tooltip near mouse pointer
-        var screenX = evt.originalEvent.x +  me.offsetX;
+        var screenX = evt.originalEvent.x + me.offsetX;
         var screenY = evt.originalEvent.y + me.offsetY;
         me.showAt([screenX, screenY]);
     },
