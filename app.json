@@ -211,6 +211,9 @@
             "path": "./lib/openlayers/ol.js"
         },
         {
+            "path": "https://cdnjs.cloudflare.com/ajax/libs/proj4js/2.5.0/proj4.js"
+        },
+        {
             "path": "app.js",
             "bundle": true
         }
