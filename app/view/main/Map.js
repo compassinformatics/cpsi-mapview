@@ -109,6 +109,13 @@ Ext.define('CpsiMapview.view.main.Map', {
     shouldUpdatePermalink: true,
 
     /**
+     * Flag to steer if center coordinates in the permalink should be rounded or
+     * not
+     * @config {Boolean}
+     */
+    roundPermalinkCoords: true,
+
+    /**
      * @event cmv-mapclick
      * Fires when the OL map is clicked.
      * @param {CpsiMapview.view.main.Map} this
@@ -302,11 +309,24 @@ Ext.define('CpsiMapview.view.main.Map', {
             me.shouldUpdatePermalink = true;
             return;
         }
+
         var mapState = me.getState();
+
+        // check if we have to round the coords (if no coordinates in deegrees)
+        var doRound =
+            me.roundPermalinkCoords &&
+            me.olMap.getView().getProjection().getUnits() !== 'degrees';
+        var centerX = mapState.center[0];
+        var centerY = mapState.center[1];
+        if (doRound) {
+            centerX = Math.round(centerX * 100) / 100;
+            centerY = Math.round(centerY * 100) / 100;
+        }
+
         var hash = '#map=' +
             mapState.zoom + '/' +
-            Math.round(mapState.center[0] * 100) / 100 + '/' +
-            Math.round(mapState.center[1] * 100) / 100 + '/' +
+            centerX + '/' +
+            centerY + '/' +
             mapState.rotation;
 
         // push the state into the window history (to navigate with browser's
