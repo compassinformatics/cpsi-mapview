@@ -93,6 +93,21 @@ Ext.define('CpsiMapview.view.main.Map', {
      */
     addScaleBarToMap: true,
 
+    /*
+     * Flag that enables/disables permalink functionality
+     * @config {Boolean}
+     */
+    enablePermalink: true,
+
+    /**
+     * Flag to show if permalink should be updated or not.
+     * We do not update the URL when the view was changed in the 'popstate'
+     * handler.
+     * @property {Boolean}
+     * @private
+     */
+    shouldUpdatePermalink: true,
+
     /**
      * @event cmv-mapclick
      * Fires when the OL map is clicked.
@@ -177,6 +192,119 @@ Ext.define('CpsiMapview.view.main.Map', {
             });
         }
 
+        if (me.enablePermalink) {
+            if (window.location.hash !== '') {
+                // try to restore center, zoom-level and rotation from the URL
+                me.applyState(me.readPermalink(window.location.hash));
+            }
+
+            me.registerPermalinkEvents();
+        }
+
         Ext.GlobalEvents.fireEvent('cmv-mapready', me);
+    },
+
+    /**
+     * Registers the events to have a permalink synchronization.
+     *
+     * @private
+     */
+    registerPermalinkEvents: function () {
+        var me = this;
+
+        // update permalink when visible map state changes
+        me.olMap.on('moveend', me.updatePermalink, me);
+
+        // restore the view state when navigating through the history, see
+        // https://developer.mozilla.org/en-US/docs/Web/API/WindowEventHandlers/onpopstate
+        window.addEventListener('popstate', function(event) {
+            if (event.state === null) {
+                return;
+            }
+            me.olMap.getView().setCenter(event.state.center);
+            me.olMap.getView().setZoom(event.state.zoom);
+            me.olMap.getView().setRotation(event.state.rotation);
+            me.shouldUpdatePermalink = false;
+        });
+    },
+
+    /**
+     * Returns the current map state (center, zoom, rotation)
+     * @return {Object} The map state object
+     */
+    getState: function () {
+        var me = this;
+        var view = me.olMap.getView();
+        return {
+            zoom: view.getZoom(),
+            center: view.getCenter(),
+            rotation: view.getRotation()
+        };
+    },
+
+    /**
+     * Applies the map state (center, zoom, rotation) to this map.
+     *
+     * @param  {Object} mapState The map state object
+     */
+    applyState: function (mapState) {
+        var me = this;
+
+        me.olMap.getView().setCenter(mapState.center);
+        me.olMap.getView().setZoom(mapState.zoom);
+        me.olMap.getView().setRotation(mapState.rotation);
+    },
+
+    /**
+     * Creates a map state object from a URL hash.
+     *
+     * @param plHash {String} The URL hash to get the state from
+     * @return {Object} The map state object
+     * @private
+     */
+    readPermalink: function (plHash) {
+        var mapState = {};
+        if (window.location.hash !== '') {
+            // read center, zoom and rotation from the URL
+            var hash = plHash.replace('#map=', '');
+            var parts = hash.split('/');
+            if (parts.length === 4) {
+                mapState.zoom = parseInt(parts[0], 10);
+                mapState.center = [
+                    parseFloat(parts[1]),
+                    parseFloat(parts[2])
+                ];
+                mapState.rotation = parseFloat(parts[3]);
+            }
+        }
+
+        return mapState;
+    },
+
+    /**
+     * Updates the permalink as URL hash and pushes the state into the window
+     * history.
+     *
+     * @private
+     */
+    updatePermalink: function () {
+        var me = this;
+
+        if (!me.shouldUpdatePermalink) {
+            // do not update the URL when the view was changed in the 'popstate'
+            // handler
+            me.shouldUpdatePermalink = true;
+            return;
+        }
+        var mapState = me.getState();
+        var hash = '#map=' +
+            mapState.zoom + '/' +
+            Math.round(mapState.center[0] * 100) / 100 + '/' +
+            Math.round(mapState.center[1] * 100) / 100 + '/' +
+            mapState.rotation;
+
+        // push the state into the window history (to navigate with browser's
+        // back and forward buttons)
+        window.history.pushState(mapState, 'map', hash);
     }
 });
