@@ -68,6 +68,23 @@
     "url": "http://ows.terrestris.de/geoserver/osm/wfs",
     "featureType": "osm:osm-fuel",
     "serverOptions": {},
+    "noCluster": false,
+    "tooltipsConfig": [
+        {
+            "property": "id"
+        },
+        {
+            "alias": "Name",
+            "property": "name"
+        },
+        {
+            "alias": "OSM ID",
+            "property": "osm_id"
+        },
+        {
+            "property": "type"
+        }
+    ],
     "openLayers": {
       "maxResolution": 1222.99245234375,
       "numZoomLevels": 12,

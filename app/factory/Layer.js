@@ -190,12 +190,39 @@ Ext.define('CpsiMapview.factory.Layer', {
             visible: layerConf.openLayers.visibility,
             minResolution: layerConf.openLayers.minResolution,
             maxResolution: layerConf.openLayers.maxResolution,
-            opacity: layerConf.openLayers.opacity
+            opacity: layerConf.openLayers.opacity,
+            toolTipConfig: layerConf.tooltipsConfig
         });
 
         if (layerConf.tooltipsConfig) {
-            //TODO has to be implemented with
-            //     https://github.com/meggsimum/cpsi-mapview/issues/27
+            // create a custom toolitp for this layer
+            var toolTip = Ext.create('CpsiMapview.view.layer.ToolTip', {
+                toolTipConfig: layerConf.tooltipsConfig,
+                layer: wfsLayer
+            });
+            wfsLayer.toolTip = toolTip;
+
+            // show / hide on appropriate events
+            mapPanel.on('cmv-map-pointerrest', function(hoveredObjs, evt) {
+                // show tooltip with feature attribute information
+                Ext.each(hoveredObjs, function (hoveredObj) {
+                    if (hoveredObj.layer &&
+                          hoveredObj.layer.id === wfsLayer.id &&
+                          hoveredObj.layer.toolTip) {
+                        hoveredObj.layer.toolTip.draw(hoveredObj.feature, evt);
+                    }
+                });
+            });
+
+            // hide tooltip if mouse moves again
+            mapPanel.on('cmv-map-pointermove', function () {
+                toolTip.hide();
+            });
+
+            // hide all tooltips if cursor leaves map
+            mapPanel.on('cmv-map-pointerrestout', function () {
+                CpsiMapview.view.layer.ToolTip.clear();
+            });
         }
 
         return wfsLayer;

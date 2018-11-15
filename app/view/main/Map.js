@@ -56,6 +56,8 @@ Ext.define('CpsiMapview.view.main.Map', {
 
     items: [{
         xtype: 'gx_map',
+        pointerRest: true,
+        pointerRestInterval: 500,
         map: new ol.Map({
             // layers will be created from config in initComponent
             layers: [],
@@ -78,6 +80,14 @@ Ext.define('CpsiMapview.view.main.Map', {
     enableMapClick: true,
 
     /**
+     * Enables a 'pointerrest' handler on the map which fires an event
+     * 'cmv-map-pointerrest' with all hovered vector features and their
+     * corresponding layers.
+     * @config {Boolean}
+     */
+    enableMapHover: true,
+
+    /*
      * Flag that to add a scale bar to the map or not
      * @config {Boolean}
      */
@@ -90,7 +100,6 @@ Ext.define('CpsiMapview.view.main.Map', {
      * @param {Object[]} clickInfo The clicked features and the corresponding layers, like `[{feature: aFeat, layer: aLayer}, ...]`
      * @param {ol.MapBrowserEvent)} evt The original 'singleclick' event of OpenLayers
      */
-
 
     inheritableStatics: {
         /**
@@ -142,6 +151,29 @@ Ext.define('CpsiMapview.view.main.Map', {
 
                 // fire event to forward click info to subscribers
                 me.fireEvent('cmv-mapclick', clickedFeatures, evt);
+            });
+        }
+
+        if (me.enableMapHover) {
+            me.mapCmp.on('pointerrest', function(evt) {
+                var hoveredFeatures = [];
+                me.olMap.forEachFeatureAtPixel(evt.pixel,
+                    function(feature, layer) {
+                        // collect all clicked features and their layers
+                        hoveredFeatures.push({feature: feature, layer: layer});
+                    }
+                );
+
+                // fire event to forward hover info to subscribers
+                me.fireEvent('cmv-map-pointerrest', hoveredFeatures, evt);
+            });
+
+            me.mapCmp.on('pointerrestout', function () {
+                me.fireEvent('cmv-map-pointerrestout');
+            });
+
+            me.olMap.on('pointermove', function () {
+                me.fireEvent('cmv-map-pointermove');
             });
         }
 
