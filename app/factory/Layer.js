@@ -157,13 +157,37 @@ Ext.define('CpsiMapview.factory.Layer', {
 
         var vectorSource = new ol.source.Vector({
             format: new ol.format.GeoJSON(),
-            url: function(extent) {
-                // add current map extent
-                return Ext.String.urlAppend(url,
-                    'bbox=' + extent.join(',') + ',' + srid);
-            },
             strategy: ol.loadingstrategy.bbox
         });
+
+        var loaderFn = function(extent) {
+            vectorSource.dispatchEvent('vectorloadstart');
+            var reqUrl = Ext.String.urlAppend(
+                url, 'bbox=' + extent.join(',') + ',' + srid
+            );
+
+            var xhr = new XMLHttpRequest();
+            xhr.open('GET', reqUrl);
+            var onError = function() {
+                vectorSource.removeLoadedExtent(extent);
+                vectorSource.dispatchEvent('vectorloaderror');
+            };
+            xhr.onerror = onError;
+            xhr.onload = function() {
+                if (xhr.status == 200) {
+                    var features = vectorSource.getFormat().readFeatures(
+                        xhr.responseText
+                    );
+                    vectorSource.addFeatures(features);
+                    vectorSource.dispatchEvent('vectorloadend');
+                } else {
+                    onError();
+                }
+            };
+            xhr.send();
+        };
+
+        vectorSource.setLoader(loaderFn);
 
         // by default use clustering, however we may want to deactivate this for
         // line features
