@@ -14,6 +14,8 @@ Ext.define('CpsiMapview.view.main.Map', {
         'CpsiMapview.view.toolbar.MapFooter',
 
         'BasiGX.view.button.Measure',
+        'BasiGX.view.button.ZoomIn',
+        'BasiGX.view.button.ZoomOut',
         'BasiGX.view.button.ZoomToExtent',
         'BasiGX.util.Projection'
     ],
@@ -28,6 +30,10 @@ Ext.define('CpsiMapview.view.main.Map', {
         items: [{
             xtype: 'basigx-button-zoomtoextent',
             extent: [-1210762, 6688545, -600489, 7490828]
+        }, {
+            xtype: 'basigx-button-zoomin'
+        }, {
+            xtype: 'basigx-button-zoomout'
         }, {
             xtype: 'basigx-button-measure',
             measureType: 'line',
