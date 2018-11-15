@@ -250,6 +250,10 @@ Ext.define('CpsiMapview.view.main.Map', {
     applyState: function (mapState) {
         var me = this;
 
+        if (!Ext.isObject(mapState)) {
+            return;
+        }
+
         me.olMap.getView().setCenter(mapState.center);
         me.olMap.getView().setZoom(mapState.zoom);
         me.olMap.getView().setRotation(mapState.rotation);
@@ -263,18 +267,20 @@ Ext.define('CpsiMapview.view.main.Map', {
      * @private
      */
     readPermalink: function (plHash) {
-        var mapState = {};
+        var mapState;
         if (window.location.hash !== '') {
             // read center, zoom and rotation from the URL
             var hash = plHash.replace('#map=', '');
             var parts = hash.split('/');
             if (parts.length === 4) {
-                mapState.zoom = parseInt(parts[0], 10);
-                mapState.center = [
-                    parseFloat(parts[1]),
-                    parseFloat(parts[2])
-                ];
-                mapState.rotation = parseFloat(parts[3]);
+                mapState = {
+                    zoom: parseInt(parts[0], 10),
+                    center: [
+                        parseFloat(parts[1]),
+                        parseFloat(parts[2])
+                    ],
+                    rotation: parseFloat(parts[3])
+                };
             }
         }
 
