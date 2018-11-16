@@ -18,7 +18,8 @@ Ext.define('CpsiMapview.view.main.Map', {
         'BasiGX.view.button.ZoomIn',
         'BasiGX.view.button.ZoomOut',
         'BasiGX.view.button.ZoomToExtent',
-        'BasiGX.util.Projection'
+        'BasiGX.util.Projection',
+        'BasiGX.view.button.History'
     ],
 
     layout: 'fit',
@@ -55,6 +56,14 @@ Ext.define('CpsiMapview.view.main.Map', {
             listeners: {
                 afterrender: 'initializeMeasureBtn'
             }
+        }, {
+            xtype: 'basigx-button-history',
+            direction: 'BACK',
+            glyph: 'xf104@FontAwesome'
+        }, {
+            xtype: 'basigx-button-history',
+            direction: 'FORWARD',
+            glyph: 'xf105@FontAwesome'
         }]
     }, {
         xtype: 'cmv_mapfooter',
