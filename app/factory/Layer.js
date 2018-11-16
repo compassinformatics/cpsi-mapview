@@ -81,9 +81,10 @@ Ext.define('CpsiMapview.factory.Layer', {
     },
 
     /**
-     * The handler when a virtual base layer changes its opacity. This method
-     * ensures that only one these virtual base layers is visible at a time.
-     * @param {ol.Object.Event} evt The event which contains teh layer.
+     * The handler when a virtual base layer changes its visibility. This method
+     * ensures that only one of these virtual base layers is visible at a time.
+     *
+     * @param {ol.Object.Event} evt The event which contains the layer.
      */
     ensureOnlyOneBaseLayerVisible: function(evt) {
         var changedLayer = evt.target;
