@@ -70,7 +70,35 @@ Ext.define('CpsiMapview.factory.Layer', {
             //do nothing, and return empty layer
         }
 
+        if (mapLayer && layerConf.isBaseLayer) {
+            mapLayer.set('isBaseLayer', true);
+            mapLayer.on(
+                'change:visible', LayerFactory.ensureOnlyOneBaseLayerVisible
+            );
+        }
+
         return mapLayer;
+    },
+
+    /**
+     * The handler when a virtual base layer changes its opacity. This method
+     * ensures that only one these virtual base layers is visible at a time.
+     * @param {ol.Object.Event} evt The event which contains teh layer.
+     */
+    ensureOnlyOneBaseLayerVisible: function(evt) {
+        var changedLayer = evt.target;
+        if (changedLayer.get('isBaseLayer') && changedLayer.getVisible()) {
+            var allLayers = BasiGX.util.Layer.getAllLayers();
+            Ext.each(allLayers, function(layer) {
+                if (!layer.get('isBaseLayer') || layer.id === changedLayer.id) {
+                    return;
+                }
+                if (layer.getVisible()) {
+                    layer.setVisible(false);
+                }
+            });
+        }
+
     },
 
     createEmptyLayer: function(layerConf) {
