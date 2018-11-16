@@ -1,5 +1,5 @@
 /**
- * A plugin for Ext.grid.column.Column s that overwrites the internal cellTpl to
+ * A plugin for Ext.grid.column.Column that overwrites the internal cellTpl to
  * support legends.
  */
 Ext.define('CpsiMapview.plugin.BasicTreeColumnLegends', {
@@ -55,8 +55,8 @@ Ext.define('CpsiMapview.plugin.BasicTreeColumnLegends', {
             }
             // if the legend cannot be obtained (which happens e.g. for cascaded
             // WMS layers, as geoserver does not support legends for these
-            // layers) we remove the broken image and the othe rdom elements
-            // that therwise would lead to vertcial gap between layers in the
+            // layers) we remove the broken image and the other dom elements
+            // that otherwise would lead to vertical gap between layers in the
             // tree.
             var ns = 'CpsiMapview.plugin.BasicTreeColumnLegends';
             return '<img' +
