@@ -54,6 +54,11 @@ Ext.define('CpsiMapview.view.main.Map', {
             listeners: {
                 afterrender: 'initializeMeasureBtn'
             }
+        }, {
+            xtype: 'cmv_timeslider',
+            startDate: new Date(1998, 0, 1),
+            endDate: new Date(Date.now()),
+            layerNames: [] // TODO: fill me
         }]
     }, {
         xtype: 'cmv_mapfooter',
