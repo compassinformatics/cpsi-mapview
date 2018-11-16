@@ -63,12 +63,12 @@ Ext.define('CpsiMapview.view.panel.TimeSlider', {
             width: 250,
             listeners: {
                 change: 'onTimeChanged',
-                afterrender: 'initTimeSlider'
+                beforerender: 'initTimeSlider'
             },
             bind: {
                 value: '{timeRangeObj.value}'
             },
-            tipText: me.getController().getTipText.bind(me.getController())
+            tipText: 'getTipText'
         },
         {
             xtype: 'checkbox',
