@@ -106,7 +106,8 @@ Ext.define('CpsiMapview.factory.Layer', {
                 visible: layerConf.openLayers.visibility,
                 minResolution: layerConf.openLayers.minResolution,
                 maxResolution: layerConf.openLayers.maxResolution,
-                opacity: layerConf.openLayers.opacity
+                opacity: layerConf.openLayers.opacity,
+                isTimeDedendent: !!layerConf.timeitem
             });
         } else {
             layer = new ol.layer.Tile({
@@ -123,7 +124,8 @@ Ext.define('CpsiMapview.factory.Layer', {
                 visible: layerConf.openLayers.visibility,
                 minResolution: layerConf.openLayers.minResolution,
                 maxResolution: layerConf.openLayers.maxResolution,
-                opacity: layerConf.openLayers.opacity
+                opacity: layerConf.openLayers.opacity,
+                isTimeDedendent: !!layerConf.timeitem
             });
         }
 
