@@ -62,16 +62,15 @@ Ext.define('CpsiMapview.controller.panel.TimeSlider', {
     /**
      * Function to generate tooltip text for slider
      *
-     * @param {Ext.slider.Thumb} thumb The Thumb that the tip is attached to
+     * @param {Ext.slider.Thumb} thumb The thumb that the tip is attached to
      * @return {String} The formatted date as text
      */
     getTipText: function (thumb) {
-        var me = this;
-        return me.getDateStringForSliderValue(thumb.value);
+        return this.getDateStringForSliderValue(thumb.value);
     },
 
     /**
-     * Function that returns formatted date string vor passed slider value
+     * Function that returns formatted date string for passed slider value
      *
      * @param {Number} sliderValue The value of the slider
      * @return {String} The formatted date as text
