@@ -36,7 +36,7 @@ Ext.define('CpsiMapview.controller.panel.TimeSlider', {
         var values = [timeRangeObj.rangeLower, timeRangeObj.rangeUpper];
         slider.setValue(values);
 
-        // hide thumb if range is noit checked
+        // hide thumb if range is not checked
         if (!isRange) {
             slider.thumbs[1].disable();
         }
@@ -49,7 +49,7 @@ Ext.define('CpsiMapview.controller.panel.TimeSlider', {
     setTimeOnLayers: function (slider) {
         var me = this;
         var isRange = me.getViewModel().get('isRange');
-        this.onTimeChanged(slider, isRange);
+        me.onTimeChanged(slider, isRange);
     },
 
     /**
