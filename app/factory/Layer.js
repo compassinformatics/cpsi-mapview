@@ -70,11 +70,15 @@ Ext.define('CpsiMapview.factory.Layer', {
             //do nothing, and return empty layer
         }
 
+        // This is the same for all types
         if (mapLayer && layerConf.isBaseLayer) {
             mapLayer.set('isBaseLayer', true);
             mapLayer.on(
                 'change:visible', LayerFactory.ensureOnlyOneBaseLayerVisible
             );
+            mapLayer.set('legendUrl', layerConf.legendUrl);
+            mapLayer.set('legendHeight', layerConf.legendHeight);
+            mapLayer.set('legendWidth', layerConf.legendWidth);
         }
 
         return mapLayer;
