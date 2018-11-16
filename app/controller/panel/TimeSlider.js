@@ -7,7 +7,7 @@ Ext.define('CpsiMapview.controller.panel.TimeSlider', {
     alias: 'controller.cmv_timeslider',
 
     requires: [
-        'CpsiMapview.util.Layer'
+        'BasiGX.util.Layer'
     ],
 
     /**
@@ -69,7 +69,7 @@ Ext.define('CpsiMapview.controller.panel.TimeSlider', {
     onTimeChanged: function (slider, isRange) {
         var me = this;
         var values = slider.getValues();
-        var timeLayers = CpsiMapview.util.Layer.getTimeDependentLayers();
+        var timeLayers = BasiGX.util.Layer.getLayersBy('isTimeDedendent', true);
         // TODO: WFS layers must be filtered
         Ext.each(timeLayers, function (layer) {
             if (layer && (layer.getSource() instanceof ol.source.TileWMS || layer.getSource() instanceof ol.source.ImageWMS)) {
