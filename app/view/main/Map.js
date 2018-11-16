@@ -7,6 +7,7 @@ Ext.define('CpsiMapview.view.main.Map', {
 
     requires: [
         'GeoExt.component.Map',
+        'GeoExt.state.PermalinkProvider',
 
         'CpsiMapview.model.button.MeasureButton',
         'CpsiMapview.controller.button.MeasureButtonController',
@@ -64,6 +65,8 @@ Ext.define('CpsiMapview.view.main.Map', {
         xtype: 'gx_map',
         pointerRest: true,
         pointerRestInterval: 500,
+        stateful: true,
+        stateId: 'cmv_mapstate',
         map: new ol.Map({
             // layers will be created from config in initComponent
             layers: [],
@@ -206,9 +209,19 @@ Ext.define('CpsiMapview.view.main.Map', {
         }
 
         if (me.enablePermalink) {
+
+            // create permalink provider
+            var plProvider = Ext.create('GeoExt.state.PermalinkProvider');
+            // set it in the state manager
+            Ext.state.Manager.setProvider(plProvider);
+
+            me.permalinkProvider = plProvider;
+
             if (window.location.hash !== '') {
                 // try to restore center, zoom-level and rotation from the URL
-                me.applyState(me.readPermalink(window.location.hash));
+                me.mapCmp.applyState(
+                    me.permalinkProvider.readPermalinkHash(window.location.hash)
+                );
             }
 
             me.registerPermalinkEvents();
@@ -226,7 +239,9 @@ Ext.define('CpsiMapview.view.main.Map', {
         var me = this;
 
         // update permalink when visible map state changes
-        me.olMap.on('moveend', me.updatePermalink, me);
+        me.permalinkProvider.on('statechange', function (stateProvider, stateId, state) {
+            me.updatePermalink(state);
+        });
 
         // restore the view state when navigating through the history, see
         // https://developer.mozilla.org/en-US/docs/Web/API/WindowEventHandlers/onpopstate
@@ -242,71 +257,12 @@ Ext.define('CpsiMapview.view.main.Map', {
     },
 
     /**
-     * Returns the current map state (center, zoom, rotation)
-     * @return {Object} The map state object
-     */
-    getState: function () {
-        var me = this;
-        var view = me.olMap.getView();
-        return {
-            zoom: view.getZoom(),
-            center: view.getCenter(),
-            rotation: view.getRotation()
-        };
-    },
-
-    /**
-     * Applies the map state (center, zoom, rotation) to this map.
-     *
-     * @param  {Object} mapState The map state object
-     */
-    applyState: function (mapState) {
-        var me = this;
-
-        if (!Ext.isObject(mapState)) {
-            return;
-        }
-
-        me.olMap.getView().setCenter(mapState.center);
-        me.olMap.getView().setZoom(mapState.zoom);
-        me.olMap.getView().setRotation(mapState.rotation);
-    },
-
-    /**
-     * Creates a map state object from a URL hash.
-     *
-     * @param plHash {String} The URL hash to get the state from
-     * @return {Object} The map state object
-     * @private
-     */
-    readPermalink: function (plHash) {
-        var mapState;
-        if (window.location.hash !== '') {
-            // read center, zoom and rotation from the URL
-            var hash = plHash.replace('#map=', '');
-            var parts = hash.split('/');
-            if (parts.length === 4) {
-                mapState = {
-                    zoom: parseInt(parts[0], 10),
-                    center: [
-                        parseFloat(parts[1]),
-                        parseFloat(parts[2])
-                    ],
-                    rotation: parseFloat(parts[3])
-                };
-            }
-        }
-
-        return mapState;
-    },
-
-    /**
      * Updates the permalink as URL hash and pushes the state into the window
      * history.
      *
      * @private
      */
-    updatePermalink: function () {
+    updatePermalink: function (mapState) {
         var me = this;
 
         if (!me.shouldUpdatePermalink) {
@@ -316,24 +272,12 @@ Ext.define('CpsiMapview.view.main.Map', {
             return;
         }
 
-        var mapState = me.getState();
-
         // check if we have to round the coords (if no coordinates in deegrees)
         var doRound =
             me.roundPermalinkCoords &&
             me.olMap.getView().getProjection().getUnits() !== 'degrees';
-        var centerX = mapState.center[0];
-        var centerY = mapState.center[1];
-        if (doRound) {
-            centerX = Math.round(centerX * 100) / 100;
-            centerY = Math.round(centerY * 100) / 100;
-        }
 
-        var hash = '#map=' +
-            mapState.zoom + '/' +
-            centerX + '/' +
-            centerY + '/' +
-            mapState.rotation;
+        var hash = me.permalinkProvider.getPermalinkHash(doRound);
 
         // push the state into the window history (to navigate with browser's
         // back and forward buttons)
