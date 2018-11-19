@@ -146,7 +146,8 @@ Ext.define('CpsiMapview.factory.Layer', {
         olSourceConf = Ext.apply(olSourceConf, olSourceProps);
 
         var olLayerConf = {
-            name: layerConf.text
+            name: layerConf.text,
+            isTimeDedendent: !!layerConf.timeitem
         };
         olLayerConf = Ext.apply(olLayerConf, olLayerProps);
 
