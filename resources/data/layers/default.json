@@ -107,7 +107,8 @@
       "version": "1.1.1"
     },
     "openLayers": {
-      "singleTile": true
+      "singleTile": true,
+      "visibility": false
     }
   }, {
     "layerType": "wfs",
@@ -124,7 +125,7 @@
       "numZoomLevels": 12,
       "opacity": 0.7,
       "projection": "EPSG:900913",
-      "visibility": true
+      "visibility": false
     }
   }]
 }
