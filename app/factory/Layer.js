@@ -1,6 +1,8 @@
 /**
- * [extend description]
- * @type {String}
+ * Factory util class to generate OpenLayers layer instances according to a
+ * JSON configuration.
+ *
+ * @class CpsiMapview.factory.Layer
  */
 Ext.define('CpsiMapview.factory.Layer', {
     alternateClassName: 'LayerFactory',
@@ -127,41 +129,36 @@ Ext.define('CpsiMapview.factory.Layer', {
     createWms: function(layerConf) {
         var layer;
         var singleTile = layerConf.openLayers.singleTile;
+        // transform OL2 properties to current ones supported by OL >=v3
+        var olSourceProps = this.ol2PropsToOlSourceProps(layerConf.openLayers);
+        var olLayerProps = this.ol2PropsToOlLayerProps(layerConf.openLayers);
+
+        var olSourceConf = {
+            url: layerConf.url,
+            params: {
+                'LAYERS': layerConf.serverOptions.layers,
+                'TRANSPARENT': true,
+                'TILED': !singleTile
+            },
+            ratio: singleTile? 1 : undefined,
+            crossOrigin: 'anonymous'
+        };
+        olSourceConf = Ext.apply(olSourceConf, olSourceProps);
+
+        var olLayerConf = {
+            name: layerConf.text
+        };
+        olLayerConf = Ext.apply(olLayerConf, olLayerProps);
 
         if (singleTile) {
-            layer = new ol.layer.Image({
-                name: layerConf.text,
-                source: new ol.source.ImageWMS({
-                    url: layerConf.url,
-                    params: {
-                        'LAYERS': layerConf.serverOptions.layers,
-                        'TRANSPARENT': true
-                    },
-                    ratio: 1,
-                    crossOrigin: 'anonymous'
-                }),
-                visible: layerConf.openLayers.visibility,
-                minResolution: layerConf.openLayers.minResolution,
-                maxResolution: layerConf.openLayers.maxResolution,
-                opacity: layerConf.openLayers.opacity
-            });
+
+            olLayerConf.source = new ol.source.ImageWMS(olSourceConf);
+            layer = new ol.layer.Image(olLayerConf);
+
         } else {
-            layer = new ol.layer.Tile({
-                name: layerConf.text,
-                source: new ol.source.TileWMS({
-                    url: layerConf.url,
-                    params: {
-                        'LAYERS': layerConf.serverOptions.layers,
-                        'TILED': true,
-                        'TRANSPARENT': true
-                    },
-                    crossOrigin: 'anonymous'
-                }),
-                visible: layerConf.openLayers.visibility,
-                minResolution: layerConf.openLayers.minResolution,
-                maxResolution: layerConf.openLayers.maxResolution,
-                opacity: layerConf.openLayers.opacity
-            });
+
+            olLayerConf.source = new ol.source.TileWMS(olSourceConf);
+            layer = new ol.layer.Tile(olLayerConf);
         }
 
         return layer;
@@ -175,6 +172,9 @@ Ext.define('CpsiMapview.factory.Layer', {
      */
     createWfs: function(layerConf) {
         var url = layerConf.url;
+        // transform OL2 properties to current ones supported by OL >=v3
+        var olSourceProps = this.ol2PropsToOlSourceProps(layerConf.openLayers);
+        var olLayerProps = this.ol2PropsToOlLayerProps(layerConf.openLayers);
 
         var srid = 'EPSG:3857';
         var mapPanel = CpsiMapview.view.main.Map.guess();
@@ -192,10 +192,13 @@ Ext.define('CpsiMapview.factory.Layer', {
             '&srsname=' + srid;
         url = Ext.String.urlAppend(url, fixUrlParams);
 
-        var vectorSource = new ol.source.Vector({
+        var olSourceConf = {
             format: new ol.format.GeoJSON(),
             strategy: ol.loadingstrategy.bbox
-        });
+        };
+        olSourceConf = Ext.apply(olSourceConf, olSourceProps);
+
+        var vectorSource = new ol.source.Vector(olSourceConf);
 
         var loaderFn = function(extent) {
             vectorSource.dispatchEvent('vectorloadstart');
@@ -231,10 +234,12 @@ Ext.define('CpsiMapview.factory.Layer', {
         var noCluster = layerConf.noCluster || false;
         var clusterSource;
         if (!noCluster) {
-            clusterSource = new ol.source.Cluster({
+            var clusterSourceConf = {
                 threshold: 5,
                 source: vectorSource
-            });
+            };
+            clusterSourceConf = Ext.apply(clusterSourceConf, olSourceProps);
+            clusterSource = new ol.source.Cluster(clusterSourceConf);
         }
 
         var sldUrl = layerConf.sldUrl;
@@ -244,16 +249,14 @@ Ext.define('CpsiMapview.factory.Layer', {
             // this.loadSLD(mapLayer, sld, this.mapFile, sldUrl);
         }
 
-        var wfsLayer = new ol.layer.Vector({
+        var olLayerConf = {
             name: layerConf.text,
-            // either clustered or non-clustered source
             source: clusterSource ? clusterSource : vectorSource,
-            visible: layerConf.openLayers.visibility,
-            minResolution: layerConf.openLayers.minResolution,
-            maxResolution: layerConf.openLayers.maxResolution,
-            opacity: layerConf.openLayers.opacity,
             toolTipConfig: layerConf.tooltipsConfig
-        });
+        };
+        olLayerConf = Ext.apply(olLayerConf, olLayerProps);
+
+        var wfsLayer = new ol.layer.Vector(olLayerConf);
 
         if (layerConf.tooltipsConfig) {
             // create a custom toolitp for this layer
@@ -297,22 +300,26 @@ Ext.define('CpsiMapview.factory.Layer', {
      * @return {ol.layer.Tile}    Bing layer
      */
     createBing: function(layerConf, type) {
+        // transform OL2 properties to current ones supported by OL >=v3
+        var olSourceProps = this.ol2PropsToOlSourceProps(layerConf.openLayers);
+        var olLayerProps = this.ol2PropsToOlLayerProps(layerConf.openLayers);
+        var olSourceConf = {
+            key: layerConf.token,
+            imagerySet: type
+            // use maxZoom 19 to see stretched tiles instead of the BingMaps
+            // "no photos at this zoom level" tiles
+            // maxZoom: 19
+        };
+        olSourceConf = Ext.apply(olSourceConf, olSourceProps);
 
-        return new ol.layer.Tile({
+        var olLayerConf = {
             name: layerConf.text,
             preload: Infinity,
-            source: new ol.source.BingMaps({
-                key: layerConf.token,
-                imagerySet: type
-                // use maxZoom 19 to see stretched tiles instead of the BingMaps
-                // "no photos at this zoom level" tiles
-                // maxZoom: 19
-            }),
-            visible: layerConf.openLayers.visibility,
-            minResolution: layerConf.openLayers.minResolution,
-            maxResolution: layerConf.openLayers.maxResolution,
-            opacity: layerConf.openLayers.opacity
-        });
+            source: new ol.source.BingMaps(olSourceConf)
+        };
+        olLayerConf = Ext.apply(olLayerConf, olLayerProps);
+
+        return new ol.layer.Tile(olLayerConf);
     },
 
     /**
@@ -322,18 +329,24 @@ Ext.define('CpsiMapview.factory.Layer', {
      * @return {ol.layer.Tile} ESRI REST tile layer
      */
     createEsriRest: function(layerConf) {
-        return new ol.layer.Tile({
+        // transform OL2 properties to current ones supported by OL >=v3
+        var olSourceProps = this.ol2PropsToOlSourceProps(layerConf.openLayers);
+        var olLayerProps = this.ol2PropsToOlLayerProps(layerConf.openLayers);
+
+        var olSourceConf = {
+            url: layerConf.url + '{z}/{y}/{x}'
+        };
+        olSourceConf = Ext.apply(olSourceConf, olSourceProps);
+
+        var olLayerConf = {
             name: layerConf.text,
-            source: new ol.source.XYZ({
-                attributions: 'Tiles © <a href="https://services.arcgisonline.com/ArcGIS/' +
-                    'rest/services/World_Topo_Map/MapServer">ArcGIS</a>',
-                url: layerConf.url + '{z}/{y}/{x}'
-            }),
-            visible: layerConf.openLayers.visibility,
-            minResolution: layerConf.openLayers.minResolution,
-            maxResolution: layerConf.openLayers.maxResolution,
-            opacity: layerConf.openLayers.opacity
-        });
+            source: new ol.source.XYZ(olSourceConf)
+        };
+        olLayerConf = Ext.apply(olLayerConf, olLayerProps);
+
+        var layer = new ol.layer.Tile(olLayerConf);
+
+        return layer;
     },
 
     /**
@@ -343,15 +356,20 @@ Ext.define('CpsiMapview.factory.Layer', {
      * @return {ol.layer.Tile} OSM layer
      */
     createOsm: function(layerConf) {
-        // OSM based map tiles
-        return new ol.layer.Tile({
+        // transform OL2 properties to current ones supported by OL >=v3
+        var olSourceProps = this.ol2PropsToOlSourceProps(layerConf.openLayers);
+        var olLayerProps = this.ol2PropsToOlLayerProps(layerConf.openLayers);
+
+        var olSourceConf = {};
+        olSourceConf = Ext.apply(olSourceConf, olSourceProps);
+
+        var olLayerConf = {
             name: layerConf.text,
-            source: new ol.source.OSM(),
-            visible: layerConf.openLayers.visibility,
-            minResolution: layerConf.openLayers.minResolution,
-            maxResolution: layerConf.openLayers.maxResolution,
-            opacity: layerConf.openLayers.opacity
-        });
+            source: new ol.source.OSM(olSourceConf)
+        };
+        olLayerConf = Ext.apply(olLayerConf, olLayerProps);
+
+        return new ol.layer.Tile(olLayerConf);
     },
 
     createGoogle: function(layerConf, layerType) {
@@ -395,30 +413,31 @@ Ext.define('CpsiMapview.factory.Layer', {
     createArcGisRest: function(layerConf) {
         var layer;
         var singleTile = layerConf.openLayers.singleTile;
+        // transform OL2 properties to current ones supported by OL >=v3
+        var olSourceProps = this.ol2PropsToOlSourceProps(layerConf.openLayers);
+        var olLayerProps = this.ol2PropsToOlLayerProps(layerConf.openLayers);
+
+        var olSourceConf = {
+            url: layerConf.url,
+            params: layerConf.serverOptions || {},
+            ratio: singleTile ? 1 : undefined
+        };
+        olSourceConf = Ext.apply(olSourceConf, olSourceProps);
+
+        var olLayerConf = {
+            name: layerConf.text
+        };
+        olLayerConf = Ext.apply(olLayerConf, olLayerProps);
+
         if (singleTile) {
-            layer = new ol.layer.Image({
-                source: new ol.source.ImageArcGISRest({
-                    url: layerConf.url,
-                    params: layerConf.serverOptions || {},
-                    ratio: 1
-                }),
-                visible: layerConf.openLayers.visibility,
-                minResolution: layerConf.openLayers.minResolution,
-                maxResolution: layerConf.openLayers.maxResolution,
-                opacity: layerConf.openLayers.opacity
-            });
+
+            olLayerConf.source = new ol.source.ImageArcGISRest(olSourceConf);
+            layer = new ol.layer.Image(olLayerConf);
+
         } else {
-            layer = new ol.layer.Tile({
-                name: layerConf.text,
-                source: new ol.source.TileArcGISRest({
-                    url: layerConf.url,
-                    params: layerConf.serverOptions || {}
-                }),
-                visible: layerConf.openLayers.visibility,
-                minResolution: layerConf.openLayers.minResolution,
-                maxResolution: layerConf.openLayers.maxResolution,
-                opacity: layerConf.openLayers.opacity
-            });
+
+            olLayerConf.source = new ol.source.TileArcGISRest(olSourceConf);
+            layer = new ol.layer.Tile(olLayerConf);
         }
 
         return layer;
@@ -426,6 +445,56 @@ Ext.define('CpsiMapview.factory.Layer', {
 
     createServerArray: function(path) {
         Ext.log.info('Not implemented yet', path);
+    },
+
+    /**
+     * Transforms the OpenLayers 2 config options to OL (>=v3) layer pendants.
+     *
+     * @param  {Object} ol2Conf OL2 config
+     * @return {Object}         OL (>=v3) layer config
+     */
+    ol2PropsToOlLayerProps: function (ol2Conf) {
+        var map = BasiGX.util.Map.getMapComponent().getMap();
+        var units = map.getView().getProjection().getUnits();
+
+        // min. and max. resolution detection:
+        // either directly given in config or indirectly by scale or we leave it
+        // unset
+        var minRes = ol2Conf.minResolution ||
+            BasiGX.util.Map.getResolutionForScale(ol2Conf.minScale, units) ||
+            undefined;
+        var maxRes = ol2Conf.maxResolution ||
+            BasiGX.util.Map.getResolutionForScale(ol2Conf.maxScale, units) ||
+            undefined;
+
+        var olProps = {
+            opacity: ol2Conf.opacity,
+            visible: ol2Conf.visibility,
+            maxResolution: maxRes,
+            minResolution: minRes
+            // no OL >=v3 pendant mapped yet
+            // numZoomLevels: ol2Conf.numZoomLevels,
+            // zoomOffset: ol2Conf.zoomOffset,
+            // resolutions: ol2Conf.resolutions
+        };
+        return olProps;
+    },
+
+    /**
+     * Transforms the OpenLayers 2 config options to OL (>=v3) source pendants.
+     *
+     * @param  {Object} ol2Conf OL2 config
+     * @return {Object}         OL (>=v3) source config
+     */
+    ol2PropsToOlSourceProps: function (ol2Conf) {
+        var olSourceProps = {
+            attributions: ol2Conf.attribution,
+            projection: ol2Conf.projection,
+            transition: ol2Conf.transitionEffect === null ? 0 : undefined,
+            gutter: ol2Conf.gutter
+        };
+
+        return olSourceProps;
     }
 
 });
