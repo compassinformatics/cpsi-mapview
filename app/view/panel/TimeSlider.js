@@ -6,7 +6,7 @@ Ext.define('CpsiMapview.view.panel.TimeSlider', {
     xtype: 'cmv_timeslider',
 
     requires: [
-        'Ext.slider.Single',
+        'Ext.slider.Multi',
 
         'CpsiMapview.controller.panel.TimeSlider'
     ],
@@ -20,11 +20,6 @@ Ext.define('CpsiMapview.view.panel.TimeSlider', {
      */
     viewModel: {
         data: {
-            timeRangeObj: {
-                minValue: 0,
-                maxValue: 10,
-                value: 5
-            },
             isRange: false
         }
     },
@@ -46,9 +41,16 @@ Ext.define('CpsiMapview.view.panel.TimeSlider', {
      */
     timeIncrementUnit: 'year',
     /**
-     * The names of the layers that should listen to chages in slider
+     * The CSS class of the slider
      */
-    layerNames: [],
+    cls: 'cpsi-time-slider',
+    /**
+     * Listener to be called when all layers are added to set configured time
+     * to time dependent layers
+     */
+    listeners: {
+        allLayersAdded: 'setTimeOnLayers'
+    },
 
     /**
      *
@@ -56,19 +58,20 @@ Ext.define('CpsiMapview.view.panel.TimeSlider', {
     initComponent: function () {
         var me = this;
         me.items = [{
-            fieldLabel: 'Time',
-            xtype: 'slider',
+            xtype: 'multislider',
             labelAlign: 'right',
-            flex: 6,
-            width: 250,
             listeners: {
-                change: 'onTimeChanged',
-                beforerender: 'initTimeSlider'
+                beforerender: 'initTimeSlider',
+                changecomplete: 'onChangeComplete'
             },
-            bind: {
-                value: '{timeRangeObj.value}'
-            },
-            tipText: 'getTipText'
+            constrainThumbs: false,
+            tipText: 'getTipText',
+            fieldLabel: 'Time',
+            width: 400,
+            values: [25, 75],
+            increment: 1,
+            minValue: 0,
+            maxValue: 100
         },
         {
             xtype: 'checkbox',
@@ -77,6 +80,9 @@ Ext.define('CpsiMapview.view.panel.TimeSlider', {
             labelAlign: 'right',
             bind: {
                 value: '{isRange}'
+            },
+            listeners: {
+                change: 'onRangeClick'
             }
         }];
 

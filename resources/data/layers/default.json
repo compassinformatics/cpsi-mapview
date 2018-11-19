@@ -94,5 +94,19 @@
       "projection": "EPSG:900913",
       "visibility": true
     }
+  }, {
+    "layerType": "wms",
+    "text": "Works_Export",
+    "url": "mapserver/",
+    "isBaseLayer": false,
+    "isDefaultBaseLayer": false,
+    "timeitem": "TIME",
+    "serverOptions": {
+      "layers": "Works_Type",
+      "version": "1.1.1"
+    },
+    "openLayers": {
+      "singleTile": true
+    }
   }]
 }

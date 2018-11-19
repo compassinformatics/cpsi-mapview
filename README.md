@@ -28,6 +28,13 @@ sencha app watch
 
 Open http://localhost:1841 in your browser.
 
+If a simple local server is needed to omit CORS problems, you can use the one configured in `docker-compose.yml`.
+Fill placeholders in `nginx.conf` with appropriate values and start nginx server beside sencha dev server simply by:
+
+```
+docker-compose up
+```
+The application is available via http://localhost:81/ afterwards.
 
 ## Updating the deployed state
 
