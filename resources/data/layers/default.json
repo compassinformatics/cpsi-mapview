@@ -21,6 +21,8 @@
     "isBaseLayer": true,
     "isDefaultBaseLayer": true,
     "text": "OpenStreetMap",
+    "legendUrl": "https://a.tile.openstreetmap.org/9/244/166.png",
+    "legendHeight": 100,
     "openLayers": {
       "maxResolution": 1222.99245234375,
       "numZoomLevels": 12,
@@ -47,6 +49,82 @@
       "projection": "EPSG:900913",
       "visibility": false,
       "zoomOffset": 7
+    }
+  }, {
+    "layerType": "wfs",
+    "text": "Country WFS",
+    "url": "http://ows.terrestris.de/geoserver/osm/wfs",
+    "featureType": "osm:osm-country-borders",
+    "serverOptions": {},
+    "noCluster": true,
+    "openLayers": {
+      "maxResolution": 1222.99245234375,
+      "numZoomLevels": 12,
+      "opacity": 0.7,
+      "projection": "EPSG:900913",
+      "visibility": false
+    }
+  }, {
+    "layerType": "wfs",
+    "text": "GAS WFS",
+    "url": "http://ows.terrestris.de/geoserver/osm/wfs",
+    "featureType": "osm:osm-fuel",
+    "serverOptions": {},
+    "noCluster": false,
+    "tooltipsConfig": [
+        {
+            "property": "id"
+        },
+        {
+            "alias": "Name",
+            "property": "name"
+        },
+        {
+            "alias": "OSM ID",
+            "property": "osm_id"
+        },
+        {
+            "property": "type"
+        }
+    ],
+    "openLayers": {
+      "maxResolution": 1222.99245234375,
+      "numZoomLevels": 12,
+      "opacity": 0.7,
+      "projection": "EPSG:900913",
+      "visibility": true
+    }
+  }, {
+    "layerType": "wms",
+    "text": "Works_Export",
+    "url": "mapserver/",
+    "isBaseLayer": false,
+    "isDefaultBaseLayer": false,
+    "timeitem": "TIME",
+    "dateFormat": "Y",
+    "serverOptions": {
+      "layers": "Works_Type",
+      "version": "1.1.1"
+    },
+    "openLayers": {
+      "singleTile": true
+    }
+  }, {
+    "layerType": "wfs",
+    "text": "Test time WFS",
+    "url": "wfs/",
+    "featureType": "test:osm-fuel",
+    "serverOptions": {},
+    "noCluster": true,
+    "timeitem": "time",
+    "dateFormat": "c",
+    "geometryProperty": "the_geom",
+    "openLayers": {
+      "maxResolution": 1222.99245234375,
+      "numZoomLevels": 12,
+      "opacity": 0.7,
+      "projection": "EPSG:900913",
+      "visibility": true
     }
   }]
 }
