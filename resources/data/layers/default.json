@@ -101,12 +101,30 @@
     "isBaseLayer": false,
     "isDefaultBaseLayer": false,
     "timeitem": "TIME",
+    "dateFormat": "Y",
     "serverOptions": {
       "layers": "Works_Type",
       "version": "1.1.1"
     },
     "openLayers": {
       "singleTile": true
+    }
+  }, {
+    "layerType": "wfs",
+    "text": "Test time WFS",
+    "url": "wfs/",
+    "featureType": "test:osm-fuel",
+    "serverOptions": {},
+    "noCluster": true,
+    "timeitem": "time",
+    "dateFormat": "c",
+    "geometryProperty": "the_geom",
+    "openLayers": {
+      "maxResolution": 1222.99245234375,
+      "numZoomLevels": 12,
+      "opacity": 0.7,
+      "projection": "EPSG:900913",
+      "visibility": true
     }
   }]
 }

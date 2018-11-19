@@ -66,8 +66,8 @@ Ext.define('CpsiMapview.view.main.Map', {
             glyph: 'xf105@FontAwesome'
         }, {
             xtype: 'cmv_timeslider',
-            startDate: new Date(1900, 0, 1),
-            endDate: new Date(2040, 11, 30)
+            startDate: new Date(2009, 0, 1),
+            endDate: new Date(2018, 11, 30)
         }]
     }, {
         xtype: 'cmv_mapfooter',

@@ -7,7 +7,8 @@ Ext.define('CpsiMapview.controller.panel.TimeSlider', {
     alias: 'controller.cmv_timeslider',
 
     requires: [
-        'BasiGX.util.Layer'
+        'BasiGX.util.Layer',
+        'BasiGX.util.WFS'
     ],
 
     /**
@@ -69,15 +70,23 @@ Ext.define('CpsiMapview.controller.panel.TimeSlider', {
     onTimeChanged: function (slider, isRange) {
         var me = this;
         var values = slider.getValues();
+        var timeIncrementUnit = slider.up('cmv_timeslider').timeIncrementUnit || 'year';
         var timeLayers = BasiGX.util.Layer.getLayersBy('isTimeDedendent', true);
-        // TODO: WFS layers must be filtered
         Ext.each(timeLayers, function (layer) {
-            if (layer && (layer.getSource() instanceof ol.source.TileWMS || layer.getSource() instanceof ol.source.ImageWMS)) {
-                var wmsLayerSource = layer.getSource();
-                if (wmsLayerSource) {
-                    wmsLayerSource.updateParams({
-                        TIME: me.formatWmsDateString(values, isRange)
+            if (layer) {
+                var layerSource = layer.getSource();
+                var dateFormat = layer.get('dateFormat') || 'C';
+                if (layerSource && (layerSource instanceof ol.source.TileWMS || layerSource instanceof ol.source.ImageWMS)) {
+                    layerSource.updateParams({
+                        TIME: me.formatDateString(values, isRange, timeIncrementUnit, dateFormat)
                     });
+                }
+                if (layerSource instanceof ol.source.Vector) {
+                    var timeProperty = layer.get('timeProperty') || 'time';
+                    var timeString = me.formatDateString(values, isRange, timeIncrementUnit, dateFormat);
+                    var filterParts = BasiGX.util.WFS.getTimeFilterParts(layer, timeProperty, timeString);
+                    layerSource.set('timeFilters', filterParts);
+                    layerSource.clear(true);
                 }
             }
         });
@@ -89,16 +98,34 @@ Ext.define('CpsiMapview.controller.panel.TimeSlider', {
      *
      * @param {Number[]} values The slider values
      * @param {Boolean} isRange Is range query or not
+     * @param {String} timeIncrementUnit The unit of time increment (year / month)
+     * @param {String} dateFormat The date format as listed in ExtJS documentation
+     * https://docs.sencha.com/extjs/6.2.1/classic/Ext.Date.html
      *
      * @returns {String} The formatted time string
      */
-    formatWmsDateString: function (values, isRange) {
+    formatDateString: function (values, isRange, timeIncrementUnit, dateFormat) {
         var me = this;
-        // we must check for min / max here since the thumbs are not contrained
-        var startDateStr = me.getDateStringForSliderValue(Ext.Array.min(values));
-        var endDateStr = me.getDateStringForSliderValue(Ext.Array.max(values));
-        // TODO: format can be layer dependent....
-        return Ext.String.format('{0}/{1}', startDateStr, isRange ? endDateStr : startDateStr);
+        // we must check for min / max here since the thumbs are not constrained
+        var startDate = me.getDateForSliderValue(Ext.Array.min(values));
+        var endDate = me.getDateForSliderValue(Ext.Array.max(values));
+
+        if (!startDate || !endDate) {
+            return;
+        }
+
+        // ceil / floor year according to selected interval if month is time increment
+        if (timeIncrementUnit === 'month') {
+            startDate = Ext.Date.getFirstDateOfMonth(startDate);
+            endDate = Ext.Date.getLastDateOfMonth(endDate);
+        } else {
+            // last day of year
+            endDate = new Date(!isRange ? startDate.getFullYear() : endDate.getFullYear(), 11, 31);
+        }
+
+        var startDateStr = Ext.Date.format(startDate, dateFormat);
+        var endDateStr = Ext.Date.format(endDate, dateFormat);
+        return Ext.String.format('{0}/{1}', startDateStr, endDateStr);
     },
 
     /**
