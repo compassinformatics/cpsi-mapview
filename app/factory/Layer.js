@@ -140,7 +140,7 @@ Ext.define('CpsiMapview.factory.Layer', {
                 'TRANSPARENT': true,
                 'TILED': !singleTile
             },
-            ratio: singleTile? 1 : undefined,
+            ratio: singleTile ? 1 : undefined,
             crossOrigin: 'anonymous'
         };
         olSourceConf = Ext.apply(olSourceConf, olSourceProps);
