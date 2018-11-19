@@ -147,7 +147,8 @@ Ext.define('CpsiMapview.factory.Layer', {
 
         var olLayerConf = {
             name: layerConf.text,
-            isTimeDedendent: !!layerConf.timeitem
+            isTimeDedendent: !!layerConf.timeitem,
+            dateFormat: layerConf.dateFormat
         };
         olLayerConf = Ext.apply(olLayerConf, olLayerProps);
 
@@ -184,6 +185,7 @@ Ext.define('CpsiMapview.factory.Layer', {
         }
 
         var featureType = layerConf.featureType;
+        var geometryProperty = layerConf.geometryProperty;
 
         // assemble fix URL parts
         var fixUrlParams =
@@ -201,10 +203,26 @@ Ext.define('CpsiMapview.factory.Layer', {
 
         var vectorSource = new ol.source.Vector(olSourceConf);
 
-        var loaderFn = function(extent) {
+        var loaderFn = function (extent) {
             vectorSource.dispatchEvent('vectorloadstart');
+
+            var allFilters = [];
+            var bboxFilter = BasiGX.util.WFS.getBboxFilter(
+                mapPanel.olMap,
+                geometryProperty,
+                extent
+            );
+            // this within the function is bound to the vector source it's
+            // called from.
+            var timeFilters = this.get('timeFilters');
+            if (!Ext.isEmpty(timeFilters)) {
+                allFilters = Ext.Array.merge(allFilters, timeFilters);
+            }
+            allFilters.push(bboxFilter);
+
+            var filter = BasiGX.util.WFS.combineFilters(allFilters);
             var reqUrl = Ext.String.urlAppend(
-                url, 'bbox=' + extent.join(',') + ',' + srid
+                url, 'filter=' + encodeURIComponent(filter)
             );
 
             var xhr = new XMLHttpRequest();
@@ -253,7 +271,9 @@ Ext.define('CpsiMapview.factory.Layer', {
         var olLayerConf = {
             name: layerConf.text,
             source: clusterSource ? clusterSource : vectorSource,
-            toolTipConfig: layerConf.tooltipsConfig
+            toolTipConfig: layerConf.tooltipsConfig,
+            isTimeDedendent: !!layerConf.timeitem,
+            dateFormat: layerConf.dateFormat
         };
         olLayerConf = Ext.apply(olLayerConf, olLayerProps);
 
