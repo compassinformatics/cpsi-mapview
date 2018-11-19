@@ -96,7 +96,7 @@
     }
   }, {
     "layerType": "wms",
-    "text": "Works_Export",
+    "text": "Works_Export (needs proxy)",
     "url": "mapserver/",
     "isBaseLayer": false,
     "isDefaultBaseLayer": false,
@@ -111,7 +111,7 @@
     }
   }, {
     "layerType": "wfs",
-    "text": "Test time WFS",
+    "text": "Test time WFS (needs proxy)",
     "url": "wfs/",
     "featureType": "test:osm-fuel",
     "serverOptions": {},
