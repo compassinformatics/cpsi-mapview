@@ -116,7 +116,7 @@
     "featureType": "test:osm-fuel",
     "serverOptions": {},
     "noCluster": true,
-    "timeitem": "TIME",
+    "timeitem": "time",
     "dateFormat": "c",
     "geometryProperty": "the_geom",
     "openLayers": {

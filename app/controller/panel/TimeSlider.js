@@ -78,12 +78,13 @@ Ext.define('CpsiMapview.controller.panel.TimeSlider', {
                 var dateFormat = layer.get('dateFormat') || 'C';
                 if (layerSource && (layerSource instanceof ol.source.TileWMS || layerSource instanceof ol.source.ImageWMS)) {
                     layerSource.updateParams({
-                        TIME: me.formatWmsDateString(values, isRange, timeIncrementUnit, dateFormat)
+                        TIME: me.formatDateString(values, isRange, timeIncrementUnit, dateFormat)
                     });
                 }
                 if (layerSource instanceof ol.source.Vector) {
-                    var timeString = me.formatWmsDateString(values, isRange, timeIncrementUnit, dateFormat);
-                    var filterParts = BasiGX.util.WFS.getTimeFilterParts(layer, 'time', timeString);
+                    var timeProperty = layer.get('timeProperty') || 'time';
+                    var timeString = me.formatDateString(values, isRange, timeIncrementUnit, dateFormat);
+                    var filterParts = BasiGX.util.WFS.getTimeFilterParts(layer, timeProperty, timeString);
                     layerSource.set('timeFilters', filterParts);
                     layerSource.clear(true);
                 }
@@ -103,9 +104,9 @@ Ext.define('CpsiMapview.controller.panel.TimeSlider', {
      *
      * @returns {String} The formatted time string
      */
-    formatWmsDateString: function (values, isRange, timeIncrementUnit, dateFormat) {
+    formatDateString: function (values, isRange, timeIncrementUnit, dateFormat) {
         var me = this;
-        // we must check for min / max here since the thumbs are not contrained
+        // we must check for min / max here since the thumbs are not constrained
         var startDate = me.getDateForSliderValue(Ext.Array.min(values));
         var endDate = me.getDateForSliderValue(Ext.Array.max(values));
 

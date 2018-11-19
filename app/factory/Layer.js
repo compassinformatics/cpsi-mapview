@@ -148,7 +148,8 @@ Ext.define('CpsiMapview.factory.Layer', {
         var olLayerConf = {
             name: layerConf.text,
             isTimeDedendent: !!layerConf.timeitem,
-            dateFormat: layerConf.dateFormat
+            dateFormat: layerConf.dateFormat,
+            timeProperty: layerConf.timeitem
         };
         olLayerConf = Ext.apply(olLayerConf, olLayerProps);
 
@@ -203,7 +204,7 @@ Ext.define('CpsiMapview.factory.Layer', {
 
         var vectorSource = new ol.source.Vector(olSourceConf);
 
-        var loaderFn = function (extent) {
+        var loaderFn = function(extent) {
             vectorSource.dispatchEvent('vectorloadstart');
 
             var allFilters = [];
@@ -273,7 +274,8 @@ Ext.define('CpsiMapview.factory.Layer', {
             source: clusterSource ? clusterSource : vectorSource,
             toolTipConfig: layerConf.tooltipsConfig,
             isTimeDedendent: !!layerConf.timeitem,
-            dateFormat: layerConf.dateFormat
+            dateFormat: layerConf.dateFormat,
+            timeProperty: layerConf.timeitem
         };
         olLayerConf = Ext.apply(olLayerConf, olLayerProps);
 
