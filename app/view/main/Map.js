@@ -64,6 +64,10 @@ Ext.define('CpsiMapview.view.main.Map', {
             xtype: 'basigx-button-history',
             direction: 'FORWARD',
             glyph: 'xf105@FontAwesome'
+        }, {
+            xtype: 'cmv_timeslider',
+            startDate: new Date(1900, 0, 1),
+            endDate: new Date(2040, 11, 30)
         }]
     }, {
         xtype: 'cmv_mapfooter',
@@ -170,6 +174,12 @@ Ext.define('CpsiMapview.view.main.Map', {
                         me.olMap.addLayer(layer);
                     }
                 });
+
+                var timeSlider = me.down('cmv_timeslider');
+                if (timeSlider) {
+                    timeSlider.fireEvent('allLayersAdded',
+                        timeSlider.down('multislider'));
+                }
             }
         });
 

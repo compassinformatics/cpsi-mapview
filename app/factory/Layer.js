@@ -70,7 +70,44 @@ Ext.define('CpsiMapview.factory.Layer', {
             //do nothing, and return empty layer
         }
 
+        // This is the same for all types
+        if (mapLayer) {
+            // handle base layer logic
+            if (layerConf.isBaseLayer) {
+                mapLayer.set('isBaseLayer', true);
+                mapLayer.on(
+                    'change:visible', LayerFactory.ensureOnlyOneBaseLayerVisible
+                );
+            }
+            // assign relevant legend properties
+            mapLayer.set('legendUrl', layerConf.legendUrl);
+            mapLayer.set('legendHeight', layerConf.legendHeight);
+            mapLayer.set('legendWidth', layerConf.legendWidth);
+        }
+
         return mapLayer;
+    },
+
+    /**
+     * The handler when a virtual base layer changes its visibility. This method
+     * ensures that only one of these virtual base layers is visible at a time.
+     *
+     * @param {ol.Object.Event} evt The event which contains the layer.
+     */
+    ensureOnlyOneBaseLayerVisible: function(evt) {
+        var changedLayer = evt.target;
+        if (changedLayer.get('isBaseLayer') && changedLayer.getVisible()) {
+            var allLayers = BasiGX.util.Layer.getAllLayers();
+            Ext.each(allLayers, function(layer) {
+                if (!layer.get('isBaseLayer') || layer.id === changedLayer.id) {
+                    return;
+                }
+                if (layer.getVisible()) {
+                    layer.setVisible(false);
+                }
+            });
+        }
+
     },
 
     createEmptyLayer: function(layerConf) {
@@ -106,7 +143,8 @@ Ext.define('CpsiMapview.factory.Layer', {
                 visible: layerConf.openLayers.visibility,
                 minResolution: layerConf.openLayers.minResolution,
                 maxResolution: layerConf.openLayers.maxResolution,
-                opacity: layerConf.openLayers.opacity
+                opacity: layerConf.openLayers.opacity,
+                isTimeDedendent: !!layerConf.timeitem
             });
         } else {
             layer = new ol.layer.Tile({
@@ -123,7 +161,8 @@ Ext.define('CpsiMapview.factory.Layer', {
                 visible: layerConf.openLayers.visibility,
                 minResolution: layerConf.openLayers.minResolution,
                 maxResolution: layerConf.openLayers.maxResolution,
-                opacity: layerConf.openLayers.opacity
+                opacity: layerConf.openLayers.opacity,
+                isTimeDedendent: !!layerConf.timeitem
             });
         }
 

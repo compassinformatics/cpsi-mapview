@@ -33,6 +33,10 @@ Ext.define('CpsiMapview.view.main.Main', {
         region: 'west',
         width: 300,
         collapsible: true,
+        layout: {
+            type: 'vbox',
+            align: 'stretch'
+        },
         items: {
             xtype: 'cmv_layertree'
         }

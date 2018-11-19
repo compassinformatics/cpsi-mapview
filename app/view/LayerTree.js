@@ -6,15 +6,31 @@ Ext.define('CpsiMapview.view.LayerTree', {
     xtype: 'cmv_layertree',
     requires: [
         'BasiGX.util.Map',
-        'GeoExt.data.store.LayersTree'
+        'GeoExt.data.store.LayersTree',
+        'CpsiMapview.plugin.BasicTreeColumnLegends'
     ],
-
     // So that instanciation works without errors, might be changed during
     // instanciation of the LayerTree.
     store: {},
     rootVisible: false,
     viewConfig: {
         plugins: { ptype: 'treeviewdragdrop' }
+    },
+    hideHeaders: true,
+    lines: false,
+    flex: 1,
+    columns: {
+        header: false,
+        items: [
+            {
+                xtype: 'treecolumn',
+                dataIndex: 'text',
+                flex: 1,
+                plugins: [{
+                    ptype: 'basic_tree_column_legend'
+                }]
+            }
+        ]
     },
 
     /**
