@@ -78,6 +78,7 @@ Ext.define('CpsiMapview.view.LayerTree', {
     initComponent: function () {
         var me = this;
         var mapPanel = CpsiMapview.view.main.Map.guess();
+
         mapPanel.on('cmv-init-layersadded', function () {
             me.initLayersAdded = true;
         });
@@ -112,16 +113,14 @@ Ext.define('CpsiMapview.view.LayerTree', {
     makeLayerStore: function(map) {
         var me = this;
         var mapPanel = CpsiMapview.view.main.Map.guess();
-
-        var store = Ext.create('GeoExt.data.store.LayersTree', {
-            layerGroup: map.getLayerGroup()
-        });
+        var store;
 
         if (me.structureMode === 'BASELAYER_OVERLAY') {
             // re-groups the map layers by divding them between base layers and
             // overlays. Then recreates the LayerStore and applies it to this
             // tree.
             var regroupLayerStore = function () {
+
                 // create group layers
                 var finalLayerGroup = me.getGroupedLayers(map);
                 map.setLayerGroup(finalLayerGroup);
@@ -143,6 +142,10 @@ Ext.define('CpsiMapview.view.LayerTree', {
             } else {
                 regroupLayerStore();
             }
+        } else {
+            store = Ext.create('GeoExt.data.store.LayersTree', {
+                layerGroup: map.getLayerGroup()
+            });
         }
 
         return store;
