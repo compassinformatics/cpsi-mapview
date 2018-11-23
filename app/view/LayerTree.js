@@ -130,6 +130,9 @@ Ext.define('CpsiMapview.view.LayerTree', {
                     layerGroup: map.getLayerGroup()
                 });
                 me.setStore(groupedStore);
+
+                // expand all folders in this tree
+                me.expandAll();
             };
 
             // check if all layers have been loaded already
@@ -140,7 +143,6 @@ Ext.define('CpsiMapview.view.LayerTree', {
             } else {
                 regroupLayerStore();
             }
-
         }
 
         return store;
