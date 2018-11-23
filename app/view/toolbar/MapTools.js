@@ -32,7 +32,7 @@ Ext.define('CpsiMapview.view.toolbar.MapTools', {
             xtype: 'basigx-button-measure',
             measureType: 'line',
             toggleGroup: 'measure-tools',
-            viewModel: 'cmw_btn_measure',
+            viewModel: 'cmv_btn_measure',
             controller: 'cmv_btn_measure',
             glyph: 'xf068@FontAwesome',
             listeners: {
@@ -43,7 +43,7 @@ Ext.define('CpsiMapview.view.toolbar.MapTools', {
             measureType: 'polygon',
             toggleGroup: 'measure-tools',
             glyph: 'xf044@FontAwesome',
-            viewModel: 'cmw_btn_measure',
+            viewModel: 'cmv_btn_measure',
             controller: 'cmv_btn_measure',
             listeners: {
                 afterrender: 'initializeMeasureBtn'
