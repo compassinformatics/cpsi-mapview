@@ -21,7 +21,8 @@ Ext.define('CpsiMapview.view.main.Map', {
     controller: 'cmv_map',
 
     dockedItems: [{
-        xtype: 'cmv_maptools'
+        xtype: 'cmv_maptools',
+        dock: 'top',
     }, {
         xtype: 'cmv_mapfooter',
         dock: 'bottom'

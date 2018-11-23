@@ -5,7 +5,7 @@
     "isBaseLayer": true,
     "isDefaultBaseLayer": false,
     "text": "Grey Background",
-    "url": "http://services.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Light_Gray_Base/MapServer/tile/",
+    "url": "https://services.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Light_Gray_Base/MapServer/tile/",
     "openLayers": {
       "maxResolution": 1222.99245234375,
       "numZoomLevels": 13,
@@ -38,7 +38,7 @@
     "isBaseLayer": false,
     "isDefaultBaseLayer": false,
     "text": "A WMS",
-    "url": "http://ows.terrestris.de/osm-gray/service",
+    "url": "https://ows.terrestris.de/osm-gray/service",
     "serverOptions": {
       "layers": "OSM-WMS"
     },
@@ -53,7 +53,7 @@
   }, {
     "layerType": "wfs",
     "text": "Country WFS",
-    "url": "http://ows.terrestris.de/geoserver/osm/wfs",
+    "url": "https://ows.terrestris.de/geoserver/osm/wfs",
     "featureType": "osm:osm-country-borders",
     "serverOptions": {},
     "noCluster": true,
@@ -67,7 +67,7 @@
   }, {
     "layerType": "wfs",
     "text": "GAS WFS",
-    "url": "http://ows.terrestris.de/geoserver/osm/wfs",
+    "url": "https://ows.terrestris.de/geoserver/osm/wfs",
     "featureType": "osm:osm-fuel",
     "serverOptions": {},
     "noCluster": false,
@@ -96,17 +96,36 @@
     }
   }, {
     "layerType": "wms",
-    "text": "Works_Export",
+    "text": "Works_Export (needs proxy)",
     "url": "mapserver/",
     "isBaseLayer": false,
     "isDefaultBaseLayer": false,
     "timeitem": "TIME",
+    "dateFormat": "Y",
     "serverOptions": {
       "layers": "Works_Type",
       "version": "1.1.1"
     },
     "openLayers": {
-      "singleTile": true
+      "singleTile": true,
+      "visibility": false
+    }
+  }, {
+    "layerType": "wfs",
+    "text": "Test time WFS (needs proxy)",
+    "url": "wfs/",
+    "featureType": "test:osm-fuel",
+    "serverOptions": {},
+    "noCluster": true,
+    "timeitem": "time",
+    "dateFormat": "c",
+    "geometryProperty": "the_geom",
+    "openLayers": {
+      "maxResolution": 1222.99245234375,
+      "numZoomLevels": 12,
+      "opacity": 0.7,
+      "projection": "EPSG:900913",
+      "visibility": false
     }
   }]
 }
