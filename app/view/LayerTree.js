@@ -27,7 +27,7 @@ Ext.define('CpsiMapview.view.LayerTree', {
                 dataIndex: 'text',
                 flex: 1,
                 plugins: [{
-                    ptype: 'basic_tree_column_legend'
+                    ptype: 'cmv_basic_tree_column_legend'
                 }]
             }
         ]

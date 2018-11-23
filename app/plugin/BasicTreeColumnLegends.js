@@ -4,8 +4,8 @@
  */
 Ext.define('CpsiMapview.plugin.BasicTreeColumnLegends', {
     extend: 'Ext.plugin.Abstract',
-    alias: 'plugin.basic_tree_column_legend',
-    pluginId: 'basic_tree_column_legend',
+    alias: 'plugin.cmv_basic_tree_column_legend',
+    pluginId: 'cmv_basic_tree_column_legend',
 
     /**
      * @private
