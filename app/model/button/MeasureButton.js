@@ -4,7 +4,7 @@
 Ext.define('CpsiMapview.model.button.MeasureButton', {
     extend: 'Ext.app.ViewModel',
 
-    alias: 'viewmodel.cmw_btn_measure',
+    alias: 'viewmodel.cmv_btn_measure',
 
     data: {
         measureTooltext: null, // don't show text
