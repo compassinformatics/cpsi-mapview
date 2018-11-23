@@ -38,7 +38,8 @@ Ext.define('CpsiMapview.view.main.Main', {
             align: 'stretch'
         },
         items: {
-            xtype: 'cmv_layertree'
+            xtype: 'cmv_layertree',
+            structureMode: 'BASELAYER_OVERLAY'
         }
     }, {
         xtype: 'cmv_header'

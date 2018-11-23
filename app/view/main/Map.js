@@ -129,6 +129,9 @@ Ext.define('CpsiMapview.view.main.Map', {
                     }
                 });
 
+                // fire event to inform subscribers that all layers are loaded
+                me.fireEvent('cmv-init-layersadded', me);
+
                 var timeSlider = me.down('cmv_timeslider');
                 if (timeSlider) {
                     timeSlider.fireEvent('allLayersAdded',
