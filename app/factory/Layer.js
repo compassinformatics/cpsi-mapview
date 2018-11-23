@@ -85,6 +85,11 @@ Ext.define('CpsiMapview.factory.Layer', {
             mapLayer.set('legendUrl', layerConf.legendUrl);
             mapLayer.set('legendHeight', layerConf.legendHeight);
             mapLayer.set('legendWidth', layerConf.legendWidth);
+
+            // this gets transformed to qtip on the layer tree node
+            mapLayer.set('description', layerConf.qtip);
+            // changes the icon in the layer tree leaf
+            mapLayer.set('iconCls', layerConf.iconCls);
         }
 
         return mapLayer;
