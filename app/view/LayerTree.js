@@ -9,6 +9,14 @@ Ext.define('CpsiMapview.view.LayerTree', {
         'GeoExt.data.store.LayersTree',
         'CpsiMapview.plugin.BasicTreeColumnLegends'
     ],
+
+    viewModel: {
+        data: {
+            baseLayerGroupText: 'Base Layers',
+            overlayGroupText: 'Layers',
+        }
+    },
+
     // So that instanciation works without errors, might be changed during
     // instanciation of the LayerTree.
     store: {},
@@ -164,6 +172,7 @@ Ext.define('CpsiMapview.view.LayerTree', {
      * @return {ol.layer.Group}   Root layer group holding groups for base layers and overlays
      */
     getGroupedLayers: function (map) {
+        var me = this;
         var allLayers = map.getLayerGroup().getLayers().getArray();
         var baseLayers = [];
         var overlays = [];
@@ -178,12 +187,12 @@ Ext.define('CpsiMapview.view.LayerTree', {
         });
 
         var baseLayerGroup = new ol.layer.Group({
-            name: 'Base Layers',
+            name: me.getViewModel().get('baseLayerGroupText'),
             layers: baseLayers,
             expanded: true
         });
         var overlayGroup = new ol.layer.Group({
-            name: 'Overlays',
+            name: me.getViewModel().get('overlayGroupText'),
             layers: overlays
         });
         var rootLayerGroup = new ol.layer.Group({
