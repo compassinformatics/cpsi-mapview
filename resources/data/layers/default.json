@@ -34,7 +34,7 @@
   }, {
     "layerType": "wms",
     "helpPage": "OSM",
-    "qtip": "Am OSM based WMS layer",
+    "qtip": "An OSM based WMS layer",
     "iconCls": "map",
     "isBaseLayer": false,
     "isDefaultBaseLayer": false,
@@ -54,7 +54,7 @@
   }, {
     "layerType": "wfs",
     "text": "Country WFS",
-    "qtip": "Am OSM based WFS layer",
+    "qtip": "An OSM based WFS layer",
     "url": "https://ows.terrestris.de/geoserver/osm/wfs",
     "featureType": "osm:osm-country-borders",
     "serverOptions": {},
