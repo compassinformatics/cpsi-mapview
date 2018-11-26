@@ -99,6 +99,12 @@ Ext.define('CpsiMapview.view.main.Map', {
      * @param {ol.MapBrowserEvent)} evt The original 'singleclick' event of OpenLayers
      */
 
+    /**
+     * @event cmv-init-layersadded
+     * Fires when all initial layers from the config have been created and added to the OL map.
+     * @param {CpsiMapview.view.main.Map} this
+     */
+
     inheritableStatics: {
         /**
          * Tries to detect the first occurance of this map panel.

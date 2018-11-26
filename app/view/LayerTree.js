@@ -106,6 +106,10 @@ Ext.define('CpsiMapview.view.LayerTree', {
     /**
      * Given a `ol.Map` this method will return an instance of the GeoExt class
      * GeoExt.data.store.LayersTree, which will work on the topmost layergroup.
+     * In case this store is configured with `this.structureMode ===
+     * 'BASELAYER_OVERLAY'` the layers of the `ol.Map` are restructured and
+     * divided into two groups ('Base Layer' and 'Overlays'). This assures that
+     * the layers will appear in two folders in a connected TreePanel.
      *
      * @param  {ol.Map} map The map to create the store from.
      * @return {GeoExt.data.store.LayersTree} The created store.
@@ -120,7 +124,6 @@ Ext.define('CpsiMapview.view.LayerTree', {
             // overlays. Then recreates the LayerStore and applies it to this
             // tree.
             var regroupLayerStore = function () {
-
                 // create group layers
                 var finalLayerGroup = me.getGroupedLayers(map);
                 map.setLayerGroup(finalLayerGroup);
@@ -154,7 +157,7 @@ Ext.define('CpsiMapview.view.LayerTree', {
     /**
      * Re-groups the layers of the given map, so they are divided between base
      * layers and overlays.
-     * For each type a layer an OL layer group is created and aggregated in a
+     * For each type an OL layer group is created and aggregated in a
      * root layer group.
      *
      * @param  {ol.Map} allLayers The map to get the grouped layers for
