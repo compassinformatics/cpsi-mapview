@@ -70,9 +70,10 @@
     "layerType": "wfs",
     "text": "GAS WFS",
     "url": "https://ows.terrestris.de/geoserver/osm/wfs",
+    "sldUrl": "resources/data/styling/Test_Gas.xml",
     "featureType": "osm:osm-fuel",
     "serverOptions": {},
-    "noCluster": false,
+    "noCluster": true,
     "tooltipsConfig": [
         {
             "property": "id"

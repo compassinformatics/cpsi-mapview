@@ -10,7 +10,9 @@ module.exports = {
         "BasiGX": false,
         "GeoExt": false,
         "CpsiMapview": false,
-        "LayerFactory": false
+        "LayerFactory": false,
+        "GeoStylerSLDParser": false,
+        "GeoStylerOpenlayersParser": false
     },
     "parserOptions": {
         "ecmaVersion": 5
