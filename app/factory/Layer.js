@@ -538,7 +538,7 @@ Ext.define('CpsiMapview.factory.Layer', {
             success: function(response) {
                 var sldXml = response.responseText;
                 var sldParser = new GeoStylerSLDParser.SldStyleParser();
-                var olParser = new GeoStylerOpenlayersParser.OlStyleParser();
+                var olParser = new GeoStylerOpenlayersParser.OlStyleParser(ol);
 
                 sldParser.readStyle(sldXml)
                     .then(function (gs) {

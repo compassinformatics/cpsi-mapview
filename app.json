@@ -208,7 +208,7 @@
      */
     "js": [
         {
-            "path": "./lib/openlayers/ol-debug.js"
+            "path": "./lib/openlayers/ol.js"
         },
         {
             "path": "./lib/geostyler/sld-style-parser/sldStyleParser.js"
