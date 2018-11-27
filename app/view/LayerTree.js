@@ -127,6 +127,17 @@ Ext.define('CpsiMapview.view.LayerTree', {
         var mapPanel = CpsiMapview.view.main.Map.guess();
         var store;
 
+        // filter function for LayerTreeStore to hide unwanted layers in tree
+        var layerFilter = function (layerRec) {
+            var layer = layerRec.getOlLayer();
+            if (layer) {
+                // neither displayInLayerSwitcher=false (our flag) nor
+                // bp_displayInLayerSwitcher=false (flag of BasiGX)
+                return layer.get('displayInLayerSwitcher') !== false &&
+                    layer.get('bp_displayInLayerSwitcher') !== false;
+            }
+        };
+
         if (me.structureMode === 'BASELAYER_OVERLAY') {
             // re-groups the map layers by divding them between base layers and
             // overlays. Then recreates the LayerStore and applies it to this
@@ -137,7 +148,8 @@ Ext.define('CpsiMapview.view.LayerTree', {
                 map.setLayerGroup(finalLayerGroup);
                 // create a new LayerStore from the grouped layers
                 var groupedStore = Ext.create('GeoExt.data.store.LayersTree', {
-                    layerGroup: map.getLayerGroup()
+                    layerGroup: map.getLayerGroup(),
+                    filters: layerFilter
                 });
                 me.setStore(groupedStore);
 
@@ -155,7 +167,8 @@ Ext.define('CpsiMapview.view.LayerTree', {
             }
         } else {
             store = Ext.create('GeoExt.data.store.LayersTree', {
-                layerGroup: map.getLayerGroup()
+                layerGroup: map.getLayerGroup(),
+                filters: layerFilter
             });
         }
 
