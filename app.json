@@ -211,6 +211,12 @@
             "path": "./lib/openlayers/ol.js"
         },
         {
+            "path": "./lib/geostyler/sld-style-parser/sldStyleParser.js"
+        },
+        {
+            "path": "./lib/geostyler/ol-style-parser/olStyleParser.js"
+        },
+        {
             "path": "https://cdnjs.cloudflare.com/ajax/libs/proj4js/2.5.0/proj4.js"
         },
         {

@@ -267,13 +267,6 @@ Ext.define('CpsiMapview.factory.Layer', {
             clusterSource = new ol.source.Cluster(clusterSourceConf);
         }
 
-        var sldUrl = layerConf.sldUrl;
-        var sld = layerConf.sld;
-        if (sldUrl && sld) {
-            // TODO load and parse style (in whatever format, to be discussed)
-            // this.loadSLD(mapLayer, sld, this.mapFile, sldUrl);
-        }
-
         var olLayerConf = {
             name: layerConf.text,
             source: clusterSource ? clusterSource : vectorSource,
@@ -285,6 +278,12 @@ Ext.define('CpsiMapview.factory.Layer', {
         olLayerConf = Ext.apply(olLayerConf, olLayerProps);
 
         var wfsLayer = new ol.layer.Vector(olLayerConf);
+
+        var sldUrl = layerConf.sldUrl;
+        if (sldUrl) {
+            // load and parse style and apply it to layer
+            LayerFactory.loadSld(wfsLayer, sldUrl);
+        }
 
         if (layerConf.tooltipsConfig) {
             // create a custom toolitp for this layer
@@ -523,6 +522,40 @@ Ext.define('CpsiMapview.factory.Layer', {
         };
 
         return olSourceProps;
+    },
+
+    /**
+     * Loads and parses the given SLD (by URL) and applies it to the given
+     * vector layer.
+     *
+     * @param  {ol.layer.Vector} mapLayer The layer to apply the style to
+     * @param  {String} sldUrl   The URL to the SLD
+     */
+    loadSld: function (mapLayer, sldUrl) {
+        Ext.Ajax.request({
+            url: sldUrl,
+            method: 'GET',
+            success: function(response) {
+                var sldXml = response.responseText;
+                var sldParser = new GeoStylerSLDParser.SldStyleParser();
+                var olParser = new GeoStylerOpenlayersParser.OlStyleParser(ol);
+
+                sldParser.readStyle(sldXml)
+                    .then(function (gs) {
+                        olParser.writeStyle(gs).then(function (olStyle) {
+                            mapLayer.setStyle(olStyle);
+                        });
+                    }, function() {
+                        // rejection
+                        Ext.log.warn('Could not parse SLD ' + sldUrl +
+                            '! Default OL style will be applied.');
+                    });
+            },
+            failure: function() {
+                Ext.log.warn('Could not load SLD ' + sldUrl +
+                    '! Default OL style will be applied.');
+            }
+        });
     }
 
 });
