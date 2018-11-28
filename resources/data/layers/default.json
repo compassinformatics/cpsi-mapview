@@ -34,6 +34,7 @@
   }, {
     "layerType": "wms",
     "helpPage": "OSM",
+    "qtip": "An OSM based WMS layer",
     "iconCls": "map",
     "isBaseLayer": false,
     "isDefaultBaseLayer": false,
@@ -53,6 +54,7 @@
   }, {
     "layerType": "wfs",
     "text": "Country WFS",
+    "qtip": "An OSM based WFS layer",
     "url": "https://ows.terrestris.de/geoserver/osm/wfs",
     "featureType": "osm:osm-country-borders",
     "serverOptions": {},
@@ -68,9 +70,10 @@
     "layerType": "wfs",
     "text": "GAS WFS",
     "url": "https://ows.terrestris.de/geoserver/osm/wfs",
+    "sldUrl": "resources/data/styling/Test_Gas.xml",
     "featureType": "osm:osm-fuel",
     "serverOptions": {},
-    "noCluster": false,
+    "noCluster": true,
     "tooltipsConfig": [
         {
             "property": "id"
