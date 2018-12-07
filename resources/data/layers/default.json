@@ -95,7 +95,7 @@
       "numZoomLevels": 12,
       "opacity": 0.7,
       "projection": "EPSG:900913",
-      "visibility": true
+      "visibility": false
     }
   }, {
     "layerType": "wms",
@@ -130,5 +130,23 @@
       "projection": "EPSG:900913",
       "visibility": false
     }
-  }]
+  }, {
+      "layerType": "wfs",
+      "text": "Accidents",
+      "url": "https://pmstipperarydev.compass.ie/mapserver/?",
+      "geometryProperty": "msGeometry",
+      "featureType": "Accidents",
+      "openLayers": {
+        "maxResolution": 1222.99245234375,
+        "numZoomLevels": 12,
+        "opacity": 0.9,
+        "visibility": true
+      },
+      "serverOptions": {
+        "outputFormat": "application/json; subtype=geojson"
+      },
+      "noCluster": false,
+      "timeitem": "DATE",
+      "dateFormat": "Y-m-d"
+    }]
 }
