@@ -71,7 +71,7 @@ Ext.define('CpsiMapview.controller.panel.TimeSlider', {
         var me = this;
         var values = slider.getValues();
         var timeIncrementUnit = slider.up('cmv_timeslider').timeIncrementUnit || 'year';
-        var timeLayers = BasiGX.util.Layer.getLayersBy('isTimeDedendent', true);
+        var timeLayers = BasiGX.util.Layer.getLayersBy('isTimeDependent', true);
         Ext.each(timeLayers, function (layer) {
             if (layer) {
                 var layerSource = layer.getSource();
@@ -82,11 +82,16 @@ Ext.define('CpsiMapview.controller.panel.TimeSlider', {
                     });
                 }
                 if (layerSource instanceof ol.source.Vector) {
+                    if (layerSource instanceof ol.source.Cluster) {
+                        layerSource = layerSource.getSource();
+                    }
                     var timeProperty = layer.get('timeProperty') || 'time';
                     var timeString = me.formatDateString(values, isRange, timeIncrementUnit, dateFormat);
                     var filterParts = BasiGX.util.WFS.getTimeFilterParts(layer, timeProperty, timeString);
                     layerSource.set('timeFilters', filterParts);
-                    layerSource.clear(true);
+                    if (layer.getVisible()) {
+                        layerSource.clear(true);
+                    }
                 }
             }
         });

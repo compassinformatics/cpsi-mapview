@@ -152,7 +152,7 @@ Ext.define('CpsiMapview.factory.Layer', {
 
         var olLayerConf = {
             name: layerConf.text,
-            isTimeDedendent: !!layerConf.timeitem,
+            isTimeDependent: !!layerConf.timeitem,
             dateFormat: layerConf.dateFormat,
             timeProperty: layerConf.timeitem
         };
@@ -192,14 +192,27 @@ Ext.define('CpsiMapview.factory.Layer', {
 
         var featureType = layerConf.featureType;
         var geometryProperty = layerConf.geometryProperty;
+        var serverOptions = layerConf.serverOptions || {};
 
-        // assemble fix URL parts
-        var fixUrlParams =
-            'service=WFS&request=GetFeature&version=1.1.0' +
-            '&typename=' + featureType +
-            '&outputFormat=application/json' +
-            '&srsname=' + srid;
-        url = Ext.String.urlAppend(url, fixUrlParams);
+        var params = {
+            SERVICE: 'WFS',
+            REQUEST: 'GetFeature',
+            VERSION: '1.1.0',
+            OUTPUTFORMAT: 'application/json',
+            TYPENAME: featureType,
+            SRSNAME: srid
+        };
+
+        Ext.iterate(serverOptions, function(key, val) {
+            key = (key + '').toUpperCase();
+            if (key in params && val === null) {
+                delete params[key];
+            } else {
+                params[key] = val;
+            }
+        });
+
+        url = Ext.String.urlAppend(url, Ext.Object.toQueryString(params));
 
         var olSourceConf = {
             format: new ol.format.GeoJSON(),
@@ -216,11 +229,13 @@ Ext.define('CpsiMapview.factory.Layer', {
             var bboxFilter = BasiGX.util.WFS.getBboxFilter(
                 mapPanel.olMap,
                 geometryProperty,
-                extent
+                extent,
+                'bbox'
             );
             // this within the function is bound to the vector source it's
             // called from.
             var timeFilters = this.get('timeFilters');
+
             if (!Ext.isEmpty(timeFilters)) {
                 allFilters = Ext.Array.merge(allFilters, timeFilters);
             }
@@ -228,7 +243,7 @@ Ext.define('CpsiMapview.factory.Layer', {
 
             var filter = BasiGX.util.WFS.combineFilters(allFilters);
             var reqUrl = Ext.String.urlAppend(
-                url, 'filter=' + encodeURIComponent(filter)
+                url, 'FILTER=' + encodeURIComponent(filter)
             );
 
             var xhr = new XMLHttpRequest();
@@ -271,7 +286,7 @@ Ext.define('CpsiMapview.factory.Layer', {
             name: layerConf.text,
             source: clusterSource ? clusterSource : vectorSource,
             toolTipConfig: layerConf.tooltipsConfig,
-            isTimeDedendent: !!layerConf.timeitem,
+            isTimeDependent: !!layerConf.timeitem,
             dateFormat: layerConf.dateFormat,
             timeProperty: layerConf.timeitem
         };
