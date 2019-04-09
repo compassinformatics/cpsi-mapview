@@ -25,9 +25,12 @@ Ext.define('CpsiMapview.view.toolbar.MapTools', {
             xtype: 'basigx-button-zoomtoextent',
             extent: [-1210762, 6688545, -600489, 7490828]
         }, {
-            xtype: 'basigx-button-zoomin'
+            xtype: 'basigx-button-zoomin',
+            toggleGroup: 'zoom'
         }, {
-            xtype: 'basigx-button-zoomout'
+            xtype: 'basigx-button-zoomout',
+            toggleGroup: 'zoom',
+            enableZoomOutWithBox: true
         }, {
             xtype: 'basigx-button-measure',
             measureType: 'line',
