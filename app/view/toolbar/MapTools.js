@@ -10,6 +10,7 @@ Ext.define('CpsiMapview.view.toolbar.MapTools', {
         'BasiGX.view.button.ZoomOut',
         'BasiGX.view.button.ZoomToExtent',
         'BasiGX.view.button.History',
+        'CpsiMapview.view.button.DigitizeButton',
 
         'CpsiMapview.model.button.MeasureButton',
         'CpsiMapview.controller.button.MeasureButtonController',
@@ -59,6 +60,22 @@ Ext.define('CpsiMapview.view.toolbar.MapTools', {
             xtype: 'basigx-button-history',
             direction: 'FORWARD',
             glyph: 'xf105@FontAwesome'
+        }, {
+            xtype: 'cmv_digitize_button',
+            tooltip: 'Point',
+            apiUrl: 'https://pmstipperarydev.compass.ie/pmspy/netsolver',
+            useContextMenu: true,
+            pointExtentBuffer: 50
+        }, {
+            xtype: 'cmv_digitize_button',
+            type: 'LineString',
+            tooltip: 'Line'
+        }, {
+            xtype: 'cmv_digitize_button',
+            type: 'Polygon',
+            tooltip: 'Polygon',
+            apiUrl: 'https://pmstipperarydev.compass.ie/WebServices/roadschedule/cutWithPolygon',
+            clearDrawnFeature: false
         }, {
             xtype: 'cmv_timeslider',
             startDate: new Date(2014, 0, 1),
