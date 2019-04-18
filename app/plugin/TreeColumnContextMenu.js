@@ -1,6 +1,6 @@
 /**
  * Plugin in order to show a ContextMenu for a layer in the LayerTree.
- * ContextMenu is opened on right-cliking a layer in the tree and shows all
+ * ContextMenu is opened on right-clicking a layer in the tree and shows all
  * configured menu items / tools.
  *
  * @class CpsiMapview.plugin.TreeColumnContextMenu
@@ -9,6 +9,13 @@ Ext.define('CpsiMapview.plugin.TreeColumnContextMenu', {
     extend: 'GeoExt.plugin.layertreenode.ContextMenu',
     alias: 'plugin.cmv_tree_column_context_menu',
     pluginId: 'cmv_tree_column_context_menu',
+
+    /**
+     * The 'xtypes' of the items, which will be shown in this context menu.
+     *
+     * @cfg {String[]}
+     */
+    menuItems: [],
 
     /**
      * @private
