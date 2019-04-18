@@ -9,7 +9,8 @@ Ext.define('CpsiMapview.view.LayerTree', {
         'GeoExt.data.store.LayersTree',
         'CpsiMapview.plugin.BasicTreeColumnLegends',
         'CpsiMapview.plugin.TreeColumnContextMenu',
-        'CpsiMapview.view.menuitem.LayerRefresh'
+        'CpsiMapview.view.menuitem.LayerRefresh',
+        'CpsiMapview.view.menuitem.LayerLabels'
     ],
 
     viewModel: {
@@ -41,7 +42,8 @@ Ext.define('CpsiMapview.view.LayerTree', {
                 }, {
                     ptype: 'cmv_tree_column_context_menu',
                     menuItems: [
-                        'cmv_menuitem_layerrefresh'
+                        'cmv_menuitem_layerrefresh',
+                        'cmv_menuitem_layerlabels'
                     ]
                 }]
             }

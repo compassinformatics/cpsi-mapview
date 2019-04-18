@@ -93,6 +93,8 @@ Ext.define('CpsiMapview.factory.Layer', {
             // indicator if a refresh option is offered in layer context menu
             var allowRefresh = layerConf.refreshLayerOption !== false;
             mapLayer.set('refreshLayerOption', allowRefresh);
+            // indicator if a label option is drawn in layer context menu
+            mapLayer.set('labelClassName', layerConf.labelClassName);
         }
 
         return mapLayer;
