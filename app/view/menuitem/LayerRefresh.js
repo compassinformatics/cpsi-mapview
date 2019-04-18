@@ -54,11 +54,12 @@ Ext.define('CpsiMapview.view.menuitem.LayerRefresh', {
             params.noCache = new Date().getMilliseconds();
             source.updateParams(params);
             source.refresh();
-        }
-
-        // mostly WFS layers
-        if (source instanceof ol.source.Vector) {
+        } else if (me.layer.get('isWfs') === true) {
+            // for WFS trigger reload of source
             source.clear();
+        } else {
+            // only refresh for other layers and sources (to not loose data)
+            source.refresh();
         }
     }
 });

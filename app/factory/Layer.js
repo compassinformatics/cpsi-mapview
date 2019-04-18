@@ -291,7 +291,8 @@ Ext.define('CpsiMapview.factory.Layer', {
             toolTipConfig: layerConf.tooltipsConfig,
             isTimeDependent: !!layerConf.timeitem,
             dateFormat: layerConf.dateFormat,
-            timeProperty: layerConf.timeitem
+            timeProperty: layerConf.timeitem,
+            isWfs: true
         };
         olLayerConf = Ext.apply(olLayerConf, olLayerProps);
 
