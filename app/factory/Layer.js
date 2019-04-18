@@ -90,6 +90,9 @@ Ext.define('CpsiMapview.factory.Layer', {
             mapLayer.set('description', layerConf.qtip);
             // changes the icon in the layer tree leaf
             mapLayer.set('iconCls', layerConf.iconCls);
+            // indicator if a refresh option is offered in layer context menu
+            var allowRefresh = layerConf.refreshLayerOption !== false;
+            mapLayer.set('refreshLayerOption', allowRefresh);
         }
 
         return mapLayer;
@@ -288,7 +291,8 @@ Ext.define('CpsiMapview.factory.Layer', {
             toolTipConfig: layerConf.tooltipsConfig,
             isTimeDependent: !!layerConf.timeitem,
             dateFormat: layerConf.dateFormat,
-            timeProperty: layerConf.timeitem
+            timeProperty: layerConf.timeitem,
+            isWfs: true
         };
         olLayerConf = Ext.apply(olLayerConf, olLayerProps);
 

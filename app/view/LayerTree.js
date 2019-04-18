@@ -7,7 +7,9 @@ Ext.define('CpsiMapview.view.LayerTree', {
     requires: [
         'BasiGX.util.Map',
         'GeoExt.data.store.LayersTree',
-        'CpsiMapview.plugin.BasicTreeColumnLegends'
+        'CpsiMapview.plugin.BasicTreeColumnLegends',
+        'CpsiMapview.plugin.TreeColumnContextMenu',
+        'CpsiMapview.view.menuitem.LayerRefresh'
     ],
 
     viewModel: {
@@ -36,6 +38,11 @@ Ext.define('CpsiMapview.view.LayerTree', {
                 flex: 1,
                 plugins: [{
                     ptype: 'cmv_basic_tree_column_legend'
+                }, {
+                    ptype: 'cmv_tree_column_context_menu',
+                    menuItems: [
+                        'cmv_menuitem_layerrefresh'
+                    ]
                 }]
             }
         ]
