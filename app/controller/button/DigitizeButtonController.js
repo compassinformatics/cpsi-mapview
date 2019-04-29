@@ -289,13 +289,17 @@ Ext.define('CpsiMapview.controller.button.DigitizeButtonController', {
         var mapComponent = me.mapComponent || BasiGX.util.Map.getMapComponent();
         var view = me.getView();
         var url = view.getApiUrl();
+
         if (!url) {
             return;
         }
+
         if (searchParams) {
             url = Ext.urlAppend(url, searchParams);
         }
+
         mapComponent.setLoading(true);
+
         Ext.Ajax.request({
             url: url,
             method: 'POST',
@@ -305,7 +309,15 @@ Ext.define('CpsiMapview.controller.button.DigitizeButtonController', {
             },
             success: me.handleApiResponse.bind(me),
             failure: function(response) {
-                BasiGX.error(response.responseText.message);
+                me.removeLastDigitizeFeature();
+
+                var errorMessage = 'Error while requesting the API endpoint';
+
+                if (response.responseText && response.responseText.message) {
+                    errorMessage += ': ' + response.responseText.message;
+                }
+
+                BasiGX.error(errorMessage);
             }
         });
     },
@@ -322,10 +334,13 @@ Ext.define('CpsiMapview.controller.button.DigitizeButtonController', {
         var view = me.getView();
         var format = new ol.format.GeoJSON();
         var json;
-        if(!Ext.isEmpty(response.responseText)) {
+
+        if (!Ext.isEmpty(response.responseText)) {
             try {
                 json = Ext.decode(response.responseText);
             } catch (e) {
+                me.removeLastDigitizeFeature();
+
                 BasiGX.error('Could not parse the response: ' +
                     response.responseText);
                 return;
@@ -364,11 +379,27 @@ Ext.define('CpsiMapview.controller.button.DigitizeButtonController', {
                 // and handle the feature response.
                 me.getView().fireEvent('responseFeatures', olFeatsForActiveGroup);
             } else {
+                me.removeLastDigitizeFeature();
+
                 BasiGX.error('Could not find features in the response: ' +
                   json.message ? json.message : JSON.stringify(json));
             }
         } else {
             BasiGX.error('Response was empty');
+        }
+    },
+
+    /**
+     * Removes the last drawn feature from the vector source (and from the map).
+     */
+    removeLastDigitizeFeature: function() {
+        var me = this;
+        var source = me.drawLayer.getSource();
+        var features = source.getFeatures();
+
+        if (features && features.length > 0) {
+            var lastFeature = features[features.length - 1];
+            source.removeFeature(lastFeature);
         }
     },
 
