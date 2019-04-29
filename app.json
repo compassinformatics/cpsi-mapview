@@ -33,8 +33,12 @@
      */
     "classpath": [
         "app",
-        "${toolkit.name}/src",
-        "./lib/geoext3/src",
+        "./lib/geoext3/src/component",
+        "./lib/geoext3/src/data",
+        "./lib/geoext3/src/mixin",
+        "./lib/geoext3/src/plugin",
+        "./lib/geoext3/src/state",
+        "./lib/geoext3/src/util",
         "./lib/BasiGX/src"
     ],
 
