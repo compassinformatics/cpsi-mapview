@@ -246,6 +246,37 @@ Ext.define('CpsiMapview.factory.Layer', {
             }
             allFilters.push(bboxFilter);
 
+            /**
+             * Apply additional filters.
+             * To get access to them here an instance of `Ext.grid.filter.filters`
+             * must be set on layer source.
+             * For example, this can be possibly achieved via `filterchange`
+             * listener of FeatureGrid component if used with GeoExt feature grid
+             * component:
+             *
+             *   'filterchange': function (rec, filters) {
+             *       var wfsLayerSource = someWfsLayer.getSource();
+             *       wfsLayerSource.getSource().set('additionalFilters', filters);
+             *       wfsLayerSource.clear();
+             *       wfsLayerSource.refresh();
+             *    }
+             *
+             * See also GeoExt3 example for filter-grid:
+             * https://rawgit.com/geoext/geoext3/master/examples/features/grid-filter.html
+             *
+             */
+            var additionalFilters = this.get('additionalFilters');
+
+            if (additionalFilters) {
+                Ext.each(additionalFilters, function(addFilter) {
+                    var ogcUtil = GeoExt.util.OGCFilter;
+                    var serializedFilter =
+                        ogcUtil.getOgcFilterBodyFromExtJsFilterObject(addFilter, '2.0.0');
+                    allFilters.push(serializedFilter);
+                });
+            }
+
+            // merge all filters to OGC complain AND filter
             var filter = BasiGX.util.WFS.combineFilters(allFilters);
             var reqUrl = Ext.String.urlAppend(
                 url, 'FILTER=' + encodeURIComponent(filter)
