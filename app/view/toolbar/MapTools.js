@@ -5,16 +5,17 @@ Ext.define('CpsiMapview.view.toolbar.MapTools', {
     extend: 'Ext.toolbar.Toolbar',
     xtype: 'cmv_maptools',
     requires: [
+        'GeoExt.form.field.GeocoderComboBox',
         'BasiGX.view.button.Measure',
         'BasiGX.view.button.ZoomIn',
         'BasiGX.view.button.ZoomOut',
         'BasiGX.view.button.ZoomToExtent',
         'BasiGX.view.button.History',
         'CpsiMapview.view.button.DigitizeButton',
-
         'CpsiMapview.model.button.MeasureButton',
         'CpsiMapview.controller.button.MeasureButtonController',
-        'CpsiMapview.controller.MapController'
+        'CpsiMapview.controller.MapController',
+        'CpsiMapview.view.combo.Gazetteer'
     ],
 
     controller: 'cmv_map',
@@ -81,5 +82,31 @@ Ext.define('CpsiMapview.view.toolbar.MapTools', {
             startDate: new Date(2014, 0, 1),
             endDate: new Date(2020, 11, 30)
         }
-    ]
+    ],
+
+    /**
+     * @private
+     */
+    initComponent: function () {
+        var me = this;
+        var map = BasiGX.util.Map.getMapComponent().map;
+
+        // Nominatim based location search
+        me.items.push({
+            xtype: 'gx_geocoder_combo',
+            map: map
+        });
+
+        // custom CPSI gazetteer
+        me.items.push({
+            xtype: 'cmv_gazetteer_combo',
+            url: 'https://pmstipperarydev.compass.ie/WebServices/townland/gazetteer/',
+            proxyRootProperty: 'data',
+            displayValueMapping: 'name',
+            emptyText: 'Townland...',
+            map: map
+        });
+
+        me.callParent();
+    }
 });
