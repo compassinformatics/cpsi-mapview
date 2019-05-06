@@ -5,13 +5,13 @@ Ext.define('CpsiMapview.view.toolbar.MapTools', {
     extend: 'Ext.toolbar.Toolbar',
     xtype: 'cmv_maptools',
     requires: [
+        'GeoExt.form.field.GeocoderComboBox',
         'BasiGX.view.button.Measure',
         'BasiGX.view.button.ZoomIn',
         'BasiGX.view.button.ZoomOut',
         'BasiGX.view.button.ZoomToExtent',
         'BasiGX.view.button.History',
         'CpsiMapview.view.button.DigitizeButton',
-
         'CpsiMapview.model.button.MeasureButton',
         'CpsiMapview.controller.button.MeasureButtonController',
         'CpsiMapview.controller.MapController'
@@ -81,5 +81,20 @@ Ext.define('CpsiMapview.view.toolbar.MapTools', {
             startDate: new Date(2014, 0, 1),
             endDate: new Date(2020, 11, 30)
         }
-    ]
+    ],
+
+    /**
+     * @private
+     */
+    initComponent: function () {
+        var me = this;
+        var map = BasiGX.util.Map.getMapComponent().map;
+
+        me.items.push({
+            xtype: 'gx_geocoder_combo',
+            map: map
+        });
+
+        me.callParent();
+    }
 });
