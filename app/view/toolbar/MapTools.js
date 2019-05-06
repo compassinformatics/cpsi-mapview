@@ -14,7 +14,8 @@ Ext.define('CpsiMapview.view.toolbar.MapTools', {
         'CpsiMapview.view.button.DigitizeButton',
         'CpsiMapview.model.button.MeasureButton',
         'CpsiMapview.controller.button.MeasureButtonController',
-        'CpsiMapview.controller.MapController'
+        'CpsiMapview.controller.MapController',
+        'CpsiMapview.view.combo.Gazetteer'
     ],
 
     controller: 'cmv_map',
@@ -90,8 +91,19 @@ Ext.define('CpsiMapview.view.toolbar.MapTools', {
         var me = this;
         var map = BasiGX.util.Map.getMapComponent().map;
 
+        // Nominatim based location search
         me.items.push({
             xtype: 'gx_geocoder_combo',
+            map: map
+        });
+
+        // custom CPSI gazetteer
+        me.items.push({
+            xtype: 'cmv_gazetteer_combo',
+            url: 'https://pmstipperarydev.compass.ie/WebServices/townland/gazetteer/',
+            proxyRootProperty: 'data',
+            displayValueMapping: 'name',
+            emptyText: 'Townland...',
             map: map
         });
 
