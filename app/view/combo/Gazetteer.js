@@ -52,6 +52,10 @@ Ext.define('CpsiMapview.view.combo.Gazetteer', {
             me.getStore().getProxy().setUrl(url);
         });
 
+        me.on('afterrender', function () {
+            me.locationLayer.set('displayInLayerSwitcher', false);
+        });
+
         me.callParent();
     },
 
