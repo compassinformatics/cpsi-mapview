@@ -48,6 +48,23 @@ Ext.define('CpsiMapview.controller.button.StreetViewToolController', {
         var me = this;
         var view = me.getView();
 
+        // helper function to disable tool when GMaps API is not available
+        var reactOnMissingGmapsApi = function () {
+            Ext.Logger.warn('No Google Maps JS-API available. ' +
+                'The Street View tool will be deactivated.');
+            view.setDisabled(true);
+        };
+        // GMaps API missing at all
+        if (!Ext.isObject(window.google)) {
+            reactOnMissingGmapsApi();
+            return;
+        }
+        // GMaps API not usable due to missing API key or similar
+        window.gm_authFailure = function() {
+            reactOnMissingGmapsApi();
+            return;
+        };
+
         // detect the map instance we work on
         if (view.map && view.map instanceof ol.Map) {
             me.map = view.map;
