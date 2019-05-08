@@ -77,6 +77,7 @@ Ext.define('CpsiMapview.controller.button.StreetViewToolController', {
         if (!me.vectorLayer) {
             me.vectorLayer = new ol.layer.Vector({
                 name: me.vectorLayerName,
+                displayInLayerSwitcher: false,
                 source: new ol.source.Vector(),
                 style: new ol.style.Style({
                     image: new ol.style.Icon(({
