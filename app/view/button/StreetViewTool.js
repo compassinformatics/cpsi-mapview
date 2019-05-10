@@ -108,6 +108,28 @@ Ext.define('CpsiMapview.view.button.StreetViewTool', {
     },
 
     /**
+     * Flag to steer if a warning UI is shown in case no panorama is available
+     * for the clicked position.
+     *
+     * @cfg {Boolean}
+     */
+    showNoPanoramaWarning: true,
+
+    /**
+     * Title of the alert UI shown in case no panorama is available.
+     *
+     * @cfg {String}
+     */
+    noPanoramaWarningTitle: 'INFO',
+
+    /**
+     * Text of the alert UI shown in case no panorama is available.
+     *
+     * @cfg {String}
+     */
+    noPanoramaWarningText: 'No panorama available for the clicked position.',
+
+    /**
      * Register the listeners and redirect them
      * to their corresponding controller methods
      */

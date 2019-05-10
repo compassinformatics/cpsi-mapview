@@ -260,6 +260,11 @@ Ext.define('CpsiMapview.controller.button.StreetViewTool', {
                 me.getView().fireEvent('missingpanorama', {
                     msg: 'No StreetView panorama available at clicked location'
                 });
+
+                if (view.showNoPanoramaWarning) {
+                    Ext.MessageBox.alert(view.noPanoramaWarningTitle,
+                        view.noPanoramaWarningText);
+                }
             }
         });
     },
