@@ -12,7 +12,8 @@ module.exports = {
         "CpsiMapview": false,
         "LayerFactory": false,
         "GeoStylerSLDParser": false,
-        "GeoStylerOpenlayersParser": false
+        "GeoStylerOpenlayersParser": false,
+        "google": false
     },
     "parserOptions": {
         "ecmaVersion": 5

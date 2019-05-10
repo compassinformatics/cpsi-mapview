@@ -15,7 +15,8 @@ Ext.define('CpsiMapview.view.toolbar.MapTools', {
         'CpsiMapview.model.button.MeasureButton',
         'CpsiMapview.controller.button.MeasureButtonController',
         'CpsiMapview.controller.MapController',
-        'CpsiMapview.view.combo.Gazetteer'
+        'CpsiMapview.view.combo.Gazetteer',
+        'CpsiMapview.view.button.StreetViewTool'
     ],
 
     controller: 'cmv_map',
@@ -77,6 +78,8 @@ Ext.define('CpsiMapview.view.toolbar.MapTools', {
             tooltip: 'Polygon',
             apiUrl: 'https://pmstipperarydev.compass.ie/WebServices/roadschedule/cutWithPolygon',
             clearDrawnFeature: false
+        }, {
+            xtype: 'cmv_streetview_tool'
         }, {
             xtype: 'cmv_timeslider',
             startDate: new Date(2014, 0, 1),
