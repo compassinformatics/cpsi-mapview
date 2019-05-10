@@ -8,7 +8,7 @@ Ext.define('CpsiMapview.view.button.StreetViewTool', {
     xtype: 'cmv_streetview_tool',
 
     requires: [
-        'CpsiMapview.controller.button.StreetViewToolController'
+        'CpsiMapview.controller.button.StreetViewTool'
     ],
 
     /**
@@ -48,6 +48,20 @@ Ext.define('CpsiMapview.view.button.StreetViewTool', {
     map: null,
 
     /**
+     * Optional style for the position layer.
+     *
+     * @cfg {ol.style.Style}
+     */
+    vectorLayerStyle: null,
+
+    /**
+     * Name of the layer group to which the position layer will be added.
+     *
+     * @cfg {String}
+     */
+    layerGroupName: 'Layers',
+
+    /**
      * The position icon image to be shown on the map.
      *
      * @cfg {String}
@@ -76,6 +90,13 @@ Ext.define('CpsiMapview.view.button.StreetViewTool', {
     svWinTitlePrefix: 'Google Street View',
 
     /**
+     * The label to be set infront of the image date of the SV panorama.
+     *
+     * @cfg {String}
+     */
+    svWinTitleDateLabel: ' Image Date: ',
+
+    /**
      * The default / initial POV settings for the Street View panorama.
      *
      * @cfg {Object}
@@ -91,6 +112,7 @@ Ext.define('CpsiMapview.view.button.StreetViewTool', {
      * to their corresponding controller methods
      */
     listeners: {
-        toggle: 'onToggle'
+        toggle: 'onToggle',
+        beforedestroy: 'onBeforeDestroy'
     }
 });

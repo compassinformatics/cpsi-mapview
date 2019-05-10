@@ -1,7 +1,7 @@
 /**
  * This class is the controller of the button to open the Street View tool.
  */
-Ext.define('CpsiMapview.controller.button.StreetViewToolController', {
+Ext.define('CpsiMapview.controller.button.StreetViewTool', {
     extend: 'Ext.app.ViewController',
 
     alias: 'controller.cmv_streetview_tool',
@@ -40,6 +40,23 @@ Ext.define('CpsiMapview.controller.button.StreetViewToolController', {
      */
     vectorLayerName: 'StreetViewLayer',
 
+    /**
+     * Listener object for the 'pov_changed' event.
+     * Used to unregister the event.
+     *
+     * @property {Object}
+     * @private
+     */
+    svPovChangedListener: null,
+
+    /**
+     * Listener object for the 'position_changed' event.
+     * Used to unregister the event.
+     *
+     * @property {Object}
+     * @private
+     */
+    svPositionChangedListener: null,
 
     /**
      * @private
@@ -53,6 +70,7 @@ Ext.define('CpsiMapview.controller.button.StreetViewToolController', {
             Ext.Logger.warn('No Google Maps JS-API available. ' +
                 'The Street View tool will be deactivated.');
             view.setDisabled(true);
+            return;
         };
         // GMaps API missing at all
         if (!Ext.isObject(window.google)) {
@@ -60,10 +78,7 @@ Ext.define('CpsiMapview.controller.button.StreetViewToolController', {
             return;
         }
         // GMaps API not usable due to missing API key or similar
-        window.gm_authFailure = function() {
-            reactOnMissingGmapsApi();
-            return;
-        };
+        window.gm_authFailure = reactOnMissingGmapsApi;
 
         // detect the map instance we work on
         if (view.map && view.map instanceof ol.Map) {
@@ -75,18 +90,22 @@ Ext.define('CpsiMapview.controller.button.StreetViewToolController', {
 
         // create a vector layer for position if not passed in
         if (!me.vectorLayer) {
-            me.vectorLayer = new ol.layer.Vector({
-                name: me.vectorLayerName,
-                displayInLayerSwitcher: false,
-                source: new ol.source.Vector(),
-                style: new ol.style.Style({
+
+            var style = view.vectorLayerStyle ||
+                new ol.style.Style({
                     image: new ol.style.Icon(({
                         anchor: [0.5, 46],
                         anchorXUnits: 'fraction',
                         anchorYUnits: 'pixels',
                         src: view.vectorIcon
                     }))
-                })
+                });
+
+            me.vectorLayer = new ol.layer.Vector({
+                name: me.vectorLayerName,
+                displayInLayerSwitcher: false,
+                source: new ol.source.Vector(),
+                style: style
             });
         }
 
@@ -103,9 +122,11 @@ Ext.define('CpsiMapview.controller.button.StreetViewToolController', {
      */
     onToggle: function (btn, pressed) {
         var me = this;
+        var view = me.getView();
+        var lyrGroupName = view.layerGroupName;
 
-        // detect the overlay layer group (to add psoition layer)
-        var overlayGroup = BasiGX.util.Layer.getLayerByName('Layers');
+        // detect the layer group to add position layer
+        var overlayGroup = BasiGX.util.Layer.getLayerByName(lyrGroupName);
         var overlayLayers;
         if (overlayGroup) {
             overlayLayers = overlayGroup.getLayers();
@@ -127,6 +148,25 @@ Ext.define('CpsiMapview.controller.button.StreetViewToolController', {
 
         // activate / deactivate click
         me.registerMapListeners(pressed);
+    },
+
+    /**
+     * Handles the 'beforedestroy' event of the view.
+     * Performs several cleanup steps.
+     */
+    onBeforeDestroy: function () {
+        var me = this;
+        var view = me.getView();
+
+        // detoggle button, forces clearing layer
+        me.onToggle(view, false);
+        // remove GMaps events
+        me.unregisterGmapsEvents();
+        // cleanup window
+        if (me.streetViewWin) {
+            me.streetViewWin.close();
+            me.streetViewWin = null;
+        }
     },
 
     /**
@@ -182,6 +222,7 @@ Ext.define('CpsiMapview.controller.button.StreetViewToolController', {
                         me.svDiv = Ext.getDom(win.getId());
                     },
                     destroy: function () {
+                        me.unregisterGmapsEvents();
                         me.streetViewWin = null;
                         me.vectorLayer.getSource().clear();
                     }
@@ -193,7 +234,8 @@ Ext.define('CpsiMapview.controller.button.StreetViewToolController', {
         me.streetViewService.getPanoramaByLocation(latLng, 50, function (data, status) {
             if (status === google.maps.StreetViewStatus.OK) {
                 var win = me.streetViewWin;
-                var title = view.svWinTitlePrefix + ' Image Date: ' + data.imageDate;
+                var title = view.svWinTitlePrefix + view.svWinTitleDateLabel +
+                    data.imageDate;
 
                 win.setTitle(title);
                 win.show();
@@ -211,10 +253,7 @@ Ext.define('CpsiMapview.controller.button.StreetViewToolController', {
                 me.drawPositionFeature(me.gmapsLatLng2olCoord(latLng));
                 me.updatePositionFeature();
 
-                google.maps.event.addListener(
-                    me.svPanorama, 'pov_changed', me.handlePovChanged.bind(me));
-                google.maps.event.addListener(
-                    me.svPanorama, 'position_changed', me.handlePositionChanged.bind(me));
+                me.registerGmapsEvents();
 
             } else {
                 // inform subscribers that there was no panorama for clicked pos
@@ -376,5 +415,27 @@ Ext.define('CpsiMapview.controller.button.StreetViewToolController', {
         }
 
         return mapCoord;
+    },
+
+    /**
+     * Registers the 'pov_changed' and the 'position_changed' events for the
+     * SV panorama.
+     */
+    registerGmapsEvents: function () {
+        var me = this;
+        me.svPovChangedListener = google.maps.event.addListener(
+            me.svPanorama, 'pov_changed', me.handlePovChanged.bind(me));
+        me.svPositionChangedListener = google.maps.event.addListener(
+            me.svPanorama, 'position_changed', me.handlePositionChanged.bind(me));
+    },
+
+    /**
+     * Unregisters the 'pov_changed' and the 'position_changed' events for the
+     * SV panorama.
+     */
+    unregisterGmapsEvents: function () {
+        var me = this;
+        google.maps.event.removeListener(me.svPovChangedListener);
+        google.maps.event.removeListener(me.svPositionChangedListener);
     }
 });
