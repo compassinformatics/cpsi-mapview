@@ -147,6 +147,7 @@
       },
       "noCluster": false,
       "timeitem": "DATE",
-      "dateFormat": "Y-m-d"
+      "dateFormat": "Y-m-d",
+      "numericitem": true
     }]
 }
