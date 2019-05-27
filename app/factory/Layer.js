@@ -160,8 +160,8 @@ Ext.define('CpsiMapview.factory.Layer', {
             isTimeDependent: !!layerConf.timeitem,
             dateFormat: layerConf.dateFormat,
             timeProperty: layerConf.timeitem,
-            // TODO docs
-            isNumericDependent: Ext.isDefined(layerConf.numericitem),
+            isNumericDependent: Ext.isDefined(layerConf.numericitem), // TODO docs
+            isWms: true // TODO docs
         };
         olLayerConf = Ext.apply(olLayerConf, olLayerProps);
 
@@ -245,8 +245,9 @@ Ext.define('CpsiMapview.factory.Layer', {
             if (!Ext.isEmpty(timeFilters)) {
                 allFilters = Ext.Array.merge(allFilters, timeFilters);
             }
-            var numericFilters = this.get('numericFilters'); // TODO
+            var numericFilters = this.get('numericFilters'); // TODO docs
             if (!Ext.isEmpty(numericFilters)) {
+                numericFilters = BasiGX.util.WFS.unwrapFilter(numericFilters);
                 allFilters = Ext.Array.merge(allFilters, numericFilters);
             }
 
@@ -333,6 +334,8 @@ Ext.define('CpsiMapview.factory.Layer', {
             timeProperty: layerConf.timeitem,
             isWfs: true,
             // TODO docs
+            // TODO wouldn't it make sense to have the actual field here
+            //      instead of at the slider and globally for all layers?
             isNumericDependent: Ext.isDefined(layerConf.numericitem),
         };
         olLayerConf = Ext.apply(olLayerConf, olLayerProps);
