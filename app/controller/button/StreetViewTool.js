@@ -219,7 +219,8 @@ Ext.define('CpsiMapview.controller.button.StreetViewTool', {
                 autoShow: false,
                 listeners: {
                     afterrender: function (win) {
-                        me.svDiv = Ext.getDom(win.getId());
+                        // render SV panorama to body of the window
+                        me.svDiv = Ext.getDom(win.body);
                     },
                     destroy: function () {
                         me.unregisterGmapsEvents();
