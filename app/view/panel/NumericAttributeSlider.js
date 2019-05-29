@@ -126,7 +126,7 @@ Ext.define('CpsiMapview.view.panel.NumericAttributeSlider', {
         this.setEnabled(newEnabled);
         var cb = this.down('checkbox[name="active"]');
         cb.setValue(newEnabled);
-        return this; // the original methoid is chainable
+        return this; // the original method is chainable
     }
 
 });

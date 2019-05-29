@@ -21,7 +21,7 @@ Ext.define('CpsiMapview.controller.panel.NumericAttributeSlider', {
 
     /**
      * Orders the values of the slider so that the first index always is the
-     * lower value, and the secind is at least equally big.
+     * lower value, and the second is at least equally big.
      * @param {number[]} values
      */
     orderValues: function(values) {

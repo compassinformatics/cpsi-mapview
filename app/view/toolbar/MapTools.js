@@ -88,7 +88,8 @@ Ext.define('CpsiMapview.view.toolbar.MapTools', {
             endDate: new Date(2020, 11, 30)
         }, {
             xtype: 'cmv_numericattributeslider',
-            numericField: 'Speed_Limit', // TODO might be better suited at thelayer level
+            // TODO might be better suited at the layer level
+            numericField: 'Speed_Limit',
             minValue: 30,
             maxValue: 130,
             increment: 10,
