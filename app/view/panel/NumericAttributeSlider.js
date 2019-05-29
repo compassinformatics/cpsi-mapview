@@ -39,9 +39,10 @@ Ext.define('CpsiMapview.view.panel.NumericAttributeSlider', {
      * Construct an instance of the numeric attribute slider. We need to take
      * care of the correct handling of the inherited disabled configuration.
      *
-     * @param {object} cfg The configuration object.
+     * @param {object} config The configuration object.
      */
-    constructor: function(cfg) {
+    constructor: function(config) {
+        var cfg = config || {};
         var cfgEnabled = cfg.enabled;
         var cfgDisabled = cfg.disabled;
         delete cfg.enabled;
