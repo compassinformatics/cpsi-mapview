@@ -1,6 +1,6 @@
-# cpsi-mapview [![Build Status](https://travis-ci.org/meggsimum/cpsi-mapview.svg?branch=master)](https://travis-ci.org/meggsimum/cpsi-mapview)
+# cpsi-mapview [![Build Status](https://travis-ci.org/compassinformatics/cpsi-mapview.svg?branch=master)](https://travis-ci.org/compassinformatics/cpsi-mapview)
 
-Check out the latest deployed version at https://meggsimum.github.io/cpsi-mapview/
+Check out the latest deployed version at https://compassinformatics.github.io/cpsi-mapview/
 
 ## Project setup
 
@@ -9,7 +9,7 @@ This steps assume you have Sencha CMD v6.6 installed on your system and a copy o
 Clone this repository
 
 ```
-git clone https://github.com/meggsimum/cpsi-mapview.git
+git clone https://github.com/compassinformatics/cpsi-mapview.git
 cd cpsi-mapview
 git submodule update --init --recursive
 ```
