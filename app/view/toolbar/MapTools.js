@@ -16,7 +16,9 @@ Ext.define('CpsiMapview.view.toolbar.MapTools', {
         'CpsiMapview.controller.button.MeasureButtonController',
         'CpsiMapview.controller.MapController',
         'CpsiMapview.view.combo.Gazetteer',
-        'CpsiMapview.view.button.StreetViewTool'
+        'CpsiMapview.view.button.StreetViewTool',
+        'CpsiMapview.view.panel.TimeSlider',
+        'CpsiMapview.view.panel.NumericAttributeSlider'
     ],
 
     controller: 'cmv_map',
@@ -84,6 +86,15 @@ Ext.define('CpsiMapview.view.toolbar.MapTools', {
             xtype: 'cmv_timeslider',
             startDate: new Date(2014, 0, 1),
             endDate: new Date(2020, 11, 30)
+        }, {
+            xtype: 'cmv_numericattributeslider',
+            // TODO might be better suited at the layer level
+            numericField: 'Speed_Limit',
+            minValue: 30,
+            maxValue: 130,
+            increment: 10,
+            currLowerValue: 50,
+            currUpperValue: 100
         }
     ],
 

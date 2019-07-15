@@ -19,6 +19,7 @@ module.exports = {
         "ecmaVersion": 5
     },
     "rules": {
+        "no-trailing-spaces": "error",
         "indent": [
             "error",
             4
