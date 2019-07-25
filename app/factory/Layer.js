@@ -28,8 +28,8 @@ Ext.define('CpsiMapview.factory.Layer', {
         case 'wfs':
             mapLayer = LayerFactory.createWfs(layerConf);
             break;
-        case 'esrirest':
-            mapLayer = LayerFactory.createEsriRest(layerConf);
+        case 'xyz':
+            mapLayer = LayerFactory.createXyz(layerConf);
             break;
         case 'osm':
             mapLayer = LayerFactory.createOsm(layerConf);
@@ -413,18 +413,18 @@ Ext.define('CpsiMapview.factory.Layer', {
     },
 
     /**
-     * Creates an ESRI REST tile layer
+     * Creates a XYZ tile layer
      *
      * @param  {Object} layerConf  The configuration object for this layer
-     * @return {ol.layer.Tile} ESRI REST tile layer
+     * @return {ol.layer.Tile} XYZ tile layer
      */
-    createEsriRest: function(layerConf) {
+    createXyz: function(layerConf) {
         // transform OL2 properties to current ones supported by OL >=v3
         var olSourceProps = this.ol2PropsToOlSourceProps(layerConf.openLayers);
         var olLayerProps = this.ol2PropsToOlLayerProps(layerConf.openLayers);
 
         var olSourceConf = {
-            url: layerConf.url + '{z}/{y}/{x}'
+            url: layerConf.url
         };
         olSourceConf = Ext.apply(olSourceConf, olSourceProps);
 

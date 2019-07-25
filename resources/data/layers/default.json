@@ -1,6 +1,6 @@
 {
   "layers": [{
-    "layerType": "esrirest",
+    "layerType": "xyz",
     "iconCls": "map",
     "isBaseLayer": true,
     "isDefaultBaseLayer": false,
