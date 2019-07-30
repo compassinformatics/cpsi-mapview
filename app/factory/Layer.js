@@ -299,11 +299,19 @@ Ext.define('CpsiMapview.factory.Layer', {
             xhr.onerror = onError;
             xhr.onload = function() {
                 if (xhr.status == 200) {
-                    var features = vectorSource.getFormat().readFeatures(
-                        xhr.responseText
-                    );
-                    vectorSource.addFeatures(features);
-                    vectorSource.dispatchEvent('vectorloadend');
+                    // check the request returns the same type as the vectorSource
+                    var contentType = xhr.getResponseHeader('Content-Type');
+                    var format = vectorSource.getFormat();
+
+                    if (contentType.indexOf('application/json') !== -1) {
+                        var features = format.readFeatures(
+                            xhr.responseText
+                        );
+                        vectorSource.addFeatures(features);
+                        vectorSource.dispatchEvent('vectorloadend');
+                    } else {
+                        onError();
+                    }
                 } else {
                     onError();
                 }
