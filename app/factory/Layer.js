@@ -147,6 +147,7 @@ Ext.define('CpsiMapview.factory.Layer', {
             url: layerConf.url,
             params: {
                 'LAYERS': layerConf.serverOptions.layers,
+                'STYLES': layerConf.serverOptions.styles,
                 'TRANSPARENT': true,
                 'TILED': !singleTile
             },
