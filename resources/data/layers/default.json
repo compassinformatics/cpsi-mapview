@@ -5,7 +5,7 @@
     "isBaseLayer": true,
     "isDefaultBaseLayer": false,
     "text": "Grey Background",
-    "url": "https://services.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Light_Gray_Base/MapServer/tile/",
+    "url": "https://services.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Light_Gray_Base/MapServer/tile/{z}/{y}/{x}",
     "openLayers": {
       "maxResolution": 1222.99245234375,
       "numZoomLevels": 13,
