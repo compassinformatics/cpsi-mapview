@@ -40,28 +40,44 @@ Ext.define('CpsiMapview.plugin.TreeColumnStyleSwitcher', {
             '</tpl>'
         ];
 
-        // Currently this plugin only works if the cellTpl of this column is
-        // modeled as a single string (as done in plugin.cmv_basic_tree_column_legend).
-        // So the cellTpl is an array with 2 entries (0 => XTemplate string,
-        // 1 => context object with template functions)
-        // For the case that the XTemplate is modeled as array this is
-        // currently not working.
-        //TODO handle cellTpl as array
-
-        // inject template code to existing one
-        var origCellTpl = treeColumn.cellTpl[0];
-        treeColumn.cellTpl[0] = origCellTpl.replace('</span></tpl>', tplArr.join('') + '</span></tpl>');
-
         // helper function to get a DOM ID from layer record ID in XTemplate
-        treeColumn.cellTpl[1].getRecId = function(rec) {
+        var getRecId = function (rec) {
             return THIS_CLS.getDomId(rec.getId());
         };
         // helper function if a DIV placeholder for style switcher is needed
-        treeColumn.cellTpl[1].needsStyleSwitcher = function(rec) {
+        var needsStyleSwitcher = function (rec) {
             var olLayer = rec.getOlLayer();
             return !rec.get('isLayerGroup') && olLayer &&
                 Ext.isArray(olLayer.get('styles'));
         };
+
+        if (treeColumn.cellTpl.length === 2) {
+
+            // The cellTpl of this column is modeled as a single string
+            // (as done in plugin.cmv_basic_tree_column_legend).
+            // So the cellTpl is an array with 2 entries (0 => XTemplate string,
+            // 1 => context object with template functions)
+
+            // inject template code (string) to existing one
+            var origCellTpl = treeColumn.cellTpl[0];
+            treeColumn.cellTpl[0] = origCellTpl.replace('</span></tpl>', '</span>' + tplArr.join('') + '</tpl>');
+            // set context function for XTemplate
+            treeColumn.cellTpl[1].getRecId = getRecId;
+            treeColumn.cellTpl[1].needsStyleSwitcher = needsStyleSwitcher;
+        } else {
+
+            // The case that the XTemplate is modeled as array (default)
+            // 0-n-1 => XTemplate strings, n => context object with template
+            // functions
+
+            // inject template code (array) to existing one
+            Ext.Array.insert(treeColumn.cellTpl, treeColumn.cellTpl.length-1, tplArr);
+            // set context function for XTemplate
+            treeColumn.cellTpl.push({
+                getRecId: getRecId,
+                needsStyleSwitcher: needsStyleSwitcher
+            });
+        }
 
         me.callParent();
 
