@@ -30,7 +30,7 @@ Ext.define('CpsiMapview.view.layer.StyleSwitcherRadioGroup', {
         Ext.each(layerStyles, function (layerStyle) {
             items.push({
                 name: 'sldstyle' + salt,
-                boxLabel: layerStyle,
+                boxLabel: me.getLayerStyleLabel(layerStyle),
                 inputValue: layerStyle,
                 checked: me.getCheckedState(layerStyle),
                 listeners: {
@@ -43,6 +43,15 @@ Ext.define('CpsiMapview.view.layer.StyleSwitcherRadioGroup', {
         me.items = items;
 
         me.callParent();
+    },
+
+    getLayerStyleLabel: function (layerStyle) {
+        if (this.layer.get('isWfs')) {
+            // remove _ and the .xml file ending
+            return layerStyle.replace(/_/g, ' ').replace('.xml', '');
+        } else {
+            return layerStyle;
+        }
     },
 
     getCheckedState: function (sldStyle) {
@@ -63,15 +72,23 @@ Ext.define('CpsiMapview.view.layer.StyleSwitcherRadioGroup', {
 
         if (newVal === true) {
             var newStyle = radioBtn.inputValue;
-            console.log('Perform a new WMS Request with style '+
-                newStyle + ' f. ' + me.layer.get('name'));
 
-            var newParams = {
-                // LAYERS: layerList.join(','),
-                STYLES: newStyle
-            };
+            if (me.layer.get('isWms')) {
 
-            me.layer.getSource().updateParams(newParams);
+                var newParams = {
+                    STYLES: newStyle
+                };
+                me.layer.getSource().updateParams(newParams);
+
+            } else if (me.layer.get('isWfs')) {
+
+                var sldUrl = me.layer.get('stylesBaseUrl') + newStyle;
+                // load and parse SLD and apply it to layer
+                LayerFactory.loadSld(me.layer, sldUrl);
+
+            } else {
+                Ext.Logger.info('Layer type not supported in StyleSwitcherRadioGroup');
+            }
         }
     }
 });
