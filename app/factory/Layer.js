@@ -143,11 +143,18 @@ Ext.define('CpsiMapview.factory.Layer', {
         var olSourceProps = this.ol2PropsToOlSourceProps(layerConf.openLayers);
         var olLayerProps = this.ol2PropsToOlLayerProps(layerConf.openLayers);
 
+        // derive STYLES parameter: either directly set in serverOptions or we
+        // we take the first of a possible SLD style list
+        var styles = layerConf.serverOptions.styles;
+        if (Ext.isArray(layerConf.sldStyles) && layerConf.sldStyles.length) {
+            styles = layerConf.sldStyles[0];
+        }
+
         var olSourceConf = {
             url: layerConf.url,
             params: {
                 'LAYERS': layerConf.serverOptions.layers,
-                'STYLES': layerConf.serverOptions.styles,
+                'STYLES': styles,
                 'TRANSPARENT': true,
                 'TILED': !singleTile
             },
@@ -162,7 +169,8 @@ Ext.define('CpsiMapview.factory.Layer', {
             dateFormat: layerConf.dateFormat,
             timeProperty: layerConf.timeitem,
             isNumericDependent: Ext.isDefined(layerConf.numericitem), // TODO docs
-            isWms: true // TODO docs
+            isWms: true, // TODO docs
+            sldStyles: layerConf.sldStyles // TODO docs
         };
         olLayerConf = Ext.apply(olLayerConf, olLayerProps);
 
