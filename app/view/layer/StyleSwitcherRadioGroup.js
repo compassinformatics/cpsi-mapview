@@ -56,11 +56,8 @@ Ext.define('CpsiMapview.view.layer.StyleSwitcherRadioGroup', {
 
     getCheckedState: function (sldStyle) {
         var me = this;
-        var layerStyles = me.layer.get('styles');
-        if (me.layer.get('activatedStyle') && me.layer.get('activatedStyle') === sldStyle) {
-            return true;
 
-        } else if (layerStyles[0] === sldStyle) {
+        if (me.layer.get('activatedStyle') && me.layer.get('activatedStyle') === sldStyle) {
             return true;
         } else {
             return false;
@@ -72,6 +69,8 @@ Ext.define('CpsiMapview.view.layer.StyleSwitcherRadioGroup', {
 
         if (newVal === true) {
             var newStyle = radioBtn.inputValue;
+
+            me.layer.set('activatedStyle', newStyle);
 
             if (me.layer.get('isWms')) {
 

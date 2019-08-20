@@ -23,6 +23,10 @@ Ext.define('CpsiMapview.plugin.TreeColumnStyleSwitcher', {
         }
     },
 
+    radioGroups: [],
+
+    styleLayers: [],
+
     init: function(treeColumn) {
         var me = this;
         if (!(treeColumn instanceof Ext.grid.column.Column)) {
@@ -84,31 +88,56 @@ Ext.define('CpsiMapview.plugin.TreeColumnStyleSwitcher', {
         // wait until all layers are loaded to the map
         var mapCmp = CpsiMapview.view.main.Map.guess();
         mapCmp.on('cmv-init-layersadded', function () {
+
+            // ensure the radio groups are re-rendered every time the tree view
+            // changes (e.g.) layer visibility is changed
+            treeColumn.up('treepanel').getView().on('itemupdate', function () {
+                me.cleanupAllRadioGroups();
+                me.renderRadioGroups();
+            });
+
             // Unfortunately we have to defer cascading of the LayerTree nodes.
             // Otherwise they are not ready and we do not have a fitting event.
             Ext.defer(function () {
+                me.renderRadioGroups();
+            }, 1);
+        });
+    },
 
-                var treePanel = treeColumn.up('treepanel');
-                treePanel.getRootNode().cascadeBy(function (node) {
-                    // skip group layers (folders) and the root node
-                    if (!node.get('isLayerGroup') && node.get('text') !== 'root') {
-                        var lyrRecId = node.get('id');
-                        var placeholderDomId = THIS_CLS.getDomId(lyrRecId);
-                        var placeholderDiv =
-                            Ext.DomQuery.select('#' + placeholderDomId)[0];
-                        var olLayer = node.getOlLayer();
+    renderRadioGroups: function () {
+        var me = this;
+        var THIS_CLS = CpsiMapview.plugin.TreeColumnStyleSwitcher;
+        var treePanel = me.cmp.up('treepanel');
 
-                        if (placeholderDiv && olLayer.get('styles')) {
+        treePanel.getRootNode().cascadeBy(function (node) {
+            // skip group layers (folders) and the root node
+            if (!node.get('isLayerGroup') && node.get('text') !== 'root') {
+                var lyrRecId = node.get('id');
+                var placeholderDomId = THIS_CLS.getDomId(lyrRecId);
+                var placeholderDiv =
+                    Ext.DomQuery.select('#' + placeholderDomId)[0];
+                var olLayer = node.getOlLayer();
 
-                            Ext.create('CpsiMapview.view.layer.StyleSwitcherRadioGroup', {
-                                layer: olLayer,
-                                renderTo: placeholderDiv
-                            });
-                        }
-                    }
-                });
+                if (placeholderDiv && olLayer.get('styles')) {
 
-            }, 100);
+                    var radioGroup = Ext.create('CpsiMapview.view.layer.StyleSwitcherRadioGroup', {
+                        layer: olLayer,
+                        containerId: placeholderDiv.id,
+                        renderTo: placeholderDiv
+                    });
+
+                    me.radioGroups.push(radioGroup);
+                    me.styleLayers.push(olLayer);
+                }
+            }
+        });
+    },
+
+    cleanupAllRadioGroups: function () {
+        var me = this;
+
+        Ext.each(me.radioGroups, function (rg) {
+            rg.destroy();
         });
     }
 });

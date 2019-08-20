@@ -146,8 +146,10 @@ Ext.define('CpsiMapview.factory.Layer', {
         // derive STYLES parameter: either directly set in serverOptions or we
         // we take the first of a possible SLD style list
         var styles = layerConf.serverOptions.styles;
+        var activatedStyle;
         if (Ext.isArray(layerConf.styles) && layerConf.styles.length) {
             styles = layerConf.styles[0];
+            activatedStyle = layerConf.styles[0];
         }
 
         var olSourceConf = {
@@ -170,7 +172,8 @@ Ext.define('CpsiMapview.factory.Layer', {
             timeProperty: layerConf.timeitem,
             isNumericDependent: Ext.isDefined(layerConf.numericitem), // TODO docs
             isWms: true, // TODO docs
-            styles: layerConf.styles // TODO docs
+            styles: layerConf.styles, // TODO docs
+            activatedStyle: activatedStyle
         };
         olLayerConf = Ext.apply(olLayerConf, olLayerProps);
 
@@ -366,6 +369,7 @@ Ext.define('CpsiMapview.factory.Layer', {
         var sldUrl = layerConf.sldUrl;
         if (Ext.isArray(layerConf.styles) && layerConf.styles.length) {
             sldUrl = wfsLayer.get('stylesBaseUrl') + layerConf.styles[0];
+            wfsLayer.set('activatedStyle', layerConf.styles[0]);
         }
 
         if (sldUrl) {
