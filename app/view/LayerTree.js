@@ -10,7 +10,8 @@ Ext.define('CpsiMapview.view.LayerTree', {
         'CpsiMapview.plugin.BasicTreeColumnLegends',
         'CpsiMapview.plugin.TreeColumnContextMenu',
         'CpsiMapview.view.menuitem.LayerRefresh',
-        'CpsiMapview.view.menuitem.LayerLabels'
+        'CpsiMapview.view.menuitem.LayerLabels',
+        'CpsiMapview.plugin.TreeColumnStyleSwitcher'
     ],
 
     viewModel: {
@@ -39,6 +40,8 @@ Ext.define('CpsiMapview.view.LayerTree', {
                 flex: 1,
                 plugins: [{
                     ptype: 'cmv_basic_tree_column_legend'
+                }, {
+                    ptype: 'cmv_tree_column_style_switcher'
                 }, {
                     ptype: 'cmv_tree_column_context_menu',
                     menuItems: [

@@ -151,7 +151,7 @@
       "numericitem": true
     },{
       "layerType": "wms",
-      "text": "Light Unit",
+      "text": "Light Unit WMS",
       "url": "https://plmonaghandev.compass.ie/mapserver/",
       "isBaseLayer": false,
       "isDefaultBaseLayer": false,
@@ -163,6 +163,6 @@
         "singleTile": false,
         "visibility": true
       },
-      "sldStyles": ["Unit Type", "Owner"]
+      "styles": ["Unit Type", "Owner"]
     }]
 }
