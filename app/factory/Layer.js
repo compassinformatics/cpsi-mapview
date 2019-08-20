@@ -354,12 +354,20 @@ Ext.define('CpsiMapview.factory.Layer', {
             // TODO wouldn't it make sense to have the actual field here
             //      instead of at the slider and globally for all layers?
             isNumericDependent: Ext.isDefined(layerConf.numericitem),
+            styles: layerConf.styles,
+            stylesBaseUrl: layerConf.stylesBaseUrl || ''
         };
         olLayerConf = Ext.apply(olLayerConf, olLayerProps);
 
         var wfsLayer = new ol.layer.Vector(olLayerConf);
 
+        // derive SLD to style WFS: either directly set in sldUrl or we
+        // we take the first of a possible SLD style list
         var sldUrl = layerConf.sldUrl;
+        if (Ext.isArray(layerConf.styles) && layerConf.styles.length) {
+            sldUrl = wfsLayer.get('stylesBaseUrl') + layerConf.styles[0];
+        }
+
         if (sldUrl) {
             // load and parse style and apply it to layer
             LayerFactory.loadSld(wfsLayer, sldUrl);

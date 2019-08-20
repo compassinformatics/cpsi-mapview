@@ -164,5 +164,21 @@
         "visibility": true
       },
       "styles": ["Unit Type", "Owner"]
-    }]
+    }, {
+        "layerType": "wfs",
+        "text": "Light Unit WFS",
+        "url": "https://plmonaghandev.compass.ie/mapserver/?",
+        "geometryProperty": "msGeometry",
+        "featureType": "LightUnit",
+        "sldUrl": "resources/data/styling/LightUnit_Unit_Type.xml",
+        "openLayers": {
+          "visibility": false
+        },
+        "serverOptions": {
+          "outputFormat": "geojson"
+        },
+        "noCluster": true,
+        "stylesBaseUrl": "resources/data/styling/",
+        "styles": ["Test_LightUnit_Unit_Type.xml", "Test_LightUnit_Owner.xml"]
+      }]
 }
