@@ -358,7 +358,8 @@ Ext.define('CpsiMapview.factory.Layer', {
             //      instead of at the slider and globally for all layers?
             isNumericDependent: Ext.isDefined(layerConf.numericitem),
             styles: layerConf.styles,
-            stylesBaseUrl: layerConf.stylesBaseUrl || ''
+            stylesBaseUrl: layerConf.stylesBaseUrl || '',
+            stylesForceNumericFilterVals: layerConf.stylesForceNumericFilterVals
         };
         olLayerConf = Ext.apply(olLayerConf, olLayerProps);
 
@@ -374,7 +375,7 @@ Ext.define('CpsiMapview.factory.Layer', {
 
         if (sldUrl) {
             // load and parse style and apply it to layer
-            LayerFactory.loadSld(wfsLayer, sldUrl);
+            LayerFactory.loadSld(wfsLayer, sldUrl, layerConf.stylesForceNumericFilterVals);
         }
 
         if (layerConf.tooltipsConfig) {
@@ -623,7 +624,7 @@ Ext.define('CpsiMapview.factory.Layer', {
      * @param  {ol.layer.Vector} mapLayer The layer to apply the style to
      * @param  {String} sldUrl   The URL to the SLD
      */
-    loadSld: function (mapLayer, sldUrl) {
+    loadSld: function (mapLayer, sldUrl, forceNumericFilterVals) {
         Ext.Ajax.request({
             url: sldUrl,
             method: 'GET',
@@ -634,6 +635,12 @@ Ext.define('CpsiMapview.factory.Layer', {
 
                 sldParser.readStyle(sldXml)
                     .then(function (gs) {
+
+                        if (forceNumericFilterVals) {
+                            // transform filter values to numbers ('1' => 1)
+                            gs = LayerFactory.forceNumericFilterValues(gs);
+                        }
+
                         olParser.writeStyle(gs).then(function (olStyle) {
                             mapLayer.setStyle(olStyle);
                         });
@@ -648,6 +655,24 @@ Ext.define('CpsiMapview.factory.Layer', {
                     '! Default OL style will be applied.');
             }
         });
+    },
+
+    /**
+     * Transforms the filter values in the given GeoStyler style object to
+     * a number (if numeric).
+     *
+     * @param  {Object} gsStyle GeoStyler style object
+     * @return {Object}         GeoStyler style object with numeric filter vals
+     */
+    forceNumericFilterValues: function (gsStyle) {
+        Ext.each(gsStyle.rules, function (rule) {
+            var filterVal = rule.filter[2];
+            if (Ext.isNumeric(filterVal)) {
+                rule.filter[2] = parseFloat(filterVal);
+            }
+        });
+
+        return gsStyle;
     }
 
 });

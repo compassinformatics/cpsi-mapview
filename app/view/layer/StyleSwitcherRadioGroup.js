@@ -82,8 +82,10 @@ Ext.define('CpsiMapview.view.layer.StyleSwitcherRadioGroup', {
             } else if (me.layer.get('isWfs')) {
 
                 var sldUrl = me.layer.get('stylesBaseUrl') + newStyle;
+                // transform filter values to numbers ('1' => 1)
+                var forceNumericFilterVals = me.layer.get('stylesForceNumericFilterVals');
                 // load and parse SLD and apply it to layer
-                LayerFactory.loadSld(me.layer, sldUrl);
+                LayerFactory.loadSld(me.layer, sldUrl, forceNumericFilterVals);
 
             } else {
                 Ext.Logger.info('Layer type not supported in StyleSwitcherRadioGroup');

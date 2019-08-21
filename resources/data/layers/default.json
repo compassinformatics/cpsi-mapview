@@ -178,7 +178,8 @@
           "outputFormat": "geojson"
         },
         "noCluster": true,
-        "stylesBaseUrl": "resources/data/styling/",
-        "styles": ["Test_LightUnit_Unit_Type.xml", "Test_LightUnit_Owner.xml"]
+        "stylesBaseUrl": "https://plmonaghandev.compass.ie/publiclighting-test/resources/data/styling/",
+        "styles": ["LightUnit_Unit_Type.xml", "LightUnit_Owner.xml"],
+        "stylesForceNumericFilterVals": true
       }]
 }
