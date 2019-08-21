@@ -6,7 +6,8 @@
     "lib": "lib"
   },
   "scripts": {
-    "test": "eslint app"
+    "lint": "eslint app",
+    "test": "npm run lint"
   },
   "repository": {
     "type": "git",
