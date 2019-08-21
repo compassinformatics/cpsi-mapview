@@ -104,12 +104,18 @@ Ext.define('CpsiMapview.view.menuitem.LayerLabels', {
                 layerList.push(layerList[0]);
                 // apply the label style on the duplicated layer
                 stylesList.push(labelClassName);
+
+                // mark layer that labels are active
+                layer.set('labelsActive', true);
             }
         } else {
             // remove any duplicate layer names created by adding labels
             layerList = Ext.Array.unique(layerList);
             // remove any label styles
             Ext.Array.remove(stylesList, labelClassName);
+
+            // mark layer that labels are inactive
+            layer.set('labelsActive', false);
         }
 
         var newParams = {
