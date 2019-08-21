@@ -67,6 +67,12 @@ Ext.define('CpsiMapview.factory.Layer', {
         case 'switchlayer':
             mapLayer = LayerFactory.createSwitchLayer(layerConf);
             break;
+        case 'vt':
+            mapLayer = LayerFactory.createVectorTilesLayer(layerConf);
+            break;
+        case 'vtwms':
+            mapLayer = LayerFactory.createVectorTilesWmsLayer(layerConf);
+            break;
         default:
             Ext.log.warn('Layer type not known');
             //do nothing, and return empty layer
@@ -565,6 +571,36 @@ Ext.define('CpsiMapview.factory.Layer', {
 
     createServerArray: function(path) {
         Ext.log.info('Not implemented yet', path);
+    },
+
+    /**
+     * Creates a Vector Tile layer.
+     *
+     * @param  {Object} layerConf  The configuration object for this layer
+     * @return {ol.layer.VectorTile}  Vector Tile layer
+     */
+    createVectorTilesLayer: function (layerConf) {
+
+        // transform OL2 properties to current ones supported by OL >=v3
+        var olSourceProps = this.ol2PropsToOlSourceProps(layerConf.openLayers);
+        var olLayerProps = this.ol2PropsToOlLayerProps(layerConf.openLayers);
+
+        var olSourceConf = {
+            format: new ol.format[layerConf.format](),
+            url: layerConf.url
+        };
+        olSourceConf = Ext.apply(olSourceConf, olSourceProps);
+
+        var olLayerConf = {
+            name: layerConf.text,
+            declutter: true,
+            source: new ol.source.VectorTile(olSourceConf)
+        };
+        olLayerConf = Ext.apply(olLayerConf, olLayerProps);
+
+        var vtLayer = new ol.layer.VectorTile(olLayerConf);
+
+        return vtLayer;
     },
 
     /**

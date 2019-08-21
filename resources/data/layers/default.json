@@ -7,7 +7,6 @@
     "text": "Grey Background",
     "url": "https://services.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Light_Gray_Base/MapServer/tile/{z}/{y}/{x}",
     "openLayers": {
-      "maxResolution": 1222.99245234375,
       "numZoomLevels": 13,
       "projection": "EPSG:900913",
       "visibility": true,
@@ -140,7 +139,7 @@
         "maxResolution": 1222.99245234375,
         "numZoomLevels": 12,
         "opacity": 0.9,
-        "visibility": true
+        "visibility": false
       },
       "serverOptions": {
         "outputFormat": "application/json; subtype=geojson"
@@ -161,7 +160,7 @@
       },
       "openLayers": {
         "singleTile": false,
-        "visibility": true
+        "visibility": false
       },
       "styles": ["Unit Type", "Owner"],
       "labelClassName": "labels"
@@ -182,5 +181,14 @@
         "stylesBaseUrl": "https://plmonaghandev.compass.ie/publiclighting-test/resources/data/styling/",
         "styles": ["LightUnit_Unit_Type.xml", "LightUnit_Owner.xml"],
         "stylesForceNumericFilterVals": true
+      },
+      {
+          "layerType": "vt",
+          "text": "Light Unit VT",
+          "url": "https://plmonaghandev.compass.ie/mapserver/?mode=tile&tilemode=gmap&tile={x}+{y}+{z}&layers=LightUnit&map.imagetype=mvt",
+          "openLayers": {
+            "visibility": true
+          },
+          "format": "MVT"
       }]
 }
