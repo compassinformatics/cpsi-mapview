@@ -143,11 +143,20 @@ Ext.define('CpsiMapview.factory.Layer', {
         var olSourceProps = this.ol2PropsToOlSourceProps(layerConf.openLayers);
         var olLayerProps = this.ol2PropsToOlLayerProps(layerConf.openLayers);
 
+        // derive STYLES parameter: either directly set in serverOptions or we
+        // we take the first of a possible SLD style list
+        var styles = layerConf.serverOptions.styles;
+        var activatedStyle;
+        if (Ext.isArray(layerConf.styles) && layerConf.styles.length) {
+            styles = layerConf.styles[0];
+            activatedStyle = layerConf.styles[0];
+        }
+
         var olSourceConf = {
             url: layerConf.url,
             params: {
                 'LAYERS': layerConf.serverOptions.layers,
-                'STYLES': layerConf.serverOptions.styles,
+                'STYLES': styles,
                 'TRANSPARENT': true,
                 'TILED': !singleTile
             },
@@ -162,7 +171,9 @@ Ext.define('CpsiMapview.factory.Layer', {
             dateFormat: layerConf.dateFormat,
             timeProperty: layerConf.timeitem,
             isNumericDependent: Ext.isDefined(layerConf.numericitem), // TODO docs
-            isWms: true // TODO docs
+            isWms: true, // TODO docs
+            styles: layerConf.styles, // TODO docs
+            activatedStyle: activatedStyle
         };
         olLayerConf = Ext.apply(olLayerConf, olLayerProps);
 
@@ -346,15 +357,25 @@ Ext.define('CpsiMapview.factory.Layer', {
             // TODO wouldn't it make sense to have the actual field here
             //      instead of at the slider and globally for all layers?
             isNumericDependent: Ext.isDefined(layerConf.numericitem),
+            styles: layerConf.styles,
+            stylesBaseUrl: layerConf.stylesBaseUrl || '',
+            stylesForceNumericFilterVals: layerConf.stylesForceNumericFilterVals
         };
         olLayerConf = Ext.apply(olLayerConf, olLayerProps);
 
         var wfsLayer = new ol.layer.Vector(olLayerConf);
 
+        // derive SLD to style WFS: either directly set in sldUrl or we
+        // we take the first of a possible SLD style list
         var sldUrl = layerConf.sldUrl;
+        if (Ext.isArray(layerConf.styles) && layerConf.styles.length) {
+            sldUrl = wfsLayer.get('stylesBaseUrl') + layerConf.styles[0];
+            wfsLayer.set('activatedStyle', layerConf.styles[0]);
+        }
+
         if (sldUrl) {
             // load and parse style and apply it to layer
-            LayerFactory.loadSld(wfsLayer, sldUrl);
+            LayerFactory.loadSld(wfsLayer, sldUrl, layerConf.stylesForceNumericFilterVals);
         }
 
         if (layerConf.tooltipsConfig) {
@@ -603,7 +624,7 @@ Ext.define('CpsiMapview.factory.Layer', {
      * @param  {ol.layer.Vector} mapLayer The layer to apply the style to
      * @param  {String} sldUrl   The URL to the SLD
      */
-    loadSld: function (mapLayer, sldUrl) {
+    loadSld: function (mapLayer, sldUrl, forceNumericFilterVals) {
         Ext.Ajax.request({
             url: sldUrl,
             method: 'GET',
@@ -614,6 +635,12 @@ Ext.define('CpsiMapview.factory.Layer', {
 
                 sldParser.readStyle(sldXml)
                     .then(function (gs) {
+
+                        if (forceNumericFilterVals) {
+                            // transform filter values to numbers ('1' => 1)
+                            gs = LayerFactory.forceNumericFilterValues(gs);
+                        }
+
                         olParser.writeStyle(gs).then(function (olStyle) {
                             mapLayer.setStyle(olStyle);
                         });
@@ -628,6 +655,24 @@ Ext.define('CpsiMapview.factory.Layer', {
                     '! Default OL style will be applied.');
             }
         });
+    },
+
+    /**
+     * Transforms the filter values in the given GeoStyler style object to
+     * a number (if numeric).
+     *
+     * @param  {Object} gsStyle GeoStyler style object
+     * @return {Object}         GeoStyler style object with numeric filter vals
+     */
+    forceNumericFilterValues: function (gsStyle) {
+        Ext.each(gsStyle.rules, function (rule) {
+            var filterVal = rule.filter[2];
+            if (Ext.isNumeric(filterVal)) {
+                rule.filter[2] = parseFloat(filterVal);
+            }
+        });
+
+        return gsStyle;
     }
 
 });
