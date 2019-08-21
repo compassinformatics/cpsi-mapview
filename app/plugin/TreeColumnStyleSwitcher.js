@@ -23,10 +23,19 @@ Ext.define('CpsiMapview.plugin.TreeColumnStyleSwitcher', {
         }
     },
 
+    /**
+     * List of currently rendered instances of
+     * CpsiMapview.view.layer.StyleSwitcherRadioGroup. Used to cleanup.
+     *
+     * @property {CpsiMapview.view.layer.StyleSwitcherRadioGroup[]}
+     * @readonly
+     * @private
+     */
     radioGroups: [],
 
-    styleLayers: [],
-
+    /**
+     * @private
+     */
     init: function(treeColumn) {
         var me = this;
         if (!(treeColumn instanceof Ext.grid.column.Column)) {
@@ -39,6 +48,7 @@ Ext.define('CpsiMapview.plugin.TreeColumnStyleSwitcher', {
         // add a DIV as placeholder for each layer needing a style switcher
         var tplArr = [
             '<tpl if="this.needsStyleSwitcher(values.record)">',
+            // DIV placeholder for radio group (layer record ID as connector)
             '<div id="{[this.getRecId(values.record)]}" style="">',
             '</div>',
             '</tpl>'
@@ -64,14 +74,15 @@ Ext.define('CpsiMapview.plugin.TreeColumnStyleSwitcher', {
 
             // inject template code (string) to existing one
             var origCellTpl = treeColumn.cellTpl[0];
-            treeColumn.cellTpl[0] = origCellTpl.replace('</span></tpl>', '</span>' + tplArr.join('') + '</tpl>');
+            treeColumn.cellTpl[0] = origCellTpl.replace(
+                '</span></tpl>', '</span>' + tplArr.join('') + '</tpl>');
             // set context function for XTemplate
             treeColumn.cellTpl[1].getRecId = getRecId;
             treeColumn.cellTpl[1].needsStyleSwitcher = needsStyleSwitcher;
         } else {
 
             // The case that the XTemplate is modeled as array (default)
-            // 0-n-1 => XTemplate strings, n => context object with template
+            // 0-(n-1) => XTemplate strings, n => context object with template
             // functions
 
             // inject template code (array) to existing one
@@ -104,6 +115,12 @@ Ext.define('CpsiMapview.plugin.TreeColumnStyleSwitcher', {
         });
     },
 
+    /**
+     * Renders the radio groups for each layer having connected styles.
+     * The radio group instance is injected into the DIV placeholder created in
+     * the cellTpl of this tree column (see #init fucntion of this plugin).
+     * Connection of placeholder and layer is done by the layer record ID.
+     */
     renderRadioGroups: function () {
         var me = this;
         var THIS_CLS = CpsiMapview.plugin.TreeColumnStyleSwitcher;
@@ -127,12 +144,14 @@ Ext.define('CpsiMapview.plugin.TreeColumnStyleSwitcher', {
                     });
 
                     me.radioGroups.push(radioGroup);
-                    me.styleLayers.push(olLayer);
                 }
             }
         });
     },
 
+    /**
+     * Removes all currently rendered radio groups.
+     */
     cleanupAllRadioGroups: function () {
         var me = this;
 
