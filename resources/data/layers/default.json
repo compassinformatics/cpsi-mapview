@@ -163,7 +163,8 @@
         "singleTile": false,
         "visibility": true
       },
-      "styles": ["Unit Type", "Owner"]
+      "styles": ["Unit Type", "Owner"],
+      "labelClassName": "labels"
     }, {
         "layerType": "wfs",
         "text": "Light Unit WFS",

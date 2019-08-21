@@ -74,6 +74,14 @@ Ext.define('CpsiMapview.view.layer.StyleSwitcherRadioGroup', {
 
             if (me.layer.get('isWms')) {
 
+                // check if a label STYLES parameter was added --> keep this
+                // the STYLES value (SLD) for the labels
+                var labelClassName = me.layer.get('labelClassName');
+                if (me.layer.get('labelsActive') === true) {
+                    newStyle += ',' + labelClassName;
+                }
+
+                // apply new style parameter and reload layer
                 var newParams = {
                     STYLES: newStyle
                 };
