@@ -57,6 +57,10 @@
     "qtip": "An OSM based WFS layer",
     "url": "https://ows.terrestris.de/geoserver/osm/wfs",
     "featureType": "osm:osm-country-borders",
+    "geomFieldName": "geometry",
+    "namespaceDefinitions": {
+      "osm": "http://terrestris"
+    },
     "serverOptions": {},
     "noCluster": true,
     "openLayers": {
@@ -72,6 +76,10 @@
     "url": "https://ows.terrestris.de/geoserver/osm/wfs",
     "sldUrl": "resources/data/styling/Test_Gas.xml",
     "featureType": "osm:osm-fuel",
+    "geomFieldName": "geometry",
+    "namespaceDefinitions": {
+      "osm": "http://terrestris"
+    },
     "serverOptions": {},
     "noCluster": true,
     "tooltipsConfig": [
