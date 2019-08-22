@@ -1,15 +1,23 @@
 /**
- * TODO: !!!
+* This class is the controller for the button 'SpatialQueryButton'
  */
 Ext.define('CpsiMapview.controller.button.SpatialQueryButtonController', {
     extend: 'Ext.app.ViewController',
 
     alias: 'controller.cmv_spatial_query_btn',
 
+    /**
+     * The {ol.interaction.Draw} used to draw the geometry used in the spatial
+     * query
+     */
+    drawQueryInteraction: null,
+
+    /**
+     * Function to determine the query layer if not yet defined in class
+     */
     findQueryLayer: function () {
         var me = this;
         var view = me.getView();
-        // get query layer
         if (!view.queryLayer && view.queryLayerName) {
             view.queryLayer = BasiGX.util.Layer.
                 getLayerByName(view.queryLayerName);
@@ -17,7 +25,7 @@ Ext.define('CpsiMapview.controller.button.SpatialQueryButtonController', {
     },
 
     /**
-     * Activates #drawSelectPolygonInteraction on button toggle to draw polygon
+     * Activates #drawQueryInteraction on button toggle to draw polygon
      * selection geometry that will be used for filtering.
      *
      * @param {Ext.button.Button} btn The toggled select by polygon button.
@@ -38,37 +46,20 @@ Ext.define('CpsiMapview.controller.button.SpatialQueryButtonController', {
             geometryFunction = ol.interaction.Draw.createBox();
         }
 
-        if (!me.drawSelectPolygonInteraction) {
-            me.drawSelectPolygonInteraction = new ol.interaction.Draw({
+        if (!me.drawQueryInteraction) {
+            me.drawQueryInteraction = new ol.interaction.Draw({
                 features: view.queryFeature,
                 geometryFunction: geometryFunction,
                 type: type
             });
-            me.drawSelectPolygonInteraction.on(
-                'drawstart', me.removeExistingDrawings, me
-            );
-            view.map.addInteraction(me.drawSelectPolygonInteraction);
+            view.map.addInteraction(me.drawQueryInteraction);
         }
         if (pressed) {
-            me.drawSelectPolygonInteraction.setActive(true);
-            view.queryFeature.on('add', me.getGeometryFromPolygon, me);
+            me.drawQueryInteraction.setActive(true);
+            view.queryFeature.on('add', me.getGeometryFromPolygonAndTriggerWfs, me);
         } else {
-            me.drawSelectPolygonInteraction.setActive(false);
-            view.queryFeature.un('add', me.getGeometryFromPolygon, me);
-        }
-    },
-
-    /**
-     * A utility method that will remove existing drawings of the vectorlayer.
-     * Bound e.g. as handler for 'drawstart' events (so we always only have one
-     * feature in the layer), when the window closes etc.
-     */
-    removeExistingDrawings: function () {
-        var view = this.getView();
-        var layer = view && view.selectVectorLayer;
-        var source = layer && layer.getSource();
-        if (source) {
-            source.clear();
+            me.drawQueryInteraction.setActive(false);
+            view.queryFeature.un('add', me.getGeometryFromPolygonAndTriggerWfs, me);
         }
     },
 
@@ -77,21 +68,17 @@ Ext.define('CpsiMapview.controller.button.SpatialQueryButtonController', {
      *
      * @param {Ext.Event} evt The add-Event containing drawn feature
      */
-    getGeometryFromPolygon: function (evt) {
+    getGeometryFromPolygonAndTriggerWfs: function (evt) {
         var geometry = evt.element.getGeometry();
-        this.getGeometryFromFeature(geometry);
+        this.buildAndRequestQuery(geometry);
     },
 
     /**
-     * Help method to get a geometry from drawn feature that should be used
-     * as basis for geometric filtering.
+     * Build query / filter and call WFS
      *
-     * If buffer value is greater as 0, the buffer will be applied on the drawn
-     * geometry before filter is created.
-     *
-     * @param {ol.geom.Geometry} feature The feature to get the geometry from.
+     * @param {ol.geom.Geometry} geometry The geometry
      */
-    getGeometryFromFeature: function (geometry) {
+    buildAndRequestQuery: function (geometry) {
         var me = this;
         var view = me.getView();
         if (!view.queryLayer) {
@@ -142,7 +129,6 @@ Ext.define('CpsiMapview.controller.button.SpatialQueryButtonController', {
         BasiGX.util.Map.getMapComponent().setLoading(false);
         var wfsResponse = response.responseText;
         if (wfsResponse.indexOf('Exception') > 0) {
-            me.removeExistingDrawings();
             // something got wrong and we probably have an exception, that we
             // try to handle...
             BasiGX.util.WFS.handleWfsExecuteException(wfsResponse);
@@ -150,7 +136,6 @@ Ext.define('CpsiMapview.controller.button.SpatialQueryButtonController', {
         } else {
             var decodedResponse = Ext.decode(wfsResponse);
             view.fireEvent('cmv-spatial-query-success', decodedResponse);
-            me.removeExistingDrawings();
         }
     },
 
@@ -166,7 +151,6 @@ Ext.define('CpsiMapview.controller.button.SpatialQueryButtonController', {
         if (response && response.responseText) {
             responseTxt = response.responseText;
         }
-        me.removeExistingDrawings();
         BasiGX.util.Map.getMapComponent().setLoading(false);
         view.fireEvent('cmv-spatial-query-error', responseTxt);
     }

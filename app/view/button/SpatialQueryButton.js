@@ -1,9 +1,7 @@
 /**
- * This class is the select by polygon button button of cpsi mapview application
- * It can be used e.g. query a layer by a drawn polygon
- */
-/**
- * Select by polygon button TODO: !!
+ * This class is the button of cpsi mapview application that can be used to
+ * query an assigned layer by a draswn geometry. After the button if toggled,
+ * a draw interaction is activated on the map to define the query geometry.
  *
  * @class CpsiMapview.view.button.SpatialQueryButton
  */
@@ -81,9 +79,6 @@ Ext.define('CpsiMapview.view.button.SpatialQueryButton', {
      */
     initComponent: function () {
         var me = this;
-
-        // set map
-        me.map = BasiGX.util.Map.getMapComponent().getMap();
         me.callParent();
     }
 
