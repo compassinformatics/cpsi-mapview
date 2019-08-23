@@ -574,7 +574,7 @@ Ext.define('CpsiMapview.factory.Layer', {
     },
 
     /**
-     * Creates a Vector Tile layer.
+     * Creates a XYZ based Vector Tile layer
      *
      * @param  {Object} layerConf  The configuration object for this layer
      * @return {ol.layer.VectorTile}  Vector Tile layer
@@ -594,11 +594,52 @@ Ext.define('CpsiMapview.factory.Layer', {
         var olLayerConf = {
             name: layerConf.text,
             declutter: true,
-            source: new ol.source.VectorTile(olSourceConf)
+            source: new ol.source.VectorTile(olSourceConf),
+            styles: layerConf.styles,
+            stylesBaseUrl: layerConf.stylesBaseUrl || '',
+            stylesForceNumericFilterVals: layerConf.stylesForceNumericFilterVals
         };
         olLayerConf = Ext.apply(olLayerConf, olLayerProps);
 
         var vtLayer = new ol.layer.VectorTile(olLayerConf);
+
+        // derive SLD to style Vector Tiles:
+        // we take the first of a possible SLD style list
+        var sldUrl;
+        if (Ext.isArray(layerConf.styles) && layerConf.styles.length) {
+            sldUrl = vtLayer.get('stylesBaseUrl') + layerConf.styles[0];
+            vtLayer.set('activatedStyle', layerConf.styles[0]);
+        }
+        if (sldUrl) {
+            // load and parse style and apply it to layer
+            LayerFactory.loadSld(vtLayer, sldUrl, layerConf.stylesForceNumericFilterVals);
+        }
+
+        return vtLayer;
+    },
+
+    /**
+     * Creates a Vector Tile layer with the WMS facade of Mapserver
+     *
+     * @param  {Object} layerConf  The configuration object for this layer
+     * @return {ol.layer.VectorTile}  Vector Tile layer
+     */
+    createVectorTilesWmsLayer: function (layerConf) {
+        var vtLayer = LayerFactory.createVectorTilesLayer(layerConf);
+        var source = vtLayer.getSource();
+
+        // apply a custom tileUrlFunction in order to create a valid URL
+        // to retrieve the Vector Tiles via WMS facade
+        source.setTileUrlFunction(function(coord) {
+            var bbox = source.getTileGrid().getTileCoordExtent(coord);
+            var tileSize = source.getTileGrid().getTileSize(coord);
+            var url = source.getUrls()[0]
+                .replace('BBOX={bbox}', 'BBOX=' + bbox.toString())
+                .replace('WIDTH={width}', 'WIDTH=' + tileSize)
+                .replace('HEIGHT={height}', 'HEIGHT=' + tileSize);
+
+            return url;
+        });
 
         return vtLayer;
     },
