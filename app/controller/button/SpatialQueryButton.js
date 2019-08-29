@@ -84,7 +84,7 @@ Ext.define('CpsiMapview.controller.button.SpatialQueryButtonController', {
         if (!view.queryLayer) {
             return;
         }
-        var mapComp = BasiGX.util.Map.getMapComponent();
+        var mapComp = CpsiMapview.view.main.Map.guess();
         var projString = mapComp.getMap().getView().getProjection().getCode();
         var geomFieldName = view.queryLayer.get('geomFieldName') ||
             view.queryLayer.getSource().get('geomFieldName') ||
@@ -100,7 +100,7 @@ Ext.define('CpsiMapview.controller.button.SpatialQueryButtonController', {
             var filter = GeoExt.util.OGCFilter.getOgcFilter(
                 geomFieldName, view.spatialOperator, geometry, '1.1.0', projString);
 
-            BasiGX.util.Map.getMapComponent().setLoading(true);
+            mapComp.setLoading(true);
             BasiGX.util.WFS.executeWfsGetFeature(
                 url,
                 view.queryLayer,
@@ -126,7 +126,8 @@ Ext.define('CpsiMapview.controller.button.SpatialQueryButtonController', {
     onWfsExecuteSuccess: function (response) {
         var me = this;
         var view = me.getView();
-        BasiGX.util.Map.getMapComponent().setLoading(false);
+        var mapComp = CpsiMapview.view.main.Map.guess();
+        mapComp.setLoading(false);
         var wfsResponse = response.responseText;
         if (wfsResponse.indexOf('Exception') > 0) {
             // something got wrong and we probably have an exception, that we
@@ -151,7 +152,8 @@ Ext.define('CpsiMapview.controller.button.SpatialQueryButtonController', {
         if (response && response.responseText) {
             responseTxt = response.responseText;
         }
-        BasiGX.util.Map.getMapComponent().setLoading(false);
+        var mapComp = CpsiMapview.view.main.Map.guess();
+        mapComp.setLoading(false);
         view.fireEvent('cmv-spatial-query-error', responseTxt);
     }
 });
