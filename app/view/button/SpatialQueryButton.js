@@ -30,7 +30,7 @@ Ext.define('CpsiMapview.view.button.SpatialQueryButton', {
     name: 'spatialQueryBtn',
 
     /**
-     * The type of the geomety to graw / query with
+     * The type of the geometry to draw / query with
      * (Polygon, LineString, Point)
      * Will be ignored if spatialOperator === 'bbox'
      */
