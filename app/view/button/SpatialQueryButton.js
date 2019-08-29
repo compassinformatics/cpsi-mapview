@@ -1,6 +1,6 @@
 /**
  * This class is the button of cpsi mapview application that can be used to
- * query an assigned layer by a draswn geometry. After the button if toggled,
+ * query an assigned layer by a drawn geometry. After the button is toggled,
  * a draw interaction is activated on the map to define the query geometry.
  *
  * @class CpsiMapview.view.button.SpatialQueryButton
