@@ -94,7 +94,9 @@ Ext.define('CpsiMapview.controller.button.SpatialQueryButtonController', {
             view.queryLayer.getSource().getUrls()[0];
 
         var featureType = view.queryLayer.get('featureType') ||
-            view.queryLayer.getSource().getParams()['LAYERS'];
+            BasiGX.util.Object.layersFromParams(
+                view.queryLayer.getSource().getParams()
+            );
 
         if (!Ext.isEmpty(geometry)) {
             var filter = GeoExt.util.OGCFilter.getOgcFilter(
