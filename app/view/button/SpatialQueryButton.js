@@ -37,7 +37,7 @@ Ext.define('CpsiMapview.view.button.SpatialQueryButton', {
     drawGeometryType: null,
 
     /**
-     * Te type of spatial operato to use, see GeoExt.util.OGCFilter.
+     * The type of spatial operator to use, see GeoExt.util.OGCFilter.
      *                               topologicalOrSpatialFilterOperators
      */
     spatialOperator: null,
