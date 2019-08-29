@@ -44,6 +44,7 @@ Ext.define('CpsiMapview.view.button.SpatialQueryButton', {
 
     /**
      * The name of the layer to query
+     * This property will be ignored if queryLayer is defined
      */
     queryLayerName: null,
 
@@ -55,7 +56,7 @@ Ext.define('CpsiMapview.view.button.SpatialQueryButton', {
     /**
      * The drawn feature to query with
      */
-    queryFeature: new ol.Collection(),
+    queryFeatures: new ol.Collection(),
 
     /**
      * Enable toggle

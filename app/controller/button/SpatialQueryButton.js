@@ -48,7 +48,7 @@ Ext.define('CpsiMapview.controller.button.SpatialQueryButtonController', {
 
         if (!me.drawQueryInteraction) {
             me.drawQueryInteraction = new ol.interaction.Draw({
-                features: view.queryFeature,
+                features: view.queryFeatures,
                 geometryFunction: geometryFunction,
                 type: type
             });
@@ -56,10 +56,10 @@ Ext.define('CpsiMapview.controller.button.SpatialQueryButtonController', {
         }
         if (pressed) {
             me.drawQueryInteraction.setActive(true);
-            view.queryFeature.on('add', me.getGeometryFromPolygonAndTriggerWfs, me);
+            view.queryFeatures.on('add', me.getGeometryFromPolygonAndTriggerWfs, me);
         } else {
             me.drawQueryInteraction.setActive(false);
-            view.queryFeature.un('add', me.getGeometryFromPolygonAndTriggerWfs, me);
+            view.queryFeatures.un('add', me.getGeometryFromPolygonAndTriggerWfs, me);
         }
     },
 
