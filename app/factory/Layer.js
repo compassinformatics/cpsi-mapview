@@ -199,6 +199,7 @@ Ext.define('CpsiMapview.factory.Layer', {
      */
     createWfs: function(layerConf) {
         var url = layerConf.url;
+        var baseUrl = layerConf.url;
         // transform OL2 properties to current ones supported by OL >=v3
         var olSourceProps = this.ol2PropsToOlSourceProps(layerConf.openLayers);
         var olLayerProps = this.ol2PropsToOlLayerProps(layerConf.openLayers);
@@ -345,6 +346,13 @@ Ext.define('CpsiMapview.factory.Layer', {
             clusterSource = new ol.source.Cluster(clusterSourceConf);
         }
 
+        var namespaceDefinitions = layerConf.namespaceDefinitions;
+        if (namespaceDefinitions) {
+            Ext.iterate(namespaceDefinitions, function (prefix, uri) {
+                BasiGX.util.Namespace.namespaces[prefix] = uri;
+            });
+        }
+
         var olLayerConf = {
             name: layerConf.text,
             source: clusterSource ? clusterSource : vectorSource,
@@ -353,6 +361,10 @@ Ext.define('CpsiMapview.factory.Layer', {
             dateFormat: layerConf.dateFormat,
             timeProperty: layerConf.timeitem,
             isWfs: true,
+            filterable: layerConf.filterable,
+            url: baseUrl,
+            featureType: featureType,
+            geomFieldName: layerConf.geomFieldName,
             // TODO docs
             // TODO wouldn't it make sense to have the actual field here
             //      instead of at the slider and globally for all layers?
