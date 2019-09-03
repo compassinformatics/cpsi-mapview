@@ -595,6 +595,7 @@ Ext.define('CpsiMapview.factory.Layer', {
             name: layerConf.text,
             declutter: true,
             source: new ol.source.VectorTile(olSourceConf),
+            isVt: true,
             styles: layerConf.styles,
             stylesBaseUrl: layerConf.stylesBaseUrl || '',
             stylesForceNumericFilterVals: layerConf.stylesForceNumericFilterVals

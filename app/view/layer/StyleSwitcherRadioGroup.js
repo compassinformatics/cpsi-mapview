@@ -64,7 +64,7 @@ Ext.define('CpsiMapview.view.layer.StyleSwitcherRadioGroup', {
      * @return {String}            Human readable label
      */
     getLayerStyleLabel: function (layerStyle) {
-        if (this.layer.get('isWfs')) {
+        if (this.layer.get('isWfs') || this.layer.get('isVt')) {
             // remove _ and the .xml file ending
             return layerStyle.replace(/_/g, ' ').replace('.xml', '');
         } else {
@@ -122,7 +122,7 @@ Ext.define('CpsiMapview.view.layer.StyleSwitcherRadioGroup', {
                 };
                 layer.getSource().updateParams(newParams);
 
-            } else if (layer.get('isWfs')) {
+            } else if (layer.get('isWfs') || layer.get('isVt')) {
 
                 var sldUrl = layer.get('stylesBaseUrl') + newStyle;
                 // transform filter values to numbers ('1' => 1)
