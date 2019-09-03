@@ -102,7 +102,9 @@ Ext.define('CpsiMapview.controller.button.SpatialQueryButtonController', {
             return;
         }
 
-        var mapComp = me.mapComponent || BasiGX.util.Map.getMapComponent();
+        if (!me.mapComponent) {
+            me.mapComponent = BasiGX.util.Map.getMapComponent();
+        }
 
         var projString = mapComp.getMap().getView().getProjection().getCode();
         var geomFieldName = view.queryLayer.get('geomFieldName') ||
