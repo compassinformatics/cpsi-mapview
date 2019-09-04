@@ -1,7 +1,5 @@
 /* eslint-env node */
 /* eslint max-len: 0 */
-// process.env.CHROME_BIN = require('puppeteer').executablePath();
-
 module.exports = function(config) {
 
     var files = [
