@@ -12,15 +12,21 @@ module.exports = function(config) {
         'https://cdnjs.cloudflare.com/ajax/libs/openlayers/4.6.5/ol.js',
         'https://cdnjs.cloudflare.com/ajax/libs/extjs/6.2.0/ext-all.js',
         'https://cdnjs.cloudflare.com/ajax/libs/extjs/6.2.0/packages/ux/classic/ux.js',
-        // 'https://geoext.github.io/geoext3/master/GeoExt.js',
         'https://cdnjs.cloudflare.com/ajax/libs/opentype.js/0.6.9/opentype.min.js',
-        'https://cdn.jsdelivr.net/gh/highsource/jsonix@2.4.1/dist/Jsonix-min.js',
+        'https://cdn.jsdelivr.net/npm/jsonix@3.0.0/jsonix.min.js',
         'https://cdn.jsdelivr.net/gh/bjornharrtell/jsts@gh-pages/1.4.0/jsts.min.js',
         'https://cdn.jsdelivr.net/gh/highsource/ogc-schemas@2.6.1/scripts/lib/SLD_1_0_0_GeoServer.js',
         'https://cdn.jsdelivr.net/gh/highsource/ogc-schemas@2.6.1/scripts/lib/Filter_1_0_0.js',
         'https://cdn.jsdelivr.net/gh/highsource/ogc-schemas@2.6.1/scripts/lib/GML_2_1_2.js',
+        'https://cdn.jsdelivr.net/gh/highsource/ogc-schemas@2.6.1/scripts/lib/GML_3_1_1.js',
+        'https://cdn.jsdelivr.net/gh/highsource/ogc-schemas@2.6.1/scripts/lib/OWS_1_1_0.js',
+        'https://cdn.jsdelivr.net/gh/highsource/ogc-schemas@2.6.1/scripts/lib/SMIL_2_0.js',
+        'https://cdn.jsdelivr.net/gh/highsource/ogc-schemas@2.6.1/scripts/lib/SMIL_2_0_Language.js',
+        'https://cdn.jsdelivr.net/gh/highsource/ogc-schemas@2.6.1/scripts/lib/WCS_1_1.js',
+        'https://cdn.jsdelivr.net/gh/highsource/ogc-schemas@2.6.1/scripts/lib/WPS_1_0_0.js',
         'https://cdn.jsdelivr.net/gh/highsource/w3c-schemas@1.4.0/scripts/lib/XLink_1_0.js',
         'https://cdn.jsdelivr.net/npm/proj4@2.5.0/dist/proj4-src.min.js',
+        'https://maps.googleapis.com/maps/api/js?v=3.36',
         'lib/geoext3/src/**/*.js',
         'lib/geoext3/classic/**/*.js',
         'lib/BasiGX/src/**/*.js',
@@ -38,7 +44,8 @@ module.exports = function(config) {
             '/spec': '/base/test/spec',
             '/GeoExt': '/base/lib/geoext3/src',
             '/BasiGX': '/base/lib/BasiGX/src',
-            '/CpsiMapview': '/base/app'
+            '/CpsiMapview': '/base/app',
+            '/app': '/base/app'
         },
 
         // frameworks to use
