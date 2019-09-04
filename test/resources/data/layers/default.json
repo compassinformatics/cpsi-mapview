@@ -1,0 +1,22 @@
+{
+  "layers": [
+    {
+      "layerType": "osm",
+      "helpPage": "OSM",
+      "iconCls": "map",
+      "isBaseLayer": true,
+      "isDefaultBaseLayer": true,
+      "text": "OpenStreetMap",
+      "legendUrl": "https://a.tile.openstreetmap.org/9/244/166.png",
+      "legendHeight": 100,
+      "openLayers": {
+        "maxResolution": 1222.99245234375,
+        "numZoomLevels": 12,
+        "opacity": 0.7,
+        "projection": "EPSG:900913",
+        "visibility": false,
+        "zoomOffset": 7
+      }
+    }
+  ]
+}
