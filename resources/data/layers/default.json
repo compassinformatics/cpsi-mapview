@@ -6,8 +6,10 @@
     "isDefaultBaseLayer": false,
     "text": "Grey Background",
     "url": "https://services.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Light_Gray_Base/MapServer/tile/{z}/{y}/{x}",
+    "qtip": "This is the background layer",
     "openLayers": {
-      "maxResolution": 1222.99245234375,
+      "maxResolution": 560,
+      "minResolution": 28,
       "numZoomLevels": 13,
       "projection": "EPSG:900913",
       "visibility": true,
@@ -148,7 +150,7 @@
         "maxResolution": 1222.99245234375,
         "numZoomLevels": 12,
         "opacity": 0.9,
-        "visibility": true
+        "visibility": false
       },
       "serverOptions": {
         "outputFormat": "application/json; subtype=geojson"
