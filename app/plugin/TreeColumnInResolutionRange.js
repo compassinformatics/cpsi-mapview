@@ -58,8 +58,13 @@ Ext.define('CpsiMapview.plugin.TreeColumnInResolutionRange', {
         Ext.each(treeNodes.items, function (node) {
             var inRange = me.layerInResolutionRange(node.getOlLayer(), resolution);
             node[inRange ? 'removeCls' : 'addCls']('cpsi-tree-node-disabled');
+            var descriptionBefore = node.getOlLayer().get('description');
             var description = me.getTooltipText(node, inRange, unit);
+            var changed = description !== descriptionBefore;
             node.getOlLayer().set('description', description);
+            if (changed) {
+                node.triggerUIUpdate();
+            }
         });
         // This triggers the rendering if any existing StyleSwitcherRadioGroups
         treepanel.fireEvent('itemupdate');
