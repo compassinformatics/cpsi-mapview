@@ -12,6 +12,7 @@ Ext.define('CpsiMapview.view.toolbar.MapTools', {
         'BasiGX.view.button.ZoomToExtent',
         'BasiGX.view.button.History',
         'CpsiMapview.view.button.DigitizeButton',
+        'CpsiMapview.view.button.SpatialQueryButton',
         'CpsiMapview.model.button.MeasureButton',
         'CpsiMapview.controller.button.MeasureButtonController',
         'CpsiMapview.controller.MapController',
@@ -55,6 +56,31 @@ Ext.define('CpsiMapview.view.toolbar.MapTools', {
             controller: 'cmv_btn_measure',
             listeners: {
                 afterrender: 'initializeMeasureBtn'
+            }
+        }, {
+            xtype: 'cmv_spatial_query_button',
+            queryLayerName: 'GAS WFS',
+            drawGeometryType: 'Polygon',
+            spatialOperator: 'intersect',
+            glyph: 'xf096@FontAwesome',
+            listeners: {
+                'cmv-spatial-query-success': function (featureCollection) {
+                    var msg = 'WFS query returned ' + featureCollection.totalFeatures + ' feature(s)';
+                    Ext.Msg.show({
+                        title: 'Info',
+                        message: msg,
+                        buttons: Ext.MessageBox.OK,
+                        icon:  Ext.MessageBox.INFO,
+                    });
+                },
+                'cmv-spatial-query-error': function () {
+                    Ext.Msg.show({
+                        title: 'Error',
+                        message: 'WFS query not successful',
+                        buttons: Ext.MessageBox.OK,
+                        icon:  Ext.MessageBox.ERROR,
+                    });
+                }
             }
         }, {
             xtype: 'basigx-button-history',
