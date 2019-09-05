@@ -386,33 +386,7 @@ Ext.define('CpsiMapview.factory.Layer', {
 
         if (layerConf.tooltipsConfig) {
             // create a custom toolitp for this layer
-            var toolTip = Ext.create('CpsiMapview.view.layer.ToolTip', {
-                toolTipConfig: layerConf.tooltipsConfig,
-                layer: wfsLayer
-            });
-            wfsLayer.toolTip = toolTip;
-
-            // show / hide on appropriate events
-            mapPanel.on('cmv-map-pointerrest', function(hoveredObjs, evt) {
-                // show tooltip with feature attribute information
-                Ext.each(hoveredObjs, function (hoveredObj) {
-                    if (hoveredObj.layer &&
-                          hoveredObj.layer.id === wfsLayer.id &&
-                          hoveredObj.layer.toolTip) {
-                        hoveredObj.layer.toolTip.draw(hoveredObj.feature, evt);
-                    }
-                });
-            });
-
-            // hide tooltip if mouse moves again
-            mapPanel.on('cmv-map-pointermove', function () {
-                toolTip.hide();
-            });
-
-            // hide all tooltips if cursor leaves map
-            mapPanel.on('cmv-map-pointerrestout', function () {
-                CpsiMapview.view.layer.ToolTip.clear();
-            });
+            LayerFactory.registerLayerTooltip(wfsLayer);
         }
 
         return wfsLayer;
@@ -607,7 +581,8 @@ Ext.define('CpsiMapview.factory.Layer', {
             isVt: true,
             styles: layerConf.styles,
             stylesBaseUrl: layerConf.stylesBaseUrl || '',
-            stylesForceNumericFilterVals: layerConf.stylesForceNumericFilterVals
+            stylesForceNumericFilterVals: layerConf.stylesForceNumericFilterVals,
+            toolTipConfig: layerConf.tooltipsConfig
         };
         olLayerConf = Ext.apply(olLayerConf, olLayerProps);
 
@@ -623,6 +598,11 @@ Ext.define('CpsiMapview.factory.Layer', {
         if (sldUrl) {
             // load and parse style and apply it to layer
             LayerFactory.loadSld(vtLayer, sldUrl, layerConf.stylesForceNumericFilterVals);
+        }
+
+        if (layerConf.tooltipsConfig) {
+            // enable map tooltips for this layer
+            LayerFactory.registerLayerTooltip(vtLayer);
         }
 
         return vtLayer;
@@ -741,6 +721,45 @@ Ext.define('CpsiMapview.factory.Layer', {
                 Ext.log.warn('Could not load SLD ' + sldUrl +
                     '! Default OL style will be applied.');
             }
+        });
+    },
+
+    /**
+     * Registers and enables map tooltips for the given layer.
+     * The layer needs a config property 'toolTipConfig' holding the tooltip
+     * configuration object from the JSON layer config.
+     *
+     * @param  {ol.layer.Vector | ol.layer.VectorTile} layer The layer to enable map tooltips for
+     */
+    registerLayerTooltip: function (layer) {
+        var mapPanel = CpsiMapview.view.main.Map.guess();
+        // create a custom toolitp for this layer
+        var toolTip = Ext.create('CpsiMapview.view.layer.ToolTip', {
+            toolTipConfig: layer.get('toolTipConfig'),
+            layer: layer
+        });
+        layer.toolTip = toolTip;
+
+        // show / hide on appropriate events
+        mapPanel.on('cmv-map-pointerrest', function(hoveredObjs, evt) {
+            // show tooltip with feature attribute information
+            Ext.each(hoveredObjs, function (hoveredObj) {
+                if (hoveredObj.layer &&
+                      hoveredObj.layer.id === layer.id &&
+                      hoveredObj.layer.toolTip) {
+                    hoveredObj.layer.toolTip.draw(hoveredObj.feature, evt);
+                }
+            });
+        });
+
+        // hide tooltip if mouse moves again
+        mapPanel.on('cmv-map-pointermove', function () {
+            toolTip.hide();
+        });
+
+        // hide all tooltips if cursor leaves map
+        mapPanel.on('cmv-map-pointerrestout', function () {
+            CpsiMapview.view.layer.ToolTip.clear();
         });
     },
 

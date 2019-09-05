@@ -204,6 +204,12 @@
           "format": "MVT",
           "stylesBaseUrl": "https://plmonaghandev.compass.ie/publiclighting-test/resources/data/styling/",
           "styles": ["LightUnit_Unit_Type.xml", "LightUnit_Owner.xml"],
-          "stylesForceNumericFilterVals": true
+          "stylesForceNumericFilterVals": true,
+          "tooltipsConfig": [
+              {
+                  "alias": "Unit ID",
+                  "property": "UnitTypeId"
+              }
+          ]
       }]
 }
