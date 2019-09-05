@@ -13,6 +13,16 @@ Ext.define('CpsiMapview.controller.button.SpatialQueryButtonController', {
     drawQueryInteraction: null,
 
     /**
+    * The OpenLayers map. If not given, will be auto-detected
+    */
+    map: null,
+
+    /**
+     * The BasiGX mapComponent. If not given, will be auto-detected
+     */
+    mapComponent: null,
+
+    /**
      * Function to determine the query layer if not yet defined in class
      */
     findQueryLayer: function () {
@@ -35,6 +45,13 @@ Ext.define('CpsiMapview.controller.button.SpatialQueryButtonController', {
         var me = this;
         var view = me.getView();
 
+        if (view.map && view.map instanceof ol.Map) {
+            me.map = view.map;
+        } else {
+            // guess map as fallback
+            me.map = BasiGX.util.Map.getMapComponent().map;
+        }
+
         if (!view.queryLayer) {
             me.findQueryLayer();
         }
@@ -52,7 +69,7 @@ Ext.define('CpsiMapview.controller.button.SpatialQueryButtonController', {
                 geometryFunction: geometryFunction,
                 type: type
             });
-            view.map.addInteraction(me.drawQueryInteraction);
+            me.map.addInteraction(me.drawQueryInteraction);
         }
         if (pressed) {
             me.drawQueryInteraction.setActive(true);
@@ -84,7 +101,9 @@ Ext.define('CpsiMapview.controller.button.SpatialQueryButtonController', {
         if (!view.queryLayer) {
             return;
         }
-        var mapComp = CpsiMapview.view.main.Map.guess();
+
+        var mapComp = me.mapComponent || BasiGX.util.Map.getMapComponent();
+
         var projString = mapComp.getMap().getView().getProjection().getCode();
         var geomFieldName = view.queryLayer.get('geomFieldName') ||
             view.queryLayer.getSource().get('geomFieldName') ||
@@ -128,7 +147,7 @@ Ext.define('CpsiMapview.controller.button.SpatialQueryButtonController', {
     onWfsExecuteSuccess: function (response) {
         var me = this;
         var view = me.getView();
-        var mapComp = CpsiMapview.view.main.Map.guess();
+        var mapComp = me.mapComponent || BasiGX.util.Map.getMapComponent();
         mapComp.setLoading(false);
         var wfsResponse = response.responseText;
         if (wfsResponse.indexOf('Exception') > 0) {
@@ -154,7 +173,7 @@ Ext.define('CpsiMapview.controller.button.SpatialQueryButtonController', {
         if (response && response.responseText) {
             responseTxt = response.responseText;
         }
-        var mapComp = CpsiMapview.view.main.Map.guess();
+        var mapComp = me.mapComponent || BasiGX.util.Map.getMapComponent();
         mapComp.setLoading(false);
         view.fireEvent('cmv-spatial-query-error', responseTxt);
     }
