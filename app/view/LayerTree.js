@@ -48,6 +48,8 @@ Ext.define('CpsiMapview.view.LayerTree', {
                         'cmv_menuitem_layerrefresh',
                         'cmv_menuitem_layerlabels'
                     ]
+                }, {
+                    ptype: 'cmv_tree_inresolutionrange'
                 }]
             }
         ]
