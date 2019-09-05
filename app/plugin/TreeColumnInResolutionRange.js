@@ -26,7 +26,7 @@ Ext.define('CpsiMapview.plugin.TreeColumnInResolutionRange', {
         var map = mapComponent.getMap();
         map.getView().on('change:resolution', me.onChangeResolution, me);
 
-        me.cmp.up('treepanel').on('afterlayout', function (tp) {
+        me.cmp.up('treepanel').on('boxready', function (tp) {
             if (tp.getStore().count()) {
                 map.getView().dispatchEvent('change:resolution');
             }
@@ -61,7 +61,8 @@ Ext.define('CpsiMapview.plugin.TreeColumnInResolutionRange', {
             var description = me.getTooltipText(node, inRange, unit);
             node.getOlLayer().set('description', description);
         });
-        nodeStore.fireEvent('refresh');
+        // This triggers the rendering if any existing StyleSwitcherRadioGroups
+        treepanel.fireEvent('itemupdate');
     },
 
     /**
