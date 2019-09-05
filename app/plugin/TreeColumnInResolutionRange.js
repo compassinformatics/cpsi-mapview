@@ -137,7 +137,7 @@ Ext.define('CpsiMapview.plugin.TreeColumnInResolutionRange', {
         }
 
         if (maxScale && minScale) {
-            scale = Ext.String.format('Visible between <b>1:{0}</b> and <b>1:{1}</b>', maxScale, minScale);
+            scale = Ext.String.format('Visible between <b>1:{0}</b> and <b>1:{1}</b>', minScale, maxScale);
         } else {
             if (maxScale) {
                 scale = Ext.String.format('Visible at <b>1:{0}</b> and above', maxScale);
