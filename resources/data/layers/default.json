@@ -7,7 +7,6 @@
     "text": "Grey Background",
     "url": "https://services.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Light_Gray_Base/MapServer/tile/{z}/{y}/{x}",
     "openLayers": {
-      "maxResolution": 1222.99245234375,
       "numZoomLevels": 13,
       "projection": "EPSG:900913",
       "visibility": true,
@@ -148,7 +147,7 @@
         "maxResolution": 1222.99245234375,
         "numZoomLevels": 12,
         "opacity": 0.9,
-        "visibility": true
+        "visibility": false
       },
       "serverOptions": {
         "outputFormat": "application/json; subtype=geojson"
@@ -169,7 +168,7 @@
       },
       "openLayers": {
         "singleTile": false,
-        "visibility": true
+        "visibility": false
       },
       "styles": ["Unit Type", "Owner"],
       "labelClassName": "labels"
@@ -190,5 +189,35 @@
         "stylesBaseUrl": "https://plmonaghandev.compass.ie/publiclighting-test/resources/data/styling/",
         "styles": ["LightUnit_Unit_Type.xml", "LightUnit_Owner.xml"],
         "stylesForceNumericFilterVals": true
+      },
+      {
+          "layerType": "vt",
+          "text": "Light Unit VT",
+          "url": "https://plmonaghandev.compass.ie/mapserver/?mode=tile&tilemode=gmap&tile={x}+{y}+{z}&layers=LightUnit&map.imagetype=mvt",
+          "openLayers": {
+            "visibility": false
+          },
+          "format": "MVT",
+          "stylesBaseUrl": "https://plmonaghandev.compass.ie/publiclighting-test/resources/data/styling/",
+          "styles": ["LightUnit_Unit_Type.xml", "LightUnit_Owner.xml"],
+          "stylesForceNumericFilterVals": true
+      },
+      {
+          "layerType": "vtwms",
+          "text": "Light Unit VT WMS",
+          "url": "https://plmonaghandev.compass.ie/mapserver/?SERVICE=WMS&VERSION=1.3.0&REQUEST=GetMap&FORMAT=image%2Fpng&TRANSPARENT=true&LAYERS=LightUnit&TILED=false&CRS=EPSG%3A3857&WIDTH={width}&HEIGHT={height}&BBOX={bbox}&STYLES=Owner&FORMAT=mvt",
+          "openLayers": {
+            "visibility": true
+          },
+          "format": "MVT",
+          "stylesBaseUrl": "https://plmonaghandev.compass.ie/publiclighting-test/resources/data/styling/",
+          "styles": ["LightUnit_Unit_Type.xml", "LightUnit_Owner.xml"],
+          "stylesForceNumericFilterVals": true,
+          "tooltipsConfig": [
+              {
+                  "alias": "Unit ID",
+                  "property": "UnitTypeId"
+              }
+          ]
       }]
 }
