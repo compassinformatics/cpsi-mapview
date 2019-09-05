@@ -88,7 +88,7 @@ Ext.define('CpsiMapview.controller.button.SpatialQueryButtonController', {
     },
 
     /**
-    * Normalizes the given degree value.
+    * Creates a Filter object from the passed geometry and queryLayer
     *
     * @param  {ol.geom.Geometry} geometry The geometry
     * @return {Ext.util.Filter}       A filter spatial
