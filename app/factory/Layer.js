@@ -67,6 +67,12 @@ Ext.define('CpsiMapview.factory.Layer', {
         case 'switchlayer':
             mapLayer = LayerFactory.createSwitchLayer(layerConf);
             break;
+        case 'vt':
+            mapLayer = LayerFactory.createVectorTilesLayer(layerConf);
+            break;
+        case 'vtwms':
+            mapLayer = LayerFactory.createVectorTilesWmsLayer(layerConf);
+            break;
         default:
             Ext.log.warn('Layer type not known');
             //do nothing, and return empty layer
@@ -392,33 +398,7 @@ Ext.define('CpsiMapview.factory.Layer', {
 
         if (layerConf.tooltipsConfig) {
             // create a custom toolitp for this layer
-            var toolTip = Ext.create('CpsiMapview.view.layer.ToolTip', {
-                toolTipConfig: layerConf.tooltipsConfig,
-                layer: wfsLayer
-            });
-            wfsLayer.toolTip = toolTip;
-
-            // show / hide on appropriate events
-            mapPanel.on('cmv-map-pointerrest', function(hoveredObjs, evt) {
-                // show tooltip with feature attribute information
-                Ext.each(hoveredObjs, function (hoveredObj) {
-                    if (hoveredObj.layer &&
-                          hoveredObj.layer.id === wfsLayer.id &&
-                          hoveredObj.layer.toolTip) {
-                        hoveredObj.layer.toolTip.draw(hoveredObj.feature, evt);
-                    }
-                });
-            });
-
-            // hide tooltip if mouse moves again
-            mapPanel.on('cmv-map-pointermove', function () {
-                toolTip.hide();
-            });
-
-            // hide all tooltips if cursor leaves map
-            mapPanel.on('cmv-map-pointerrestout', function () {
-                CpsiMapview.view.layer.ToolTip.clear();
-            });
+            LayerFactory.registerLayerTooltip(wfsLayer);
         }
 
         return wfsLayer;
@@ -580,6 +560,93 @@ Ext.define('CpsiMapview.factory.Layer', {
     },
 
     /**
+     * Creates a XYZ based Vector Tile layer
+     *
+     * @param  {Object} layerConf  The configuration object for this layer
+     * @return {ol.layer.VectorTile}  Vector Tile layer
+     */
+    createVectorTilesLayer: function (layerConf) {
+
+        // transform OL2 properties to current ones supported by OL >=v3
+        var olSourceProps = this.ol2PropsToOlSourceProps(layerConf.openLayers);
+        var olLayerProps = this.ol2PropsToOlLayerProps(layerConf.openLayers);
+
+        // check for correct OL format and use 'MVT' as fallback
+        var format = layerConf.format;
+        if (!ol.format[format]) {
+            format = 'MVT';
+            Ext.Logger.warn('Unsupported format for Vector Tiles layer "' +
+                layerConf.text + '" given in config. Will use "MVT" ' +
+                'as fallback.');
+        }
+
+        var olSourceConf = {
+            format: new ol.format[format](),
+            url: layerConf.url
+        };
+        olSourceConf = Ext.apply(olSourceConf, olSourceProps);
+
+        var olLayerConf = {
+            name: layerConf.text,
+            declutter: true,
+            source: new ol.source.VectorTile(olSourceConf),
+            isVt: true,
+            styles: layerConf.styles,
+            stylesBaseUrl: layerConf.stylesBaseUrl || '',
+            stylesForceNumericFilterVals: layerConf.stylesForceNumericFilterVals,
+            toolTipConfig: layerConf.tooltipsConfig
+        };
+        olLayerConf = Ext.apply(olLayerConf, olLayerProps);
+
+        var vtLayer = new ol.layer.VectorTile(olLayerConf);
+
+        // derive SLD to style Vector Tiles:
+        // we take the first of a possible SLD style list
+        var sldUrl;
+        if (Ext.isArray(layerConf.styles) && layerConf.styles.length) {
+            sldUrl = vtLayer.get('stylesBaseUrl') + layerConf.styles[0];
+            vtLayer.set('activatedStyle', layerConf.styles[0]);
+        }
+        if (sldUrl) {
+            // load and parse style and apply it to layer
+            LayerFactory.loadSld(vtLayer, sldUrl, layerConf.stylesForceNumericFilterVals);
+        }
+
+        if (layerConf.tooltipsConfig) {
+            // enable map tooltips for this layer
+            LayerFactory.registerLayerTooltip(vtLayer);
+        }
+
+        return vtLayer;
+    },
+
+    /**
+     * Creates a Vector Tile layer with the WMS facade of Mapserver
+     *
+     * @param  {Object} layerConf  The configuration object for this layer
+     * @return {ol.layer.VectorTile}  Vector Tile layer
+     */
+    createVectorTilesWmsLayer: function (layerConf) {
+        var vtLayer = LayerFactory.createVectorTilesLayer(layerConf);
+        var source = vtLayer.getSource();
+
+        // apply a custom tileUrlFunction in order to create a valid URL
+        // to retrieve the Vector Tiles via WMS facade
+        source.setTileUrlFunction(function(coord) {
+            var bbox = source.getTileGrid().getTileCoordExtent(coord);
+            var tileSize = source.getTileGrid().getTileSize(coord);
+            var url = source.getUrls()[0]
+                .replace('BBOX={bbox}', 'BBOX=' + bbox.toString())
+                .replace('WIDTH={width}', 'WIDTH=' + tileSize)
+                .replace('HEIGHT={height}', 'HEIGHT=' + tileSize);
+
+            return url;
+        });
+
+        return vtLayer;
+    },
+
+    /**
      * Transforms the OpenLayers 2 config options to OL (>=v3) layer pendants.
      *
      * @param  {Object} ol2Conf OL2 config
@@ -666,6 +733,45 @@ Ext.define('CpsiMapview.factory.Layer', {
                 Ext.log.warn('Could not load SLD ' + sldUrl +
                     '! Default OL style will be applied.');
             }
+        });
+    },
+
+    /**
+     * Registers and enables map tooltips for the given layer.
+     * The layer needs a config property 'toolTipConfig' holding the tooltip
+     * configuration object from the JSON layer config.
+     *
+     * @param  {ol.layer.Vector | ol.layer.VectorTile} layer The layer to enable map tooltips for
+     */
+    registerLayerTooltip: function (layer) {
+        var mapPanel = CpsiMapview.view.main.Map.guess();
+        // create a custom toolitp for this layer
+        var toolTip = Ext.create('CpsiMapview.view.layer.ToolTip', {
+            toolTipConfig: layer.get('toolTipConfig'),
+            layer: layer
+        });
+        layer.toolTip = toolTip;
+
+        // show / hide on appropriate events
+        mapPanel.on('cmv-map-pointerrest', function(hoveredObjs, evt) {
+            // show tooltip with feature attribute information
+            Ext.each(hoveredObjs, function (hoveredObj) {
+                if (hoveredObj.layer &&
+                      hoveredObj.layer.id === layer.id &&
+                      hoveredObj.layer.toolTip) {
+                    hoveredObj.layer.toolTip.draw(hoveredObj.feature, evt);
+                }
+            });
+        });
+
+        // hide tooltip if mouse moves again
+        mapPanel.on('cmv-map-pointermove', function () {
+            toolTip.hide();
+        });
+
+        // hide all tooltips if cursor leaves map
+        mapPanel.on('cmv-map-pointerrestout', function () {
+            CpsiMapview.view.layer.ToolTip.clear();
         });
     },
 
