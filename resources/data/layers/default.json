@@ -144,6 +144,7 @@
       "url": "https://pmstipperarydev.compass.ie/mapserver/?",
       "geometryProperty": "msGeometry",
       "featureType": "Accidents",
+      "guid": "0cf84adb-059b-4cf4-8dfc-337c29b1b205",
       "openLayers": {
         "maxResolution": 1222.99245234375,
         "numZoomLevels": 12,
