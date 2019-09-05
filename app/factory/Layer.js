@@ -91,6 +91,7 @@ Ext.define('CpsiMapview.factory.Layer', {
             mapLayer.set('legendUrl', layerConf.legendUrl);
             mapLayer.set('legendHeight', layerConf.legendHeight);
             mapLayer.set('legendWidth', layerConf.legendWidth);
+            mapLayer.set('guid', layerConf.guid);
 
             // this gets transformed to qtip on the layer tree node
             mapLayer.set('description', layerConf.qtip);
