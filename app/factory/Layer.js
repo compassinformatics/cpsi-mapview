@@ -585,8 +585,17 @@ Ext.define('CpsiMapview.factory.Layer', {
         var olSourceProps = this.ol2PropsToOlSourceProps(layerConf.openLayers);
         var olLayerProps = this.ol2PropsToOlLayerProps(layerConf.openLayers);
 
+        // check for correct OL format and use 'MVT' as fallback
+        var format = layerConf.format;
+        if (!ol.format[format]) {
+            format = 'MVT';
+            Ext.Logger.warn('Unsupported format for Vector Tiles layer "' +
+                layerConf.text + '" given in config. Will use "MVT" ' +
+                'as fallback.');
+        }
+
         var olSourceConf = {
-            format: new ol.format[layerConf.format](),
+            format: new ol.format[format](),
             url: layerConf.url
         };
         olSourceConf = Ext.apply(olSourceConf, olSourceProps);
