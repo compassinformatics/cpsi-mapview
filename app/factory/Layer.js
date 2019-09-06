@@ -198,12 +198,12 @@ Ext.define('CpsiMapview.factory.Layer', {
         return layer;
     },
 
-     /**
-     * Creates custom filters for a vector layer
-     *
-     * @param {ol.source.Vector}  Vector layer source
-     * @return {Ext.util.Filter[]} filters array with custom filters
-     */
+    /**
+    * Creates custom filters for a vector layer
+    *
+    * @param {ol.source.Vector}  Vector layer source
+    * @return {Ext.util.Filter[]} filters array with custom filters
+    */
     createCustomFilters: function (layerSource) {
         var allFilters = [];
 
