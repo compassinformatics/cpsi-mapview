@@ -199,6 +199,60 @@ Ext.define('CpsiMapview.factory.Layer', {
     },
 
     /**
+    * Creates custom filters for a vector layer
+    *
+    * @param {ol.source.Vector}  Vector layer source
+    * @return {Ext.util.Filter[]} filters array with custom filters
+    */
+    createCustomFilters: function (layerSource) {
+        var allFilters = [];
+
+        // this within the function is bound to the vector source it's
+        // called from.
+        var timeFilters = layerSource.get('timeFilters');
+        if (!Ext.isEmpty(timeFilters)) {
+            allFilters = Ext.Array.merge(allFilters, timeFilters);
+        }
+        var numericFilters = layerSource.get('numericFilters'); // TODO docs
+        if (!Ext.isEmpty(numericFilters)) {
+            numericFilters = BasiGX.util.WFS.unwrapFilter(numericFilters);
+            allFilters = Ext.Array.merge(allFilters, numericFilters);
+        }
+
+        /**
+         * Apply additional filters.
+         * To get access to them here an instance of `Ext.grid.filter.filters`
+         * must be set on layer source.
+         * For example, this can be possibly achieved via `filterchange`
+         * listener of FeatureGrid component if used with GeoExt feature grid
+         * component:
+         *
+         *   'filterchange': function (rec, filters) {
+         *       var wfsLayerSource = someWfsLayer.getSource();
+         *       wfsLayerSource.getSource().set('additionalFilters', filters);
+         *       wfsLayerSource.clear();
+         *       wfsLayerSource.refresh();
+         *    }
+         *
+         * See also GeoExt3 example for filter-grid:
+         * https://rawgit.com/geoext/geoext3/master/examples/features/grid-filter.html
+         *
+         */
+        var additionalFilters = layerSource.get('additionalFilters');
+
+        if (additionalFilters) {
+            Ext.each(additionalFilters, function(addFilter) {
+                var ogcUtil = GeoExt.util.OGCFilter;
+                var serializedFilter =
+                    ogcUtil.getOgcFilterBodyFromExtJsFilterObject(addFilter, '2.0.0');
+                allFilters.push(serializedFilter);
+            });
+        }
+
+        return allFilters;
+    },
+
+    /**
      * Creates an OGC WFS layer
      *
      * @param  {Object} layerConf The configuration object for this layer
@@ -250,60 +304,21 @@ Ext.define('CpsiMapview.factory.Layer', {
         var vectorSource = new ol.source.Vector(olSourceConf);
 
         var loaderFn = function(extent) {
+            var layerSource = this;
             vectorSource.dispatchEvent('vectorloadstart');
 
-            var allFilters = [];
+            var allFilters = LayerFactory.createCustomFilters(layerSource);
+
             var bboxFilter = BasiGX.util.WFS.getBboxFilter(
                 mapPanel.olMap,
                 geometryProperty,
                 extent,
                 'bbox'
             );
-            // this within the function is bound to the vector source it's
-            // called from.
-            var timeFilters = this.get('timeFilters');
-            if (!Ext.isEmpty(timeFilters)) {
-                allFilters = Ext.Array.merge(allFilters, timeFilters);
-            }
-            var numericFilters = this.get('numericFilters'); // TODO docs
-            if (!Ext.isEmpty(numericFilters)) {
-                numericFilters = BasiGX.util.WFS.unwrapFilter(numericFilters);
-                allFilters = Ext.Array.merge(allFilters, numericFilters);
-            }
 
             allFilters.push(bboxFilter);
 
-            /**
-             * Apply additional filters.
-             * To get access to them here an instance of `Ext.grid.filter.filters`
-             * must be set on layer source.
-             * For example, this can be possibly achieved via `filterchange`
-             * listener of FeatureGrid component if used with GeoExt feature grid
-             * component:
-             *
-             *   'filterchange': function (rec, filters) {
-             *       var wfsLayerSource = someWfsLayer.getSource();
-             *       wfsLayerSource.getSource().set('additionalFilters', filters);
-             *       wfsLayerSource.clear();
-             *       wfsLayerSource.refresh();
-             *    }
-             *
-             * See also GeoExt3 example for filter-grid:
-             * https://rawgit.com/geoext/geoext3/master/examples/features/grid-filter.html
-             *
-             */
-            var additionalFilters = this.get('additionalFilters');
-
-            if (additionalFilters) {
-                Ext.each(additionalFilters, function(addFilter) {
-                    var ogcUtil = GeoExt.util.OGCFilter;
-                    var serializedFilter =
-                        ogcUtil.getOgcFilterBodyFromExtJsFilterObject(addFilter, '2.0.0');
-                    allFilters.push(serializedFilter);
-                });
-            }
-
-            // merge all filters to OGC complain AND filter
+            // merge all filters to OGC compliant AND filter
             var filter = BasiGX.util.WFS.combineFilters(allFilters);
             var reqUrl = Ext.String.urlAppend(
                 url, 'FILTER=' + encodeURIComponent(filter)
@@ -634,6 +649,14 @@ Ext.define('CpsiMapview.factory.Layer', {
         // apply a custom tileUrlFunction in order to create a valid URL
         // to retrieve the Vector Tiles via WMS facade
         source.setTileUrlFunction(function(coord) {
+            var filters = LayerFactory.createCustomFilters(source);
+            var ogcFilter = null;
+
+            // merge all filters to OGC compliant AND filter
+            if (filters.length > 0) {
+                ogcFilter = BasiGX.util.WFS.combineFilters(filters);
+            }
+
             var bbox = source.getTileGrid().getTileCoordExtent(coord);
             var tileSize = source.getTileGrid().getTileSize(coord);
             var url = source.getUrls()[0]
@@ -641,6 +664,11 @@ Ext.define('CpsiMapview.factory.Layer', {
                 .replace('WIDTH={width}', 'WIDTH=' + tileSize)
                 .replace('HEIGHT={height}', 'HEIGHT=' + tileSize);
 
+            if (ogcFilter) {
+                url = Ext.String.urlAppend(
+                    url, 'FILTER=' + encodeURIComponent(ogcFilter)
+                );
+            }
             return url;
         });
 
