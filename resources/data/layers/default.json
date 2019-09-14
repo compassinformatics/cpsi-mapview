@@ -107,7 +107,51 @@
       "projection": "EPSG:900913",
       "visibility": false
     }
-  }, {
+  },{
+    "layerType": "switchlayer",
+    "visibility": false,
+    "vectorFeaturesMinScale": 80000,
+    "layers": [
+      {
+        "layerType": "wms",
+        "text": "Light Unit Switch Layer (far)",
+        "url": "https://plmonaghandev.compass.ie/mapserver/",
+        "isBaseLayer": false,
+        "isDefaultBaseLayer": false,
+        "serverOptions": {
+          "layers": "LightUnit",
+          "version": "1.3.0"
+        },
+        "openLayers": {
+          "singleTile": false
+        },
+        "styles": [
+          "Unit Type",
+          "Owner"
+        ],
+        "labelClassName": "labels"
+      },
+      {
+        "layerType": "wfs",
+        "text": "Light Unit Switch Layer (close)",
+        "url": "https://plmonaghandev.compass.ie/mapserver/?",
+        "geometryProperty": "msGeometry",
+        "featureType": "LightUnit",
+        "sldUrl": "resources/data/styling/LightUnit_Unit_Type.xml",
+        "openLayers": {},
+        "serverOptions": {
+          "outputFormat": "geojson"
+        },
+        "noCluster": true,
+        "stylesBaseUrl": "https://plmonaghandev.compass.ie/publiclighting-test/resources/data/styling/",
+        "styles": [
+          "LightUnit_Unit_Type.xml",
+          "LightUnit_Owner.xml"
+        ],
+        "stylesForceNumericFilterVals": true
+      }
+    ]
+  },{
     "layerType": "wms",
     "text": "Works_Export (needs proxy)",
     "url": "mapserver/",
