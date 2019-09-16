@@ -7,6 +7,10 @@ Ext.define('CpsiMapview.plugin.TreeColumnInResolutionRange', {
     alias: 'plugin.cmv_tree_inresolutionrange',
     pluginId: 'cmv_tree_inresolutionrange',
 
+    statics: {
+        LINE_BREAK: '<br class="cpsi-resolution-range-popup-br" />'
+    },
+
     /**
      * Initialize TreeColumnInResolutionRange plugin
      * @param {Ext.grid.column.Column} column The column to register the plugin
@@ -101,6 +105,7 @@ Ext.define('CpsiMapview.plugin.TreeColumnInResolutionRange', {
      * @returns {String} The toolip text valid for current range
      */
     getTooltipText: function (node, inRange, unit) {
+        var staticMe = CpsiMapview.plugin.TreeColumnInResolutionRange;
         if (!Ext.isDefined(node.originalQtip)) {
             node.originalQtip = node.getOlLayer().get('description') || '';
         }
@@ -110,7 +115,7 @@ Ext.define('CpsiMapview.plugin.TreeColumnInResolutionRange', {
         }
 
         var currentTip = node.getOlLayer().get('description');
-        if (currentTip && (currentTip.indexOf('<br />') > -1 ||
+        if (currentTip && (currentTip.indexOf(staticMe.LINE_BREAK) > -1 ||
             currentTip.indexOf('Visible') > -1)) {
             return currentTip;
         }
@@ -127,6 +132,7 @@ Ext.define('CpsiMapview.plugin.TreeColumnInResolutionRange', {
      * @returns {String} The enhanced toolip text
      */
     enhanceTooltip: function (layer, unit) {
+        var staticMe = CpsiMapview.plugin.TreeColumnInResolutionRange;
         var scale = '', maxScale, minScale;
         maxScale = BasiGX.util.Map.getScaleForResolution(layer.getMaxResolution(), unit);
         minScale = BasiGX.util.Map.getScaleForResolution(layer.getMinResolution(), unit);
@@ -151,7 +157,9 @@ Ext.define('CpsiMapview.plugin.TreeColumnInResolutionRange', {
                 scale = Ext.String.format('Visible at <b>1:{0}<b> and below', minScale);
             }
         }
-        return layer.get('description') ? (layer.get('description').trim() + '<br />' + scale) : scale;
+        return layer.get('description') ?
+            (layer.get('description').trim() + staticMe.LINE_BREAK + scale) :
+            scale;
     }
 
 });
