@@ -78,13 +78,6 @@ Ext.define('CpsiMapview.factory.Layer', {
             //do nothing, and return empty layer
         }
 
-        // TODO: make sure this listener is called only once
-
-        // listener that checks the resolution and
-        // changes the switch layer if required
-        var olMap = BasiGX.util.Map.getMapComponent().getMap();
-        olMap.getView().on('change:resolution', LayerFactory.handleSwitchLayerOnResolutionChange);
-
         // This is the same for all types
         if (mapLayer) {
             // handle base layer logic
@@ -121,27 +114,27 @@ Ext.define('CpsiMapview.factory.Layer', {
      * @param {ol.Object.Event} evt The event which contains the view.
      */
     handleSwitchLayerOnResolutionChange: function (evt) {
-
         var resolution = evt.target.getResolution();
-
-        // TODO: this needs to be called more elegantly
         var allLayers = BasiGX.util.Map.getMapComponent().getMap().getLayers();
-        var overlayGroup =  BasiGX.util.Layer.getLayerByName('Layers', allLayers).getLayers();
+        var overlayGroup = BasiGX.util.Layer.getLayerByName('Layers', allLayers);
 
-        overlayGroup.forEach(
-            function (layer, index) {
+        if (!Ext.isDefined(overlayGroup)) {
+            return;
+        }
+        var overlayCollection = overlayGroup.getLayers();
 
-                if(layer.get('isSwitchLayer') && LayerFactory.isLayerSwitchNecessary(layer, resolution)){
+        overlayCollection.forEach(function (layer, index) {
 
-                    var switchConfiguration = layer.get('switchConfiguration');
-                    var newLayer = LayerFactory.createSwitchLayer(switchConfiguration);
+            if(layer.get('isSwitchLayer') && LayerFactory.isLayerSwitchNecessary(layer, resolution)){
 
-                    overlayGroup.setAt(index, newLayer);
+                var switchConfiguration = layer.get('switchConfiguration');
+                var newLayer = LayerFactory.createSwitchLayer(switchConfiguration);
 
-                    LayerFactory.updateLayerTreeForSwitchLayers();
-                }
+                overlayCollection.setAt(index, newLayer);
+
+                LayerFactory.updateLayerTreeForSwitchLayers();
             }
-        );
+        });
     },
 
     /**
