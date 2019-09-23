@@ -133,8 +133,14 @@ Ext.define('CpsiMapview.factory.Layer', {
         Ext.log.info('Not implemented yet', layerConf);
     },
 
+    /**
+     * Creates an layer which renders shows a WMS for small scales and a WFS
+     * for large scales as sub layer.
+     *
+     * @param  {Object} layerConf The configuration object for this layer
+     * @return {ol.layer.Base}    The created sub layer
+     */
     createSwitchLayer: function(layerConf) {
-
         // compute switch resolution when layer is
         // initialised the first time
         if(!layerConf.switchResolution){
@@ -869,7 +875,7 @@ Ext.define('CpsiMapview.factory.Layer', {
      *
      * @param {ol.Object.Event} evt The event which contains the view.
      */
-    handleSwitchLayerOnResolutionChange: function (evt) {
+    handleSwitchLayerOnResolutionChange: function(evt) {
         var resolution = evt.target.getResolution();
         var allLayers = BasiGX.util.Map.getMapComponent().getMap().getLayers();
         var overlayGroup = BasiGX.util.Layer.getLayerByName('Layers', allLayers);
@@ -898,13 +904,11 @@ Ext.define('CpsiMapview.factory.Layer', {
     /**
      * Checks if the switch layer has to be replaced
      *
-     * @param {*} layer       the layer to check
-     * @param {*} resolution  the resolution of the map view
+     * @param {ol.layer.Base} layer the layer to check
+     * @param {Number} resolution  the resolution of the map view
      */
-    isLayerSwitchNecessary: function(layer, resolution){
-
+    isLayerSwitchNecessary: function(layer, resolution) {
         var switchConfiguration = layer.get('switchConfiguration');
-
         // get precomputed switch resolution from layer config
         var switchResolution = switchConfiguration.switchResolution;
 
@@ -925,10 +929,10 @@ Ext.define('CpsiMapview.factory.Layer', {
      * Updates the switch layer items of the layer tree. This is
      * necessary when switch layers get replaced.
      */
-    updateLayerTreeForSwitchLayers: function(){
+    updateLayerTreeForSwitchLayers: function() {
         var treePanel = Ext.ComponentQuery.query('treepanel')[0];
-        var nodeStore = treePanel.getStore();
-        var treeNodes = nodeStore.getData();
+        var treeStore = treePanel.getStore();
+        var treeNodes = treeStore.getData();
 
         Ext.each(treeNodes.items, function (node) {
             var switchConf = node.getOlLayer().get('switchConfiguration');
