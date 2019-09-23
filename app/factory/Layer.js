@@ -155,10 +155,16 @@ Ext.define('CpsiMapview.factory.Layer', {
         var resultLayer;
         if (resolution < layerConf.switchResolution) {
             var confBelowSwitchResolution = layerConf.layers[1];
+            // apply overall visibility to sub layer
+            confBelowSwitchResolution.openLayers.visibility =
+                layerConf.visibility;
             resultLayer = LayerFactory.createLayer(confBelowSwitchResolution);
             resultLayer.set('currentSwitchType', 'below_switch_resolution');
         } else {
             var confAboveSwitchResolution = layerConf.layers[0];
+            // apply overall visibility to sub layer
+            confAboveSwitchResolution.openLayers.visibility =
+                layerConf.visibility;
             resultLayer = LayerFactory.createLayer(confAboveSwitchResolution);
             resultLayer.set('currentSwitchType', 'above_switch_resolution');
         }
@@ -878,6 +884,8 @@ Ext.define('CpsiMapview.factory.Layer', {
             if(layer.get('isSwitchLayer') && LayerFactory.isLayerSwitchNecessary(layer, resolution)){
 
                 var switchConfiguration = layer.get('switchConfiguration');
+                // restore current layer visibility
+                switchConfiguration.visibility = layer.getVisible();
                 var newLayer = LayerFactory.createSwitchLayer(switchConfiguration);
 
                 overlayCollection.setAt(index, newLayer);
