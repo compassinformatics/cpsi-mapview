@@ -188,6 +188,10 @@ Ext.define('CpsiMapview.view.main.Map', {
             me.olMap.on('pointermove', function () {
                 me.fireEvent('cmv-map-pointermove');
             });
+
+            // listener that checks the resolution and changes the switch layer if required
+            me.olMap.getView().on('change:resolution',
+                LayerFactory.handleSwitchLayerOnResolutionChange);
         }
 
         if (me.enablePermalink) {

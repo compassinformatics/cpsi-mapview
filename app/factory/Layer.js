@@ -133,8 +133,55 @@ Ext.define('CpsiMapview.factory.Layer', {
         Ext.log.info('Not implemented yet', layerConf);
     },
 
+    /**
+     * Creates an layer which renders shows a WMS for small scales and a WFS
+     * for large scales as sub layer.
+     *
+     * @param  {Object} layerConf The configuration object for this layer
+     * @return {ol.layer.Base}    The created sub layer
+     */
     createSwitchLayer: function(layerConf) {
-        Ext.log.info('Not implemented yet', layerConf);
+        // compute switch resolution when layer is
+        // initialised the first time
+        if(!layerConf.switchResolution){
+
+            // compute resolution from scale
+            var unit = BasiGX.util.Map.getMapComponent().getView().getProjection().getUnits();
+            var vectorFeaturesMinScale = layerConf.vectorFeaturesMinScale;
+            var switchResolution = BasiGX.util.Map.getResolutionForScale(vectorFeaturesMinScale ,unit);
+
+            // add computed switch resolution to layerConf
+            layerConf.switchResolution = switchResolution;
+        }
+
+        // create layer depending on the resolution
+        var mapPanel = CpsiMapview.view.main.Map.guess();
+        var resolution = mapPanel.olMap.getView().getResolution();
+
+        var resultLayer;
+        if (resolution < layerConf.switchResolution) {
+            var confBelowSwitchResolution = layerConf.layers[1];
+            // apply overall visibility to sub layer
+            confBelowSwitchResolution.openLayers.visibility =
+                layerConf.visibility;
+            resultLayer = LayerFactory.createLayer(confBelowSwitchResolution);
+            resultLayer.set('currentSwitchType', 'below_switch_resolution');
+        } else {
+            var confAboveSwitchResolution = layerConf.layers[0];
+            // apply overall visibility to sub layer
+            confAboveSwitchResolution.openLayers.visibility =
+                layerConf.visibility;
+            resultLayer = LayerFactory.createLayer(confAboveSwitchResolution);
+            resultLayer.set('currentSwitchType', 'above_switch_resolution');
+        }
+
+        // store the whole layer configuration
+        resultLayer.set('switchConfiguration', layerConf);
+
+        // for later identification
+        resultLayer.set('isSwitchLayer', true);
+
+        return resultLayer;
     },
 
     /**
@@ -820,6 +867,81 @@ Ext.define('CpsiMapview.factory.Layer', {
         });
 
         return gsStyle;
+    },
+
+    /**
+     * Loops through all layers, identifies switch layers
+     * and replaces them if required
+     *
+     * @param {ol.Object.Event} evt The event which contains the view.
+     */
+    handleSwitchLayerOnResolutionChange: function(evt) {
+        var resolution = evt.target.getResolution();
+        var allLayers = BasiGX.util.Map.getMapComponent().getMap().getLayers();
+        var overlayGroup = BasiGX.util.Layer.getLayerByName('Layers', allLayers);
+
+        if (!Ext.isDefined(overlayGroup)) {
+            return;
+        }
+        var overlayCollection = overlayGroup.getLayers();
+
+        overlayCollection.forEach(function (layer, index) {
+
+            if(layer.get('isSwitchLayer') && LayerFactory.isLayerSwitchNecessary(layer, resolution)){
+
+                var switchConfiguration = layer.get('switchConfiguration');
+                // restore current layer visibility
+                switchConfiguration.visibility = layer.getVisible();
+                var newLayer = LayerFactory.createSwitchLayer(switchConfiguration);
+
+                overlayCollection.setAt(index, newLayer);
+
+                LayerFactory.updateLayerTreeForSwitchLayers();
+            }
+        });
+    },
+
+    /**
+     * Checks if the switch layer has to be replaced
+     *
+     * @param {ol.layer.Base} layer the layer to check
+     * @param {Number} resolution  the resolution of the map view
+     */
+    isLayerSwitchNecessary: function(layer, resolution) {
+        var switchConfiguration = layer.get('switchConfiguration');
+        // get precomputed switch resolution from layer config
+        var switchResolution = switchConfiguration.switchResolution;
+
+        // logic that checks when a switch layer needs to be replaced
+        var mapviewBelowSwitchResolution = (resolution < switchResolution);
+        var mapViewAboveSwitchResolution = !mapviewBelowSwitchResolution;
+
+        var currentSwitchType = layer.get('currentSwitchType');
+
+        var createCloseView = (mapviewBelowSwitchResolution && (currentSwitchType === 'above_switch_resolution'));
+        var createFarAwayView = (mapViewAboveSwitchResolution && (currentSwitchType === 'below_switch_resolution'));
+
+        return createCloseView || createFarAwayView;
+    },
+
+
+    /**
+     * Updates the switch layer items of the layer tree. This is
+     * necessary when switch layers get replaced.
+     */
+    updateLayerTreeForSwitchLayers: function() {
+        var treePanel = Ext.ComponentQuery.query('treepanel')[0];
+        var treeStore = treePanel.getStore();
+        var treeNodes = treeStore.getData();
+
+        Ext.each(treeNodes.items, function (node) {
+            var switchConf = node.getOlLayer().get('switchConfiguration');
+
+            // only change for switch layers
+            if(switchConf){
+                node.triggerUIUpdate();
+            }
+        });
     }
 
 });
