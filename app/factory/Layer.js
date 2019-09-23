@@ -108,87 +108,6 @@ Ext.define('CpsiMapview.factory.Layer', {
     },
 
     /**
-     * Loops through all layers, identifies switch layers
-     * and replaces them if required
-     *
-     * @param {ol.Object.Event} evt The event which contains the view.
-     */
-    handleSwitchLayerOnResolutionChange: function (evt) {
-        var resolution = evt.target.getResolution();
-        var allLayers = BasiGX.util.Map.getMapComponent().getMap().getLayers();
-        var overlayGroup = BasiGX.util.Layer.getLayerByName('Layers', allLayers);
-
-        if (!Ext.isDefined(overlayGroup)) {
-            return;
-        }
-        var overlayCollection = overlayGroup.getLayers();
-
-        overlayCollection.forEach(function (layer, index) {
-
-            if(layer.get('isSwitchLayer') && LayerFactory.isLayerSwitchNecessary(layer, resolution)){
-
-                var switchConfiguration = layer.get('switchConfiguration');
-                var newLayer = LayerFactory.createSwitchLayer(switchConfiguration);
-
-                overlayCollection.setAt(index, newLayer);
-
-                LayerFactory.updateLayerTreeForSwitchLayers();
-            }
-        });
-    },
-
-    /**
-     * Checks if the switch layer has to be replaced
-     *
-     * @param {*} layer       the layer to check
-     * @param {*} resolution  the resolution of the map view
-     */
-    isLayerSwitchNecessary: function(layer, resolution){
-
-        var switchConfiguration = layer.get('switchConfiguration');
-
-        // get precomputed switch resolution from layer config
-        var switchResolution = switchConfiguration.switchResolution;
-
-        // logic that checks when a switch layer needs to be replaced
-        var mapviewBelowSwitchResolution = (resolution < switchResolution);
-        var mapViewAboveSwitchResolution = !mapviewBelowSwitchResolution;
-
-        var currentSwitchType = layer.get('currentSwitchType');
-
-        var createCloseView = (mapviewBelowSwitchResolution && (currentSwitchType === 'above_switch_resolution'));
-        var createFarAwayView = (mapViewAboveSwitchResolution && (currentSwitchType === 'below_switch_resolution'));
-
-        return createCloseView || createFarAwayView;
-    },
-
-
-    /**
-     * Updates the switch layer items of the layer tree. This is
-     * necessary when switch layers get replaced.
-     */
-    updateLayerTreeForSwitchLayers: function(){
-
-        var treePanel = Ext.ComponentQuery.query('treepanel')[0];
-        var nodeStore = treePanel.getStore();
-        var treeNodes = nodeStore.getData();
-
-        Ext.each(treeNodes.items, function (node) {
-            var switchConf = node.getOlLayer().get('switchConfiguration');
-
-            // only change for switch layers
-            if(switchConf){
-                node.triggerUIUpdate();
-            }
-        });
-
-        // TODO: not sure if this is required (?)
-        if(treePanel) {
-            treePanel.fireEvent('itemupdate');
-        }
-    },
-
-    /**
      * The handler when a virtual base layer changes its visibility. This method
      * ensures that only one of these virtual base layers is visible at a time.
      *
@@ -936,6 +855,87 @@ Ext.define('CpsiMapview.factory.Layer', {
         });
 
         return gsStyle;
+    },
+
+    /**
+     * Loops through all layers, identifies switch layers
+     * and replaces them if required
+     *
+     * @param {ol.Object.Event} evt The event which contains the view.
+     */
+    handleSwitchLayerOnResolutionChange: function (evt) {
+        var resolution = evt.target.getResolution();
+        var allLayers = BasiGX.util.Map.getMapComponent().getMap().getLayers();
+        var overlayGroup = BasiGX.util.Layer.getLayerByName('Layers', allLayers);
+
+        if (!Ext.isDefined(overlayGroup)) {
+            return;
+        }
+        var overlayCollection = overlayGroup.getLayers();
+
+        overlayCollection.forEach(function (layer, index) {
+
+            if(layer.get('isSwitchLayer') && LayerFactory.isLayerSwitchNecessary(layer, resolution)){
+
+                var switchConfiguration = layer.get('switchConfiguration');
+                var newLayer = LayerFactory.createSwitchLayer(switchConfiguration);
+
+                overlayCollection.setAt(index, newLayer);
+
+                LayerFactory.updateLayerTreeForSwitchLayers();
+            }
+        });
+    },
+
+    /**
+     * Checks if the switch layer has to be replaced
+     *
+     * @param {*} layer       the layer to check
+     * @param {*} resolution  the resolution of the map view
+     */
+    isLayerSwitchNecessary: function(layer, resolution){
+
+        var switchConfiguration = layer.get('switchConfiguration');
+
+        // get precomputed switch resolution from layer config
+        var switchResolution = switchConfiguration.switchResolution;
+
+        // logic that checks when a switch layer needs to be replaced
+        var mapviewBelowSwitchResolution = (resolution < switchResolution);
+        var mapViewAboveSwitchResolution = !mapviewBelowSwitchResolution;
+
+        var currentSwitchType = layer.get('currentSwitchType');
+
+        var createCloseView = (mapviewBelowSwitchResolution && (currentSwitchType === 'above_switch_resolution'));
+        var createFarAwayView = (mapViewAboveSwitchResolution && (currentSwitchType === 'below_switch_resolution'));
+
+        return createCloseView || createFarAwayView;
+    },
+
+
+    /**
+     * Updates the switch layer items of the layer tree. This is
+     * necessary when switch layers get replaced.
+     */
+    updateLayerTreeForSwitchLayers: function(){
+
+        var treePanel = Ext.ComponentQuery.query('treepanel')[0];
+        var nodeStore = treePanel.getStore();
+        var treeNodes = nodeStore.getData();
+
+        Ext.each(treeNodes.items, function (node) {
+            var switchConf = node.getOlLayer().get('switchConfiguration');
+
+            // only change for switch layers
+            if(switchConf){
+                node.triggerUIUpdate();
+            }
+        });
+
+        // TODO: not sure if this is required (?)
+        if(treePanel) {
+            treePanel.fireEvent('itemupdate');
+        }
     }
 
 });
