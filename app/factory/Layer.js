@@ -926,7 +926,6 @@ Ext.define('CpsiMapview.factory.Layer', {
      * necessary when switch layers get replaced.
      */
     updateLayerTreeForSwitchLayers: function(){
-
         var treePanel = Ext.ComponentQuery.query('treepanel')[0];
         var nodeStore = treePanel.getStore();
         var treeNodes = nodeStore.getData();
@@ -939,11 +938,6 @@ Ext.define('CpsiMapview.factory.Layer', {
                 node.triggerUIUpdate();
             }
         });
-
-        // TODO: not sure if this is required (?)
-        if(treePanel) {
-            treePanel.fireEvent('itemupdate');
-        }
     }
 
 });
