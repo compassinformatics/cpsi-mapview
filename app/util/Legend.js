@@ -11,7 +11,7 @@ Ext.define('CpsiMapview.util.Legend', {
 
     /**
      * Creates a WMS getLegendGraphic request URL for the given OL layer.
-     * For WMS it uses the standard WMS mechnism / information.
+     * For WMS it uses the standard WMS mechanism / information.
      * For WFS the assumption is that MapServer uses the same configuration for
      * WMS and WFS so we can create the getLegendGraphic the same way.
      * STYLE parameter is derived by the corresponding SLD file name
@@ -21,14 +21,29 @@ Ext.define('CpsiMapview.util.Legend', {
      * @return {String}       The getLegendGraphic request URL
      */
     createGetLegendGraphicUrl: function (layer) {
+
         var source = layer.getSource();
         var url;
         var activatedStyle;
-        if (layer.get('isWms')) {
+        if (layer.get('isWms') || layer.get('isVt')) {
+            if (source.getUrls) {
+                url = source.getUrls()[0];
+            } else {
+                url = source.getUrl(); // for a ol.source.ImageWMS layer
+            }
 
-            url = source.getUrls()[0];
-            var layers = BasiGX.util.Object.layersFromParams(source.getParams());
+            var layers;
             activatedStyle = layer.get('activatedStyle');
+
+            if (layer.get('isVt')) {
+                var splitUrl = url.toLowerCase().split('?');
+                url = splitUrl[0];
+                layers = Ext.Object.fromQueryString(splitUrl[1]).layers;
+                activatedStyle = this.getWmsStyleFromSldFile(activatedStyle);
+            } else {
+                layers = BasiGX.util.Object.layersFromParams(source.getParams());
+            }
+
             if (!url || !layers) {
                 return;
             }
