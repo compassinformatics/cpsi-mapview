@@ -103,6 +103,7 @@ Ext.define('CpsiMapview.view.layer.StyleSwitcherRadioGroup', {
         if (newVal === true) {
             var layer = me.layer;
             var newStyle = radioBtn.inputValue;
+            var layerTreePanel = Ext.ComponentQuery.query('cmv_layertree')[0];
 
             // preserve active style as lookup
             layer.set('activatedStyle', newStyle);
@@ -122,6 +123,11 @@ Ext.define('CpsiMapview.view.layer.StyleSwitcherRadioGroup', {
                 };
                 layer.getSource().updateParams(newParams);
 
+                if (layerTreePanel) {
+                    // force update of corresponding layer node UI (e.g. legend)
+                    layerTreePanel.updateLayerNodeUi(layer);
+                }
+
             } else if (layer.get('isWfs') || layer.get('isVt')) {
 
                 var sldUrl = layer.get('stylesBaseUrl') + newStyle;
@@ -129,6 +135,11 @@ Ext.define('CpsiMapview.view.layer.StyleSwitcherRadioGroup', {
                 var forceNumericFilterVals = layer.get('stylesForceNumericFilterVals');
                 // load and parse SLD and apply it to layer
                 LayerFactory.loadSld(layer, sldUrl, forceNumericFilterVals);
+
+                if (layer.get('isWfs') && layerTreePanel) {
+                    // force update of corresponding layer node UI (e.g. legend)
+                    layerTreePanel.updateLayerNodeUi(layer);
+                }
 
             } else {
                 Ext.Logger.info('Layer type not supported in StyleSwitcherRadioGroup');

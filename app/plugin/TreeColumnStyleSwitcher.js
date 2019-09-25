@@ -103,8 +103,10 @@ Ext.define('CpsiMapview.plugin.TreeColumnStyleSwitcher', {
             // ensure the radio groups are re-rendered every time the tree view
             // changes (e.g.) layer visibility is changed
             treeColumn.up('treepanel').getView().on('itemupdate', function () {
-                me.cleanupAllRadioGroups();
-                me.renderRadioGroups();
+                Ext.defer(function () {
+                    me.cleanupAllRadioGroups();
+                    me.renderRadioGroups();
+                }, 1);
             });
 
             // Unfortunately we have to defer cascading of the LayerTree nodes.

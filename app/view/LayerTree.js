@@ -228,5 +228,21 @@ Ext.define('CpsiMapview.view.LayerTree', {
         });
 
         return rootLayerGroup;
+    },
+
+    /**
+     * Updates the layer node UI for the given layer.
+     *
+     * @param  {ol.layer.Base} layer The layer to update in the tree
+     */
+    updateLayerNodeUi: function (layer) {
+        var me = this;
+        var treeStore = me.getStore();
+
+        treeStore.each(function (node) {
+            if (node.getOlLayer().get('name') === layer.get('name')) {
+                node.triggerUIUpdate();
+            }
+        });
     }
 });
