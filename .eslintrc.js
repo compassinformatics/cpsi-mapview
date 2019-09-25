@@ -11,6 +11,7 @@ module.exports = {
         "GeoExt": false,
         "CpsiMapview": false,
         "LayerFactory": false,
+        "LegendUtil": false,
         "GeoStylerSLDParser": false,
         "GeoStylerOpenlayersParser": false,
         "google": false

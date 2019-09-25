@@ -7,6 +7,8 @@ Ext.define('CpsiMapview.plugin.BasicTreeColumnLegends', {
     alias: 'plugin.cmv_basic_tree_column_legend',
     pluginId: 'cmv_basic_tree_column_legend',
 
+    requires: ['CpsiMapview.util.Legend'],
+
     /**
      * @private
      */
@@ -49,9 +51,16 @@ Ext.define('CpsiMapview.plugin.BasicTreeColumnLegends', {
             var w = layer.get('legendWidth');
             var h = layer.get('legendHeight');
             if (!legendUrl) {
-                // 1px×1px transparent gif
-                legendUrl = staticMe.transparentGif;
-                w = h = 1;
+
+                if (Ext.isNumber(w) || Ext.isNumber(h)) {
+                    // in case we have no URL we try to detect getLegendGraphic
+                    // request for WMS / WFS
+                    legendUrl = LegendUtil.createGetLegendGraphicUrl(layer);
+                } else {
+                    // 1px×1px transparent gif
+                    legendUrl = staticMe.transparentGif;
+                    w = h = 1;
+                }
             }
             // if the legend cannot be obtained (which happens e.g. for cascaded
             // WMS layers, as geoserver does not support legends for these

@@ -219,7 +219,9 @@
         "visibility": false
       },
       "styles": ["Unit Type", "Owner"],
-      "labelClassName": "labels"
+      "labelClassName": "labels",
+      "legendWidth": 100
+
     }, {
         "layerType": "wfs",
         "text": "Light Unit WFS",
