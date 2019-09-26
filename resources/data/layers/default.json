@@ -218,10 +218,8 @@
         "singleTile": false,
         "visibility": false
       },
-      "styles": ["Unit Type", "Owner"],
-      "labelClassName": "labels",
-      "legendWidth": 100
-
+      "styles": [ "Height", "Owner", "Type", "InterfaceBox", "IsMetered", "Materials", "Sources", "SwitchingProfiles" ],
+      "labelClassName": "labels"
     }, {
         "layerType": "wfs",
         "text": "Light Unit WFS",

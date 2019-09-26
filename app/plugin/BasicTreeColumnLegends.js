@@ -51,22 +51,19 @@ Ext.define('CpsiMapview.plugin.BasicTreeColumnLegends', {
             var w = layer.get('legendWidth');
             var h = layer.get('legendHeight');
             if (!legendUrl) {
-
-                if (Ext.isNumber(w) || Ext.isNumber(h)) {
-                    // in case we have no URL we try to detect getLegendGraphic
-                    // request for WMS / WFS
-                    legendUrl = LegendUtil.createGetLegendGraphicUrl(layer);
-                } else {
-                    // 1px×1px transparent gif
-                    legendUrl = staticMe.transparentGif;
-                    w = h = 1;
-                }
+                legendUrl = LegendUtil.createGetLegendGraphicUrl(layer);
             }
             // if the legend cannot be obtained (which happens e.g. for cascaded
             // WMS layers, as geoserver does not support legends for these
             // layers) we remove the broken image and the other dom elements
             // that otherwise would lead to vertical gap between layers in the
             // tree.
+            if (!legendUrl) {
+                // 1px×1px transparent gif
+                legendUrl = staticMe.transparentGif;
+                w = h = 1;
+            }
+
             var ns = 'CpsiMapview.plugin.BasicTreeColumnLegends';
             return '<img' +
                 ' class="cpsi-layer-legend"' +
