@@ -76,6 +76,12 @@ Ext.define('CpsiMapview.view.button.SpatialQueryButton', {
     },
 
     /**
+    * If set to true a Wfs GetFeatures request will be automatically triggered
+    *
+    * @cfg {Boolean} triggerWfsRequest Whether or not to trigger a Wfs GetFeatures request
+    */
+    triggerWfsRequest: true,
+    /**
      * Initializes this component
      */
     initComponent: function () {

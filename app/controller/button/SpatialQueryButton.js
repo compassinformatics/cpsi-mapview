@@ -23,13 +23,6 @@ Ext.define('CpsiMapview.controller.button.SpatialQueryButtonController', {
     mapComponent: null,
 
     /**
-    * If set to true a Wfs GetFeatures request will be automatically triggered
-    *
-    * @cfg {Boolean} triggerWfsRequest Whether or not to trigger a Wfs GetFeatures request
-    */
-    triggerWfsRequest: true,
-
-    /**
      * Function to determine the query layer if not yet defined in class
      */
     findQueryLayer: function () {
@@ -130,7 +123,7 @@ Ext.define('CpsiMapview.controller.button.SpatialQueryButtonController', {
         var filter = me.createSpatialFilter(geometry);
         view.fireEvent('cmv-spatial-query-filter', filter);
 
-        if (me.triggerWfsRequest === true) {
+        if (view.triggerWfsRequest === true) {
             this.buildAndRequestQuery(geometry);
         }
     },
