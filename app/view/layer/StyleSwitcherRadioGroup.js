@@ -5,8 +5,10 @@ Ext.define('CpsiMapview.view.layer.StyleSwitcherRadioGroup', {
     extend: 'Ext.form.RadioGroup',
     xtype: 'cmv_layer_styleswitcher_radiogroup',
     requires: [
-        'Ext.form.field.Radio'
+        'Ext.form.field.Radio',
+        'CpsiMapview.util.Legend'
     ],
+
 
     /** @private */
     simpleValue: true,
@@ -66,7 +68,7 @@ Ext.define('CpsiMapview.view.layer.StyleSwitcherRadioGroup', {
     getLayerStyleLabel: function (layerStyle) {
         if (this.layer.get('isWfs') || this.layer.get('isVt')) {
             // remove _ and the .xml file ending
-            return layerStyle.replace(/_/g, ' ').replace('.xml', '');
+            return LegendUtil.getWmsStyleFromSldFile(layerStyle);
         } else {
             return layerStyle;
         }
