@@ -931,8 +931,8 @@ Ext.define('CpsiMapview.factory.Layer', {
 
                     // apply new style parameter and reload layer
                     var newParams = {
-                        styles: activeStyle,
-                        filter: wmsFilter,
+                        STYLES: activeStyle,
+                        FILTER: wmsFilter,
                         cacheBuster: Math.random()
                     };
 
