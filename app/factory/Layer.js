@@ -912,7 +912,7 @@ Ext.define('CpsiMapview.factory.Layer', {
                 // store filters for either layer type so they can be retrieved when switching
                 newLayerSource.set('additionalFilters', filters);
 
-                if (newLayer.get("isWms")) {
+                if (newLayer.get('isWms')) {
 
                     activeStyle = LegendUtil.getWmsStyleFromSldFile(activeStyle);
 
