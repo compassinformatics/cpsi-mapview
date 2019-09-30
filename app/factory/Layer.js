@@ -6,7 +6,15 @@
  */
 Ext.define('CpsiMapview.factory.Layer', {
     alternateClassName: 'LayerFactory',
-    requires: [],
+    requires: [
+        'CpsiMapview.util.Legend',
+        'CpsiMapview.view.main.Map',
+        'CpsiMapview.view.layer.ToolTip',
+        'BasiGX.util.Layer',
+        'BasiGX.util.Map',
+        'BasiGX.util.WFS',
+        'BasiGX.util.Namespace'
+    ],
 
     singleton: true,
 
@@ -78,8 +86,10 @@ Ext.define('CpsiMapview.factory.Layer', {
             //do nothing, and return empty layer
         }
 
-        // This is the same for all types
-        if (mapLayer) {
+        // This is the same for all types except switchlayer
+        // which returns one of its 2 child layers
+
+        if (mapLayer && layerType !== 'switchlayer') {
             // handle base layer logic
             if (layerConf.isBaseLayer) {
                 mapLayer.set('isBaseLayer', true);
@@ -821,7 +831,7 @@ Ext.define('CpsiMapview.factory.Layer', {
      */
     registerLayerTooltip: function (layer) {
         var mapPanel = CpsiMapview.view.main.Map.guess();
-        // create a custom toolitp for this layer
+        // create a custom tooltip for this layer
         var toolTip = Ext.create('CpsiMapview.view.layer.ToolTip', {
             toolTipConfig: layer.get('toolTipConfig'),
             layer: layer
@@ -892,9 +902,62 @@ Ext.define('CpsiMapview.factory.Layer', {
                 var switchConfiguration = layer.get('switchConfiguration');
                 // restore current layer visibility
                 switchConfiguration.visibility = layer.getVisible();
+                // also apply current filter and selected style
+
+                var activeStyle = layer.get('activatedStyle');
+                var filters = layer.getSource().get('additionalFilters');
+
                 var newLayer = LayerFactory.createSwitchLayer(switchConfiguration);
+                var newLayerSource = newLayer.getSource();
+                // store filters for either layer type so they can be retrieved when switching
+                newLayerSource.set('additionalFilters', filters);
+
+                if (newLayer.get("isWms")) {
+
+                    activeStyle = LegendUtil.getWmsStyleFromSldFile(activeStyle);
+
+                    // check if a label STYLES parameter was added --> keep this
+                    // the STYLES value (SLD) for the labels
+                    var labelClassName = newLayer.get('labelClassName');
+                    if (newLayer.get('labelsActive') === true) {
+                        activeStyle += ',' + labelClassName;
+                    }
+
+                    var wmsFilter = '';
+
+                    if (filters && filters.length > 0) {
+                        wmsFilter = GeoExt.util.OGCFilter.getOgcFilterFromExtJsFilter(filters, 'wms', 'and', '1.1.0');
+                    }
+
+                    // apply new style parameter and reload layer
+                    var newParams = {
+                        styles: activeStyle,
+                        filter: wmsFilter,
+                        cacheBuster: Math.random()
+                    };
+
+                    newLayerSource.updateParams(newParams);
+
+                } else if (newLayer.get('isWfs') || newLayer.get('isVt')) {
+
+                    var wmsLayerName = layer.getSource().getParams()['LAYERS'].split(',')[0];
+                    activeStyle = LegendUtil.getSldFileFromWmsStyle(activeStyle, wmsLayerName);
+
+                    // TODO following code duplicated in CpsiMapview.view.layer.StyleSwitcherRadioGroup
+                    var sldUrl = newLayer.get('stylesBaseUrl') + activeStyle;
+                    // transform filter values to numbers ('1' => 1)
+                    var forceNumericFilterVals = newLayer.get('stylesForceNumericFilterVals');
+                    // load and parse SLD and apply it to layer
+                    LayerFactory.loadSld(newLayer, sldUrl, forceNumericFilterVals);
+                    newLayerSource.clear();
+                    newLayerSource.refresh();
+
+                } else {
+                    Ext.Logger.info('Layer type not supported in StyleSwitcherRadioGroup');
+                }
 
                 overlayCollection.setAt(index, newLayer);
+                newLayer.set('activatedStyle', activeStyle);
 
                 LayerFactory.updateLayerTreeForSwitchLayers();
             }
