@@ -68,7 +68,8 @@ Ext.define('CpsiMapview.view.layer.StyleSwitcherRadioGroup', {
     getLayerStyleLabel: function (layerStyle) {
         if (this.layer.get('isWfs') || this.layer.get('isVt')) {
             // remove _ and the .xml file ending
-            return LegendUtil.getWmsStyleFromSldFile(layerStyle);
+            var legendUtil = CpsiMapview.util.Legend;
+            return legendUtil.getWmsStyleFromSldFile(layerStyle);
         } else {
             return layerStyle;
         }
