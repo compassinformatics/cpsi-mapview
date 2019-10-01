@@ -24,6 +24,8 @@ Ext.define('CpsiMapview.util.Legend', {
 
         var source = layer.getSource();
         var url;
+        var requestParams = '';
+
         var activatedStyle;
         if (layer.get('isWms') || layer.get('isVt')) {
             if (source.getUrls) {
@@ -48,33 +50,40 @@ Ext.define('CpsiMapview.util.Legend', {
                 return;
             }
 
-            if (!url.endsWith('?')) {
-                url += '?';
+            requestParams += 'SERVICE=WMS&VERSION=1.3.0&REQUEST=GetLegendGraphic&';
+            requestParams += 'FORMAT=image%2Fpng&TRANSPARENT=TRUE&SLD_VERSION=1.1.0&';
+            requestParams += 'LAYER=' + layers + '&';
+            if (activatedStyle) {
+                requestParams += 'STYLE=' + activatedStyle;
             }
-
-            url += 'SERVICE=WMS&VERSION=1.3.0&REQUEST=GetLegendGraphic&';
-            url += 'FORMAT=image%2Fpng&TRANSPARENT=TRUE&SLD_VERSION=1.1.0&';
-            url += 'LAYER=' + layers + '&';
-            url += 'STYLE=' + activatedStyle;
 
         } else if (layer.get('isWfs')) {
 
             url = layer.get('url');
             var ft = layer.get('featureType');
             activatedStyle = layer.get('activatedStyle');
+
             if (!url || !ft) {
                 return;
             }
 
-            if (!url.endsWith('?')) {
-                url += '?';
+            requestParams += 'SERVICE=WMS&VERSION=1.3.0&REQUEST=GetLegendGraphic&';
+            requestParams += 'FORMAT=image%2Fpng&TRANSPARENT=TRUE&SLD_VERSION=1.1.0&';
+            requestParams += 'LAYER=' + ft + '&';
+            if (activatedStyle) {            
+                requestParams += 'STYLE=' + LegendUtil.getWmsStyleFromSldFile(activatedStyle);
             }
-
-            url += 'SERVICE=WMS&VERSION=1.3.0&REQUEST=GetLegendGraphic&';
-            url += 'FORMAT=image%2Fpng&TRANSPARENT=TRUE&SLD_VERSION=1.1.0&';
-            url += 'LAYER=' + ft + '&';
-            url += 'STYLE=' + LegendUtil.getWmsStyleFromSldFile(activatedStyle);
         }
+
+        if (!url) {
+            return;
+        }
+
+        if (!url.endsWith('?') && !url.endsWith('&')) {
+            url += '?';
+        }
+
+        url += requestParams;
 
         return url;
     },
