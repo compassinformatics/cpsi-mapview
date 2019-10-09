@@ -276,7 +276,7 @@ Ext.define('CpsiMapview.controller.grid.Grid', {
 
     /**
     * Clear both the grid filters and any spatial filter.
-    * This will cause the store to reload. 
+    * This will cause the store to reload.
     *
     * @private
     */

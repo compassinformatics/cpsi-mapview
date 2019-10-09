@@ -62,7 +62,7 @@ Ext.define('CpsiMapview.view.menuitem.LayerGrid', {
 
         if (existingGrids.length > 0) {
             // get the parent window of the grid
-            gridWindow = existingGrids[0].up(".window");
+            gridWindow = existingGrids[0].up('.window');
         } else {
             gridWindow = Ext.create('Ext.window.Window', {
                 height: 600,
