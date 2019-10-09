@@ -101,7 +101,7 @@ Ext.define('CpsiMapview.factory.Layer', {
             mapLayer.set('legendUrl', layerConf.legendUrl);
             mapLayer.set('legendHeight', layerConf.legendHeight);
             mapLayer.set('legendWidth', layerConf.legendWidth);
-            mapLayer.set('guid', layerConf.guid);
+            mapLayer.set('layerKey', layerConf.layerKey);
 
             // this gets transformed to qtip on the layer tree node
             mapLayer.set('description', layerConf.qtip);
@@ -112,6 +112,8 @@ Ext.define('CpsiMapview.factory.Layer', {
             mapLayer.set('refreshLayerOption', allowRefresh);
             // indicator if a label option is drawn in layer context menu
             mapLayer.set('labelClassName', layerConf.labelClassName);
+            // the xtype of any associated grid
+            mapLayer.set('gridXType', layerConf.gridXType);
         }
 
         return mapLayer;
