@@ -99,7 +99,7 @@ Ext.define('CpsiMapview.util.Legend', {
     },
 
     /**
-    * Derives the SLD file name by the corresponding WMS STYLES ans LAYERS
+    * Derives the SLD file name by the corresponding WMS STYLES and LAYERS
     * parameter.
     * Convention is LAYERS_STYLES.xml (whereas for STYLES we replace blanks by
     * underscores), e.g. 'Unit Type' and 'LightUnit' => LightUnit_Unit_Type.xml
