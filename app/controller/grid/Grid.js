@@ -1,3 +1,8 @@
+/**
+ * This class is the controller for the cpsi mapview WFS
+ * generic grid class
+ *
+ */
 Ext.define('CpsiMapview.controller.grid.Grid', {
     extend: 'Ext.app.ViewController',
     alias: 'controller.cmv_grid',
@@ -9,15 +14,30 @@ Ext.define('CpsiMapview.controller.grid.Grid', {
         'GeoExt.util.OGCFilter'
     ],
 
+    /**
+    * The currently active spatial filter for the layer.
+    *
+    * @cfg {Ext.util.Filter} spatialFilter
+    */
+    spatialFilter: null,
+
+    /**
+     * Fire a onRowDblClick to be handled by the parent application
+     */
     onRowDblClick: function (sender, record) {
         this.fireEvent('onRowDblClick', sender, record);
     },
 
-    spatialFilter: null,
-
+    /**
+     * Zoom the map to the selected feature with a buffer
+     *
+     * @param {ol.Feature} feature
+     * @param {ol.Map} map
+     * @private
+     */
     zoomToFeature: function (feature, map) {
 
-        // TODO check for feature type
+        // TODO check for feature type when zooming
         var extent = feature.getGeometry().getExtent();
         // as this is a point then buffer it by 100m
         extent = ol.extent.buffer(extent, 100);
@@ -46,6 +66,10 @@ Ext.define('CpsiMapview.controller.grid.Grid', {
         );
     },
 
+    /**
+     * Open a row-level context-menu with a Zoom to Feature option
+     * @private
+     */
     onItemContextMenu: function (grid, record, item, index, e) {
 
         var me = this;
@@ -53,8 +77,6 @@ Ext.define('CpsiMapview.controller.grid.Grid', {
 
         if (!me.contextMenu) {
             me.contextMenu = Ext.create('Ext.menu.Menu', {
-                //height: 200,
-                //width: 250,
                 items: [{
                     text: 'Zoom to Feature',
                     scope: me,
@@ -72,18 +94,30 @@ Ext.define('CpsiMapview.controller.grid.Grid', {
         me.contextMenu.showAt(e.getXY());
     },
 
+    /**
+     * Find a layer in the map based on its unique and custom layerKey
+     * property
+     *
+     * @param {string} key
+     * @private
+     */
     getLayerByKey: function (key) {
-        var layers = BasiGX.util.Layer.getLayersBy("layerKey", key);
+        var layers = BasiGX.util.Layer.getLayersBy('layerKey', key);
 
         if (layers && layers.length === 1) {
             return layers[0];
         }
     },
 
-    applyAllFilters: function () {
+    /**
+     * Applies both attribute and spatial filters to
+     * any associated WMS and vector layer
+     *
+     * @private
+     */
+    filterAssociatedLayers: function () {
 
         var me = this;
-        debugger;
         var grid = me.getView();
         var viewModel = me.getViewModel();
 
@@ -122,15 +156,14 @@ Ext.define('CpsiMapview.controller.grid.Grid', {
 
     },
 
-    onFilterChange: function () {
-
-        this.applyAllFilters();
-
-    },
-
+    /**
+     * Apply any spatial filter to the store request, and convert all
+     * ExtJS filters to WFS filters.
+     * Also set a loading mask on the grid.
+     *
+     * @private
+     */
     onWfsStoreBeforeLoad: function (store, params) {
-
-        //store.setRemoteFilter(true);
 
         // handle the loadMask ourselves due to various issues around data binding and reconfiguring stores
         // https://www.sencha.com/forum/showthread.php?299670-ExtJS-5.1.0-LoadMask-missing-on-grids-with-bound-store&p=1116109#post1116109
@@ -138,7 +171,7 @@ Ext.define('CpsiMapview.controller.grid.Grid', {
         var me = this;
 
         var view = me.getView();
-        view.setLoading("Loading Records...");
+        view.setLoading('Loading Records...');
 
         var filters = Ext.clone(store.getFilters().items);
 
@@ -153,12 +186,26 @@ Ext.define('CpsiMapview.controller.grid.Grid', {
         }
     },
 
+    /**
+    * Hide the loading mask when the store has loaded
+    *
+    * @private
+    */
     onWfsStoreAfterLoad: function () {
         var view = this.getView();
         view.setLoading(false);
     },
 
+    /**
+     * Store the spatial filter as a property of this class
+     * then force a reload of the grid store with the new filter
+     * Finally apply all filters to any associated layers.
+     *
+     * @param {Ext.util.Filter} spatialFilter
+     * @private
+     */
     onSpatialFilter: function (spatialFilter) {
+
         var me = this;
         me.spatialFilter = spatialFilter;
 
@@ -168,9 +215,16 @@ Ext.define('CpsiMapview.controller.grid.Grid', {
         store.loadWfs();
 
 
-        this.applyAllFilters();
+        this.filterAssociatedLayers();
     },
-
+    /**
+    * Enable and disable paging for the grid.
+    * Disabling paging allows all records to be loaded into the
+    * grid for an Excel export. Enabling paging improves load
+    * performance.
+    *
+    * @private
+    */
     togglePaging: function (checkBox, checked) {
 
         var me = this;
@@ -187,10 +241,6 @@ Ext.define('CpsiMapview.controller.grid.Grid', {
             me.originalPageSize = store.pageSize;
         }
 
-        //if (!me.startIndex) {
-        //    me.startIndex = store.startIndex;
-        //}
-
         if (checked) {
             store.pageSize = me.originalPageSize;
             store.startIndex = 0; // reset each time // me.startIndex;
@@ -202,6 +252,11 @@ Ext.define('CpsiMapview.controller.grid.Grid', {
         store.loadWfs();
     },
 
+    /**
+    * Export the current records in the grid to Excel
+    *
+    * @private
+    */
     exportToExcel: function () {
 
         var me = this;
@@ -219,16 +274,35 @@ Ext.define('CpsiMapview.controller.grid.Grid', {
         });
     },
 
+    /**
+    * Clear both the grid filters and any spatial filter.
+    * This will cause the store to reload. 
+    *
+    * @private
+    */
     clearFilters: function () {
         this.spatialFilter = null;
         this.getView().getPlugin('gridfilters').clearFilters();
     },
 
+    /**
+    * Dynamically apply a store to the grid based on the gridStoreType
+    * config option. Also set the hidden grid vector layer to be associated
+    * with the cmv_spatial_query_button
+    *
+    * @private
+    */
     initViewModel: function (viewModel) {
 
         var gridStoreType = viewModel.get('gridStoreType');
-
         var layerName = gridStoreType + 'Layer';
+
+        // TODO check why we can't simply add a {'queryLayerName'} binding in
+        // the grid view - already created ?
+        var spatialQueryButton = viewModel.getView().down('cmv_spatial_query_button');
+        spatialQueryButton.setQueryLayerName(layerName);
+
+        // dynamically create the store based on the config setting
 
         var stores = {
             gridstore: {
@@ -245,10 +319,7 @@ Ext.define('CpsiMapview.controller.grid.Grid', {
                 }
             }
         };
+
         viewModel.setStores(stores);
-
-        viewModel.setData('queryLayerName', layerName);
-
-    },
-
+    }
 });

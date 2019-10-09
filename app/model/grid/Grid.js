@@ -1,3 +1,8 @@
+/**
+ * This class is the model for the cpsi mapview WFS
+ * generic grid class
+ *
+ */
 Ext.define('CpsiMapview.model.grid.Grid', {
     extend: 'Ext.app.ViewModel',
     alias: 'viewmodel.cmv_grid',
@@ -6,6 +11,9 @@ Ext.define('CpsiMapview.model.grid.Grid', {
         'BasiGX.util.Map'
     ],
 
+    /**
+    * The following should all be overridden in child classes
+    */
     data: {
         vectorLayerKey: null,
         wmsLayerKey: null,
@@ -15,17 +23,6 @@ Ext.define('CpsiMapview.model.grid.Grid', {
     formulas: {
         map: function () {
             return BasiGX.util.Map.getMapComponent().map;
-        },
-        selectStyle: { // TODO - cannot bind this at the moment
-            get: function () {
-                return new ol.style.Circle({
-                    radius: 2,
-                    stroke: new ol.style.Stroke({
-                        color: '#0ff',
-                        width: 2
-                    })
-                });
-            }
         }
     }
 });

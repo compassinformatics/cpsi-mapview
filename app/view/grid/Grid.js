@@ -12,17 +12,20 @@ Ext.define('CpsiMapview.view.grid.Grid', {
         'GeoExt.selection.FeatureModel',
         'BasiGX.util.Layer',
         'CpsiMapview.view.button.SpatialQueryButton',
-        'Ext.exporter.excel.Xlsx' // from the Premium package
+        'Ext.exporter.excel.Xlsx' // from the Sencha Premium package
     ],
 
     xtype: 'cmv_grid',
-
     controller: 'cmv_grid',
     viewModel: 'cmv_grid',
+
+    plugins: ['gridfilters', 'gridexporter'],
+    width: 1050,
 
     bind: {
         store: '{gridstore}'
     },
+
     viewConfig: {  //this config is passed to the view
         loadMask: {
             msg: 'Loading records' // TODO not sure why this isn't applied to the loadMask
@@ -44,21 +47,24 @@ Ext.define('CpsiMapview.view.grid.Grid', {
         }),
         bind: {
             map: '{map}'
-            // TODO can't be bound to a formula in the ViewModel
+            // TODO can't bind to a formula in the ViewModel
             //selectStyle: '{selectStyle}'
         }
     },
 
-    plugins: ['gridfilters', 'gridexporter'],
-
-    width: 1050,
+    /**
+    * Functions attached to various listeners on the grid
+    */
     listeners: {
         rowdblclick: 'onRowDblClick',
-        filterchange: 'onFilterChange',
+        filterchange: 'filterAssociatedLayers',
         itemcontextmenu: 'onItemContextMenu',
-        documentsave: 'onDocumentSave',
-        spatialfilter: 'onSpatialFilter'
+        documentsave: 'onDocumentSave'
     },
+
+    /**
+    * Collection of tools and buttons at the top of the grid
+    */
     dockedItems: [{
         xtype: 'toolbar',
         dock: 'top',
@@ -78,29 +84,13 @@ Ext.define('CpsiMapview.view.grid.Grid', {
             '->',
             {
                 xtype: 'cmv_spatial_query_button',
-                ref: 'spatial-query-button',
-                queryLayerName: 'EndPointsLayer',
-                //bind: {
-                //    queryLayerName: '{queryLayerName}'
-                //},
                 drawGeometryType: 'Polygon',
                 spatialOperator: 'intersect',
                 toggleGroup: 'map',
                 triggerWfsRequest: false,
                 glyph: 'xf044@FontAwesome',
                 listeners: {
-                    'cmv-spatial-query-filter': function (filter) {
-                        var grid = this.up().up();
-                        grid.fireEvent('spatialfilter', filter);
-                    },
-                    'cmv-spatial-query-error': function () {
-                        Ext.Msg.show({
-                            title: 'Error',
-                            message: 'WFS query not successful',
-                            buttons: Ext.MessageBox.OK,
-                            icon: Ext.MessageBox.ERROR
-                        });
-                    }
+                    'cmv-spatial-query-filter': 'onSpatialFilter'
                 }
             },
             {
