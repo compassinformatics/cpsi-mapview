@@ -14,6 +14,14 @@ Ext.define('CpsiMapview.view.button.SpatialQueryButton', {
         'CpsiMapview.controller.button.SpatialQueryButtonController'
     ],
 
+    config: {
+        /**
+         * The name of the layer to query
+         * This property will be ignored if queryLayer is defined
+         */
+        queryLayerName: null
+    },
+
     /**
      * The viewModel for this class
      */
@@ -41,12 +49,6 @@ Ext.define('CpsiMapview.view.button.SpatialQueryButton', {
      *                               topologicalOrSpatialFilterOperators
      */
     spatialOperator: null,
-
-    /**
-     * The name of the layer to query
-     * This property will be ignored if queryLayer is defined
-     */
-    queryLayerName: null,
 
     /**
      * The layer to query
