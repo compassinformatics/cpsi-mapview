@@ -70,7 +70,7 @@ Ext.define('CpsiMapview.util.Legend', {
             requestParams += 'SERVICE=WMS&VERSION=1.3.0&REQUEST=GetLegendGraphic&';
             requestParams += 'FORMAT=image%2Fpng&TRANSPARENT=TRUE&SLD_VERSION=1.1.0&';
             requestParams += 'LAYER=' + ft + '&';
-            if (activatedStyle) {            
+            if (activatedStyle) {
                 requestParams += 'STYLE=' + LegendUtil.getWmsStyleFromSldFile(activatedStyle);
             }
         }
