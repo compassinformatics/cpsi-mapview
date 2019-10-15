@@ -153,7 +153,7 @@ Ext.define('CpsiMapview.view.LayerTree', {
         };
 
         if (me.structureMode === 'BASELAYER_OVERLAY') {
-            // re-groups the map layers by divding them between base layers and
+            // re-groups the map layers by dividing them between base layers and
             // overlays. Then recreates the LayerStore and applies it to this
             // tree.
             var regroupLayerStore = function () {
