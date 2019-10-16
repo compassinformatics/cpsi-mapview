@@ -7,19 +7,17 @@ Ext.define('CpsiMapview.view.grid.Grid', {
 
     requires: [
         'Ext.toolbar.Paging',
-        'Ext.grid.plugin.Exporter',
         'GeoExt.toolbar.WfsPaging',
         'GeoExt.selection.FeatureModel',
         'BasiGX.util.Layer',
-        'CpsiMapview.view.button.SpatialQueryButton',
-        'Ext.exporter.excel.Xlsx' // from the Sencha Premium package
+        'CpsiMapview.view.button.SpatialQueryButton'
     ],
 
     xtype: 'cmv_grid',
     controller: 'cmv_grid',
     viewModel: 'cmv_grid',
 
-    plugins: ['gridfilters', 'gridexporter'],
+    plugins: ['gridfilters'],
     width: 1050,
 
     bind: {
