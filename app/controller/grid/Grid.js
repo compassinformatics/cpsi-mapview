@@ -262,6 +262,12 @@ Ext.define('CpsiMapview.controller.grid.Grid', {
         var me = this;
         var grid = me.getView();
 
+        if (!grid.saveDocumentAs) {
+            Ext.Msg.alert('Not Supported',
+                'The Excel export is not supported in this version of the system', Ext.emptyFn);
+            return;
+        }
+
         grid.setLoading('Exporting to Excel...');
 
         // later in an event listeners
@@ -295,7 +301,7 @@ Ext.define('CpsiMapview.controller.grid.Grid', {
     initViewModel: function (viewModel) {
 
         var gridStoreType = viewModel.get('gridStoreType');
-        var layerName = gridStoreType + 'Layer';
+        var layerName = viewModel.get('gridLayerName');
 
         // TODO check why we can't simply add a {'queryLayerName'} binding in
         // the grid view - already created ?
@@ -309,9 +315,6 @@ Ext.define('CpsiMapview.controller.grid.Grid', {
                 type: gridStoreType,
                 map: '{map}',
                 createLayer: true,
-                layerOptions: {
-                    name: layerName
-                },
                 style: null, // hide WFS features unless selected - they are visible as part of the WMS
                 listeners: {
                     'gx-wfsstoreload-beforeload': 'onWfsStoreBeforeLoad',
