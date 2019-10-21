@@ -112,6 +112,9 @@ Ext.define('CpsiMapview.factory.Layer', {
             mapLayer.set('refreshLayerOption', allowRefresh);
             // indicator if a label option is drawn in layer context menu
             mapLayer.set('labelClassName', layerConf.labelClassName);
+            // indicator if an opacity slider is offered in layer context menu
+            var allowOpacitySlider = layerConf.opacitySlider !== false;
+            mapLayer.set('opacitySlider', allowOpacitySlider);
         }
 
         return mapLayer;

@@ -11,6 +11,7 @@ Ext.define('CpsiMapview.view.LayerTree', {
         'CpsiMapview.plugin.TreeColumnContextMenu',
         'CpsiMapview.view.menuitem.LayerRefresh',
         'CpsiMapview.view.menuitem.LayerLabels',
+        'CpsiMapview.view.menuitem.LayerOpacity',
         'CpsiMapview.plugin.TreeColumnStyleSwitcher'
     ],
 
@@ -46,7 +47,8 @@ Ext.define('CpsiMapview.view.LayerTree', {
                     ptype: 'cmv_tree_column_context_menu',
                     menuItems: [
                         'cmv_menuitem_layerrefresh',
-                        'cmv_menuitem_layerlabels'
+                        'cmv_menuitem_layerlabels',
+                        'cmv_menuitem_layeropacity'
                     ]
                 }, {
                     ptype: 'cmv_tree_inresolutionrange'
