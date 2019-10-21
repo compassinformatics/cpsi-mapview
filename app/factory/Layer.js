@@ -693,6 +693,15 @@ Ext.define('CpsiMapview.factory.Layer', {
             LayerFactory.registerLayerTooltip(vtLayer);
         }
 
+        // workaround to apply an opacity for the vector tile layer
+        // just setting 'opacity' to the layer does not work
+        // seems related to https://github.com/openlayers/openlayers/issues/4758
+        if (Ext.isNumber(layerConf.opacity)) {
+            vtLayer.on('precompose', function(evt) {
+                evt.context.globalAlpha = layerConf.opacity;
+            });
+        }
+
         return vtLayer;
     },
 

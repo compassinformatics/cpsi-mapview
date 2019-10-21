@@ -57,7 +57,7 @@ Ext.define('CpsiMapview.view.menuitem.LayerOpacity', {
     },
 
     /**
-     * Executed when the opacity slider in this menue is changed.
+     * Executed when the opacity slider in this menu is changed.
      *
      * @param  {Ext.slider.Single} slider The opacity slider
      * @param  {Number} newValue The new value which the slider has been changed to.
@@ -67,5 +67,16 @@ Ext.define('CpsiMapview.view.menuitem.LayerOpacity', {
         var opac = newValue / 100;
 
         me.layer.setOpacity(opac);
+
+        // treat vector tile layers special since setOpacity has no effect on
+        // them, see https://github.com/openlayers/openlayers/issues/4758
+        if (me.layer.get('isVt')) {
+            var setLayerOpacity = function(evt) {
+                evt.context.globalAlpha = opac;
+            };
+            me.layer.on('precompose', setLayerOpacity);
+            CpsiMapview.view.main.Map.guess().olMap.render();
+        }
+
     }
 });
