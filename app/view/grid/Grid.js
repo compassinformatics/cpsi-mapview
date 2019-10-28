@@ -20,14 +20,22 @@ Ext.define('CpsiMapview.view.grid.Grid', {
     plugins: ['gridfilters'],
     width: 1050,
 
+    /**
+     * The distance used to buffer a feature when the zoomToFeature
+     * function is used
+     * @cfg {Number}
+     */
+    extentBuffer: 100,
+
     bind: {
         store: '{gridstore}'
     },
 
     viewConfig: {  //this config is passed to the view
-        loadMask: {
-            msg: 'Loading records' // TODO not sure why this isn't applied to the loadMask
-        }
+        loadingText: 'Loading records'
+        //loadMask: {
+        //    msg: 'Loading records' // TODO not sure why this isn't applied to the loadMask
+        //}
     },
 
     selModel: {

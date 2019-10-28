@@ -22,13 +22,6 @@ Ext.define('CpsiMapview.controller.grid.Grid', {
     spatialFilter: null,
 
     /**
-     * Fire a onRowDblClick to be handled by the parent application
-     */
-    onRowDblClick: function (sender, record) {
-        this.fireEvent('onRowDblClick', sender, record);
-    },
-
-    /**
      * Zoom the map to the selected feature with a buffer
      *
      * @param {ol.Feature} feature
@@ -37,25 +30,28 @@ Ext.define('CpsiMapview.controller.grid.Grid', {
      */
     zoomToFeature: function (feature, map) {
 
+        var me = this;
+
         // TODO check for feature type when zooming
         var extent = feature.getGeometry().getExtent();
-        // as this is a point then buffer it by 100m
-        extent = ol.extent.buffer(extent, 100);
+        var view = me.getView();
+        // as this is a point then buffer it by the extentBuffer property
+        extent = ol.extent.buffer(extent, view.extentBuffer);
         //map.getView().fit(extent, map.getSize());
 
-        var view = map.getView();
+        var mapView = map.getView();
 
-        var resolution = view.getResolutionForExtent(extent);
-        var zoom = view.getZoomForResolution(resolution);
+        var resolution = mapView.getResolutionForExtent(extent);
+        var zoom = mapView.getZoomForResolution(resolution);
         var center = ol.extent.getCenter(extent);
         var duration = 2000;
 
-        view.animate({
+        mapView.animate({
             center: center,
             duration: duration
         });
 
-        view.animate(
+        mapView.animate(
             {
                 zoom: zoom - 1,
                 duration: duration / 2
@@ -71,7 +67,6 @@ Ext.define('CpsiMapview.controller.grid.Grid', {
      * @private
      */
     onItemContextMenu: function (grid, record, item, index, e) {
-
         var me = this;
         var map = me.getViewModel().get('map');
 
@@ -79,9 +74,7 @@ Ext.define('CpsiMapview.controller.grid.Grid', {
             me.contextMenu = Ext.create('Ext.menu.Menu', {
                 items: [{
                     text: 'Zoom to Feature',
-                    scope: me,
                     handler: function () {
-                        var record = grid.getSelection()[0];
                         if (record) {
                             me.zoomToFeature(record.getFeature(), map);
                         }
@@ -171,7 +164,7 @@ Ext.define('CpsiMapview.controller.grid.Grid', {
         var me = this;
 
         var view = me.getView();
-        view.setLoading('Loading Records...');
+        view.setLoading();
 
         var filters = Ext.clone(store.getFilters().items);
 
@@ -212,6 +205,11 @@ Ext.define('CpsiMapview.controller.grid.Grid', {
         // force a reload of the grid store
         var grid = me.getView();
         var store = grid.getStore();
+
+        // clear any paging parameters as these will no longer apply
+        // once the spatial filter has been applied
+        store.currentPage = 1;
+
         store.loadWfs();
 
 
