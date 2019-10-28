@@ -51,7 +51,7 @@ Ext.define('CpsiMapview.view.grid.ExampleGridModel', {
 // create the grid view
 Ext.define('CpsiMapview.view.grid.ExampleGrid', {
     extend: 'CpsiMapview.view.grid.Grid',
-    xtype: 'examplegrid',
+    xtype: 'cmv_examplegrid',
     controller: 'cmv_grid',
     viewModel: 'example_grid',
     columns: {

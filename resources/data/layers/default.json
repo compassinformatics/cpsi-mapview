@@ -271,7 +271,7 @@
       "stylesBaseUrl": "https://plmonaghandev.compass.ie/resources/data/styling/",
       "styles": [ "LightUnit_Type.xml", "LightUnit_Owner.xml" ],
       "stylesForceNumericFilterVals": true,
-      "gridXType": "examplegrid",
+      "gridXType": "cmv_examplegrid",
       "layerKey": "LIGHT_UNIT_MVT",
       "tooltipsConfig": [
         {
