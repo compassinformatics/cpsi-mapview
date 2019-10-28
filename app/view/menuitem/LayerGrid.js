@@ -21,7 +21,6 @@ Ext.define('CpsiMapview.view.menuitem.LayerGrid', {
      */
     text: 'Open Data Grid',
 
-
     /**
      * @private
      */
@@ -54,7 +53,7 @@ Ext.define('CpsiMapview.view.menuitem.LayerGrid', {
         var title = me.layer.get('name');
 
         // we can't keep a reference to the window in this class
-        // as a new Ext.menu.Item i created each time the menu is
+        // as a new Ext.menu.Item is created each time the menu is
         // opened - use Ext.ComponentQuery instead
 
         var existingGrids = Ext.ComponentQuery.query(gridXType);
