@@ -271,8 +271,8 @@ Ext.define('CpsiMapview.controller.grid.Grid', {
         // later in an event listeners
         grid.saveDocumentAs({
             type: 'xlsx',
-            title: 'Map Export',
-            fileName: 'myExport.xlsx'
+            title: grid.exportTitle,
+            fileName: grid.exportFileName
         }).then(function () {
             grid.setLoading(false);
         });

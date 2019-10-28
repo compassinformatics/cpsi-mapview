@@ -27,6 +27,18 @@ Ext.define('CpsiMapview.view.grid.Grid', {
      */
     extentBuffer: 100,
 
+    /**
+     * The title added to the Excel document
+     * @cfg {String}
+     */
+    exportTitle: 'Records Export',
+
+    /**
+    * The filename of the Excel export
+    * @cfg {String}
+    */
+    exportFileName: 'RecordsExport.xlsx',
+
     bind: {
         store: '{gridstore}'
     },
