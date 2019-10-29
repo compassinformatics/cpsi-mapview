@@ -12,6 +12,7 @@ Ext.define('CpsiMapview.view.LayerTree', {
         'CpsiMapview.view.menuitem.LayerRefresh',
         'CpsiMapview.view.menuitem.LayerLabels',
         'CpsiMapview.view.menuitem.LayerOpacity',
+        'CpsiMapview.view.menuitem.LayerGrid',
         'CpsiMapview.plugin.TreeColumnStyleSwitcher'
     ],
 
@@ -22,8 +23,8 @@ Ext.define('CpsiMapview.view.LayerTree', {
         }
     },
 
-    // So that instanciation works without errors, might be changed during
-    // instanciation of the LayerTree.
+    // So that instantiation works without errors, might be changed during
+    // instantiation of the LayerTree.
     store: {},
     rootVisible: false,
     viewConfig: {
@@ -49,6 +50,7 @@ Ext.define('CpsiMapview.view.LayerTree', {
                         'cmv_menuitem_layerrefresh',
                         'cmv_menuitem_layerlabels',
                         'cmv_menuitem_layeropacity'
+                        'cmv_menuitem_layergrid'
                     ]
                 }, {
                     ptype: 'cmv_tree_inresolutionrange'

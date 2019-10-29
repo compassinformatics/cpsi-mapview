@@ -101,7 +101,7 @@ Ext.define('CpsiMapview.factory.Layer', {
             mapLayer.set('legendUrl', layerConf.legendUrl);
             mapLayer.set('legendHeight', layerConf.legendHeight);
             mapLayer.set('legendWidth', layerConf.legendWidth);
-            mapLayer.set('guid', layerConf.guid);
+            mapLayer.set('layerKey', layerConf.layerKey);
 
             // this gets transformed to qtip on the layer tree node
             mapLayer.set('description', layerConf.qtip);
@@ -115,6 +115,8 @@ Ext.define('CpsiMapview.factory.Layer', {
             // indicator if an opacity slider is offered in layer context menu
             var allowOpacitySlider = layerConf.opacitySlider !== false;
             mapLayer.set('opacitySlider', allowOpacitySlider);
+            // the xtype of any associated grid
+            mapLayer.set('gridXType', layerConf.gridXType);
         }
 
         return mapLayer;
