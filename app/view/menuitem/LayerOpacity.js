@@ -68,8 +68,8 @@ Ext.define('CpsiMapview.view.menuitem.LayerOpacity', {
 
         me.layer.setOpacity(opac);
 
-        // treat vector tile layers special since setOpacity has no effect on
-        // them, see https://github.com/openlayers/openlayers/issues/4758
+        // treat vector tile layers as a special case since setOpacity has no effect
+        // on them, see https://github.com/openlayers/openlayers/issues/4758
         if (me.layer.get('isVt')) {
             var setLayerOpacity = function(evt) {
                 evt.context.globalAlpha = opac;
