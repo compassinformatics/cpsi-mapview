@@ -112,6 +112,9 @@ Ext.define('CpsiMapview.factory.Layer', {
             mapLayer.set('refreshLayerOption', allowRefresh);
             // indicator if a label option is drawn in layer context menu
             mapLayer.set('labelClassName', layerConf.labelClassName);
+            // indicator if an opacity slider is offered in layer context menu
+            var allowOpacitySlider = layerConf.opacitySlider !== false;
+            mapLayer.set('opacitySlider', allowOpacitySlider);
             // the xtype of any associated grid
             mapLayer.set('gridXType', layerConf.gridXType);
         }
@@ -690,6 +693,15 @@ Ext.define('CpsiMapview.factory.Layer', {
         if (layerConf.tooltipsConfig) {
             // enable map tooltips for this layer
             LayerFactory.registerLayerTooltip(vtLayer);
+        }
+
+        // workaround to apply an opacity for the vector tile layer
+        // just setting 'opacity' to the layer does not work
+        // seems related to https://github.com/openlayers/openlayers/issues/4758
+        if (Ext.isNumber(layerConf.opacity)) {
+            vtLayer.on('precompose', function(evt) {
+                evt.context.globalAlpha = layerConf.opacity;
+            });
         }
 
         return vtLayer;
