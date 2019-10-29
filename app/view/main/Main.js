@@ -17,7 +17,8 @@ Ext.define('CpsiMapview.view.main.Main', {
         'CpsiMapview.model.MainModel',
         'CpsiMapview.view.main.Map',
         'CpsiMapview.view.header.Panel',
-        'CpsiMapview.view.LayerTree'
+        'CpsiMapview.view.LayerTree',
+        'CpsiMapview.view.grid.ExampleGrid'
     ],
 
     controller: 'cmv_main',
