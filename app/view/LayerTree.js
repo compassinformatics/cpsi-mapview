@@ -49,7 +49,7 @@ Ext.define('CpsiMapview.view.LayerTree', {
                     menuItems: [
                         'cmv_menuitem_layerrefresh',
                         'cmv_menuitem_layerlabels',
-                        'cmv_menuitem_layeropacity'
+                        'cmv_menuitem_layeropacity',
                         'cmv_menuitem_layergrid'
                     ]
                 }, {
