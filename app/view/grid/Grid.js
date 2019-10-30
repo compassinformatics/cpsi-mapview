@@ -74,7 +74,6 @@ Ext.define('CpsiMapview.view.grid.Grid', {
     * Functions attached to various listeners on the grid
     */
     listeners: {
-        rowdblclick: 'onRowDblClick',
         filterchange: 'filterAssociatedLayers',
         itemcontextmenu: 'onItemContextMenu',
         documentsave: 'onDocumentSave'
