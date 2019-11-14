@@ -70,21 +70,27 @@ Ext.define('CpsiMapview.controller.grid.Grid', {
         var me = this;
         var map = me.getViewModel().get('map');
 
-        if (!me.contextMenu) {
-            me.contextMenu = Ext.create('Ext.menu.Menu', {
-                items: [{
-                    text: 'Zoom to Feature',
-                    handler: function () {
-                        if (record) {
-                            me.zoomToFeature(record.getFeature(), map);
-                        }
+        var contextMenu = Ext.create('Ext.menu.Menu', {
+            defaults: {
+                clickHideDelay: 1
+            },
+            items: [{
+                text: 'Zoom to Feature',
+                handler: function () {
+                    me.zoomToFeature(record.getFeature(), map);
+                }
+            }],
+            listeners: {
+                hide: {
+                    fn: function (menu) {
+                        menu.destroy();
                     }
-                }]
-            });
-        }
+                }
+            }
+        });
 
         e.stopEvent();
-        me.contextMenu.showAt(e.getXY());
+        contextMenu.showAt(e.getXY());
     },
 
     /**
