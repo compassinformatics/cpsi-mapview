@@ -6,8 +6,9 @@ Ext.define('CpsiMapview.view.form.Login', {
         'CpsiMapview.controller.form.Login'
     ],
 
-    serviceUrl: 'https://pmstipperarydev.compass.ie/WebServices/authorization/authenticate',
-    tokenName: 'pmstoken',
+    serviceUrl: './WebServices/authorization/authenticate',
+    validateUrl: './WebServices/authorization/validateToken',
+    tokenName: 'token',
 
     controller: 'cmv_login_form',
     bodyPadding: 10,

@@ -28,10 +28,12 @@ Ext.define('CpsiMapview.controller.form.Login', {
 
         var token = Ext.util.Cookies.get(tokenName);
         var jsonData = {};
+        var serviceUrl = me.getView().validateUrl;
 
         if (token) {
             jsonData[tokenName] = token;
-            me.callLoginService(jsonData);
+            jsonData = Ext.JSON.encode(jsonData);
+            me.callLoginService(jsonData, serviceUrl);
         }
     },
 
@@ -55,7 +57,7 @@ Ext.define('CpsiMapview.controller.form.Login', {
         loginData[tokenName] = response.data;
 
         me.updateCookie(loginData);
-        me.fireEvent('login', loginData);
+        me.fireEvent('login', loginData, me.getView());
     },
 
     logout: function () {
@@ -89,12 +91,10 @@ Ext.define('CpsiMapview.controller.form.Login', {
 
     },
 
-    callLoginService: function (jsonData) {
+    callLoginService: function (jsonData, serviceUrl) {
 
         var me = this;
-        var serviceUrl = me.getView().serviceUrl;
-
-        Ext.util.Cookies.set('username', jsonData.username);
+        var view = me.getView();
 
         Ext.Ajax.request({
             method: 'POST',
@@ -113,12 +113,12 @@ Ext.define('CpsiMapview.controller.form.Login', {
                 }
                 else {
                     //username / password login failure
-                    me.fireEvent('loginfail');
+                    me.fireEvent('loginfail', result.statusText, view);
                 }
             },
             failure: function (result) {
                 // indicates HTTP failure
-                me.fireEvent('loginfail', result.statusText);
+                me.fireEvent('loginfail', result.statusText, view);
             }
         });
     },
@@ -128,11 +128,18 @@ Ext.define('CpsiMapview.controller.form.Login', {
         var me = this;
         var view = me.getView();
 
-        var myForm = view.down('form').getForm();
-        var jsonData = Ext.JSON.encode(myForm.getValues());
+        var formValues = view.down('form').getForm().getValues();
+        Ext.util.Cookies.set('username', formValues.username);
 
-        me.callLoginService(jsonData);
+        var jsonData = Ext.JSON.encode(formValues);
 
+        var serviceUrl = view.serviceUrl;
+        me.callLoginService(jsonData, serviceUrl);
+
+    },
+
+    init: function () {
+        this.tryAutomaticLogin();
     }
 
 });
