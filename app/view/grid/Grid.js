@@ -75,8 +75,7 @@ Ext.define('CpsiMapview.view.grid.Grid', {
     */
     listeners: {
         filterchange: 'filterAssociatedLayers',
-        itemcontextmenu: 'onItemContextMenu',
-        documentsave: 'onDocumentSave'
+        itemcontextmenu: 'onItemContextMenu'
     },
 
     /**
