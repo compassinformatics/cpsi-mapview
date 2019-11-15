@@ -1,0 +1,16 @@
+{
+  "data": "bfdb15be-7ec9-4956-b2b3-5b25f77d3877",
+  "message": "",
+  "success": true,
+  "userRoles": [
+    "UPL",
+    "Mobile_Upload",
+    "Browser_RoadScheduleEditor",
+    "MECHUPL",
+    "MechanicalData_Upload",
+    "Browser_Administrator",
+    "Browser_BridgeEditor",
+    "Browser_ReadOnly",
+    "Browser_ReadWrite"
+  ]
+}

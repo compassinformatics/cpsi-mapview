@@ -5,10 +5,19 @@ var commonConfig = require('./karma-conf.common.js');
 
 module.exports = function(config) {
     commonConfig(config); // apply shared configuration
+
+    var sourcePreprocessors = 'coverage';
+    function isDebug(argument) {
+        return argument === '--debug';
+    }
+    if (process.argv.some(isDebug)) {
+        sourcePreprocessors = [];
+    }
+
     config.set({
         // Preprocess so we can gather coverage
         preprocessors: {
-            'app/**/*.js': ['coverage']
+            'app/**/*.js': sourcePreprocessors // remove coverage here if we want to debug a test
         },
 
         // test results reporter to use

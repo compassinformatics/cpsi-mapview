@@ -36,6 +36,12 @@ docker-compose up
 ```
 The application is available via http://localhost:81/ afterwards.
 
+For running tests various dependencies listed in package.json need to be installed. Run the following:
+
+```
+npm install
+```
+
 ## Updating the deployed state
 
 ```
@@ -46,3 +52,28 @@ sencha app build
 npx gh-pages -d build/production/CpsiMapview/ -o upstream
 
 ```
+
+## Testing
+
+Navigate to the project folder and run the following:
+
+```
+npm test
+```
+
+To have tests continually running while making changes:
+
+```
+npm run test:watch
+```
+
+To open in a browser and leave the browser open (to review UI components, debug, etc.).
+`--auto-watch` prevents application JS files being cached. 
+
+```
+karma start --browsers Chrome --single-run=False --debug --auto-watch
+
+```
+
+See also https://glebbahmutov.com/blog/debugging-karma-unit-tests/
+
