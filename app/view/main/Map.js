@@ -37,6 +37,12 @@ Ext.define('CpsiMapview.view.main.Map', {
         map: new ol.Map({
             // layers will be created from config in initComponent
             layers: [],
+            controls: ol.control.defaults().extend([
+                new ol.control.FullScreen()
+            ]),
+            interactions: ol.interaction.defaults().extend([
+                new ol.interaction.DragRotateAndZoom()
+            ]),
             view: new ol.View({
                 center: ol.proj.fromLonLat( [-8, 53.5] ),
                 zoom: 8
