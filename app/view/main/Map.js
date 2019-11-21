@@ -11,6 +11,7 @@ Ext.define('CpsiMapview.view.main.Map', {
 
         'CpsiMapview.view.toolbar.MapFooter',
         'CpsiMapview.view.toolbar.MapTools',
+        'CpsiMapview.controller.panel.TimeSlider',
         'CpsiMapview.controller.MapController',
 
         'BasiGX.util.Projection'

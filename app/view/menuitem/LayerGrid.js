@@ -6,8 +6,6 @@
 Ext.define('CpsiMapview.view.menuitem.LayerGrid', {
     extend: 'Ext.menu.Item',
     xtype: 'cmv_menuitem_layergrid',
-    requires: [],
-
     /**
      * The connected layer for this item.
      *
