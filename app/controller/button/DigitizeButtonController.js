@@ -110,14 +110,18 @@ Ext.define('CpsiMapview.controller.button.DigitizeButtonController', {
             me.map.addInteraction(me.modifyInteraction);
         }
 
-        // create a temporary result layer
+        // create a result layer unless one has already been set
         if (!me.resultLayer) {
-            me.resultLayer = new ol.layer.Vector({
-                name: 'resultLayer',
-                displayInLayerSwitcher: false,
-                source: new ol.source.Vector(),
-                style: view.getResultLayerStyle()
-            });
+            if (view.resultLayer) {
+                me.resultLayer = view.resultLayer;
+            } else {
+                me.resultLayer = new ol.layer.Vector({
+                    name: 'resultLayer',
+                    displayInLayerSwitcher: false,
+                    source: new ol.source.Vector(),
+                    style: view.getResultLayerStyle()
+                });
+            }
             me.map.addLayer(me.resultLayer);
         }
 

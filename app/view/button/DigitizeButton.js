@@ -86,7 +86,9 @@ Ext.define('CpsiMapview.view.button.DigitizeButton', {
          * this buffer in units of the maps projection.
          * Internally, this uses the `buffer` method of ol.extent
          */
-        pointExtentBuffer: 0
+        pointExtentBuffer: 0,
+
+        resultLayer: null
     },
 
     /**
