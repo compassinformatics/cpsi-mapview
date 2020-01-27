@@ -239,6 +239,7 @@
       "sldUrl": "resources/data/styling/LightUnit_Unit_Type.xml",
       "openLayers": {
         "visibility": false
+      }
       },
       {
         "layerType": "vt",
@@ -263,7 +264,7 @@
         "stylesBaseUrl": "https://plmonaghandev.compass.ie/resources/data/styling/",
         "styles": [ "LightUnit_Type.xml", "LightUnit_Owner.xml" ],
         "stylesForceNumericFilterVals": true,
-        "gridXType": "cmv_examplegrid",            
+        "gridXType": "cmv_examplegrid",
         "layerKey": "LIGHT_UNIT_MVT",
         "tooltipsConfig": [
           {
