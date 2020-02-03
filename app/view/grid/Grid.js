@@ -10,7 +10,8 @@ Ext.define('CpsiMapview.view.grid.Grid', {
         'GeoExt.toolbar.WfsPaging',
         'GeoExt.selection.FeatureModel',
         'BasiGX.util.Layer',
-        'CpsiMapview.view.button.SpatialQueryButton'
+        'CpsiMapview.view.button.SpatialQueryButton',
+        'CpsiMapview.controller.grid.Grid'
     ],
 
     xtype: 'cmv_grid',
