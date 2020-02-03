@@ -28,19 +28,19 @@ Ext.define('CpsiMapview.controller.form.Login', {
 
         var token = Ext.util.Cookies.get(tokenName);
         var jsonData = {};
-        var serviceUrl = me.getView().validateUrl;
+        var serviceUrl = me.getViewModel().validateUrl;
 
         if (token) {
             jsonData[tokenName] = token;
             jsonData = Ext.JSON.encode(jsonData);
-            me.callLoginService(jsonData, serviceUrl);
+            me.callLoginService(jsonData, serviceUrl, false);
         }
     },
 
     getTokenName: function () {
 
         var me = this;
-        return me.getView().tokenName;
+        return me.getViewModel().tokenName;
     },
 
     login: function (response) {
@@ -57,7 +57,8 @@ Ext.define('CpsiMapview.controller.form.Login', {
         loginData[tokenName] = response.data;
 
         me.updateCookie(loginData);
-        me.fireEvent('login', loginData, me.getView());
+        me.getView().destroy();
+        me.fireEvent('login', loginData);
     },
 
     logout: function () {
@@ -91,11 +92,14 @@ Ext.define('CpsiMapview.controller.form.Login', {
 
     },
 
-    callLoginService: function (jsonData, serviceUrl) {
+    callLoginService: function (jsonData, serviceUrl, showMask) {
 
         var me = this;
         var view = me.getView();
-        view.mask('Logging in');
+
+        if (showMask) {
+            view.mask('Logging in');
+        }
 
         Ext.Ajax.request({
             method: 'POST',
@@ -114,16 +118,18 @@ Ext.define('CpsiMapview.controller.form.Login', {
                 }
                 else {
                     //username / password login failure
-                    me.fireEvent('loginfail', result.statusText, view);
+                    me.fireEvent('loginfail', result.statusText);
                 }
             },
             failure: function (result) {
                 // indicates HTTP failure
-                me.fireEvent('loginfail', result.statusText, view);
+                me.fireEvent('loginfail', result.statusText);
 
             },
-            callback: function() {
-                view.unmask();
+            callback: function () {
+                if (view && showMask) {
+                    view.unmask();
+                }
             }
 
         });
@@ -139,8 +145,8 @@ Ext.define('CpsiMapview.controller.form.Login', {
 
         var jsonData = Ext.JSON.encode(formValues);
 
-        var serviceUrl = view.serviceUrl;
-        me.callLoginService(jsonData, serviceUrl);
+        var serviceUrl = me.getViewModel().serviceUrl;
+        me.callLoginService(jsonData, serviceUrl, true);
 
     },
 
