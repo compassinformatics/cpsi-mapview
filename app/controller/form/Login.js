@@ -95,6 +95,7 @@ Ext.define('CpsiMapview.controller.form.Login', {
 
         var me = this;
         var view = me.getView();
+        view.mask('Logging in');
 
         Ext.Ajax.request({
             method: 'POST',
@@ -119,7 +120,12 @@ Ext.define('CpsiMapview.controller.form.Login', {
             failure: function (result) {
                 // indicates HTTP failure
                 me.fireEvent('loginfail', result.statusText, view);
+
+            },
+            callback: function() {
+                view.unmask();
             }
+
         });
     },
 
