@@ -11,8 +11,10 @@ describe('CpsiMapview.view.form.Login', function() {
 
         it('can call mocked service', function (done) {
             var inst = Ext.create('CpsiMapview.view.form.Login', {
-                serviceUrl: '/resources/data/forms/login.json',
-                tokenName: 'mytoken'
+                viewModel: {
+                    serviceUrl: '/resources/data/forms/login.json',
+                    tokenName: 'mytoken'
+                }
             });
 
             var ctrlr = inst.getController();
