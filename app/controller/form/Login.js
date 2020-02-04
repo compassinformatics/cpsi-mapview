@@ -131,7 +131,7 @@ Ext.define('CpsiMapview.controller.form.Login', {
 
             },
             callback: function () {
-                if (view) {
+                if (showMask) {
                     view.unmask();
                 }
             }
