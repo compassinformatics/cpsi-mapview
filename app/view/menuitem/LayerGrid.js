@@ -20,6 +20,18 @@ Ext.define('CpsiMapview.view.menuitem.LayerGrid', {
     text: 'Open Data Grid',
 
     /**
+     * A Ext.window.Window configuration object
+     * @cfg {Object}
+     */
+    windowConfig: {
+        minHeight: 600,
+        constrain: true,
+        layout: 'fit',
+        maximizable: true,
+        closeAction: 'hide' // don't destroy the window when closed
+    },
+
+    /**
      * @private
      */
     initComponent: function () {
@@ -56,21 +68,21 @@ Ext.define('CpsiMapview.view.menuitem.LayerGrid', {
 
         var existingGrids = Ext.ComponentQuery.query(gridXType);
         var gridWindow;
+        var windowConfig = me.windowConfig;
 
         if (existingGrids.length > 0) {
             // get the parent window of the grid
             gridWindow = existingGrids[0].up('.window');
         } else {
-            gridWindow = Ext.create('Ext.window.Window', {
-                height: 600,
+
+            Ext.apply(windowConfig, {
                 title: title,
-                layout: 'fit',
-                maximizable: true,
-                closeAction: 'hide', // don't destroy the window when closed
                 items: [{
                     xtype: gridXType
                 }]
             });
+
+            gridWindow = Ext.create('Ext.window.Window', windowConfig);
         }
         gridWindow.show();
     }
