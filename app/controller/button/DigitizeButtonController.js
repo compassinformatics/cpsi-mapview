@@ -386,7 +386,7 @@ Ext.define('CpsiMapview.controller.button.DigitizeButtonController', {
                 me.removeLastDigitizeFeature();
 
                 BasiGX.error('Could not find features in the response: ' +
-                  json.message ? json.message : JSON.stringify(json));
+                  (json.message ? json.message : JSON.stringify(json)));
             }
         } else {
             BasiGX.error('Response was empty');
