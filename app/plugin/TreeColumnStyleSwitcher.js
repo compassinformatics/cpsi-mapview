@@ -115,6 +115,21 @@ Ext.define('CpsiMapview.plugin.TreeColumnStyleSwitcher', {
                 me.renderRadioGroups();
             }, 1);
         });
+
+        // ensure that the radio groups are rendered after a node has been
+        // dragged and dropped
+        treeColumn.up('treepanel').on('drop', function (node, data) {
+            Ext.defer(function () {
+                me.cleanupAllRadioGroups();
+                // updates the whole node for the layer and forces the
+                // me.renderRadioGroups via 'itemupdate' event
+                // directly executing me.renderRadioGroups leaves some artifacts
+                if (data.records && data.records.length > 0 && data.records[0].getOlLayer()) {
+                    var layer = data.records[0].getOlLayer();
+                    treeColumn.up('treepanel').updateLayerNodeUi(layer);
+                }
+            }, 1);
+        });
     },
 
     /**
@@ -133,8 +148,8 @@ Ext.define('CpsiMapview.plugin.TreeColumnStyleSwitcher', {
             if (!node.get('isLayerGroup') && node.get('text') !== 'root') {
                 var lyrRecId = node.get('id');
                 var placeholderDomId = THIS_CLS.getDomId(lyrRecId);
-                var placeholderDiv =
-                    Ext.DomQuery.select('#' + placeholderDomId)[0];
+                // use fly to avoid Ext element cache which raises error
+                var placeholderDiv = Ext.fly(placeholderDomId);
                 var olLayer = node.getOlLayer();
 
                 if (placeholderDiv && olLayer.get('styles')) {
