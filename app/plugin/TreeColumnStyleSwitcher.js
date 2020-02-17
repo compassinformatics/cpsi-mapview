@@ -160,5 +160,7 @@ Ext.define('CpsiMapview.plugin.TreeColumnStyleSwitcher', {
         Ext.each(me.radioGroups, function (rg) {
             rg.destroy();
         });
+
+        me.radioGroups = [];
     }
 });
