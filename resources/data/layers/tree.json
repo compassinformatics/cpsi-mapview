@@ -1,0 +1,37 @@
+{
+  "id": "root",
+  "children": [
+    {
+      "id": "overlay-folder",
+      "title": "Layers",
+      "children": [
+        {
+          "id": "LIGHT_UNIT_MVT",
+          "isLeaf": true
+        },
+        {
+          "id": "ACCIDENTS_WFS",
+          "isLeaf": true
+        },
+        {
+          "id": "GAS_WFS",
+          "isLeaf": true
+        }
+      ]
+    },
+    {
+      "id": "base-folder",
+      "title": "Base Layers",
+      "children": [
+        {
+          "id": "OSM_BACKGROUND",
+          "isLeaf": true
+        },
+        {
+          "id": "GREY_BACKGROUND",
+          "isLeaf": true
+        }
+      ]
+    }
+  ]
+}

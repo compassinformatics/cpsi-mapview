@@ -2,6 +2,7 @@
   "layers": [
     {
       "layerType": "xyz",
+      "layerKey": "GREY_BACKGROUND",
       "iconCls": "map",
       "isBaseLayer": true,
       "isDefaultBaseLayer": false,
@@ -20,6 +21,7 @@
     },
     {
       "layerType": "osm",
+      "layerKey": "OSM_BACKGROUND",
       "helpPage": "OSM",
       "iconCls": "map",
       "isBaseLayer": true,
@@ -82,6 +84,7 @@
       "text": "GAS WFS",
       "layerKey": "GAS_WFS",
       "url": "https://ows.terrestris.de/geoserver/osm/wfs",
+      "featureType": "osm:osm-fuel",
       "sldUrl": "resources/data/styling/Test_Gas.xml",
       "geomFieldName": "geometry",
       "namespaceDefinitions": {
