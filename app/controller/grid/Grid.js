@@ -272,6 +272,7 @@ Ext.define('CpsiMapview.controller.grid.Grid', {
             return;
         }
 
+        var originalMsg = grid.loadMask.msg;
         grid.setLoading('Exporting to Excel...');
 
         // later in an event listeners
@@ -281,6 +282,7 @@ Ext.define('CpsiMapview.controller.grid.Grid', {
             fileName: grid.exportFileName
         }).then(function () {
             grid.setLoading(false);
+            grid.loadMask.msg = originalMsg;
         });
     },
 
