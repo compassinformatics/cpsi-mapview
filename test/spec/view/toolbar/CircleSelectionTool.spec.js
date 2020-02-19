@@ -16,7 +16,7 @@ describe('CpsiMapview.view.toolbar.CircleSelection', function () {
             var inst = Ext.create('CpsiMapview.view.toolbar.CircleSelection', { feature: feat });
 
             var radius = inst.getController().getCurrentRadius();
-            expect(radius).to.be.equal(expectedRadius);
+            expect(radius).to.be.equal(expectedRadius / 2);
         });
 
         it('updates the radius', function () {

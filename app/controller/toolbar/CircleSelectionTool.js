@@ -37,7 +37,9 @@ Ext.define('CpsiMapview.controller.toolbar.CircleSelectionController', {
         if (feat != null) {
             var geom = feat.getGeometry();
             if (geom !== undefined) {
-                radius = geom.getRadius();
+                // geom.getRadius actually is the diameter
+                // therefore we have to divide by 2
+                radius = geom.getRadius() / 2;
             }
         }
         return radius;
@@ -55,7 +57,9 @@ Ext.define('CpsiMapview.controller.toolbar.CircleSelectionController', {
         if (feat != null) {
             var geom = me.getView().feature.getGeometry();
             if (geom !== undefined) {
-                geom.setRadius(newVal);
+                // geom.setRadius actually is the diameter
+                // therefore we have to multiply by 2
+                geom.setRadius(newVal * 2);
             }
         }
     },
@@ -76,7 +80,9 @@ Ext.define('CpsiMapview.controller.toolbar.CircleSelectionController', {
      */
     init: function () {
         var me = this;
-        var radius = me.getCurrentRadius();
+        // geom.setRadius actually is the diameter
+        // therefore we have to multiply by 2
+        var radius = me.getCurrentRadius() * 2;
         me.getViewModel().set('radius', radius);
         me.setCurrentUnit();
     }
