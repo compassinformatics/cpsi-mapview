@@ -76,7 +76,11 @@ Ext.define('CpsiMapview.view.grid.Grid', {
     */
     listeners: {
         filterchange: 'filterAssociatedLayers',
-        itemcontextmenu: 'onItemContextMenu'
+        itemcontextmenu: 'onItemContextMenu',
+        columnhide: 'onColumnHideShow',
+        columnshow: 'onColumnHideShow',
+        // ensure columns are set when the store is bound to the grid
+        reconfigure: 'onColumnHideShow'
     },
 
     /**

@@ -285,6 +285,34 @@ Ext.define('CpsiMapview.controller.grid.Grid', {
     },
 
     /**
+    * Whenever columns are shown or hidden update
+    * the WFS propertyName so only data to
+    * be displayed is returned. The idProperty will
+    * always be returned even if the column is hidden.
+    *
+    */
+    onColumnHideShow: function () {
+
+        var me = this;
+        var grid = me.getView();
+        var store = grid.getStore();
+
+        var visibleColumnNames, idProperty;
+
+        if (!store.isEmptyStore) {
+            visibleColumnNames = Ext.Array.pluck(grid.getVisibleColumns(), 'dataIndex');
+            idProperty = store.model.prototype.idField.name;
+
+            // add the idProperty as the first item in the list
+            // if not already in list
+            if (visibleColumnNames.indexOf(idProperty) === -1) {
+                visibleColumnNames.unshift(idProperty);
+            }
+            store.propertyName = visibleColumnNames.join(',');
+        }
+    },
+
+    /**
     * Clear both the grid filters and any spatial filter.
     * This will cause the store to reload.
     *
