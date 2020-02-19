@@ -107,6 +107,12 @@ Ext.define('CpsiMapview.view.toolbar.MapTools', {
             apiUrl: 'https://pmstipperarydev.compass.ie/WebServices/roadschedule/cutWithPolygon',
             clearDrawnFeature: false
         }, {
+            xtype: 'cmv_digitize_button',
+            type: 'Circle',
+            tooltip: 'Circle',
+            apiUrl: 'https://pmstipperarydev.compass.ie/WebServices/roadschedule/cutWithPolygon',
+            clearDrawnFeature: false
+        }, {
             xtype: 'cmv_streetview_tool'
         }, {
             xtype: 'cmv_timeslider',
