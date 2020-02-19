@@ -11,6 +11,7 @@ Ext.define('CpsiMapview.view.main.Map', {
 
         'CpsiMapview.view.toolbar.MapFooter',
         'CpsiMapview.view.toolbar.MapTools',
+        'CpsiMapview.view.toolbar.MinimizedWindows',
         'CpsiMapview.controller.panel.TimeSlider',
         'CpsiMapview.controller.MapController',
 
@@ -26,6 +27,9 @@ Ext.define('CpsiMapview.view.main.Map', {
         dock: 'top',
     }, {
         xtype: 'cmv_mapfooter',
+        dock: 'bottom'
+    }, {
+        xtype: 'cmv_minimized_windows',
         dock: 'bottom'
     }],
 
