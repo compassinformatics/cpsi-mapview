@@ -22,6 +22,6 @@ Ext.define('CpsiMapview.view.toolbar.MinimizedWindows', {
 
     listeners: {
         addMinimizedWindow: 'onAddMinimizedWindow',
-        restoreWindow: 'onRestoreWindow'
+        restoreFromWindow: 'onRestoreFromWindow'
     }
 });

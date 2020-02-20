@@ -20,6 +20,12 @@ Ext.define('CpsiMapview.view.window.MinimizableWindow', {
     minimizable: true,
 
     /**
+     * True, if the window is currently minimized,
+     * false otherwise.
+     */
+    isMinimized: false,
+
+    /**
      * Component to where the window should be added
      * when minimized. If null, it will be added to
      * the first MinimizedWindows toolbar found. If
@@ -28,6 +34,7 @@ Ext.define('CpsiMapview.view.window.MinimizableWindow', {
     minimizeTo: null,
 
     listeners: {
-        minimize: 'onMinimize'
+        minimize: 'onMinimize',
+        show: 'onShow'
     }
 });

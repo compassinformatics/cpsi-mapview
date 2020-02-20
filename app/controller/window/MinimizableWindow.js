@@ -12,19 +12,44 @@ Ext.define('CpsiMapview.controller.window.MinimizableWindow', {
      */
     onMinimize: function () {
         var me = this;
+        var minimizeTo = me.getMinimizeToolbar();
+        if (minimizeTo == null) {
+            Ext.log({
+                msg: 'No cmv_minimized_windows found. Window might just disappear.',
+                level: 'warn'
+            });
+        }
+        me.getView().setVisible(false);
+        minimizeTo.fireEvent('addMinimizedWindow', me.getView());
+        me.getView().isMinimized = true;
+    },
+
+    /**
+     * Helper function to get the right MinimizedWindows toolbar.
+     * If defined, returns me.getView().minimizeTo, else checks for
+     * any MinimizedWindows toolbar and returns first match. If no
+     * toolbar found, returns undefined
+     */
+    getMinimizeToolbar: function () {
+        var me = this;
         var minimizeTo = me.getView().minimizeTo;
         if (minimizeTo == null) {
             var toolbars = Ext.ComponentQuery.query('cmv_minimized_windows');
             if (toolbars.length > 0) {
                 minimizeTo = toolbars[0];
-            } else {
-                Ext.log({
-                    msg: 'No cmv_minimized_windows found. Window might just disappear.',
-                    level: 'warn'
-                });
             }
         }
-        me.getView().setVisible(false);
-        minimizeTo.fireEvent('addMinimizedWindow', me.getView());
+        return minimizeTo;
+    },
+
+    /**
+     * Fires the restoreFromWindow event if window is currently minimized
+     */
+    onShow: function () {
+        var me = this;
+        if (me.getView().isMinimized) {
+            var minimizeTo = me.getMinimizeToolbar();
+            minimizeTo.fireEvent('restoreFromWindow', me.getView());
+        }
     }
 });

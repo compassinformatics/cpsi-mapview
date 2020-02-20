@@ -29,7 +29,7 @@ Ext.define('CpsiMapview.controller.toolbar.MinimizedWindows', {
             text: windowTitle != null ? windowTitle : windowId,
             windowRef: windowId,
             listeners: {
-                click: 'onRestoreWindow',
+                click: 'onRestoreFromButton',
                 scope: me
             }
         });
@@ -37,16 +37,43 @@ Ext.define('CpsiMapview.controller.toolbar.MinimizedWindows', {
     },
 
     /**
-     * Handles all actions to restore a minimized window
-     * @param {Ext.button.Button} button that represents window to restore
+     * Handles restoring a minimized window using the toolbar button object
+     * @param {Ext.button.Button} minimizedWindow
      */
-    onRestoreWindow: function (button) {
+    onRestoreFromButton: function (button) {
         var me = this;
-        var buttonId = button.windowRef;
+        var windowRef = button.windowRef;
+        me.restoreWindow(windowRef);
+    },
 
-        var minimizedWindow = Ext.ComponentQuery.query('#' + buttonId)[0];
+    /**
+     * Handles restoring a minimized window using the window object
+     * @param {CpsiMapview.view.window.MinimizableWindow} minimizedWindow
+     */
+    onRestoreFromWindow: function (minimizedWindow) {
+        var me = this;
+        var windowId = minimizedWindow.getId();
+        me.restoreWindow(windowId);
+    },
+
+    /**
+     * Handles all actions to restore a minimized window
+     * @param {String} windowRef reference to the minimized window
+     */
+    restoreWindow: function (windowRef) {
+        var me = this;
+        var minimizedWindow = Ext.ComponentQuery.query('#' + windowRef)[0];
         minimizedWindow.setVisible(true);
-        me.getView().remove(button);
+        minimizedWindow.isMinimized = false;
+
+        var button = me.getView().items.find(function (item) {
+            return (item.getXType() === 'button') && (item.windowRef === windowRef);
+        });
+
+        if (button !== undefined) {
+            me.getView().remove(button);
+        }
+
         if (me.getView().items.length == 0) {
             me.getView().setHidden(true);
         }
