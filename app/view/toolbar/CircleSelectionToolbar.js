@@ -1,21 +1,22 @@
 /**
- * This class is the circle selection of cpsi mapview application
- * It can be used e.g. for the zone tool
+ * This class is the circle selection toolbar of cpsi mapview application
+ * It can be used e.g. for manipulating the radius of a drawn circle
+ * and using that circle for filtering features.
  */
 /**
- * Circle Selection
+ * Circle Selection Toolbar
  *
- * @class CpsiMapview.view.toolbar.CircleSelection
+ * @class CpsiMapview.view.toolbar.CircleSelectionToolbar
  */
-Ext.define('CpsiMapview.view.toolbar.CircleSelection', {
+Ext.define('CpsiMapview.view.toolbar.CircleSelectionToolbar', {
     extend: 'Ext.toolbar.Toolbar',
 
     xtype: 'cmv_circle_selection_toolbar',
 
     requires: [
         'Ext.form.field.Number',
-        'CpsiMapview.controller.toolbar.CircleSelectionController',
-        'CpsiMapview.model.toolbar.CircleSelection'
+        'CpsiMapview.controller.toolbar.CircleSelectionToolbar',
+        'CpsiMapview.model.toolbar.CircleSelectionToolbar'
     ],
 
     viewModel: 'cmv_circle_selection_toolbar',

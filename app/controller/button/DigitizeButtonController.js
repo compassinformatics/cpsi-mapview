@@ -259,10 +259,10 @@ Ext.define('CpsiMapview.controller.button.DigitizeButtonController', {
         var me = this;
         // deactivate the creation of another circle
         me.drawInteraction.setActive(false);
-        me.circleToolbar = Ext.create('CpsiMapview.view.toolbar.CircleSelection', {
+        me.circleToolbar = Ext.create('CpsiMapview.view.toolbar.CircleSelectionToolbar', {
             feature: evt.feature,
         });
-        me.circleToolbar.on({
+        me.circleToolbar.getController().on({
             circleSelectApply: me.onCircleSelectApply,
             circleSelectCancel: me.onCircleSelectCancel,
             scope: me
@@ -355,7 +355,7 @@ Ext.define('CpsiMapview.controller.button.DigitizeButtonController', {
             };
         }
         else if (type === 'Circle') {
-            // ol circle objects consist of a center corrdinate and a radius in the
+            // ol circle objects consist of a center coordinate and a radius in the
             // unit of the projection. In order to convert it into a geoJSON, we have
             // to convert the circle to a polygon first.
             var circleAsPolygon = new ol.geom.Polygon.fromCircle(feat.getGeometry());

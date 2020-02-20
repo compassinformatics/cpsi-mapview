@@ -1,7 +1,7 @@
 /**
- * This class is the controller for the CircleSelectionController.
+ * This class is the controller for the CircleSelectionToolbar.
  */
-Ext.define('CpsiMapview.controller.toolbar.CircleSelectionController', {
+Ext.define('CpsiMapview.controller.toolbar.CircleSelectionToolbar', {
     extend: 'Ext.app.ViewController',
 
     alias: 'controller.cmv_circle_selection_toolbar',
@@ -14,7 +14,7 @@ Ext.define('CpsiMapview.controller.toolbar.CircleSelectionController', {
     handleApply: function () {
         var me = this;
         var feat = me.getView().feature;
-        me.getView().fireEvent('circleSelectApply', feat);
+        me.fireEvent('circleSelectApply', feat);
     },
 
     /**
@@ -24,7 +24,7 @@ Ext.define('CpsiMapview.controller.toolbar.CircleSelectionController', {
      */
     handleCancel: function () {
         var me = this;
-        me.getView().fireEvent('circleSelectCancel');
+        me.fireEvent('circleSelectCancel');
     },
 
     /**
@@ -48,7 +48,7 @@ Ext.define('CpsiMapview.controller.toolbar.CircleSelectionController', {
     /**
      * Handles changes in the numberField by applying the value
      * as radius for the ol circle feature
-     * @param {Ext numberField} numberField component that fired the event
+     * @param {Ext.form.field.Number} numberField component that fired the event
      * @param {float} newVal new value of the numberField
      */
     onRadiusChange: function (numberField, newVal) {
