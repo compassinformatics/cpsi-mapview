@@ -6,10 +6,6 @@ Ext.define('CpsiMapview.controller.toolbar.MinimizedWindows', {
 
     alias: 'controller.cmv_minimized_windows',
 
-    requires: [
-        'CpsiMapview.view.button.MinimizedWindowButton'
-    ],
-
     /**
      * Handles the toolbar related actions when minimizing a window
      * @param {CpsiMapview.view.window.MinimizableWindow} minimizedWindow window to add
@@ -29,16 +25,20 @@ Ext.define('CpsiMapview.controller.toolbar.MinimizedWindows', {
         var windowId = minimizedWindow.getId();
         var windowTitle = minimizedWindow.getTitle();
 
-        var button = Ext.create('CpsiMapview.view.button.MinimizedWindowButton', {
+        var button = Ext.create('Ext.button.Button', {
             text: windowTitle != null ? windowTitle : windowId,
-            windowRef: windowId
+            windowRef: windowId,
+            listeners: {
+                click: 'onRestoreWindow',
+                scope: me
+            }
         });
         me.getView().add(button);
     },
 
     /**
      * Handles all actions to restore a minimized window
-     * @param {CpsiMapview.view.button.MinimizedWindowButton} button that represents window to restore
+     * @param {Ext.button.Button} button that represents window to restore
      */
     onRestoreWindow: function (button) {
         var me = this;
