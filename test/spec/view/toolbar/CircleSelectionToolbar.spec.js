@@ -33,22 +33,5 @@ describe('CpsiMapview.view.toolbar.CircleSelectionToolbar', function () {
             expect(radius).to.be.equal(changeRadius);
             expect(radius).not.to.be.equal(initRadius);
         });
-
-
-        it('sets the unit', function () {
-            var inst = Ext.create('CpsiMapview.view.toolbar.CircleSelectionToolbar');
-            var initUnit = inst.getViewModel().data.unit;
-
-            var map = BasiGX.util.Map.getMapComponent().map;
-            // set view to projection of unit degrees
-            var view = new ol.View({projection: 'EPSG:4326'});
-            map.setView(view);
-
-            inst.getController().setCurrentUnit();
-
-            var currentUnit = inst.getViewModel().data.unit;
-            expect(currentUnit).not.to.be.equal(initUnit);
-            expect(currentUnit).to.be.equal('degrees');
-        });
     });
 });
