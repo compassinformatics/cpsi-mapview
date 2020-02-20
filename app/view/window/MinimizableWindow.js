@@ -4,7 +4,7 @@
  * and already implement the minimization logic. If a
  * CpsiMapview.view.toolbar.MinimizedWindows toolbar is given, minimized
  * windows will be added to that toolbar and can be restored afterwards.
- * 
+ *
  * @class CpsiMapview.view.window.MinimizableWindow
  */
 Ext.define('CpsiMapview.view.window.MinimizableWindow', {

@@ -44,7 +44,7 @@ Ext.define('CpsiMapview.controller.toolbar.MinimizedWindows', {
         var me = this;
         var buttonId = button.windowRef;
 
-        var minimizedWindow = Ext.ComponentQuery.query(`#${buttonId}`)[0];
+        var minimizedWindow = Ext.ComponentQuery.query('#' + buttonId)[0];
         minimizedWindow.setVisible(true);
         me.getView().remove(button);
         if (me.getView().items.length == 0) {

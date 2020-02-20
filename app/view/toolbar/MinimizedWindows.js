@@ -3,7 +3,7 @@
  * minimized windows. After a window was resized, the toolbar will be visible.
  * If a window was minimized without adding this toolbar in advance, the window
  * will minimize into nowhere.
- * 
+ *
  * @class CpsiMapview.view.toolbar.MinimizedWindows
  */
 Ext.define('CpsiMapview.view.toolbar.MinimizedWindows', {
