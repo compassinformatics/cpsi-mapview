@@ -97,13 +97,11 @@ Ext.define('CpsiMapview.plugin.TreeColumnStyleSwitcher', {
         me.callParent();
 
         // wait until all layers are loaded to the map
-        var mapCmp = CpsiMapview.view.main.Map.guess();
-        mapCmp.on('cmv-init-layersadded', function () {
+        var layerTree = treeColumn.up('treepanel');
+        layerTree.on('cmv-init-layertree', function () {
             // ensure the radio groups are re-rendered every time the tree view
             // changes (e.g.) layer visibility is changed
-            treeColumn.up('treepanel').getView().on('itemupdate', function () {
-                // Unfortun. we have to defer cascading of the LayerTree nodes.
-                // Otherwise they are not ready and we don't have a event.
+            layerTree.getView().on('itemupdate', function () {
                 Ext.defer(function () {
                     me.cleanupAllRadioGroups();
                     me.renderRadioGroups();

@@ -2,6 +2,7 @@
   "layers": [
     {
       "layerType": "xyz",
+      "layerKey": "GREY_BACKGROUND",
       "iconCls": "map",
       "isBaseLayer": true,
       "isDefaultBaseLayer": false,
@@ -20,6 +21,7 @@
     },
     {
       "layerType": "osm",
+      "layerKey": "OSM_BACKGROUND",
       "helpPage": "OSM",
       "iconCls": "map",
       "isBaseLayer": true,
@@ -38,12 +40,13 @@
     },
     {
       "layerType": "wms",
+      "text": "A WMS",
+      "layerKey": "OSM_WMS",
       "helpPage": "OSM",
       "qtip": "An OSM based WMS layer",
       "iconCls": "map",
       "isBaseLayer": false,
       "isDefaultBaseLayer": false,
-      "text": "A WMS",
       "url": "https://ows.terrestris.de/osm-gray/service",
       "serverOptions": {
         "layers": "OSM-WMS"
@@ -60,6 +63,7 @@
     {
       "layerType": "wfs",
       "text": "Country WFS",
+      "layerKey": "COUNTRY_WFS",
       "qtip": "An OSM based WFS layer",
       "url": "https://ows.terrestris.de/geoserver/osm/wfs",
       "featureType": "osm:osm-country-borders",
@@ -82,6 +86,7 @@
       "text": "GAS WFS",
       "layerKey": "GAS_WFS",
       "url": "https://ows.terrestris.de/geoserver/osm/wfs",
+      "featureType": "osm:osm-fuel",
       "sldUrl": "resources/data/styling/Test_Gas.xml",
       "geomFieldName": "geometry",
       "namespaceDefinitions": {
@@ -114,12 +119,14 @@
     },
     {
       "layerType": "switchlayer",
+      "layerKey": "LIGHT_UNIT_SWITCH_LAYER",
       "visibility": false,
       "vectorFeaturesMinScale": 80000,
       "layers": [
         {
           "layerType": "wms",
           "text": "Light Unit Switch Layer (far)",
+          "layerKey": "LIGHT_UNIT_SWITCH_LAYER_FAR",
           "url": "https://plmonaghandev.compass.ie/mapserver/",
           "isBaseLayer": false,
           "isDefaultBaseLayer": false,
@@ -139,6 +146,7 @@
         {
           "layerType": "wfs",
           "text": "Light Unit Switch Layer (close)",
+          "layerKey": "LIGHT_UNIT_SWITCH_LAYER_CLOSE",
           "url": "https://plmonaghandev.compass.ie/mapserver/?",
           "geometryProperty": "msGeometry",
           "featureType": "LightUnit",
@@ -160,6 +168,7 @@
     {
       "layerType": "wms",
       "text": "Works_Export (needs proxy)",
+      "layerKey": "WORKS_EXPORT_WMS_PROXY",
       "url": "mapserver/",
       "isBaseLayer": false,
       "isDefaultBaseLayer": false,
@@ -177,6 +186,7 @@
     {
       "layerType": "wfs",
       "text": "Test time WFS (needs proxy)",
+      "layerKey": "TIME_WFS_PROXY",
       "url": "wfs/",
       "featureType": "test:osm-fuel",
       "serverOptions": {},
@@ -195,10 +205,10 @@
     {
       "layerType": "wfs",
       "text": "Accidents",
+      "layerKey": "ACCIDENTS_WFS",
       "url": "https://pmstipperarydev.compass.ie/mapserver/?",
       "geometryProperty": "msGeometry",
       "featureType": "Accidents",
-      "layerKey": "ACCIDENTS_WFS",
       "openLayers": {
         "maxResolution": 1222.99245234375,
         "numZoomLevels": 12,
@@ -216,6 +226,7 @@
     {
       "layerType": "wms",
       "text": "Light Unit WMS",
+      "layerKey": "LIGHT_UNIT_WMS",
       "url": "https://plmonaghandev.compass.ie/mapserver/",
       "isBaseLayer": false,
       "isDefaultBaseLayer": false,
@@ -233,6 +244,7 @@
     {
       "layerType": "wfs",
       "text": "Light Unit WFS",
+      "layerKey": "LIGHT_UNIT_WFS",
       "url": "https://plmonaghandev.compass.ie/mapserver/?",
       "geometryProperty": "msGeometry",
       "featureType": "LightUnit",
@@ -244,6 +256,7 @@
     {
       "layerType": "vt",
       "text": "Light Unit VT",
+      "layerKey": "LIGHT_UNIT_VT",
       "url": "https://plmonaghandev.compass.ie/mapserver/?mode=tile&tilemode=gmap&tile={x}+{y}+{z}&layers=LightUnit&map.imagetype=mvt",
       "openLayers": {
         "visibility": false
@@ -256,6 +269,7 @@
     {
       "layerType": "vtwms",
       "text": "Light Unit VT WMS",
+      "layerKey": "LIGHT_UNIT_MVT",
       "url": "https://plmonaghandev.compass.ie/mapserver/?SERVICE=WMS&VERSION=1.3.0&REQUEST=GetMap&FORMAT=image%2Fpng&TRANSPARENT=true&LAYERS=LightUnit&TILED=false&CRS=EPSG%3A3857&WIDTH={width}&HEIGHT={height}&BBOX={bbox}&STYLES=Owner&FORMAT=mvt",
       "openLayers": {
         "visibility": true
@@ -265,7 +279,6 @@
       "styles": [ "LightUnit_Type.xml", "LightUnit_Owner.xml" ],
       "stylesForceNumericFilterVals": true,
       "gridXType": "cmv_examplegrid",
-      "layerKey": "LIGHT_UNIT_MVT",
       "tooltipsConfig": [
         {
           "alias": "Unit ID",

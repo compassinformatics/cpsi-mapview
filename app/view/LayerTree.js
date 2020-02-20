@@ -6,6 +6,7 @@ Ext.define('CpsiMapview.view.LayerTree', {
     xtype: 'cmv_layertree',
     requires: [
         'BasiGX.util.Map',
+        'BasiGX.util.Layer',
         'GeoExt.data.store.LayersTree',
         'CpsiMapview.plugin.BasicTreeColumnLegends',
         'CpsiMapview.plugin.TreeColumnContextMenu',
@@ -15,13 +16,6 @@ Ext.define('CpsiMapview.view.LayerTree', {
         'CpsiMapview.view.menuitem.LayerGrid',
         'CpsiMapview.plugin.TreeColumnStyleSwitcher'
     ],
-
-    viewModel: {
-        data: {
-            baseLayerGroupText: 'Base Layers',
-            overlayGroupText: 'Layers',
-        }
-    },
 
     // So that instantiation works without errors, might be changed during
     // instantiation of the LayerTree.
@@ -90,9 +84,9 @@ Ext.define('CpsiMapview.view.LayerTree', {
         me.callParent([cfg]);
 
         var mapComp = BasiGX.util.Map.getMapComponent();
-        var map = mapComp && mapComp.getMap();
-        if (map) {
-            me.setStore(me.makeLayerStore(map));
+        me.map = mapComp && mapComp.getMap();
+        if (me.map) {
+            me.setStore(me.makeLayerStore(me.map));
         } else {
             Ext.GlobalEvents.on('cmv-mapready', me.autoConnectToMap);
         }
@@ -121,29 +115,24 @@ Ext.define('CpsiMapview.view.LayerTree', {
      */
     autoConnectToMap: function() {
         var me = this;
-        var mapComp = BasiGX.util.Map.getMapComponent();
-        var map = mapComp && mapComp.getMap();
-        if (map) {
-            var store = me.makeLayerStore(map);
+        if (me.map) {
+            var store = me.makeLayerStore();
             me.setStore(store);
         }
     },
 
     /**
-     * Given a `ol.Map` this method will return an instance of the GeoExt class
-     * GeoExt.data.store.LayersTree, which will work on the topmost layergroup.
-     * In case this store is configured with `this.structureMode ===
-     * 'BASELAYER_OVERLAY'` the layers of the `ol.Map` are restructured and
-     * divided into two groups ('Base Layer' and 'Overlays'). This assures that
-     * the layers will appear in two folders in a connected TreePanel.
+     * This method will return an instance of the GeoExt class
+     * `GeoExt.data.store.LayersTree` based on the connected OL #map. The layers
+     * of the `ol.Map` are restructured and divided into groups based on the
+     * JSON tree structure loaded in #loadTreeStructure. This assures that
+     * the layers will appear in different folders in this TreePanel
+     * (as defined in the tree structure JSON).
      *
-     * @param  {ol.Map} map The map to create the store from.
      * @return {GeoExt.data.store.LayersTree} The created store.
      */
-    makeLayerStore: function(map) {
+    makeLayerStore: function() {
         var me = this;
-        var mapPanel = CpsiMapview.view.main.Map.guess();
-        var store;
 
         // filter function for LayerTreeStore to hide unwanted layers in tree
         var layerFilter = function (layerRec) {
@@ -156,82 +145,121 @@ Ext.define('CpsiMapview.view.LayerTree', {
             }
         };
 
-        if (me.structureMode === 'BASELAYER_OVERLAY') {
-            // re-groups the map layers by dividing them between base layers and
-            // overlays. Then recreates the LayerStore and applies it to this
-            // tree.
-            var regroupLayerStore = function () {
-                // create group layers
-                var finalLayerGroup = me.getGroupedLayers(map);
-                map.setLayerGroup(finalLayerGroup);
-                // create a new LayerStore from the grouped layers
-                var groupedStore = Ext.create('GeoExt.data.store.LayersTree', {
-                    layerGroup: map.getLayerGroup(),
-                    filters: layerFilter
-                });
-                me.setStore(groupedStore);
+        var treeJsonPromise = me.loadTreeStructure();
+        treeJsonPromise.then(function (treeJson) {
+            // get the root layer group holding the grouped map layers
+            var rootLayerGroup = me.getGroupedLayers(treeJson);
 
-                // expand all folders in this tree
-                me.expandAll();
-            };
-
-            // check if all layers have been loaded already
-            if (!me.initLayersAdded) {
-                mapPanel.on('cmv-init-layersadded', function () {
-                    regroupLayerStore();
-                });
-            } else {
-                regroupLayerStore();
-            }
-        } else {
-            store = Ext.create('GeoExt.data.store.LayersTree', {
-                layerGroup: map.getLayerGroup(),
+            me.map.setLayerGroup(rootLayerGroup);
+            // create a new LayerStore from the grouped layers
+            var groupedLayerTreeStore = Ext.create('GeoExt.data.store.LayersTree', {
+                layerGroup: me.map.getLayerGroup(),
                 filters: layerFilter
             });
-        }
+            me.setStore(groupedLayerTreeStore);
 
-        return store;
+            // expand all folders in this tree
+            me.expandAll();
+
+            // inform subscribers that LayerTree is ready
+            me.fireEvent('cmv-init-layertree', me);
+        });
+
+        // fallback in case loading the JSON tree structure failed:
+        // create a flat store holding all map layers at one hierarchy
+        treeJsonPromise.catch(function () {
+            Ext.Logger.warn('Loading of JSON structure for LayerTree failed' +
+                '- creating flat layer hierarchy as fallback');
+
+            var layerTreeStore = Ext.create('GeoExt.data.store.LayersTree', {
+                layerGroup: me.map.getLayerGroup(),
+                filters: layerFilter
+            });
+
+            me.setStore(layerTreeStore);
+
+            // inform subscribers that LayerTree is ready
+            me.fireEvent('cmv-init-layertree', me);
+        });
     },
 
     /**
-     * Re-groups the layers of the given map, so they are divided between base
-     * layers and overlays.
-     * For each type an OL layer group is created and aggregated in a
+     * Loads the JSON tree structure from 'resources/data/layers/tree.json'.
+     *
+     * @return {Ext.Promise} Promise resolving once the JSON is loaded
+     */
+    loadTreeStructure: function () {
+        return new Ext.Promise(function (resolve, reject) {
+            Ext.Ajax.request({
+                url: 'resources/data/layers/tree.json',
+                method: 'GET',
+                success: function(response) {
+                    var respJson = Ext.decode(response.responseText);
+                    resolve(respJson);
+                },
+                failure: function(response) {
+                    reject(response.status);
+                }
+            });
+        });
+    },
+
+    /**
+     * Re-groups the layers of the #map, so they are put into a folder hierarchy
+     * based on the given tree structure loaded in #loadTreeStructure.
+     * For each folder an OL layer group is created and gets aggregated in a
      * root layer group.
      *
-     * @param  {ol.Map} allLayers The map to get the grouped layers for
-     * @return {ol.layer.Group}   Root layer group holding groups for base layers and overlays
+     * @param  {Object} treeJson LayerTree structure
+     * @return {ol.layer.Group}  Root layer group
      */
-    getGroupedLayers: function (map) {
+    getGroupedLayers: function (treeJson) {
         var me = this;
-        var allLayers = map.getLayerGroup().getLayers().getArray();
-        var baseLayers = [];
-        var overlays = [];
 
-        // iterate over all layers and divide between base layers and overlays
-        Ext.each(allLayers, function (layer) {
-            if (layer.get('isBaseLayer') === true) {
-                baseLayers.push(layer);
-            } else {
-                overlays.push(layer);
-            }
-        });
-
-        var baseLayerGroup = new ol.layer.Group({
-            name: me.getViewModel().get('baseLayerGroupText'),
-            layers: baseLayers,
-            expanded: true
-        });
-        var overlayGroup = new ol.layer.Group({
-            name: me.getViewModel().get('overlayGroupText'),
-            layers: overlays
-        });
+        // wrapping all under the 'root' node aggregating all together
         var rootLayerGroup = new ol.layer.Group({
-            layers: [baseLayerGroup, overlayGroup],
-            visible: true
+            name: 'Root',
+            layers: []
         });
+        // recursively create the OL layer group by the given tree structure
+        me.createOlLayerGroups(treeJson.children, rootLayerGroup);
 
         return rootLayerGroup;
+    },
+
+    /**
+     * Creates recursively the OL layer groups for the given tree structure and
+     * puts them all togheter in the given parent group so they get folders in the LayerTree.
+     * Layers are directly put to the given parent group so they appear as "leafs" in the LayerTree.
+     *
+     * @param  {Object} treeNodesJson Child section of the LayerTree structure
+     * @param  {ol.layer.Group} parentGroup The parent group to put children (another groups / layers) into
+     */
+    createOlLayerGroups: function (treeNodeChilds, parentGroup) {
+        var me = this;
+        // go over all passed in tree childs nodes
+        Ext.each(treeNodeChilds, function (child) {
+            // layer groups --> folders in tree
+            if (child.isLeaf !== true) {
+                // create empty layer group for this level
+                var layerGroup = new ol.layer.Group({
+                    name: child.title,
+                    layers: [],
+                });
+
+                var parentLayers = parentGroup.getLayers();
+                parentLayers.insertAt(0, layerGroup);
+
+                // recursion
+                me.createOlLayerGroups(child.children, layerGroup);
+            } else {
+                // layers --> leafs in tree
+                var mapLyr = BasiGX.util.Layer.getLayerBy('layerKey', child.id);
+                if (mapLyr) {
+                    parentGroup.getLayers().insertAt(0, mapLyr);
+                }
+            }
+        });
     },
 
     /**

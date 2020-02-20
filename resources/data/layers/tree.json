@@ -1,0 +1,69 @@
+{
+  "id": "root",
+  "children": [
+    {
+      "id": "overlay-folder",
+      "title": "Layers",
+      "children": [
+        {
+          "id": "LIGHT_UNIT_MVT",
+          "isLeaf": true
+        },
+        {
+          "id": "LIGHT_UNIT_VT",
+          "isLeaf": true
+        },
+        {
+          "id": "LIGHT_UNIT_WFS",
+          "isLeaf": true
+        },
+        {
+          "id": "LIGHT_UNIT_WMS",
+          "isLeaf": true
+        },
+        {
+          "id": "ACCIDENTS_WFS",
+          "isLeaf": true
+        },
+        {
+          "id": "TIME_WFS_PROXY",
+          "isLeaf": true
+        },
+        {
+          "id": "WORKS_EXPORT_WMS_PROXY",
+          "isLeaf": true
+        },
+        {
+          "id": "LIGHT_UNIT_SWITCH_LAYER_FAR",
+          "isLeaf": true
+        },
+        {
+          "id": "GAS_WFS",
+          "isLeaf": true
+        },
+        {
+          "id": "COUNTRY_WFS",
+          "isLeaf": true
+        },
+        {
+          "id": "OSM_WMS",
+          "isLeaf": true
+        }
+      ]
+    },
+    {
+      "id": "base-folder",
+      "title": "Base Layers",
+      "children": [
+        {
+          "id": "OSM_BACKGROUND",
+          "isLeaf": true
+        },
+        {
+          "id": "GREY_BACKGROUND",
+          "isLeaf": true
+        }
+      ]
+    }
+  ]
+}
