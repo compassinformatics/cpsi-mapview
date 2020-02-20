@@ -33,7 +33,7 @@ Ext.define('CpsiMapview.view.button.DigitizeButton', {
 
     config: {
         /**
-         * The type to draw. Can be Point, Polygon or LineString
+         * The type to draw. Can be Point, Polygon, LineString or Circle
          */
         type: 'Point',
 
