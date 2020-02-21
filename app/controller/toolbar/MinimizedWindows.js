@@ -4,7 +4,7 @@
 Ext.define('CpsiMapview.controller.toolbar.MinimizedWindows', {
     extend: 'Ext.app.ViewController',
 
-    alias: 'controller.cmv_minimized_windows',
+    alias: 'controller.cmv_minimized_windows_toolbar',
 
     /**
      * Handles the toolbar related actions when minimizing a window

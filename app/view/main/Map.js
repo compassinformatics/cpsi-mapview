@@ -29,7 +29,7 @@ Ext.define('CpsiMapview.view.main.Map', {
         xtype: 'cmv_mapfooter',
         dock: 'bottom'
     }, {
-        xtype: 'cmv_minimized_windows',
+        xtype: 'cmv_minimized_windows_toolbar',
         dock: 'bottom'
     }],
 

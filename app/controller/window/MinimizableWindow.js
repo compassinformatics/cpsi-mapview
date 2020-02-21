@@ -15,7 +15,7 @@ Ext.define('CpsiMapview.controller.window.MinimizableWindow', {
         var minimizeTo = me.getMinimizeToolbar();
         if (minimizeTo == null) {
             Ext.log({
-                msg: 'No cmv_minimized_windows found. Window might just disappear.',
+                msg: 'No cmv_minimized_windows_toolbar found. Window might just disappear.',
                 level: 'warn'
             });
         }
@@ -34,7 +34,7 @@ Ext.define('CpsiMapview.controller.window.MinimizableWindow', {
         var me = this;
         var minimizeTo = me.getView().minimizeTo;
         if (minimizeTo == null) {
-            var toolbars = Ext.ComponentQuery.query('cmv_minimized_windows');
+            var toolbars = Ext.ComponentQuery.query('cmv_minimized_windows_toolbar');
             if (toolbars.length > 0) {
                 minimizeTo = toolbars[0];
             }

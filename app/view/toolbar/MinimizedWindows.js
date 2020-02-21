@@ -8,13 +8,13 @@
  */
 Ext.define('CpsiMapview.view.toolbar.MinimizedWindows', {
     extend: 'Ext.toolbar.Toolbar',
-    xtype: 'cmv_minimized_windows',
+    xtype: 'cmv_minimized_windows_toolbar',
 
     requires: [
         'CpsiMapview.controller.toolbar.MinimizedWindows'
     ],
 
-    controller: 'cmv_minimized_windows',
+    controller: 'cmv_minimized_windows_toolbar',
 
     name: null,
 
