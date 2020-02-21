@@ -7,7 +7,7 @@ Ext.define('CpsiMapview.controller.button.DigitizeButtonController', {
         'BasiGX.util.Map',
         'BasiGX.util.MsgBox',
         'Ext.menu.Menu',
-        'Ext.window.Window',
+        'CpsiMapview.view.window.MinimizableWindow',
         'GeoExt.component.FeatureRenderer',
         'GeoExt.data.store.Features'
     ],
@@ -571,7 +571,7 @@ Ext.define('CpsiMapview.controller.button.DigitizeButtonController', {
         if (me.win) {
             me.win.destroy();
         }
-        me.win = Ext.create('Ext.window.Window', {
+        me.win = Ext.create('CpsiMapview.view.window.MinimizableWindow', {
             height: 500,
             width: 300,
             layout: 'fit',

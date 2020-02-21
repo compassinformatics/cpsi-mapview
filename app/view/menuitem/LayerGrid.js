@@ -6,6 +6,7 @@
 Ext.define('CpsiMapview.view.menuitem.LayerGrid', {
     extend: 'Ext.menu.Item',
     xtype: 'cmv_menuitem_layergrid',
+
     /**
      * The connected layer for this item.
      *
@@ -81,8 +82,7 @@ Ext.define('CpsiMapview.view.menuitem.LayerGrid', {
                     xtype: gridXType
                 }]
             });
-
-            gridWindow = Ext.create('Ext.window.Window', windowConfig);
+            gridWindow = Ext.create('CpsiMapview.view.window.MinimizableWindow', windowConfig);
         }
         gridWindow.show();
     }
