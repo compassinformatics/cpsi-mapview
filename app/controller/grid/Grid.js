@@ -250,6 +250,7 @@ Ext.define('CpsiMapview.controller.grid.Grid', {
             store.startIndex = 0; // reset each time // me.startIndex;
         } else {
             store.pageSize = null;
+            store.currentPage = 1;
             store.startIndex = 0;
         }
 
