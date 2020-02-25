@@ -250,6 +250,7 @@ Ext.define('CpsiMapview.controller.grid.Grid', {
             store.startIndex = 0; // reset each time // me.startIndex;
         } else {
             store.pageSize = null;
+            store.currentPage = 1;
             store.startIndex = 0;
         }
 
@@ -310,6 +311,9 @@ Ext.define('CpsiMapview.controller.grid.Grid', {
             if (visibleColumnNames.indexOf(idProperty) === -1) {
                 visibleColumnNames.unshift(idProperty);
             }
+            // remove any null columns which may have been created by
+            // selection checkboxes for example
+            visibleColumnNames = Ext.Array.clean(visibleColumnNames);
             store.propertyName = visibleColumnNames.join(',');
         }
     },
