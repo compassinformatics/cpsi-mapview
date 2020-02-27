@@ -20,7 +20,9 @@ Ext.define('CpsiMapview.controller.window.MinimizableWindow', {
             });
         }
         me.getView().setVisible(false);
-        minimizeTo.fireEvent('addMinimizedWindow', me.getView());
+        if (minimizeTo) {
+            minimizeTo.fireEvent('addMinimizedWindow', me.getView());
+        }
         me.getView().isMinimized = true;
     },
 
@@ -49,7 +51,9 @@ Ext.define('CpsiMapview.controller.window.MinimizableWindow', {
         var me = this;
         if (me.getView().isMinimized) {
             var minimizeTo = me.getMinimizeToolbar();
-            minimizeTo.fireEvent('restoreFromWindow', me.getView());
+            if (minimizeTo) {
+                minimizeTo.fireEvent('restoreFromWindow', me.getView());
+            }
         }
     }
 });
