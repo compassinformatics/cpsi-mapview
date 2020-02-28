@@ -7,10 +7,11 @@
   },
   "scripts": {
     "lint": "eslint app",
-    "test": "npm run lint && karma start --single-run",
+    "jsonlint": "jsonlint -q resources/data/layers/default.json && jsonlint -q resources/data/layers/tree.json",
+    "test": "npm run lint && npm run jsonlint && karma start --single-run",
     "test:watch": "karma start karma-watch.conf.js"
   },
-  "repository": {
+  "repository": { 
     "type": "git",
     "url": "git+https://github.com/meggsimum/cpsi-mapview.git"
   },
@@ -21,7 +22,8 @@
   },
   "homepage": "https://github.com/meggsimum/cpsi-mapview#readme",
   "dependencies": {
-    "eslint": "^6.2.1"
+    "eslint": "^6.2.1",
+    "jsonlint": "^1.6.3"
   },
   "devDependencies": {
     "karma": "4.3.0",
