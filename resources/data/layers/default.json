@@ -254,19 +254,6 @@
       }
     },
     {
-      "layerType": "vt",
-      "text": "Light Unit VT",
-      "layerKey": "LIGHT_UNIT_VT",
-      "url": "https://plmonaghandev.compass.ie/mapserver/?mode=tile&tilemode=gmap&tile={x}+{y}+{z}&layers=LightUnit&map.imagetype=mvt",
-      "openLayers": {
-        "visibility": false
-      },
-      "format": "MVT",
-      "stylesBaseUrl": "https://plmonaghandev.compass.ie/resources/data/styling/",
-      "styles": [ "LightUnit_Type.xml", "LightUnit_Owner.xml" ],
-      "stylesForceNumericFilterVals": true
-    },
-    {
       "layerType": "vtwms",
       "text": "Light Unit VT WMS",
       "layerKey": "LIGHT_UNIT_MVT",
