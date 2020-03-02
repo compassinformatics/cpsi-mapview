@@ -14,12 +14,76 @@ Ext.define('CpsiMapview.view.button.SpatialQueryButton', {
         'CpsiMapview.controller.button.SpatialQueryButtonController'
     ],
 
+    statics: {
+        /**
+         * Finds the associated permanent layer of a layer that is
+         * used for the spatial query. This is done by comparing the
+         * layerKey of the layer to the associatedLayerKey property
+         * of the permanent layer.
+         * @param {ol.Map} map the map in which to look for the layer
+         * @param {String} layerKey layerKey property of the layer
+         */
+        findAssociatedPermanentLayer: function (map, layerKey) {
+            var layers = map.getLayers().getArray();
+            var associatedPermanentLayer = layers.find(function (layer) {
+                var isSpatialQueryLayer = layer.get('isSpatialQueryLayer');
+                var associatedLayerKey = layer.get('associatedLayerKey');
+                return isSpatialQueryLayer && (associatedLayerKey === layerKey);
+            });
+            return associatedPermanentLayer;
+        },
+
+        /**
+         * Clears the geometries of the associated permanent
+         * layer of a layer that is used for the spatial query.
+         * @param {ol.Map} map the map in which to look for the layer
+         * @param {String} layerKey layerKey property of the layer
+         */
+        clearAssociatedPermanentLayer: function (map, layerKey) {
+            var associatedPermanentLayer = CpsiMapview.view.button.SpatialQueryButton.findAssociatedPermanentLayer(map, layerKey);
+            if (associatedPermanentLayer !== undefined) {
+                associatedPermanentLayer.getSource().clear();
+            }
+        },
+
+        /**
+         * Shows the associated permanent layer of a layer that
+         * is used for the spatial query.
+         * @param {ol.Map} map the map in which to look for the layer
+         * @param {String} layerKey layerKey property of the layer
+         */
+        showAssociatedPermanentLayer: function (map, layerKey) {
+            var associatedPermanentLayer = CpsiMapview.view.button.SpatialQueryButton.findAssociatedPermanentLayer(map, layerKey);
+            if (associatedPermanentLayer !== undefined) {
+                associatedPermanentLayer.setVisible(true);
+            }
+        },
+
+        /**
+         * Hides the associated permanent layer of a layer that
+         * is used for the spatial query.
+         * @param {ol.Map} map the map in which to look for the layer
+         * @param {String} layerKey layerKey property of the layer
+         */
+        hideAssociatedPermanentLayer: function (map, layerKey) {
+            var associatedPermanentLayer = CpsiMapview.view.button.SpatialQueryButton.findAssociatedPermanentLayer(map, layerKey);
+            if (associatedPermanentLayer !== undefined) {
+                associatedPermanentLayer.setVisible(false);
+            }
+        },
+    },
+
     config: {
         /**
          * The name of the layer to query
          * This property will be ignored if queryLayer is defined
          */
-        queryLayerName: null
+        queryLayerName: null,
+
+        /**
+         * The layerKey property of the layer to query
+         */
+        vectorLayerKey: null
     },
 
     /**
@@ -61,6 +125,12 @@ Ext.define('CpsiMapview.view.button.SpatialQueryButton', {
     queryFeatures: new ol.Collection(),
 
     /**
+     * If true, the filter geometry will be displayed until filter was cleared
+     * If false, the filter geometry will disappear after filtering
+     */
+    displayPermanently: false,
+
+    /**
      * Enable toggle
      */
     enableToggle: true,
@@ -70,7 +140,10 @@ Ext.define('CpsiMapview.view.button.SpatialQueryButton', {
      * to their corresponding controller methods
      */
     listeners: {
-        toggle: 'onSpatialQueryBtnToggle'
+        toggle: 'onSpatialQueryBtnToggle',
+        clearAssociatedPermanentLayer: 'onClearAssociatedPermanentLayer',
+        hideAssociatedPermanentLayer: 'onHideAssociatedPermanentLayer',
+        showAssociatedPermanentLayer: 'onShowAssociatedPermanentLayer',
     },
 
     bind: {
@@ -83,6 +156,7 @@ Ext.define('CpsiMapview.view.button.SpatialQueryButton', {
     * @cfg {Boolean} triggerWfsRequest Whether or not to trigger a Wfs GetFeatures request
     */
     triggerWfsRequest: true,
+
     /**
      * Initializes this component
      */

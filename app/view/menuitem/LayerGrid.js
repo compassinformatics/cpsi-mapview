@@ -80,7 +80,24 @@ Ext.define('CpsiMapview.view.menuitem.LayerGrid', {
                 title: title,
                 items: [{
                     xtype: gridXType
-                }]
+                }],
+                listeners: {
+                    hide: function () {
+                        var me = this;
+                        var queryButton = me.down('cmv_spatial_query_button');
+                        if (queryButton !== null) {
+                            queryButton.fireEvent('hideAssociatedPermanentLayer');
+                            queryButton.toggle(false);
+                        }
+                    },
+                    show: function () {
+                        var me = this;
+                        var queryButton = me.down('cmv_spatial_query_button');
+                        if (queryButton !== null) {
+                            queryButton.fireEvent('showAssociatedPermanentLayer');
+                        }
+                    }
+                }
             });
             gridWindow = Ext.create('CpsiMapview.view.window.MinimizableWindow', windowConfig);
         }
