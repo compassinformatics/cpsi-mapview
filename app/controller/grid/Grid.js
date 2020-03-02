@@ -56,9 +56,9 @@ Ext.define('CpsiMapview.controller.grid.Grid', {
                 zoom: zoom - 1,
                 duration: duration / 2
             }, {
-            zoom: zoom,
-            duration: duration / 2
-        }
+                zoom: zoom,
+                duration: duration / 2
+            }
         );
     },
 
