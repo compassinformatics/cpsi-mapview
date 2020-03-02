@@ -9,24 +9,28 @@ Ext.define('CpsiMapview.controller.button.SpatialQueryButtonController', {
     /**
      * The {ol.interaction.Draw} used to draw the geometry used in the spatial
      * query
+     * @property{ol.interaction.Draw}
      */
     drawQueryInteraction: null,
 
     /**
      * The {ol.interaction.Modify} used to modify the geometry used in the spatial
      * query
+     * @property{ol.interaction.Modify}
      */
     modifiyQueryInteraction: null,
 
     /**
      * The {ol.interaction.Snap} used to snap to the points of the geometry used
      * in the spatial query
+     * @property{ol.interaction.Snap}
      */
     snapQueryInteraction: null,
 
     /**
      * The layer that contains the geometry used in the spatial query, if
      * displayPermanently is set to true
+     * @property{ol.layer.Vector}
      */
     permanentLayer: null,
 
@@ -134,8 +138,8 @@ Ext.define('CpsiMapview.controller.button.SpatialQueryButtonController', {
             if (view.displayPermanently) {
                 me.modifiyQueryInteraction.setActive(false);
                 me.snapQueryInteraction.setActive(false);
-                me.drawQueryInteraction.on('drawend', me.getFeaturesFromSourceAndTriggerWfs, me);
-                me.modifiyQueryInteraction.on('modifyend', me.getFeaturesFromSourceAndTriggerWfs, me);
+                me.drawQueryInteraction.un('drawend', me.getFeaturesFromSourceAndTriggerWfs, me);
+                me.modifiyQueryInteraction.un('modifyend', me.getFeaturesFromSourceAndTriggerWfs, me);
             } else {
                 view.queryFeatures.un('add', me.getGeometryFromPolygonAndTriggerWfs, me);
             }
