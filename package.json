@@ -21,7 +21,9 @@
   },
   "homepage": "https://github.com/meggsimum/cpsi-mapview#readme",
   "dependencies": {
-    "eslint": "^6.2.1"
+    "eslint": "^6.2.1",
+    "geostyler-openlayers-parser": "^2.0.1",
+    "geostyler-sld-parser": "^2.0.0"
   },
   "devDependencies": {
     "karma": "4.3.0",
