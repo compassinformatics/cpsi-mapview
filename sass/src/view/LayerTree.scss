@@ -8,3 +8,9 @@
     opacity: 0.7;
     font-style: italic;
 }
+
+.cpsi-tree-node-baselayer {
+    .x-tree-checkbox {
+        background-image: url(images/form/radio.png);
+    }
+}
