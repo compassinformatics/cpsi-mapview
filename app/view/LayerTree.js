@@ -160,7 +160,7 @@ Ext.define('CpsiMapview.view.LayerTree', {
 
             me.getRootNode().cascade(function (node) {
                 var data = node.getData();
-                if (typeof data.get === 'function') {
+                if (data.leaf) {
                     var isBaseLayer =  data.get('isBaseLayer');
                     if (isBaseLayer) {
                         node.addCls('cpsi-tree-node-baselayer');
