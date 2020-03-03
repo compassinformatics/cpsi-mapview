@@ -78,7 +78,7 @@ Ext.define('CpsiMapview.view.LayerTree', {
      *
      * @param  {Object} cfg The configuration of the tree which we may change.
      */
-    constructor: function(cfg) {
+    constructor: function (cfg) {
         var me = this;
 
         me.callParent([cfg]);
@@ -113,7 +113,7 @@ Ext.define('CpsiMapview.view.LayerTree', {
      *
      * TODO this may change to use the passed map view from the mapready event.
      */
-    autoConnectToMap: function() {
+    autoConnectToMap: function () {
         var me = this;
         if (me.map) {
             var store = me.makeLayerStore();
@@ -131,7 +131,7 @@ Ext.define('CpsiMapview.view.LayerTree', {
      *
      * @return {GeoExt.data.store.LayersTree} The created store.
      */
-    makeLayerStore: function() {
+    makeLayerStore: function () {
         var me = this;
 
         // filter function for LayerTreeStore to hide unwanted layers in tree
@@ -157,6 +157,13 @@ Ext.define('CpsiMapview.view.LayerTree', {
                 filters: layerFilter
             });
             me.setStore(groupedLayerTreeStore);
+
+            me.getRootNode().cascade(function (node) {
+                var data = node.getData();
+                if (data.leaf && data.get('isBaseLayer')) {
+                    node.addCls('cpsi-tree-node-baselayer');
+                }
+            });
 
             // expand all folders in this tree
             me.expandAll();
@@ -193,11 +200,11 @@ Ext.define('CpsiMapview.view.LayerTree', {
             Ext.Ajax.request({
                 url: 'resources/data/layers/tree.json',
                 method: 'GET',
-                success: function(response) {
+                success: function (response) {
                     var respJson = Ext.decode(response.responseText);
                     resolve(respJson);
                 },
-                failure: function(response) {
+                failure: function (response) {
                     reject(response.status);
                 }
             });
