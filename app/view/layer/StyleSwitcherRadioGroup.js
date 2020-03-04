@@ -151,6 +151,19 @@ Ext.define('CpsiMapview.view.layer.StyleSwitcherRadioGroup', {
             } else if (layer.get('isWfs') || layer.get('isVt')) {
 
                 var sldUrl = layer.get('stylesBaseUrl') + newStyle;
+                // use style with label if one was specified
+                if (layer.get('labelsActive') === true && !Ext.isEmpty(layer.get('labelStyles'))) {
+                    var labelStyleObj = layer.get('labelStyles').find(function(style) {
+                        return style.refStyle === newStyle;
+                    });
+                    if (labelStyleObj) {
+                        sldUrl = layer.get('stylesBaseUrl') + labelStyleObj.style;
+                        layer.set('activeLabelStyle', sldUrl);
+                    } else {
+                        layer.set('activeLabelStyle', undefined);
+                    }
+
+                }
                 // transform filter values to numbers ('1' => 1)
                 var forceNumericFilterVals = layer.get('stylesForceNumericFilterVals');
                 // load and parse SLD and apply it to layer
