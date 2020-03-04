@@ -198,6 +198,7 @@ Ext.define('CpsiMapview.view.menuitem.LayerLabels', {
 
             if (url) {
                 layer.set('activeLabelStyle', url);
+                layer.set('labelsActive', true);
                 LayerFactory.loadSld(layer, url, forceNumericFilterVals);
             }
 
@@ -211,6 +212,7 @@ Ext.define('CpsiMapview.view.menuitem.LayerLabels', {
 
             if (url) {
                 layer.set('activeLabelStyle', undefined);
+                layer.set('labelsActive', false);
                 LayerFactory.loadSld(layer, url, forceNumericFilterVals);
             }
 
