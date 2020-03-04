@@ -69,8 +69,8 @@ Ext.define('CpsiMapview.view.menuitem.LayerLabels', {
         var me = this;
 
         me.clientSideStyle = (me.layer && (
-                me.layer.getSource() instanceof ol.source.VectorTile
-                || me.layer.getSource() instanceof ol.source.Vector
+            me.layer.getSource() instanceof ol.source.VectorTile
+            || me.layer.getSource() instanceof ol.source.Vector
         ));
         // try to detect the 'labelClassName' property of a WMS layer
         if (me.layer && (me.layer.getSource() instanceof ol.source.TileWMS ||
