@@ -110,7 +110,7 @@ Ext.define('CpsiMapview.factory.Layer', {
             // indicator if a refresh option is offered in layer context menu
             var allowRefresh = layerConf.refreshLayerOption !== false;
             mapLayer.set('refreshLayerOption', allowRefresh);
-            // indicator if a label option is drawn in layer context menu
+            // indicator if a label option is drawn in layer context menu for wms layers
             mapLayer.set('labelClassName', layerConf.labelClassName);
             // indicator if an opacity slider is offered in layer context menu
             var allowOpacitySlider = layerConf.opacitySlider !== false;
@@ -455,7 +455,10 @@ Ext.define('CpsiMapview.factory.Layer', {
             isNumericDependent: Ext.isDefined(layerConf.numericitem),
             styles: layerConf.styles,
             stylesBaseUrl: layerConf.stylesBaseUrl || '',
-            stylesForceNumericFilterVals: layerConf.stylesForceNumericFilterVals
+            labelStyles: layerConf.labelStyles,
+            stylesForceNumericFilterVals: layerConf.stylesForceNumericFilterVals,
+            sldUrl: layerConf.sldUrl,
+            sldUrlLabel: layerConf.sldUrlLabel
         };
         olLayerConf = Ext.apply(olLayerConf, olLayerProps);
 
@@ -671,8 +674,11 @@ Ext.define('CpsiMapview.factory.Layer', {
             isVt: true,
             styles: layerConf.styles,
             stylesBaseUrl: layerConf.stylesBaseUrl || '',
+            labelStyles: layerConf.labelStyles,
             stylesForceNumericFilterVals: layerConf.stylesForceNumericFilterVals,
-            toolTipConfig: layerConf.tooltipsConfig
+            toolTipConfig: layerConf.tooltipsConfig,
+            sldUrl: layerConf.sldUrl,
+            sldUrlLabel: layerConf.sldUrlLabel
         };
         olLayerConf = Ext.apply(olLayerConf, olLayerProps);
 
