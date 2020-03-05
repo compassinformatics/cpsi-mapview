@@ -80,9 +80,7 @@ Ext.define('CpsiMapview.controller.toolbar.CircleSelectionToolbar', {
      */
     init: function () {
         var me = this;
-        // geom.setRadius actually is the diameter
-        // therefore we have to multiply by 2
-        var radius = me.getCurrentRadius() * 2;
+        var radius = me.getCurrentRadius();
         me.getViewModel().set('radius', radius);
         me.setCurrentUnit();
     }
