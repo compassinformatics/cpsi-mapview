@@ -128,6 +128,65 @@ Ext.define('CpsiMapview.view.main.Map', {
     },
 
     /**
+     * Applies the default values to each layer
+     * @param {*} layerConf
+     * @param {*} defaults
+     */
+    applyDefaultsToLayerConf : function(layerConf, defaults){
+
+        var newLayerConf = {};
+
+        // general default
+        var generalDefaults = defaults['general'];
+        Ext.apply(newLayerConf, generalDefaults);
+
+        // layer type default
+        var typeDefaults = defaults[layerConf.layerType];
+        Ext.apply(newLayerConf,typeDefaults);
+
+        // actual config
+        Ext.apply(newLayerConf, layerConf);
+        return newLayerConf;
+    },
+
+    /**
+     * Takes the configuration file of the application
+     * and applies the default values to each layer definition.
+     * @param {*} layerJson
+     */
+    applyDefaultsToApplicationConf: function(layerJson){
+        var me = this;
+
+        var defaults = layerJson.defaults;
+
+        var newConfiguration = {'layers':[]};
+
+        // loop through layers and apply defaults
+        Ext.each(layerJson.layers, function (layerConf) {
+
+            var newLayerConf = me.applyDefaultsToLayerConf(layerConf, defaults);
+
+            // additionally update sublayers of switch layers
+            if(newLayerConf.layerType == 'switchlayer'){
+
+                var updatedSubLayers = [];
+                // loop through sublayers and apply defaults
+                Ext.each(newLayerConf.layers, function(subLayerConf){
+
+                    var newSubLayerConf = me.applyDefaultsToLayerConf( subLayerConf, defaults);
+                    updatedSubLayers.push(newSubLayerConf);
+                });
+                // replace old layers with updated layers
+                newLayerConf.layers = updatedSubLayers;
+            }
+            // add updated layer config to new configuration file
+            newConfiguration.layers.push(newLayerConf);
+        });
+        return newConfiguration;
+    },
+
+
+    /**
      * @private
      */
     initComponent: function () {
@@ -138,8 +197,9 @@ Ext.define('CpsiMapview.view.main.Map', {
             url: 'resources/data/layers/default.json',
             success: function (response) {
                 var layerJson = Ext.decode(response.responseText);
+                var newConfiguration = me.applyDefaultsToApplicationConf(layerJson);
 
-                Ext.each(layerJson.layers, function (layerConf) {
+                Ext.each(newConfiguration.layers, function (layerConf) {
                     var layer = LayerFactory.createLayer(layerConf);
                     if (layer) {
                         me.olMap.addLayer(layer);
