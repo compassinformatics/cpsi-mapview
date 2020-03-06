@@ -40,17 +40,34 @@ Ext.define('CpsiMapview.view.layer.StyleSwitcherRadioGroup', {
 
         // create a 'radiofield' for each style connected to the layer
         Ext.each(layerStyles, function (layerStyle) {
+
+            var layerTitle;
+            var layerName;
+
+            // check if style has title property
+            if(layerStyle['title'] && layerStyle['name']){
+                // has title property
+                layerTitle = layerStyle['title'];
+                layerName = layerStyle['name'];
+            } else{
+                // does not have title property
+                // title generated from stlye name
+                layerTitle = me.getLayerStyleLabel(layerStyle);
+                layerName = layerStyle;
+            }
+
             radioButtons.push({
                 name: 'sldstyle' + salt,
-                boxLabel: me.getLayerStyleLabel(layerStyle),
-                inputValue: layerStyle,
-                checked: me.getCheckedState(layerStyle),
+                boxLabel: layerTitle,
+                inputValue: layerName,
+                checked: me.getCheckedState(layerName),
                 listeners: {
                     change: me.onStyleChange,
                     scope: me
                 }
             });
-        });
+        }
+        );
 
         me.items = radioButtons;
 
@@ -59,7 +76,7 @@ Ext.define('CpsiMapview.view.layer.StyleSwitcherRadioGroup', {
 
     /**
      * Returns the human readable label for the given style.
-     * If WFS we remove the '_' and the .xml file ending. For other layer types
+     * If WFS or VT we remove the '_' and the .xml file ending. For other layer types
      * we return the input value.
      *
      * @param  {String} layerStyle The style name to get the label for

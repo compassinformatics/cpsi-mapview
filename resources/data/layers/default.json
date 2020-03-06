@@ -108,7 +108,12 @@
       "text": "GAS WFS",
       "layerKey": "GAS_WFS",
       "featureType": "osm:osm-fuel",
-      "sldUrl": "resources/data/styling/Test_Gas.xml",
+      "stylesBaseUrl": "resources/data/styling/",
+      "styles": [
+        "Test_Gas.xml",
+        {"name":"Test_Alternative_Gas_Style.xml", 
+        "title": "CUSTOM TITLE"}
+      ],
       "geomFieldName": "geometry",
       "namespaceDefinitions": {
         "osm": "http://terrestris"
@@ -250,16 +255,15 @@
         "singleTile": false,
         "visibility": false
       },
-      "styles": [
-        "Height",
-        "Owner",
-        "Type",
-        "InterfaceBox",
-        "IsMetered",
-        "Materials",
-        "Sources",
-        "SwitchingProfiles"
-      ],
+      "styles": [ "Height", 
+                  {"name":"Owner", 
+                  "title": "CUSTOM TITLE"},  
+                  "Type", 
+                  "InterfaceBox", 
+                  "IsMetered", 
+                  "Materials", 
+                  "Sources", 
+                  "SwitchingProfiles" ],
       "labelClassName": "labels"
     },
     {
@@ -283,10 +287,11 @@
         "visibility": true
       },
       "stylesBaseUrl": "https://plmonaghandev.compass.ie/resources/data/styling/",
-      "styles": [
-        "LightUnit_Type.xml",
-        "LightUnit_Owner.xml"
-      ],
+      "styles": [ "LightUnit_Type.xml", 
+                  {"name":"LightUnit_Owner.xml", 
+                  "title": "CUSTOM TITLE"} ],
+      "stylesForceNumericFilterVals": true,
+      "gridXType": "cmv_examplegrid",
       "tooltipsConfig": [
         {
           "alias": "Unit ID",
