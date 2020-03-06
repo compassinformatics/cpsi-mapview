@@ -157,12 +157,13 @@ Ext.define('CpsiMapview.view.layer.StyleSwitcherRadioGroup', {
                  * has a non-empty label property.
                  * @param {Array<{label: String}>} styles Styles object from layerConfig to check
                  */
-                function hasLabels(styles) {
+                var hasLabels = function (styles) {
                     hasLabels = styles.some(function (style) {
                         return !Ext.isEmpty(style.label);
                     });
                     return hasLabels;
-                }
+                };
+
                 // use style with label if one was specified
                 if (layer.get('labelsActive') === true && !Ext.isEmpty(layer.get('styles')) && hasLabels(layer.get('styles'))) {
                     var styleObj = layer.get('styles').find(function (style) {

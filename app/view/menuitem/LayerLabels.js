@@ -326,7 +326,7 @@ Ext.define('CpsiMapview.view.menuitem.LayerLabels', {
      * @param {Array<{label: String}>} styles Styles object from layerConfig to check
      */
     hasLabels: function (styles) {
-        hasLabels = styles.some(function (style) {
+        var hasLabels = styles.some(function (style) {
             return !Ext.isEmpty(style.label);
         });
         return hasLabels;
