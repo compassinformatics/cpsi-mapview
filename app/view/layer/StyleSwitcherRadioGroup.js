@@ -45,11 +45,11 @@ Ext.define('CpsiMapview.view.layer.StyleSwitcherRadioGroup', {
             var layerName;
 
             // check if style has title property
-            if(layerStyle['title'] && layerStyle['name']){
+            if (layerStyle['title'] && layerStyle['name']) {
                 // has title property
                 layerTitle = layerStyle['title'];
                 layerName = layerStyle['name'];
-            } else{
+            } else {
                 // does not have title property
                 // title generated from stlye name
                 layerTitle = me.getLayerStyleLabel(layerStyle);
@@ -151,13 +151,25 @@ Ext.define('CpsiMapview.view.layer.StyleSwitcherRadioGroup', {
             } else if (layer.get('isWfs') || layer.get('isVt')) {
 
                 var sldUrl = layer.get('stylesBaseUrl') + newStyle;
-                // use style with label if one was specified
-                if (layer.get('labelsActive') === true && !Ext.isEmpty(layer.get('labelStyles'))) {
-                    var labelStyleObj = layer.get('labelStyles').find(function(style) {
-                        return style.refStyle === newStyle;
+
+                /**
+                 * Helper function to check if at least one style
+                 * has a non-empty label property.
+                 * @param {Array<{label: String}>} styles Styles object from layerConfig to check
+                 */
+                function hasLabels(styles) {
+                    hasLabels = styles.some(function (style) {
+                        return !Ext.isEmpty(style.label);
                     });
-                    if (labelStyleObj) {
-                        sldUrl = layer.get('stylesBaseUrl') + labelStyleObj.style;
+                    return hasLabels;
+                }
+                // use style with label if one was specified
+                if (layer.get('labelsActive') === true && !Ext.isEmpty(layer.get('styles')) && hasLabels(layer.get('styles'))) {
+                    var styleObj = layer.get('styles').find(function (style) {
+                        return style.name === newStyle;
+                    });
+                    if (styleObj && !Ext.isEmpty(styleObj.label)) {
+                        sldUrl = layer.get('stylesBaseUrl') + styleObj.label;
                         layer.set('activeLabelStyle', sldUrl);
                     } else {
                         layer.set('activeLabelStyle', undefined);

@@ -39,7 +39,7 @@ Ext.define('CpsiMapview.view.menuitem.LayerLabels', {
 
     /**
      * Is true if all multi style properties
-     * are given for labeling (styles, stylesBaseUrl, labelStyles).
+     * are given for labeling (styles, styles.label, stylesBaseUrl).
      * False otherwise.
      * @property{Boolean}
      * @readonly
@@ -86,11 +86,11 @@ Ext.define('CpsiMapview.view.menuitem.LayerLabels', {
         if (me.clientSideStyle) {
             me.hasSingleStyle = !Ext.isEmpty(me.layer.get('sldUrl')) && !Ext.isEmpty(me.layer.get('sldUrlLabel'));
             me.hasMultiStyle = (
-                !Ext.isEmpty(me.layer.get('labelStyles'))
-                && !Ext.isEmpty(me.layer.get('stylesBaseUrl'))
+                !Ext.isEmpty(me.layer.get('stylesBaseUrl'))
                 && !Ext.isEmpty(me.layer.get('styles'))
+                && me.hasLabels(me.layer.get('styles'))
             );
-            // if neither sldUrlLabel nor labelStyles are defined, labeling is not enabled
+            // if neither sldUrlLabel nor styles[x].label are defined, labeling is not enabled
             me.setHidden(!me.hasSingleStyle && !me.hasMultiStyle);
         } else {
             me.setHidden(Ext.isEmpty(me.labelClassName));
@@ -272,7 +272,7 @@ Ext.define('CpsiMapview.view.menuitem.LayerLabels', {
         var me = this;
         var layer = me.layer;
         var sldUrlLabel = layer.get('sldUrlLabel');
-        var labelStyles = layer.get('labelStyles');
+        var styles = layer.get('styles');
         var stylesBaseUrl = layer.get('stylesBaseUrl');
 
         var labelStyleUrls = [];
@@ -280,8 +280,10 @@ Ext.define('CpsiMapview.view.menuitem.LayerLabels', {
             labelStyleUrls.push(sldUrlLabel);
         }
         if (me.hasMultiStyle) {
-            Ext.each(labelStyles, function(style) {
-                labelStyleUrls.push(stylesBaseUrl + style.style);
+            Ext.each(styles, function(style) {
+                if (!Ext.isEmpty(style.label)) {
+                    labelStyleUrls.push(stylesBaseUrl + style.label);
+                }
             });
         }
         return labelStyleUrls;
@@ -296,21 +298,37 @@ Ext.define('CpsiMapview.view.menuitem.LayerLabels', {
     getLabelStyleUrl: function (activatedStyle) {
         var me = this;
         var stylesBaseUrl = me.layer.get('stylesBaseUrl');
-        var labelStyles = me.layer.get('labelStyles');
+        var styles = me.layer.get('styles');
 
         var labelStyle;
         if (!me.hasMultiStyle) {
             return;
         }
 
-        labelStyle = labelStyles.find(function (style) {
-            return style.refStyle === activatedStyle;
+        labelStyle = styles.find(function (style) {
+            return style.name === activatedStyle;
         });
 
         if (!labelStyle) {
             return;
         }
 
-        return stylesBaseUrl + labelStyle.style;
+        if (Ext.isEmpty(labelStyle.label)) {
+            return;
+        }
+
+        return stylesBaseUrl + labelStyle.label;
+    },
+
+    /**
+     * Helper function to check if at least one style
+     * has a non-empty label property.
+     * @param {Array<{label: String}>} styles Styles object from layerConfig to check
+     */
+    hasLabels: function (styles) {
+        hasLabels = styles.some(function (style) {
+            return !Ext.isEmpty(style.label);
+        });
+        return hasLabels;
     }
 });

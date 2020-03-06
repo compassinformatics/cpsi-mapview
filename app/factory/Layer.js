@@ -455,7 +455,6 @@ Ext.define('CpsiMapview.factory.Layer', {
             isNumericDependent: Ext.isDefined(layerConf.numericitem),
             styles: layerConf.styles,
             stylesBaseUrl: layerConf.stylesBaseUrl || '',
-            labelStyles: layerConf.labelStyles,
             stylesForceNumericFilterVals: layerConf.stylesForceNumericFilterVals,
             sldUrl: layerConf.sldUrl,
             sldUrlLabel: layerConf.sldUrlLabel
@@ -674,7 +673,6 @@ Ext.define('CpsiMapview.factory.Layer', {
             isVt: true,
             styles: layerConf.styles,
             stylesBaseUrl: layerConf.stylesBaseUrl || '',
-            labelStyles: layerConf.labelStyles,
             stylesForceNumericFilterVals: layerConf.stylesForceNumericFilterVals,
             toolTipConfig: layerConf.tooltipsConfig,
             sldUrl: layerConf.sldUrl,

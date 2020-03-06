@@ -111,8 +111,11 @@
       "stylesBaseUrl": "resources/data/styling/",
       "styles": [
         "Test_Gas.xml",
-        {"name":"Test_Alternative_Gas_Style.xml", 
-        "title": "CUSTOM TITLE"}
+        {
+          "name": "Test_Alternative_Gas_Style.xml",
+          "title": "CUSTOM TITLE",
+          "label": "Test_Alternative_Gas_Style_label.xml"
+        }
       ],
       "geomFieldName": "geometry",
       "namespaceDefinitions": {
@@ -255,15 +258,19 @@
         "singleTile": false,
         "visibility": false
       },
-      "styles": [ "Height", 
-                  {"name":"Owner", 
-                  "title": "CUSTOM TITLE"},  
-                  "Type", 
-                  "InterfaceBox", 
-                  "IsMetered", 
-                  "Materials", 
-                  "Sources", 
-                  "SwitchingProfiles" ],
+      "styles": [
+        "Height",
+        {
+          "name": "Owner",
+          "title": "CUSTOM TITLE"
+        },
+        "Type",
+        "InterfaceBox",
+        "IsMetered",
+        "Materials",
+        "Sources",
+        "SwitchingProfiles"
+      ],
       "labelClassName": "labels"
     },
     {
@@ -287,9 +294,13 @@
         "visibility": true
       },
       "stylesBaseUrl": "https://plmonaghandev.compass.ie/resources/data/styling/",
-      "styles": [ "LightUnit_Type.xml", 
-                  {"name":"LightUnit_Owner.xml", 
-                  "title": "CUSTOM TITLE"} ],
+      "styles": [
+        "LightUnit_Type.xml",
+        {
+          "name": "LightUnit_Owner.xml",
+          "title": "CUSTOM TITLE"
+        }
+      ],
       "stylesForceNumericFilterVals": true,
       "gridXType": "cmv_examplegrid",
       "tooltipsConfig": [
