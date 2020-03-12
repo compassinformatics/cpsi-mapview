@@ -402,7 +402,7 @@ Ext.define('CpsiMapview.factory.Layer', {
                     // on occasion a WFS response from MapServer is empty with no error
                     // but with HTTP status 200 (for unknown reasons)
                     // fail here to avoid OL parsing errors
-                    if (xhr.responseText === "") {
+                    if (xhr.responseText === '') {
                         onError();
                     } else {
                         if (contentType.indexOf('application/json') !== -1) {
