@@ -10,7 +10,7 @@
           "isLeaf": true
         },
         {
-          "id": "LIGHT_UNIT_VT",
+          "id": "RUINS_WFS",
           "isLeaf": true
         },
         {
@@ -18,11 +18,11 @@
           "isLeaf": true
         },
         {
-          "id": "LIGHT_UNIT_WMS",
+          "id": "BOREHOLE_WMS",
           "isLeaf": true
         },
         {
-          "id": "ACCIDENTS_WFS",
+          "id": "BOREHOLE_WFS",
           "isLeaf": true
         },
         {
@@ -35,6 +35,14 @@
         },
         {
           "id": "LIGHT_UNIT_SWITCH_LAYER_FAR",
+          "isLeaf": true
+        },
+        {
+          "id": "WATERBODY_SWITCH_LAYER_FAR",
+          "isLeaf": true
+        },
+        {
+          "id": "WATERBODY_SWITCH_LAYER_CLOSE",
           "isLeaf": true
         },
         {
