@@ -109,7 +109,9 @@ Ext.define('CpsiMapview.view.grid.Grid', {
                 spatialOperator: 'intersect',
                 toggleGroup: 'map',
                 triggerWfsRequest: false,
+                displayPermanently: true,
                 glyph: 'xf044@FontAwesome',
+                vectorLayerKey: '{vectorLayerKey}',
                 listeners: {
                     'cmv-spatial-query-filter': 'onSpatialFilter'
                 }

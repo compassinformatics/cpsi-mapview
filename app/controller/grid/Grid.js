@@ -325,8 +325,16 @@ Ext.define('CpsiMapview.controller.grid.Grid', {
     * @private
     */
     clearFilters: function () {
-        this.spatialFilter = null;
-        this.getView().getPlugin('gridfilters').clearFilters();
+        var me = this;
+        var view = me.getView();
+        me.spatialFilter = null;
+        view.getPlugin('gridfilters').clearFilters();
+
+        var spatialQueryButton = view.down('cmv_spatial_query_button');
+        if (spatialQueryButton !== null) {
+            spatialQueryButton.fireEvent('clearAssociatedPermanentLayer');
+            spatialQueryButton.toggle(false);
+        }
     },
 
     /**
@@ -340,11 +348,13 @@ Ext.define('CpsiMapview.controller.grid.Grid', {
 
         var gridStoreType = viewModel.get('gridStoreType');
         var layerName = viewModel.get('gridLayerName');
+        var vectorLayerKey = viewModel.get('vectorLayerKey');
 
         // TODO check why we can't simply add a {'queryLayerName'} binding in
         // the grid view - already created ?
         var spatialQueryButton = viewModel.getView().down('cmv_spatial_query_button');
         spatialQueryButton.setQueryLayerName(layerName);
+        spatialQueryButton.setVectorLayerKey(vectorLayerKey);
 
         // dynamically create the store based on the config setting
 

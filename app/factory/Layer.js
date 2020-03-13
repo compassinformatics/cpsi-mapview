@@ -174,18 +174,17 @@ Ext.define('CpsiMapview.factory.Layer', {
         var resolution = mapPanel.olMap.getView().getResolution();
 
         var resultLayer;
+        var olVisibility = { openLayers: { visibility: layerConf.visibility } };
         if (resolution < layerConf.switchResolution) {
             var confBelowSwitchResolution = layerConf.layers[1];
             // apply overall visibility to sub layer
-            confBelowSwitchResolution.openLayers.visibility =
-                layerConf.visibility;
+            Ext.Object.merge(confBelowSwitchResolution, olVisibility);
             resultLayer = LayerFactory.createLayer(confBelowSwitchResolution);
             resultLayer.set('currentSwitchType', 'below_switch_resolution');
         } else {
             var confAboveSwitchResolution = layerConf.layers[0];
             // apply overall visibility to sub layer
-            confAboveSwitchResolution.openLayers.visibility =
-                layerConf.visibility;
+            Ext.Object.merge(confAboveSwitchResolution, olVisibility);
             resultLayer = LayerFactory.createLayer(confAboveSwitchResolution);
             resultLayer.set('currentSwitchType', 'above_switch_resolution');
         }
@@ -399,14 +398,21 @@ Ext.define('CpsiMapview.factory.Layer', {
                     var contentType = xhr.getResponseHeader('Content-Type');
                     var format = vectorSource.getFormat();
 
-                    if (contentType.indexOf('application/json') !== -1) {
-                        var features = format.readFeatures(
-                            xhr.responseText
-                        );
-                        vectorSource.addFeatures(features);
-                        vectorSource.dispatchEvent('vectorloadend');
-                    } else {
+                    // on occasion a WFS response from MapServer is empty with no error
+                    // but with HTTP status 200 (for unknown reasons)
+                    // fail here to avoid OL parsing errors
+                    if (xhr.responseText === '') {
                         onError();
+                    } else {
+                        if (contentType.indexOf('application/json') !== -1) {
+                            var features = format.readFeatures(
+                                xhr.responseText
+                            );
+                            vectorSource.addFeatures(features);
+                            vectorSource.dispatchEvent('vectorloadend');
+                        } else {
+                            onError();
+                        }
                     }
                 } else {
                     onError();

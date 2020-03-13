@@ -99,6 +99,10 @@ Ext.define('CpsiMapview.plugin.TreeColumnStyleSwitcher', {
         // wait until all layers are loaded to the map
         var layerTree = treeColumn.up('treepanel');
         layerTree.on('cmv-init-layertree', function () {
+            // render radio groups on initialisation
+            me.cleanupAllRadioGroups();
+            me.renderRadioGroups();
+
             // ensure the radio groups are re-rendered every time the tree view
             // changes (e.g.) layer visibility is changed
             layerTree.getView().on('itemupdate', function () {
