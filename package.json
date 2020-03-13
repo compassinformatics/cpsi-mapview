@@ -22,7 +22,7 @@
   "homepage": "https://github.com/meggsimum/cpsi-mapview#readme",
   "dependencies": {
     "eslint": "^6.2.1",
-    "geostyler-openlayers-parser": "^2.0.1",
+    "geostyler-openlayers-parser": "^0.21.0",
     "geostyler-sld-parser": "^2.0.0"
   },
   "devDependencies": {
