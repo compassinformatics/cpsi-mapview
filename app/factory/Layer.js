@@ -399,14 +399,21 @@ Ext.define('CpsiMapview.factory.Layer', {
                     var contentType = xhr.getResponseHeader('Content-Type');
                     var format = vectorSource.getFormat();
 
-                    if (contentType.indexOf('application/json') !== -1) {
-                        var features = format.readFeatures(
-                            xhr.responseText
-                        );
-                        vectorSource.addFeatures(features);
-                        vectorSource.dispatchEvent('vectorloadend');
-                    } else {
+                    // on occasion a WFS response from MapServer is empty with no error
+                    // but with HTTP status 200 (for unknown reasons)
+                    // fail here to avoid OL parsing errors
+                    if (xhr.responseText === '') {
                         onError();
+                    } else {
+                        if (contentType.indexOf('application/json') !== -1) {
+                            var features = format.readFeatures(
+                                xhr.responseText
+                            );
+                            vectorSource.addFeatures(features);
+                            vectorSource.dispatchEvent('vectorloadend');
+                        } else {
+                            onError();
+                        }
                     }
                 } else {
                     onError();
