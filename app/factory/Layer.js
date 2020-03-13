@@ -174,18 +174,17 @@ Ext.define('CpsiMapview.factory.Layer', {
         var resolution = mapPanel.olMap.getView().getResolution();
 
         var resultLayer;
+        var olVisibility = { openLayers: { visibility: layerConf.visibility } };
         if (resolution < layerConf.switchResolution) {
             var confBelowSwitchResolution = layerConf.layers[1];
             // apply overall visibility to sub layer
-            confBelowSwitchResolution.openLayers.visibility =
-                layerConf.visibility;
+            Ext.Object.merge(confBelowSwitchResolution, olVisibility);
             resultLayer = LayerFactory.createLayer(confBelowSwitchResolution);
             resultLayer.set('currentSwitchType', 'below_switch_resolution');
         } else {
             var confAboveSwitchResolution = layerConf.layers[0];
             // apply overall visibility to sub layer
-            confAboveSwitchResolution.openLayers.visibility =
-                layerConf.visibility;
+            Ext.Object.merge(confAboveSwitchResolution, olVisibility);
             resultLayer = LayerFactory.createLayer(confAboveSwitchResolution);
             resultLayer.set('currentSwitchType', 'above_switch_resolution');
         }
