@@ -153,50 +153,6 @@
     },
     {
       "layerType": "switchlayer",
-      "layerKey": "LIGHT_UNIT_SWITCH_LAYER",
-      "visibility": false,
-      "layers": [
-        {
-          "layerType": "wms",
-          "text": "Light Unit Switch Layer (far)",
-          "layerKey": "LIGHT_UNIT_SWITCH_LAYER_FAR",
-          "serverOptions": {
-            "layers": "LightUnit",
-            "version": "1.3.0"
-          },
-          "openLayers": {
-            "singleTile": false
-          },
-          "styles": [
-            "Unit Type",
-            "Owner"
-          ],
-          "labelClassName": "labels"
-        },
-        {
-          "layerType": "wfs",
-          "text": "Light Unit Switch Layer (close)",
-          "layerKey": "LIGHT_UNIT_SWITCH_LAYER_CLOSE",
-          "url": "https://plmonaghandev.compass.ie/mapserver/?",
-          "geometryProperty": "msGeometry",
-          "featureType": "LightUnit",
-          "sldUrl": "resources/data/styling/LightUnit_Unit_Type.xml",
-          "openLayers": {},
-          "serverOptions": {
-            "outputFormat": "geojson"
-          },
-          "noCluster": true,
-          "stylesBaseUrl": "https://plmonaghandev.compass.ie/resources/data/styling/",
-          "styles": [
-            "LightUnit_Type.xml",
-            "LightUnit_Owner.xml"
-          ],
-          "stylesForceNumericFilterVals": true
-        }
-      ]
-    },
-    {
-      "layerType": "switchlayer",
       "layerKey": "WATERBODY_SWITCH_LAYER",
       "visibility": false,
       "layers": [
@@ -310,6 +266,8 @@
     {
       "layerType": "wfs",
       "text": "Ruins",
+      "qtip": "Right-click for a layer grid",
+      "gridXType": "cmv_examplegrid",
       "layerKey": "RUINS_WFS",
       "geometryProperty": "msGeometry",
       "featureType": "ruins",
