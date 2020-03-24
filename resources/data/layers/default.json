@@ -43,9 +43,7 @@
       "vectorFeaturesMinScale": 80000
     },
     "vtwms": {
-      "stylesForceNumericFilterVals": true,
-      "format": "MVT",
-      "gridXType": "cmv_examplegrid"
+      "format": "MVT"
     }
   },
   "layers": [
@@ -206,25 +204,6 @@
     },
     {
       "layerType": "wfs",
-      "text": "Test time WFS (needs proxy)",
-      "layerKey": "TIME_WFS_PROXY",
-      "url": "wfs/",
-      "featureType": "test:osm-fuel",
-      "serverOptions": {},
-      "noCluster": true,
-      "timeitem": "time",
-      "dateFormat": "c",
-      "geometryProperty": "the_geom",
-      "openLayers": {
-        "maxResolution": 1222.99245234375,
-        "numZoomLevels": 12,
-        "opacity": 0.7,
-        "projection": "EPSG:900913",
-        "visibility": false
-      }
-    },
-    {
-      "layerType": "wfs",
       "text": "Borehole WFS (Time)",
       "qtip": "Filter records with the timeslider control",
       "layerKey": "BOREHOLE_WFS",
@@ -262,6 +241,34 @@
         }
       ],
       "labelClassName": "labels"
+    },
+    {
+      "layerType": "vtwms",
+      "text": "Waterways VT WMS",
+      "layerKey": "WATERWAYS_VTWMS",
+      "url": "https://w08-mapserver.compass.ie/mapserver/?map=/MapServer/apps/mapview-demo/example.map&SERVICE=WMS&VERSION=1.3.0&REQUEST=GetMap&FORMAT=image%2Fpng&TRANSPARENT=true&LAYERS=waterways&TILED=false&CRS=EPSG%3A3857&WIDTH={width}&HEIGHT={height}&BBOX={bbox}&STYLES=Waterways&FORMAT=mvt",
+      "openLayers": {
+        "visibility": false
+      },
+      "sldUrl": "https://w08-mapserver.compass.ie/mapserver/?map=/MapServer/apps/mapview-demo/example.map&SERVICE=WMS&VERSION=1.3.0&REQUEST=GetStyles&LAYERS=waterways",
+      "tooltipsConfig": [
+        {
+          "alias": "Id",
+          "property": "osm_id"
+        },
+        {
+          "alias": "Code",
+          "property": "code"
+        },
+        {
+          "alias": "Class",
+          "property": "fclass"
+        },
+        {
+          "alias": "Name",
+          "property": "name"
+        }
+      ]
     },
     {
       "layerType": "wfs",

@@ -46,6 +46,10 @@
           "isLeaf": true
         },
         {
+          "id": "WATERWAYS_VTWMS",
+          "isLeaf": true
+        },
+        {
           "id": "GAS_WFS",
           "isLeaf": true
         },
