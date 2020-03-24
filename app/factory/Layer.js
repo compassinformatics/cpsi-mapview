@@ -476,8 +476,12 @@ Ext.define('CpsiMapview.factory.Layer', {
         // we take the first of a possible SLD style list
         var sldUrl = layerConf.sldUrl;
         if (Ext.isArray(layerConf.styles) && layerConf.styles.length) {
-            sldUrl = wfsLayer.get('stylesBaseUrl') + layerConf.styles[0];
-            wfsLayer.set('activatedStyle', layerConf.styles[0]);
+            // check if first SLD style in list is an object (with SLD file
+            // name and UI alias) or if the SLD file name is directly provided
+            var firstStyle = layerConf.styles[0];
+            var style = Ext.isObject(firstStyle) ? firstStyle.name : firstStyle;
+            sldUrl = wfsLayer.get('stylesBaseUrl') + style;
+            wfsLayer.set('activatedStyle', style);
         }
 
         if (sldUrl) {

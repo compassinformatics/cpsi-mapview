@@ -110,9 +110,8 @@
       "featureType": "osm:osm-fuel",
       "stylesBaseUrl": "resources/data/styling/",
       "styles": [
-        "Test_Gas.xml",
-        {"name":"Test_Alternative_Gas_Style.xml",
-        "title": "CUSTOM TITLE"}
+        {"name":"Test_Gas.xml", "title": "Style 1"},
+        "Test_Alternative_Gas_Style.xml"
       ],
       "geomFieldName": "geometry",
       "namespaceDefinitions": {

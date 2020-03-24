@@ -15,9 +15,9 @@
                     <PointSymbolizer>
                         <Graphic>
                             <Mark>
-                                <WellKnownName>circle</WellKnownName>
+                                <WellKnownName>triangle</WellKnownName>
                                 <Fill>
-                                    <CssParameter name="fill">#ff0000</CssParameter>
+                                    <CssParameter name="fill">purple</CssParameter>
                                 </Fill>
                             </Mark>
                             <Size>12</Size>
@@ -35,9 +35,9 @@
                     <PointSymbolizer>
                         <Graphic>
                             <Mark>
-                                <WellKnownName>circle</WellKnownName>
+                                <WellKnownName>star</WellKnownName>
                                 <Fill>
-                                    <CssParameter name="fill">#ff0000</CssParameter>
+                                    <CssParameter name="fill">pink</CssParameter>
                                 </Fill>
                             </Mark>
                             <Size>12</Size>
@@ -55,9 +55,9 @@
                     <PointSymbolizer>
                         <Graphic>
                             <Mark>
-                                <WellKnownName>circle</WellKnownName>
+                                <WellKnownName>square</WellKnownName>
                                 <Fill>
-                                    <CssParameter name="fill">#ff0000</CssParameter>
+                                    <CssParameter name="fill">blue</CssParameter>
                                 </Fill>
                             </Mark>
                             <Size>12</Size>
@@ -75,9 +75,9 @@
                     <PointSymbolizer>
                         <Graphic>
                             <Mark>
-                                <WellKnownName>circle</WellKnownName>
+                                <WellKnownName>star</WellKnownName>
                                 <Fill>
-                                    <CssParameter name="fill">#ff0000</CssParameter>
+                                    <CssParameter name="fill">yellow</CssParameter>
                                 </Fill>
                             </Mark>
                             <Size>12</Size>
