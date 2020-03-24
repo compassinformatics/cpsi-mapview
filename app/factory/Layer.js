@@ -216,8 +216,13 @@ Ext.define('CpsiMapview.factory.Layer', {
         var styles = layerConf.serverOptions.styles;
         var activatedStyle;
         if (Ext.isArray(layerConf.styles) && layerConf.styles.length) {
-            styles = layerConf.styles[0];
-            activatedStyle = layerConf.styles[0];
+            // check if first possible SLD style list is an object (with STYLES
+            // name and UI alias) or if the STYLES name is directly provided.
+            var firstStyle = layerConf.styles[0];
+            var stylesWmsParam =
+                Ext.isObject(firstStyle) ? firstStyle.name : firstStyle;
+            styles = stylesWmsParam;
+            activatedStyle = stylesWmsParam;
         }
 
         var olSourceConf = {
