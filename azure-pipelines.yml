@@ -1,0 +1,83 @@
+# Pipeline to build and minify the project
+
+# Useful links
+# https://adamtheautomator.com/azure-devops-pipelines-powershell/
+# https://aka.ms/yaml
+# Invoke-WebRequest -Uri "http://cdn.sencha.com/ext/gpl/ext-6.2.0-gpl.zip" -OutFile "ext-6.2.0-gpl.zip"
+# http://cdn.sencha.com/cmd/6.5.2/jre/SenchaCmd-6.5.2-windows-64bit.zip
+
+trigger:
+- master
+
+pool:
+  vmImage: 'windows-2019'
+
+# inbuilt variables at https://docs.microsoft.com/en-us/azure/devops/pipelines/build/variables?view=azure-devops&tabs=yaml
+
+variables:
+    SENCHA_EXT_VERSION: '6.2.0'
+    SENCHA_CMD_VERSION: '6.5.2'
+
+steps:
+- task: CacheBeta@1
+  inputs:
+    key: ext
+    path: $(System.DefaultWorkingDirectory)/ext
+    cacheHitVar: CACHE_RESTORED
+- powershell: Invoke-WebRequest -Uri "http://cdn.sencha.com/ext/gpl/ext-$($env:SENCHA_EXT_VERSION)-gpl.zip" -OutFile "ExtJS.zip"
+  condition: ne(variables.CACHE_RESTORED, 'true')
+- task: ExtractFiles@1
+  inputs:
+    archiveFilePatterns: '$(System.DefaultWorkingDirectory)/ExtJS.zip'
+    destinationFolder: '$(System.DefaultWorkingDirectory)'
+    # set following or it will delete the zip!
+    cleanDestinationFolder: false 
+  condition: ne(variables.CACHE_RESTORED, 'true')
+- powershell: Rename-Item -Path ext-$($env:SENCHA_EXT_VERSION) -newName ext
+  displayName: 'Rename downloaded ExtJS framework folder'
+  condition: ne(variables.CACHE_RESTORED, 'true')
+- task: CacheBeta@1
+  inputs:
+    key: sencha-cmd
+    path: $(System.DefaultWorkingDirectory)/sencha-cmd
+    cacheHitVar: CMD_CACHE_RESTORED
+- powershell: Invoke-WebRequest -Uri "http://cdn.sencha.com/cmd/$($env:SENCHA_CMD_VERSION)/jre/SenchaCmd-$($env:SENCHA_CMD_VERSION)-windows-64bit.zip" -OutFile "SenchaCmd.zip"
+  condition: ne(variables.CMD_CACHE_RESTORED, 'true')
+  displayName: 'Download SenchaCmd'
+- powershell: Invoke-WebRequest -Uri "http://cdn.sencha.com/cmd/$($env:SENCHA_CMD_VERSION)/jre/SenchaCmd-$($env:SENCHA_CMD_VERSION)-windows-64bit.zip" -OutFile "SenchaCmd.zip"
+  condition: ne(variables.CMD_CACHE_RESTORED, 'true')
+  displayName: 'Download SenchaCmd'  
+- task: ExtractFiles@1
+  inputs:
+    archiveFilePatterns: "$(System.DefaultWorkingDirectory)/SenchaCmd.zip"
+    destinationFolder:  $(System.DefaultWorkingDirectory)/sencha-cmd
+  condition: ne(variables.CMD_CACHE_RESTORED, 'true')
+
+# TODO duplicated cache? How to check sencha.exe is available?
+- task: CacheBeta@1
+  inputs:
+    key: sencha-cmd-exe
+    path: $(System.DefaultWorkingDirectory)/sencha-cmd
+    cacheHitVar: CMD_EXE_CACHE_RESTORED
+# https://docs.sencha.com/cmd/guides/intro_to_cmd.html#intro_to_cmd_-_installing_sencha_cmd_silently
+# https://docs.microsoft.com/en-us/azure/devops/pipelines/tasks/utility/powershell?view=azure-devops
+- powershell: ./SenchaCmd-6.5.2.15-windows-64bit.exe -q -dir "."
+  workingDirectory:  $(System.DefaultWorkingDirectory)/sencha-cmd
+  displayName: 'Install SenchaCmd'
+  condition: ne(variables.CMD_EXE_CACHE_RESTORED, 'true')
+
+- script: |
+    git submodule update --init --recursive
+    npm install
+- script: npm test
+  displayName: 'Test'
+
+- script: |
+     $(System.DefaultWorkingDirectory)/sencha-cmd/sencha which
+     $(System.DefaultWorkingDirectory)/sencha-cmd/sencha -info app build
+  displayName: 'Build production'
+# https://docs.microsoft.com/en-us/azure/devops/pipelines/artifacts/build-artifacts?view=azure-devops&tabs=yaml
+- task: PublishBuildArtifacts@1
+  inputs:
+    pathtoPublish: '$(System.DefaultWorkingDirectory)/build/production/CpsiMapview'
+    artifactName: CpsiMapview
