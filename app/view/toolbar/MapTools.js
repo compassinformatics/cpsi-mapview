@@ -116,7 +116,7 @@ Ext.define('CpsiMapview.view.toolbar.MapTools', {
             xtype: 'cmv_streetview_tool'
         }, {
             xtype: 'cmv_timeslider',
-            startDate: new Date(2014, 0, 1),
+            startDate: new Date(1946, 0, 1),
             endDate: new Date(2020, 11, 30)
         }, {
             xtype: 'cmv_numericattributeslider',
