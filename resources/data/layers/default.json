@@ -288,9 +288,10 @@
         "visibility": true
       },
       "stylesBaseUrl": "https://plmonaghandev.compass.ie/resources/data/styling/",
-      "styles": [ "LightUnit_Type.xml",
-                  {"name":"LightUnit_Owner.xml",
-                  "title": "CUSTOM TITLE"} ],
+      "styles": [
+          {"name":"LightUnit_Type.xml", "title": "LightUnit Type"},
+          "LightUnit_Owner.xml"
+      ],
       "stylesForceNumericFilterVals": true,
       "gridXType": "cmv_examplegrid",
       "tooltipsConfig": [

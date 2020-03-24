@@ -693,8 +693,12 @@ Ext.define('CpsiMapview.factory.Layer', {
         // we take the first of a possible SLD style list
         var sldUrl;
         if (Ext.isArray(layerConf.styles) && layerConf.styles.length) {
-            sldUrl = vtLayer.get('stylesBaseUrl') + layerConf.styles[0];
-            vtLayer.set('activatedStyle', layerConf.styles[0]);
+            // check if first SLD style in list is an object (with SLD file
+            // name and UI alias) or if the SLD file name is directly provided
+            var firstStyle = layerConf.styles[0];
+            var style = Ext.isObject(firstStyle) ? firstStyle.name : firstStyle;
+            sldUrl = vtLayer.get('stylesBaseUrl') + style;
+            vtLayer.set('activatedStyle', style);
         }
         if (sldUrl) {
             // load and parse style and apply it to layer
