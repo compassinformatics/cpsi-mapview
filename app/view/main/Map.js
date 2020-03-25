@@ -138,14 +138,14 @@ Ext.define('CpsiMapview.view.main.Map', {
 
         // general default
         var generalDefaults = defaults['general'];
-        Ext.apply(newLayerConf, generalDefaults);
+        Ext.Object.merge(newLayerConf, generalDefaults);
 
         // layer type default
         var typeDefaults = defaults[layerConf.layerType];
-        Ext.apply(newLayerConf,typeDefaults);
+        Ext.Object.merge(newLayerConf,typeDefaults);
 
         // actual config
-        Ext.apply(newLayerConf, layerConf);
+        Ext.Object.merge(newLayerConf, layerConf);
         return newLayerConf;
     },
 
