@@ -11,6 +11,7 @@ Ext.define('CpsiMapview.view.toolbar.MinimizedWindows', {
     xtype: 'cmv_minimized_windows_toolbar',
 
     requires: [
+        'Ext.layout.container.Absolute',
         'CpsiMapview.controller.toolbar.MinimizedWindows'
     ],
 
