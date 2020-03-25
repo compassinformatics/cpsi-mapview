@@ -1,1 +1,11 @@
 // This file can contain specific scss for the Main.js view component
+
+.cmv_minimized_windows_toolbar {
+    background-color: transparent;
+    // twice the height of a toolbar + padding
+    bottom: calc(2 * 36px + 6px);
+    // unfortunately, we have to use a hack here to overwrite
+    // the 'top' property set by Ext, so that our bottom property
+    // actually applies.
+    top: unset !important;
+}
