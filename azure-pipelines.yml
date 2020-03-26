@@ -24,7 +24,7 @@ steps:
     key: ext
     path: $(System.DefaultWorkingDirectory)/ext
     cacheHitVar: CACHE_RESTORED
-  displayName: 'Check if ExtJS Framework is Cached'
+  displayName: 'Get Cached ExtJS Framework'
 
 - powershell: Invoke-WebRequest -Uri "http://cdn.sencha.com/ext/gpl/ext-$($env:SENCHA_EXT_VERSION)-gpl.zip" -OutFile "ExtJS.zip"
   condition: ne(variables.CACHE_RESTORED, 'true')
@@ -51,7 +51,7 @@ steps:
     key: sencha-cmd
     path: $(System.DefaultWorkingDirectory)/sencha-cmd
     cacheHitVar: CMD_CACHE_RESTORED
-  displayName: 'Check if SenchaCmd is Cached'
+  displayName: 'Get Cached SenchaCmd'
 
 - powershell: Invoke-WebRequest -Uri "http://cdn.sencha.com/cmd/$($env:SENCHA_CMD_VERSION)/jre/SenchaCmd-$($env:SENCHA_CMD_VERSION)-windows-64bit.zip" -OutFile "SenchaCmd.zip"
   condition: ne(variables.CMD_CACHE_RESTORED, 'true')
@@ -64,11 +64,10 @@ steps:
   condition: ne(variables.CMD_CACHE_RESTORED, 'true')
   displayName: 'Unzip SenchaCmd'
 
-# Check if sencha.exe is available
 - powershell: $senchaCmdExists = Test-Path -Path "$(System.DefaultWorkingDirectory)/sencha-cmd/sencha.exe"
   displayName: 'Check if SenchaCmd is Installed'
 
-# If not run the installer
+# Run the SenchaCmd installer
 # https://docs.sencha.com/cmd/guides/intro_to_cmd.html#intro_to_cmd_-_installing_sencha_cmd_silently
 # https://docs.microsoft.com/en-us/azure/devops/pipelines/tasks/utility/powershell?view=azure-devops
 - powershell: ./SenchaCmd-6.5.2.15-windows-64bit.exe -q -dir "."
