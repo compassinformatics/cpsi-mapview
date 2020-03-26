@@ -41,7 +41,6 @@ steps:
 
 # rename the framework folder to ext
 - powershell: Rename-Item -Path ext-$($env:SENCHA_EXT_VERSION) -newName ext
-  displayName: 'Rename downloaded ExtJS framework folder'
   condition: ne(variables.CACHE_RESTORED, 'true')
   displayName: 'Rename ExtJS Framework Folder'
 
