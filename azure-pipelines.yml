@@ -24,9 +24,11 @@ steps:
     key: ext
     path: $(System.DefaultWorkingDirectory)/ext
     cacheHitVar: CACHE_RESTORED
+  displayName: 'Check if ExtJS Framework is Cached'
 
 - powershell: Invoke-WebRequest -Uri "http://cdn.sencha.com/ext/gpl/ext-$($env:SENCHA_EXT_VERSION)-gpl.zip" -OutFile "ExtJS.zip"
   condition: ne(variables.CACHE_RESTORED, 'true')
+  displayName: 'Download ExtJS Framework'
 
 - task: ExtractFiles@1
   inputs:
@@ -35,11 +37,13 @@ steps:
     # set following or it will delete the zip!
     cleanDestinationFolder: false 
   condition: ne(variables.CACHE_RESTORED, 'true')
+  displayName: 'Unzip ExtJS Framework'
 
 # rename the framework folder to ext
 - powershell: Rename-Item -Path ext-$($env:SENCHA_EXT_VERSION) -newName ext
   displayName: 'Rename downloaded ExtJS framework folder'
   condition: ne(variables.CACHE_RESTORED, 'true')
+  displayName: 'Rename ExtJS Framework Folder'
 
 # now let's download and install SenchaCmd
 
@@ -48,23 +52,22 @@ steps:
     key: sencha-cmd
     path: $(System.DefaultWorkingDirectory)/sencha-cmd
     cacheHitVar: CMD_CACHE_RESTORED
+  displayName: 'Check if SenchaCmd is Cached'
 
 - powershell: Invoke-WebRequest -Uri "http://cdn.sencha.com/cmd/$($env:SENCHA_CMD_VERSION)/jre/SenchaCmd-$($env:SENCHA_CMD_VERSION)-windows-64bit.zip" -OutFile "SenchaCmd.zip"
   condition: ne(variables.CMD_CACHE_RESTORED, 'true')
   displayName: 'Download SenchaCmd'
-
-- powershell: Invoke-WebRequest -Uri "http://cdn.sencha.com/cmd/$($env:SENCHA_CMD_VERSION)/jre/SenchaCmd-$($env:SENCHA_CMD_VERSION)-windows-64bit.zip" -OutFile "SenchaCmd.zip"
-  condition: ne(variables.CMD_CACHE_RESTORED, 'true')
-  displayName: 'Download SenchaCmd'  
 
 - task: ExtractFiles@1
   inputs:
     archiveFilePatterns: "$(System.DefaultWorkingDirectory)/SenchaCmd.zip"
     destinationFolder:  $(System.DefaultWorkingDirectory)/sencha-cmd
   condition: ne(variables.CMD_CACHE_RESTORED, 'true')
+  displayName: 'Unzip SenchaCmd'
 
 # Check if sencha.exe is available
 - powershell: $senchaCmdExists = Test-Path -Path "$(System.DefaultWorkingDirectory)/sencha-cmd/sencha.exe"
+  displayName: 'Check if SenchaCmd is Installed'
 
 # If not run the installer
 # https://docs.sencha.com/cmd/guides/intro_to_cmd.html#intro_to_cmd_-_installing_sencha_cmd_silently
@@ -75,11 +78,13 @@ steps:
   condition: ne(variables.senchaCmdExists, True)
 
 # Now we can begin the production build process
+
+- script: git submodule update --init --recursive
+  displayName: 'Update git Dependencies'
+
 - script: |
-    git submodule update --init --recursive
     npm install
-    npm list
-  displayName: 'Install Dependencies'
+  displayName: 'Install NodeJS Dependencies'
 
 - script: npm test
   displayName: 'Run Tests'
@@ -95,3 +100,4 @@ steps:
   inputs:
     pathtoPublish: '$(System.DefaultWorkingDirectory)/build/production/CpsiMapview'
     artifactName: CpsiMapview
+  displayName: 'Publish Output'
