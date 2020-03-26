@@ -52,6 +52,11 @@ Ext.define('CpsiMapview.util.Legend', {
                 return;
             }
 
+            // Remove possible duplicates created by adding labels
+            // (CpsiMapview.view.menuitem.LayerLabels) because GetLegendGraphic
+            // accepts only one layer in its LAYER param
+            layers = LegendUtil.getUniqueLayersParam(layers);
+
             requestParams += 'SERVICE=WMS&VERSION=1.3.0&REQUEST=GetLegendGraphic&';
             requestParams += 'FORMAT=image%2Fpng&TRANSPARENT=TRUE&SLD_VERSION=1.1.0&';
             requestParams += 'LAYER=' + layers + '&';
@@ -119,6 +124,19 @@ Ext.define('CpsiMapview.util.Legend', {
      */
     getSldFileFromWmsStyle: function (wmsStyle, wmsLayers) {
         return wmsLayers + '_' + wmsStyle.replace(' ', '_') + '.xml';
-    }
+    },
 
+    /**
+     * Removes any duplicate layer name from the given LAYERS parameter value.
+     *
+     * @param  {String} layers WMS LAYERS parameter value, e.g. (layer1,layer2)
+     * @return {String}        WMS LAYERS parameter without duplicates
+     */
+    getUniqueLayersParam: function (layers) {
+        var layerList = Ext.isArray(layers) ? layers : layers.split(',');
+        // remove any duplicate layer names
+        var reducedLayerList = Ext.Array.unique(layerList);
+
+        return reducedLayerList.join(',');
+    }
 });
