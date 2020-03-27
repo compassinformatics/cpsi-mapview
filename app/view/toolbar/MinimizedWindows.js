@@ -19,8 +19,6 @@ Ext.define('CpsiMapview.view.toolbar.MinimizedWindows', {
 
     cls: 'cmv_minimized_windows_toolbar',
 
-    layout: 'absolute',
-
     name: null,
 
     hidden: true,
