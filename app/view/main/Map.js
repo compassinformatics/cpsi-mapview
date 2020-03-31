@@ -28,9 +28,6 @@ Ext.define('CpsiMapview.view.main.Map', {
     }, {
         xtype: 'cmv_mapfooter',
         dock: 'bottom'
-    }, {
-        xtype: 'cmv_minimized_windows_toolbar',
-        dock: 'bottom'
     }],
 
     items: [{
@@ -56,6 +53,8 @@ Ext.define('CpsiMapview.view.main.Map', {
         listeners: {
             afterrender: 'afterMapRender'
         }
+    }, {
+        xtype: 'cmv_minimized_windows_toolbar'
     }],
 
     /**
