@@ -6,14 +6,22 @@
 Ext.define('CpsiMapview.model.GridExample', {
     requires: 'GeoExt.data.model.Feature',
     extend: 'GeoExt.data.model.Feature',
-    idProperty: 'EquipmentId',
+    idProperty: 'osm_id',
     fields: [
         {
-            name: 'UnitTypeName',
+            name: 'code',
             type: 'string'
         },
         {
-            name: 'EquipmentId',
+            name: 'name',
+            type: 'string'
+        },
+        {
+            name: 'fclass',
+            type: 'string'
+        },
+        {
+            name: 'osm_id',
             type: 'integer'
         }
     ]
@@ -23,16 +31,17 @@ Ext.define('CpsiMapview.model.GridExample', {
 Ext.define('CpsiMapview.store.GridExample', {
     extend: 'CpsiMapview.store.WfsFeatures',
     alias: 'store.GridExample',
-    url: 'https://plmonaghandev.compass.ie/mapserver/?',
+    url: 'https://w08-mapserver.compass.ie/mapserver/?map=/MapServer/apps/mapview-demo/example.map&',
     storeId: 'GridExample',
+    requestMethod: 'POST',
     model: 'CpsiMapview.model.GridExample',
-    typeName: 'LightUnit',
+    typeName: 'ruins',
     layerOptions: {
         displayInLayerSwitcher: false,
         name: 'GridExampleLayer'
     },
     sorters: [{
-        property: 'EquipmentId',
+        property: 'osm_id',
         direction: 'ASC'
     }]
 });
@@ -42,7 +51,7 @@ Ext.define('CpsiMapview.view.grid.ExampleGridModel', {
     extend: 'CpsiMapview.model.grid.Grid',
     alias: 'viewmodel.example_grid',
     data: {
-        vectorLayerKey: 'LIGHT_UNIT_MVT',
+        vectorLayerKey: 'RUINS_WFS',
         gridStoreType: 'GridExample',
         gridLayerName: 'GridExampleLayer' // TODO this is duplicated in layerOptions above
     }
@@ -58,14 +67,30 @@ Ext.define('CpsiMapview.view.grid.ExampleGrid', {
         items: [
             {
                 text: 'Id',
-                dataIndex: 'EquipmentId', // case-sensitive
+                dataIndex: 'osm_id', // case-sensitive
                 filter: {
                     type: 'number'
                 }
             },
             {
-                text: 'Type',
-                dataIndex: 'UnitTypeName',
+                text: 'Code',
+                dataIndex: 'code',
+                flex: 2,
+                filter: {
+                    type: 'string'
+                }
+            },
+            {
+                text: 'Class',
+                dataIndex: 'fclass',
+                flex: 2,
+                filter: {
+                    type: 'string'
+                }
+            },
+            {
+                text: 'Name',
+                dataIndex: 'name',
                 flex: 1,
                 filter: {
                     type: 'string'

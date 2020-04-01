@@ -1,0 +1,90 @@
+<StyledLayerDescriptor xmlns="http://www.opengis.net/sld" xmlns:ogc="http://www.opengis.net/ogc" xmlns:se="http://www.opengis.net/se" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" version="1.1.0" xsi:schemaLocation="http://www.opengis.net/sld http://schemas.opengis.net/sld/1.1.0/StyledLayerDescriptor.xsd">
+    <NamedLayer>
+        <se:Name>waterbodies</se:Name>
+        <UserStyle>
+            <se:Name>Type</se:Name>
+            <se:FeatureTypeStyle>
+                <se:Rule>
+                    <se:Name>Dock</se:Name>
+                    <ogc:Filter>
+                        <ogc:PropertyIsEqualTo>
+                            <ogc:PropertyName>fclass</ogc:PropertyName>
+                            <ogc:Literal>dock</ogc:Literal>
+                        </ogc:PropertyIsEqualTo>
+                    </ogc:Filter>
+                    <se:PolygonSymbolizer>
+                        <se:Fill>
+                            <se:SvgParameter name="fill">#f7fbff</se:SvgParameter>
+                        </se:Fill>
+                    </se:PolygonSymbolizer>
+                </se:Rule>
+                <se:Rule>
+                    <se:Name>Reservoir</se:Name>
+                    <ogc:Filter>
+                        <ogc:PropertyIsEqualTo>
+                            <ogc:PropertyName>fclass</ogc:PropertyName>
+                            <ogc:Literal>reservoir</ogc:Literal>
+                        </ogc:PropertyIsEqualTo>
+                    </ogc:Filter>
+                    <se:PolygonSymbolizer>
+                        <se:Fill>
+                            <se:SvgParameter name="fill">#d1e3f3</se:SvgParameter>
+                        </se:Fill>
+                    </se:PolygonSymbolizer>
+                </se:Rule>
+                <se:Rule>
+                    <se:Name>River</se:Name>
+                    <ogc:Filter>
+                        <ogc:PropertyIsEqualTo>
+                            <ogc:PropertyName>fclass</ogc:PropertyName>
+                            <ogc:Literal>river</ogc:Literal>
+                        </ogc:PropertyIsEqualTo>
+                    </ogc:Filter>
+                    <se:PolygonSymbolizer>
+                        <se:Fill>
+                            <se:SvgParameter name="fill">#9ac8e1</se:SvgParameter>
+                        </se:Fill>
+                    </se:PolygonSymbolizer>
+                </se:Rule>
+                <se:Rule>
+                    <se:Name>Water</se:Name>
+                    <ogc:Filter>
+                        <ogc:PropertyIsEqualTo>
+                            <ogc:PropertyName>fclass</ogc:PropertyName>
+                            <ogc:Literal>water</ogc:Literal>
+                        </ogc:PropertyIsEqualTo>
+                    </ogc:Filter>
+                    <se:PolygonSymbolizer>
+                        <se:Fill>
+                            <se:SvgParameter name="fill">#529dcc</se:SvgParameter>
+                        </se:Fill>
+                    </se:PolygonSymbolizer>
+                </se:Rule>
+                <se:Rule>
+                    <se:Name>Wetland</se:Name>
+                    <ogc:Filter>
+                        <ogc:PropertyIsEqualTo>
+                            <ogc:PropertyName>fclass</ogc:PropertyName>
+                            <ogc:Literal>wetland</ogc:Literal>
+                        </ogc:PropertyIsEqualTo>
+                    </ogc:Filter>
+                    <se:PolygonSymbolizer>
+                        <se:Fill>
+                            <se:SvgParameter name="fill">#1c6cb1</se:SvgParameter>
+                        </se:Fill>
+                    </se:PolygonSymbolizer>
+                </se:Rule>
+                <!--
+                <se:Rule>
+                    <se:Name>Other</se:Name>
+                    <se:PolygonSymbolizer>
+                        <se:Fill>
+                            <se:SvgParameter name="fill">#08306b</se:SvgParameter>
+                        </se:Fill>
+                    </se:PolygonSymbolizer>
+                </se:Rule>
+                -->
+            </se:FeatureTypeStyle>
+        </UserStyle>
+    </NamedLayer>
+</StyledLayerDescriptor>

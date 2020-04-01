@@ -206,61 +206,61 @@
      *      }
      *
      */
-    "js": [
-        {
-            "path": "https://maps.googleapis.com/maps/api/js?v=3.36&key=INSERT_YOUR_API_KEY_HERE",
-            "remote": true
-        },
-        {
-            "path": "./lib/openlayers/ol.js"
-        },
-        {
-            "path": "./lib/geostyler/sld-style-parser/sldStyleParser.js"
-        },
-        {
-            "path": "./lib/geostyler/ol-style-parser/olStyleParser.js"
-        },
-        {
-            "path": "https://cdnjs.cloudflare.com/ajax/libs/proj4js/2.5.0/proj4.js"
-        },
-        {
-            "path": "https://cdn.jsdelivr.net/npm/jsonix@3.0.0/jsonix.min.js"
-        },
-        {
-            "path": "https://cdn.jsdelivr.net/gh/highsource/ogc-schemas@2.6.1/scripts/lib/SLD_1_0_0_GeoServer.js"
-        },
-        {
-            "path": "https://cdn.jsdelivr.net/gh/highsource/ogc-schemas@2.6.1/scripts/lib/Filter_1_0_0.js"
-        },
-        {
-            "path": "https://cdn.jsdelivr.net/gh/highsource/ogc-schemas@2.6.1/scripts/lib/GML_2_1_2.js"
-        },
-        {
-            "path": "https://cdn.jsdelivr.net/gh/highsource/ogc-schemas@2.6.1/scripts/lib/GML_3_1_1.js"
-        },
-        {
-            "path": "https://cdn.jsdelivr.net/gh/highsource/ogc-schemas@2.6.1/scripts/lib/OWS_1_1_0.js"
-        },
-        {
-            "path": "https://cdn.jsdelivr.net/gh/highsource/ogc-schemas@2.6.1/scripts/lib/SMIL_2_0.js"
-        },
-        {
-            "path": "https://cdn.jsdelivr.net/gh/highsource/ogc-schemas@2.6.1/scripts/lib/SMIL_2_0_Language.js"
-        },
-        {
-            "path": "https://cdn.jsdelivr.net/gh/highsource/ogc-schemas@2.6.1/scripts/lib/WCS_1_1.js"
-        },
-        {
-            "path": "https://cdn.jsdelivr.net/gh/highsource/ogc-schemas@2.6.1/scripts/lib/WPS_1_0_0.js"
-        },
-        {
-            "path": "https://cdn.jsdelivr.net/gh/highsource/w3c-schemas@1.4.0/scripts/lib/XLink_1_0.js"
-        },
-        {
-            "path": "app.js",
-            "bundle": true
-        }
-    ],
+  "js": [
+    {
+      "path": "./lib/openlayers/ol-debug.js"
+    },
+    {
+      "path": "./node_modules/geostyler-sld-parser/browser/sldStyleParser.js"
+    },
+    {
+      "path": "./node_modules/geostyler-openlayers-parser/browser/olStyleParser.js"
+    },
+    {
+      "path": "https://cdnjs.cloudflare.com/ajax/libs/proj4js/2.5.0/proj4.js"
+    },
+    {
+      "path": "https://cdn.jsdelivr.net/npm/jsonix@3.0.0/jsonix.min.js"
+    },
+    {
+      "path": "https://cdn.jsdelivr.net/gh/highsource/ogc-schemas@2.6.1/scripts/lib/SLD_1_0_0_GeoServer.js"
+    },
+    {
+      "path": "https://cdn.jsdelivr.net/gh/highsource/ogc-schemas@2.6.1/scripts/lib/Filter_1_0_0.js"
+    },
+    {
+      "path": "https://cdn.jsdelivr.net/gh/highsource/ogc-schemas@2.6.1/scripts/lib/GML_2_1_2.js"
+    },
+    {
+      "path": "https://cdn.jsdelivr.net/gh/highsource/ogc-schemas@2.6.1/scripts/lib/GML_3_1_1.js"
+    },
+    {
+      "path": "https://cdn.jsdelivr.net/gh/highsource/ogc-schemas@2.6.1/scripts/lib/OWS_1_1_0.js"
+    },
+    {
+      "path": "https://cdn.jsdelivr.net/gh/highsource/ogc-schemas@2.6.1/scripts/lib/SMIL_2_0.js"
+    },
+    {
+      "path": "https://cdn.jsdelivr.net/gh/highsource/ogc-schemas@2.6.1/scripts/lib/SMIL_2_0_Language.js"
+    },
+    {
+      "path": "https://cdn.jsdelivr.net/gh/highsource/ogc-schemas@2.6.1/scripts/lib/WCS_1_1.js"
+    },
+    {
+      "path": "https://cdn.jsdelivr.net/gh/highsource/ogc-schemas@2.6.1/scripts/lib/WPS_1_0_0.js"
+    },
+    {
+      "path": "https://cdn.jsdelivr.net/gh/highsource/w3c-schemas@1.4.0/scripts/lib/XLink_1_0.js"
+    },
+    {
+      "path": "https://maps.googleapis.com/maps/api/js?v=3.36&key=INSERT_YOUR_API_KEY_HERE",
+      "remote": true
+    },
+    {
+      "path": "app.js",
+      "bundle": true
+    }
+  ],
 
     /**
      * List of all CSS assets in the right inclusion order.
