@@ -119,6 +119,18 @@ Ext.define('CpsiMapview.util.Legend', {
      */
     getSldFileFromWmsStyle: function (wmsStyle, wmsLayers) {
         return wmsLayers + '_' + wmsStyle.replace(' ', '_') + '.xml';
+    },
+
+    /**
+     * Helper function to check if all styles
+     * have a non-empty label property.
+     * @param {Object[]} styles Styles object from layerConfig to check
+     */
+    hasLabels: function (styles) {
+        var hasLabels = styles.every(function (style) {
+            return !Ext.isEmpty(style.label);
+        });
+        return hasLabels;
     }
 
 });

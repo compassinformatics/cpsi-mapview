@@ -7,7 +7,9 @@
 Ext.define('CpsiMapview.view.menuitem.LayerLabels', {
     extend: 'Ext.menu.CheckItem',
     xtype: 'cmv_menuitem_layerlabels',
-    requires: [],
+    requires: [
+        'CpsiMapview.util.Legend'
+    ],
 
     /**
      * The connected layer for this item.
@@ -88,7 +90,7 @@ Ext.define('CpsiMapview.view.menuitem.LayerLabels', {
             me.hasMultiStyle = (
                 !Ext.isEmpty(me.layer.get('stylesBaseUrl'))
                 && !Ext.isEmpty(me.layer.get('styles'))
-                && me.hasLabels(me.layer.get('styles'))
+                && CpsiMapview.util.Legend.hasLabels(me.layer.get('styles'))
             );
             // if neither sldUrlLabel nor styles[x].label are defined, labeling is not enabled
             me.setHidden(!me.hasSingleStyle && !me.hasMultiStyle);
@@ -275,18 +277,18 @@ Ext.define('CpsiMapview.view.menuitem.LayerLabels', {
         var styles = layer.get('styles');
         var stylesBaseUrl = layer.get('stylesBaseUrl');
 
-        var labelStyleUrls = [];
         if (me.hasSingleStyle) {
-            labelStyleUrls.push(sldUrlLabel);
+            return [sldUrlLabel];
         }
         if (me.hasMultiStyle) {
+            var labelStyleUrls = [];
             Ext.each(styles, function(style) {
                 if (!Ext.isEmpty(style.label)) {
                     labelStyleUrls.push(stylesBaseUrl + style.label);
                 }
             });
+            return labelStyleUrls;
         }
-        return labelStyleUrls;
     },
 
     /**
@@ -318,17 +320,6 @@ Ext.define('CpsiMapview.view.menuitem.LayerLabels', {
         }
 
         return stylesBaseUrl + labelStyle.label;
-    },
-
-    /**
-     * Helper function to check if at least one style
-     * has a non-empty label property.
-     * @param {Array<{label: String}>} styles Styles object from layerConfig to check
-     */
-    hasLabels: function (styles) {
-        var hasLabels = styles.some(function (style) {
-            return !Ext.isEmpty(style.label);
-        });
-        return hasLabels;
     }
+
 });
