@@ -45,11 +45,11 @@ Ext.define('CpsiMapview.view.layer.StyleSwitcherRadioGroup', {
             var layerName;
 
             // check if style has title property
-            if(layerStyle['title'] && layerStyle['name']){
+            if (layerStyle['title'] && layerStyle['name']) {
                 // has title property
                 layerTitle = layerStyle['title'];
                 layerName = layerStyle['name'];
-            } else{
+            } else {
                 // does not have title property
                 // title generated from stlye name
                 layerTitle = me.getLayerStyleLabel(layerStyle);
@@ -151,6 +151,22 @@ Ext.define('CpsiMapview.view.layer.StyleSwitcherRadioGroup', {
             } else if (layer.get('isWfs') || layer.get('isVt')) {
 
                 var sldUrl = layer.get('stylesBaseUrl') + newStyle;
+
+                var hasLabels = CpsiMapview.util.Legend.hasLabels;
+
+                // use style with label if one was specified
+                if (layer.get('labelsActive') === true && !Ext.isEmpty(layer.get('styles')) && hasLabels(layer.get('styles'))) {
+                    var styleObj = layer.get('styles').find(function (style) {
+                        return style.name === newStyle;
+                    });
+                    if (styleObj && !Ext.isEmpty(styleObj.label)) {
+                        sldUrl = layer.get('stylesBaseUrl') + styleObj.label;
+                        layer.set('activeLabelStyle', sldUrl);
+                    } else {
+                        layer.set('activeLabelStyle', undefined);
+                    }
+
+                }
                 // transform filter values to numbers ('1' => 1)
                 var forceNumericFilterVals = layer.get('stylesForceNumericFilterVals');
                 // load and parse SLD and apply it to layer

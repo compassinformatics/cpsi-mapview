@@ -127,6 +127,18 @@ Ext.define('CpsiMapview.util.Legend', {
     },
 
     /**
+     * Helper function to check if all styles
+     * have a non-empty label property.
+     * @param {Object[]} styles Styles object from layerConfig to check
+     */
+    hasLabels: function (styles) {
+        var hasLabels = styles.every(function (style) {
+            return !Ext.isEmpty(style.label);
+        });
+        return hasLabels;
+    },
+
+    /*
      * Removes any duplicate layer name from the given LAYERS parameter value.
      *
      * @param  {String} layers WMS LAYERS parameter value, e.g. (layer1,layer2)

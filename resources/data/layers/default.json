@@ -114,10 +114,15 @@
       "url": "https://ows.terrestris.de/geoserver/osm/wfs",
       "featureType": "osm:osm-fuel",
       "styles": [
-        "Test_Gas.xml",
+        {
+          "name": "Test_Gas.xml",
+          "title": "Test GAS",
+          "label": "Test_Gas_label.xml"
+        },
         {
           "name": "Test_Alternative_Gas_Style.xml",
-          "title": "CUSTOM TITLE"
+          "title": "CUSTOM TITLE",
+          "label": "Test_Alternative_Gas_Style_label.xml"
         }
       ],
       "geomFieldName": "geometry",
