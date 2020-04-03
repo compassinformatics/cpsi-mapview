@@ -216,8 +216,13 @@ Ext.define('CpsiMapview.factory.Layer', {
         var styles = layerConf.serverOptions.styles;
         var activatedStyle;
         if (Ext.isArray(layerConf.styles) && layerConf.styles.length) {
-            styles = layerConf.styles[0];
-            activatedStyle = layerConf.styles[0];
+            // check if first possible SLD style list is an object (with STYLES
+            // name and UI alias) or if the STYLES name is directly provided.
+            var firstStyle = layerConf.styles[0];
+            var stylesWmsParam =
+                Ext.isObject(firstStyle) ? firstStyle.name : firstStyle;
+            styles = stylesWmsParam;
+            activatedStyle = stylesWmsParam;
         }
 
         var olSourceConf = {
@@ -471,8 +476,12 @@ Ext.define('CpsiMapview.factory.Layer', {
         // we take the first of a possible SLD style list
         var sldUrl = layerConf.sldUrl;
         if (Ext.isArray(layerConf.styles) && layerConf.styles.length) {
-            sldUrl = wfsLayer.get('stylesBaseUrl') + layerConf.styles[0];
-            wfsLayer.set('activatedStyle', layerConf.styles[0]);
+            // check if first SLD style in list is an object (with SLD file
+            // name and UI alias) or if the SLD file name is directly provided
+            var firstStyle = layerConf.styles[0];
+            var style = Ext.isObject(firstStyle) ? firstStyle.name : firstStyle;
+            sldUrl = wfsLayer.get('stylesBaseUrl') + style;
+            wfsLayer.set('activatedStyle', style);
         }
 
         if (sldUrl) {
@@ -688,8 +697,12 @@ Ext.define('CpsiMapview.factory.Layer', {
         // we take the first of a possible SLD style list
         var sldUrl;
         if (Ext.isArray(layerConf.styles) && layerConf.styles.length) {
-            sldUrl = vtLayer.get('stylesBaseUrl') + layerConf.styles[0];
-            vtLayer.set('activatedStyle', layerConf.styles[0]);
+            // check if first SLD style in list is an object (with SLD file
+            // name and UI alias) or if the SLD file name is directly provided
+            var firstStyle = layerConf.styles[0];
+            var style = Ext.isObject(firstStyle) ? firstStyle.name : firstStyle;
+            sldUrl = vtLayer.get('stylesBaseUrl') + style;
+            vtLayer.set('activatedStyle', style);
         }
         if (sldUrl) {
             // load and parse style and apply it to layer
