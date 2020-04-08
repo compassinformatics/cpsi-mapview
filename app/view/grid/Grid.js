@@ -152,5 +152,5 @@ Ext.define('CpsiMapview.view.grid.Grid', {
                 boxLabel: 'Page Records?',
                 handler: 'togglePaging'
             }]
-    }],
+    }]
 });
