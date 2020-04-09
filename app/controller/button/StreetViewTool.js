@@ -147,7 +147,9 @@ Ext.define('CpsiMapview.controller.button.StreetViewTool', {
             }
             // cleanup
             me.vectorLayer.getSource().clear();
-            me.streetViewWin.close();
+            if (me.streetViewWin) {
+                me.streetViewWin.close();
+            }
         }
 
         // activate / deactivate click
