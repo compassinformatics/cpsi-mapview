@@ -57,14 +57,6 @@ Ext.define('CpsiMapview.view.menuitem.LayerLabels', {
     clientSideStyle: null,
 
     /**
-     * Switch if values in filter should be
-     * cast to numeric values.
-     * @property{Boolean}
-     * @readonly
-     */
-    forceNumericFilterVals: null,
-
-    /**
      * @private
      */
     initComponent: function () {
@@ -78,9 +70,6 @@ Ext.define('CpsiMapview.view.menuitem.LayerLabels', {
         if (me.layer && (me.layer.getSource() instanceof ol.source.TileWMS ||
             me.layer.getSource() instanceof ol.source.ImageWMS)) {
             me.labelClassName = me.layer.get('labelClassName');
-        } else if (me.clientSideStyle) {
-            // set required properties for client side labeling
-            me.forceNumericFilterVals = me.layer.get('stylesForceNumericFilterVals');
         }
 
         me.callParent();
@@ -187,7 +176,6 @@ Ext.define('CpsiMapview.view.menuitem.LayerLabels', {
     addLabelStyle: function (addLabel) {
         var me = this;
         var layer = me.layer;
-        var forceNumericFilterVals = me.forceNumericFilterVals;
         var activatedStyle = layer.get('activatedStyle');
 
         var url;
@@ -201,7 +189,7 @@ Ext.define('CpsiMapview.view.menuitem.LayerLabels', {
             if (url) {
                 layer.set('activeLabelStyle', url);
                 layer.set('labelsActive', true);
-                LayerFactory.loadSld(layer, url, forceNumericFilterVals);
+                LayerFactory.loadSld(layer, url);
             }
 
         } else {
@@ -215,7 +203,7 @@ Ext.define('CpsiMapview.view.menuitem.LayerLabels', {
             if (url) {
                 layer.set('activeLabelStyle', undefined);
                 layer.set('labelsActive', false);
-                LayerFactory.loadSld(layer, url, forceNumericFilterVals);
+                LayerFactory.loadSld(layer, url);
             }
 
         }
