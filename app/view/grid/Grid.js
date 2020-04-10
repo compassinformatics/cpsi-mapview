@@ -77,10 +77,10 @@ Ext.define('CpsiMapview.view.grid.Grid', {
     listeners: {
         filterchange: 'filterAssociatedLayers',
         itemcontextmenu: 'onItemContextMenu',
-        columnhide: 'onColumnHideShow',
-        columnshow: 'onColumnHideShow',
+        columnhide: 'onColumnHide',
+        columnshow: 'onColumnShow',
         // ensure columns are set when the store is bound to the grid
-        reconfigure: 'onColumnHideShow'
+        reconfigure: 'onColumnsReconfigure'
     },
 
     /**
@@ -152,5 +152,5 @@ Ext.define('CpsiMapview.view.grid.Grid', {
                 boxLabel: 'Page Records?',
                 handler: 'togglePaging'
             }]
-    }]
+    }],
 });

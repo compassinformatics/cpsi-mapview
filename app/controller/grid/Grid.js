@@ -294,7 +294,7 @@ Ext.define('CpsiMapview.controller.grid.Grid', {
     * always be returned even if the column is hidden.
     *
     */
-    onColumnHideShow: function () {
+    getVisibleColumns: function () {
 
         var me = this;
         var grid = me.getView();
@@ -316,6 +316,27 @@ Ext.define('CpsiMapview.controller.grid.Grid', {
             visibleColumnNames = Ext.Array.clean(visibleColumnNames);
             store.propertyName = visibleColumnNames.join(',');
         }
+    },
+
+    onColumnHide: function () {
+        this.getVisibleColumns();
+    },
+
+    onColumnsReconfigure: function () {
+        this.getVisibleColumns();
+    },
+
+    onColumnShow: function () {
+
+        var me = this;
+        var grid = me.getView();
+        var store = grid.getStore();
+
+        me.getVisibleColumns();
+
+        // when a new column is displayed
+        // query the server again to retrieve the data
+        store.reload();
     },
 
     /**
