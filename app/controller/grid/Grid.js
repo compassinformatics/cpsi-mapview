@@ -334,13 +334,10 @@ Ext.define('CpsiMapview.controller.grid.Grid', {
 
         me.getVisibleColumns();
 
-        // when a new column is displayed 
+        // when a new column is displayed
         // query the server again to retrieve the data
         store.reload();
     },
-
-,
-
 
     /**
     * Clear both the grid filters and any spatial filter.
