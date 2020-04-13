@@ -220,7 +220,7 @@ Ext.define('CpsiMapview.factory.Layer', {
 
         // derive STYLES parameter: either directly set in serverOptions or we
         // we take the first of a possible SLD style list
-        var styles = serverOptions.styles || '';
+        var styles = serverOptions.STYLES || '';
         var activatedStyle;
         if (Ext.isArray(layerConf.styles) && layerConf.styles.length) {
             // check if first possible SLD style list is an object (with STYLES
