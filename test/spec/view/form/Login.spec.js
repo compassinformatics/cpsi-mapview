@@ -20,7 +20,7 @@ describe('CpsiMapview.view.form.Login', function() {
             var ctrlr = inst.getController();
             ctrlr.attemptLogin();
 
-            ctrlr.getView().on('login', function (jsonData) {
+            ctrlr.on('login', function (jsonData) {
                 var token = Ext.util.Cookies.get('mytoken');
                 expect(token).to.be('bfdb15be-7ec9-4956-b2b3-5b25f77d3877');
                 expect(jsonData.roles.length).to.be(9);
