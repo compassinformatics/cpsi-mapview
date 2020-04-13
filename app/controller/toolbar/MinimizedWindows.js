@@ -66,7 +66,7 @@ Ext.define('CpsiMapview.controller.toolbar.MinimizedWindows', {
         minimizedWindow.setVisible(true);
         minimizedWindow.isMinimized = false;
 
-        var button = me.getView().items.find(function (item) {
+        var button = me.getView().items.findBy(function (item) {
             return (item.getXType() === 'button') && (item.windowRef === windowRef);
         });
 
