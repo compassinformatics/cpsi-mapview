@@ -211,9 +211,16 @@ Ext.define('CpsiMapview.factory.Layer', {
         var olSourceProps = this.ol2PropsToOlSourceProps(layerConf.openLayers);
         var olLayerProps = this.ol2PropsToOlLayerProps(layerConf.openLayers);
 
+        var serverOptions = {};
+
+        // force all keys to be uppercase
+        Ext.Object.each(layerConf.serverOptions, function (key, value) {
+            serverOptions[key.toUpperCase()] = value;
+        });
+
         // derive STYLES parameter: either directly set in serverOptions or we
         // we take the first of a possible SLD style list
-        var styles = layerConf.serverOptions.styles;
+        var styles = serverOptions.STYLES || '';
         var activatedStyle;
         if (Ext.isArray(layerConf.styles) && layerConf.styles.length) {
             // check if first possible SLD style list is an object (with STYLES
@@ -228,7 +235,6 @@ Ext.define('CpsiMapview.factory.Layer', {
         var olSourceConf = {
             url: layerConf.url,
             params: {
-                'LAYERS': layerConf.serverOptions.layers,
                 'STYLES': styles,
                 'TRANSPARENT': true,
                 'TILED': !singleTile
@@ -236,6 +242,14 @@ Ext.define('CpsiMapview.factory.Layer', {
             ratio: singleTile ? 1 : undefined,
             crossOrigin: 'anonymous'
         };
+
+        // apply any WMS serverOptions from the config to the params
+        olSourceConf.params = Ext.apply(olSourceConf.params, serverOptions);
+
+        if (!olSourceConf.params.LAYERS) {
+            Ext.log.warn('LAYERS parameter not set on WMS');
+        }
+
         olSourceConf = Ext.apply(olSourceConf, olSourceProps);
 
         var olLayerConf = {
