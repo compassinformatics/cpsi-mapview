@@ -97,9 +97,6 @@ Ext.define('CpsiMapview.view.grid.Grid', {
         },
         {
             xtype: 'button',
-            bind: {
-                pressed: '{isGroupEditingEnabled}'
-            },
             text: 'Clear Sorting',
             glyph: 'f039@FontAwesome',
             handler: 'onClearSort'
@@ -120,7 +117,8 @@ Ext.define('CpsiMapview.view.grid.Grid', {
         {
             xtype: 'button',
             bind: {
-                pressed: '{isGroupEditingEnabled}'
+                pressed: '{isGroupEditingEnabled}',
+                hidden: '{!isGroupEditingVisible}'
             },
             text: 'Group Edit',
             enableToggle: true,
