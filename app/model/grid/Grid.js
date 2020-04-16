@@ -23,6 +23,10 @@ Ext.define('CpsiMapview.model.grid.Grid', {
     formulas: {
         map: function () {
             return BasiGX.util.Map.getMapComponent().map;
+        },
+        isGroupEditingVisible: function () {
+            // can be overridden in subclasses
+            return false;
         }
     }
 });
