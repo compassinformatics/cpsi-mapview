@@ -53,7 +53,7 @@ Ext.define('CpsiMapview.view.button.DigitizeButton', {
         useContextMenu: false,
 
         /**
-         * Shall the drawn feature be removed when a new gets drawn?
+         * Should the drawn feature be removed when a new feature gets drawn?
          */
         clearDrawnFeature: true,
 
@@ -88,7 +88,13 @@ Ext.define('CpsiMapview.view.button.DigitizeButton', {
          */
         pointExtentBuffer: 0,
 
-        resultLayer: null
+        resultLayer: null,
+
+        /**
+        * Should the results and draw layers be reset if the
+        * tool is deactivated?
+        */
+        resetOnToggle: true
     },
 
     /**
