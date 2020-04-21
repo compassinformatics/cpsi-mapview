@@ -165,13 +165,16 @@ Ext.define('CpsiMapview.controller.button.DigitizeButtonController', {
                 me.map.getViewport().removeEventListener('contextmenu', me.showContextMenu.bind(me));
             }
             me.drawInteraction.setActive(false);
-            me.drawLayer.getSource().clear();
-            if (me.resultLayer) {
-                me.resultLayer.getSource().clear();
+
+            if (me.getView().getResetOnToggle()) {
+                me.drawLayer.getSource().clear();
+                if (me.resultLayer) {
+                    me.resultLayer.getSource().clear();
+                }
+                // reset context menu entries
+                me.activeGroupIdx = 0;
+                me.contextMenuGroupsCounter = 0;
             }
-            // reset context menu entries
-            me.activeGroupIdx = 0;
-            me.contextMenuGroupsCounter = 0;
         }
     },
 
