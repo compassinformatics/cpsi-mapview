@@ -97,15 +97,14 @@ Ext.define('CpsiMapview.view.toolbar.MapTools', {
             useContextMenu: true,
             pointExtentBuffer: 50,
             listeners: {
-                responseFeatures: 'onResponseFeatures'
+                responseFeatures: function () {
+                    this.getController().onResponseFeatures();
+                }
             }
         }, {
             xtype: 'cmv_digitize_button',
             type: 'LineString',
-            tooltip: 'Line',
-            listeners: {
-                responseFeatures: 'onResponseFeatures'
-            }
+            tooltip: 'Line'
         }, {
             xtype: 'cmv_digitize_button',
             type: 'Polygon',
@@ -113,7 +112,9 @@ Ext.define('CpsiMapview.view.toolbar.MapTools', {
             apiUrl: 'https://pmstipperarydev.compass.ie/WebServices/roadschedule/cutWithPolygon',
             clearDrawnFeature: false,
             listeners: {
-                responseFeatures: 'onResponseFeatures'
+                responseFeatures: function () {
+                    this.getController().onResponseFeatures();
+                }
             }
         }, {
             xtype: 'cmv_digitize_button',
@@ -122,7 +123,9 @@ Ext.define('CpsiMapview.view.toolbar.MapTools', {
             apiUrl: 'https://pmstipperarydev.compass.ie/WebServices/roadschedule/cutWithPolygon',
             clearDrawnFeature: false,
             listeners: {
-                responseFeatures: 'onResponseFeatures'
+                responseFeatures: function () {
+                    this.getController().onResponseFeatures();
+                }
             }
         }, {
             xtype: 'cmv_streetview_tool'
