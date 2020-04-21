@@ -108,7 +108,6 @@ Ext.define('CpsiMapview.view.button.DigitizeButton', {
      */
     listeners: {
         toggle: 'onToggle',
-        beforedestroy: 'onBeforeDestroy',
-        responseFeatures: 'onResponseFeatures'
+        beforedestroy: 'onBeforeDestroy'
     }
 });

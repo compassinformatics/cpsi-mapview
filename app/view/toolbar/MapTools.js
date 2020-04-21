@@ -70,7 +70,7 @@ Ext.define('CpsiMapview.view.toolbar.MapTools', {
                         title: 'Info',
                         message: msg,
                         buttons: Ext.MessageBox.OK,
-                        icon:  Ext.MessageBox.INFO,
+                        icon: Ext.MessageBox.INFO,
                     });
                 },
                 'cmv-spatial-query-error': function () {
@@ -78,7 +78,7 @@ Ext.define('CpsiMapview.view.toolbar.MapTools', {
                         title: 'Error',
                         message: 'WFS query not successful',
                         buttons: Ext.MessageBox.OK,
-                        icon:  Ext.MessageBox.ERROR,
+                        icon: Ext.MessageBox.ERROR,
                     });
                 }
             }
@@ -95,23 +95,35 @@ Ext.define('CpsiMapview.view.toolbar.MapTools', {
             tooltip: 'Point',
             apiUrl: 'https://pmstipperarydev.compass.ie/pmspy/netsolver',
             useContextMenu: true,
-            pointExtentBuffer: 50
+            pointExtentBuffer: 50,
+            listeners: {
+                responseFeatures: 'onResponseFeatures'
+            }
         }, {
             xtype: 'cmv_digitize_button',
             type: 'LineString',
-            tooltip: 'Line'
+            tooltip: 'Line',
+            listeners: {
+                responseFeatures: 'onResponseFeatures'
+            }
         }, {
             xtype: 'cmv_digitize_button',
             type: 'Polygon',
             tooltip: 'Polygon',
             apiUrl: 'https://pmstipperarydev.compass.ie/WebServices/roadschedule/cutWithPolygon',
-            clearDrawnFeature: false
+            clearDrawnFeature: false,
+            listeners: {
+                responseFeatures: 'onResponseFeatures'
+            }
         }, {
             xtype: 'cmv_digitize_button',
             type: 'Circle',
             tooltip: 'Circle',
             apiUrl: 'https://pmstipperarydev.compass.ie/WebServices/roadschedule/cutWithPolygon',
-            clearDrawnFeature: false
+            clearDrawnFeature: false,
+            listeners: {
+                responseFeatures: 'onResponseFeatures'
+            }
         }, {
             xtype: 'cmv_streetview_tool'
         }, {
