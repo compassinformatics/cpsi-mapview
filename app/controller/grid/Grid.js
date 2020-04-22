@@ -221,6 +221,45 @@ Ext.define('CpsiMapview.controller.grid.Grid', {
 
         this.filterAssociatedLayers();
     },
+
+
+    /**
+     * If there is an edit / view window for individual records
+     * in the grid then open it with this function
+     *
+     * @param {Ext.grid.View} grid
+     * @param {Ext.data.Model} record
+     * @private
+     */
+    onRowDblClick: function (grid, record) {
+
+        var me = this;
+        var vm = me.getViewModel();
+        var associatedEditWindow = vm.get('associatedEditWindow');
+        var associatedEditModel = vm.get('associatedEditModel');
+        var modelPrototype = Ext.ClassManager.get(associatedEditModel);
+
+        if (associatedEditWindow && modelPrototype) {
+
+            // get a reference to the model class so we can use the
+            // static .load function without creating a new empty model
+            var recId = record.getId();
+
+            grid.mask('Loading Record...');
+            modelPrototype.load(recId, {
+                success: function (rec) {
+                    var win = Ext.create(associatedEditWindow);
+                    var vm = win.getViewModel();
+                    vm.set('currentRecord', rec);
+                    win.show();
+                },
+                callback: function () {
+                    grid.unmask();
+                },
+                scope: this
+            });
+        }
+    },
     /**
     * Enable and disable paging for the grid.
     * Disabling paging allows all records to be loaded into the

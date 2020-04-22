@@ -79,6 +79,7 @@ Ext.define('CpsiMapview.view.grid.Grid', {
         itemcontextmenu: 'onItemContextMenu',
         columnhide: 'onColumnHide',
         columnshow: 'onColumnShow',
+        rowdblclick: 'onRowDblClick',
         // ensure columns are set when the store is bound to the grid
         reconfigure: 'onColumnsReconfigure'
     },
