@@ -142,8 +142,8 @@ Ext.define('CpsiMapview.controller.button.DigitizeButtonController', {
                     source: new ol.source.Vector(),
                     style: view.getResultLayerStyle()
                 });
+                me.map.addLayer(me.resultLayer);
             }
-            me.map.addLayer(me.resultLayer);
         }
 
         if (pressed) {
