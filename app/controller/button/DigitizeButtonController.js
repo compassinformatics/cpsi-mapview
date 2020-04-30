@@ -88,13 +88,18 @@ Ext.define('CpsiMapview.controller.button.DigitizeButtonController', {
             me.circleToolbarParent = view.findParentByType('cmv_map');
         }
 
-        // create a temporary draw layer
+        // create a temporary draw layer unless one has already been set
+
         if (!me.drawLayer) {
-            me.drawLayer = new ol.layer.Vector({
-                source: new ol.source.Vector(),
-                displayInLayerSwitcher: false
-            });
-            me.map.addLayer(me.drawLayer);
+            if (view.drawLayer) {
+                me.drawLayer = view.drawLayer;
+            } else {
+                me.drawLayer = new ol.layer.Vector({
+                    source: new ol.source.Vector(),
+                    displayInLayerSwitcher: false
+                });
+                me.map.addLayer(me.drawLayer);
+            }
         }
 
         var type = view.getType();

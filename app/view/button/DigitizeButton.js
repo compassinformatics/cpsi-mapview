@@ -88,7 +88,17 @@ Ext.define('CpsiMapview.view.button.DigitizeButton', {
          */
         pointExtentBuffer: 0,
 
+        /**
+         * Set a layer to store the solver results
+         * If not set a layer will be created and added to the map automatically
+         */
         resultLayer: null,
+
+        /**
+         * Set a layer to store the features drawn by a user (points, polygons_
+         * If not set a layer will be created and added to the map automatically
+         */
+        drawLayer: null,
 
         /**
         * Should the results and draw layers be reset if the
