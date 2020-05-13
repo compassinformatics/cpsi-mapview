@@ -110,11 +110,11 @@ Ext.define('CpsiMapview.controller.grid.Grid', {
 
     /**
      * Applies both attribute and spatial filters to
-     * any associated WMS and vector layer
+     * any associated WMS and vector layer and forces a reload of both
      *
      * @private
      */
-    filterAssociatedLayers: function () {
+    updateAssociatedLayers: function () {
 
         var me = this;
         var grid = me.getView();
@@ -219,7 +219,7 @@ Ext.define('CpsiMapview.controller.grid.Grid', {
         store.loadWfs();
 
 
-        this.filterAssociatedLayers();
+        this.updateAssociatedLayers();
     },
 
 
@@ -398,6 +398,32 @@ Ext.define('CpsiMapview.controller.grid.Grid', {
     },
 
     /**
+    * If any models associated with the grid are edited
+    * (for example in a child form) then automatically update
+    * the grid and associated layers
+    *
+    * @private
+    */
+    addChildModelListener: function () {
+
+        var me = this;
+        var vm = me.getViewModel();
+        var associatedEditModel = vm.get('associatedEditModel');
+
+        if (associatedEditModel) {
+            var modelPrototype = Ext.ClassManager.get(associatedEditModel);
+            Ext.util.Observable.observe(modelPrototype, {
+                modelsaved: function () {
+                    var grid = me.getView();
+                    var store = grid.getStore();
+                    store.loadWfs();
+                    me.updateAssociatedLayers();
+                }
+            });
+        }
+    },
+
+    /**
     * Dynamically apply a store to the grid based on the gridStoreType
     * config option. Also set the hidden grid vector layer to be associated
     * with the cmv_spatial_query_button
@@ -432,5 +458,10 @@ Ext.define('CpsiMapview.controller.grid.Grid', {
         };
 
         viewModel.setStores(stores);
+    },
+
+    init: function () {
+        var me = this;
+        me.addChildModelListener();
     }
 });
