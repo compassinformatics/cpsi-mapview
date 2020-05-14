@@ -237,27 +237,45 @@ Ext.define('CpsiMapview.controller.grid.Grid', {
         var vm = me.getViewModel();
         var associatedEditWindow = vm.get('associatedEditWindow');
         var associatedEditModel = vm.get('associatedEditModel');
+
+        // get a reference to the model class so we can use the
+        // static .load function without creating a new empty model
         var modelPrototype = Ext.ClassManager.get(associatedEditModel);
 
         if (associatedEditWindow && modelPrototype) {
 
-            // get a reference to the model class so we can use the
-            // static .load function without creating a new empty model
+            // if the record is already open in a window then simply bring that window to the front
             var recId = record.getId();
+            var windowXType = Ext.ClassManager.get(associatedEditWindow).prototype.getXType();
+            var existingWindows = Ext.ComponentQuery.query(windowXType);
+            var rec, recordWindow;
 
-            grid.mask('Loading Record...');
-            modelPrototype.load(recId, {
-                success: function (rec) {
-                    var win = Ext.create(associatedEditWindow);
-                    var vm = win.getViewModel();
-                    vm.set('currentRecord', rec);
-                    win.show();
-                },
-                callback: function () {
-                    grid.unmask();
-                },
-                scope: this
+            Ext.each(existingWindows, function (w) {
+                rec = w.getViewModel().get('currentRecord');
+                if (rec.getId() == recId) {
+                    recordWindow = w;
+                    return false;
+                }
             });
+
+            if (recordWindow) {
+                Ext.WindowManager.bringToFront(recordWindow);
+            } else {
+                // load the record into a new window
+                grid.mask('Loading Record...');
+                modelPrototype.load(recId, {
+                    success: function (rec) {
+                        var win = Ext.create(associatedEditWindow);
+                        var vm = win.getViewModel();
+                        vm.set('currentRecord', rec);
+                        win.show();
+                    },
+                    callback: function () {
+                        grid.unmask();
+                    },
+                    scope: this
+                });
+            }
         }
     },
     /**
