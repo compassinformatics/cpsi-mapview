@@ -41,8 +41,10 @@ Ext.define('CpsiMapview.view.toolbar.CircleSelectionToolbar', {
                 fieldLabel: 'Radius in {unit}'
             },
             minValue: 0,
+            enableKeyEvents: true, // required for keypress event
             listeners: {
-                change: 'onRadiusChange'
+                change: 'onRadiusChange',
+                keypress: 'handleEnterKey'
             }
         }, {
             xtype: 'button',

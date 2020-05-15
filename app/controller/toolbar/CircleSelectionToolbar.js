@@ -28,6 +28,19 @@ Ext.define('CpsiMapview.controller.toolbar.CircleSelectionToolbar', {
     },
 
     /**
+     * Handles a keypress in the textfield and triggers
+     * handleApply when the Enter key is pressed
+     */
+    handleEnterKey: function (fld, e) {
+        var me = this;
+
+        if (e.getCharCode() == Ext.EventObject.ENTER) {
+            me.handleApply();
+        }
+
+    },
+
+    /**
      * Gets the radius of the ol circle feature.
      */
     getCurrentRadius: function () {
