@@ -9,7 +9,8 @@ Ext.define('CpsiMapview.controller.button.DigitizeButtonController', {
         'Ext.menu.Menu',
         'CpsiMapview.view.window.MinimizableWindow',
         'GeoExt.component.FeatureRenderer',
-        'GeoExt.data.store.Features'
+        'GeoExt.data.store.Features',
+        'CpsiMapview.view.toolbar.CircleSelectionToolbar'
     ],
 
     alias: 'controller.cmv_digitize_button',
@@ -83,9 +84,9 @@ Ext.define('CpsiMapview.controller.button.DigitizeButtonController', {
             me.map = BasiGX.util.Map.getMapComponent().map;
         }
 
-        // use default parent for circle toolbar if not defined
+        // use default cmv_map Ext.panel.Panel for circle toolbar if not defined
         if (!me.circleToolbarParent) {
-            me.circleToolbarParent = view.findParentByType('cmv_map');
+            me.circleToolbarParent = Ext.ComponentQuery.query('cmv_map')[0];
         }
 
         // create a temporary draw layer unless one has already been set
