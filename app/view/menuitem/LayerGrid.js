@@ -78,6 +78,7 @@ Ext.define('CpsiMapview.view.menuitem.LayerGrid', {
 
             Ext.apply(windowConfig, {
                 title: title,
+                layout: 'fit',
                 items: [{
                     xtype: gridXType
                 }],

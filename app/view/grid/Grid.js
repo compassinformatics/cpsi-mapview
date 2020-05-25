@@ -20,7 +20,6 @@ Ext.define('CpsiMapview.view.grid.Grid', {
 
     plugins: ['gridfilters'],
     width: 1050,
-    height: 550,
 
     /**
      * The distance used to buffer a feature when the zoomToFeature
