@@ -72,24 +72,13 @@ Ext.define('CpsiMapview.view.LayerTree', {
     initLayersAdded: false,
 
     /**
-     * Constructor which either directly assigns a GeoExt.data.store.LayersTree
-     * or sets up a listener which does this as soon as the application itself
-     * fires the `mapready`-event.
+     * Constructor for the custom layer tree component
      *
      * @param  {Object} cfg The configuration of the tree which we may change.
      */
     constructor: function (cfg) {
         var me = this;
-
         me.callParent([cfg]);
-
-        var mapComp = BasiGX.util.Map.getMapComponent();
-        me.map = mapComp && mapComp.getMap();
-        if (me.map) {
-            me.setStore(me.makeLayerStore(me.map));
-        } else {
-            Ext.GlobalEvents.on('cmv-mapready', me.autoConnectToMap);
-        }
     },
 
     /**
@@ -101,6 +90,7 @@ Ext.define('CpsiMapview.view.LayerTree', {
 
         mapPanel.on('cmv-init-layersadded', function () {
             me.initLayersAdded = true;
+            me.autoConnectToMap(); // connect after all the layers have been loaded to the map
         });
 
         me.callParent();
@@ -108,13 +98,15 @@ Ext.define('CpsiMapview.view.LayerTree', {
 
     /**
      * Guesses the mapcomponent and assigns the appropriate layers store, if one
-     * could be guessed. This is bound as listener to the mapready event of the
-     * application.
-     *
-     * TODO this may change to use the passed map view from the mapready event.
+     * could be guessed. 
      */
     autoConnectToMap: function () {
+
         var me = this;
+
+        var mapComp = BasiGX.util.Map.getMapComponent();
+        me.map = mapComp && mapComp.getMap();
+
         if (me.map) {
             var store = me.makeLayerStore();
             me.setStore(store);
@@ -225,7 +217,7 @@ Ext.define('CpsiMapview.view.LayerTree', {
 
         // wrapping all under the 'root' node aggregating all together
         var rootLayerGroup = new ol.layer.Group({
-            name: 'Root',
+            name: 'root',
             layers: []
         });
         // recursively create the OL layer group by the given tree structure
@@ -236,7 +228,7 @@ Ext.define('CpsiMapview.view.LayerTree', {
 
     /**
      * Creates recursively the OL layer groups for the given tree structure and
-     * puts them all togheter in the given parent group so they get folders in the LayerTree.
+     * puts them all together in the given parent group so they get folders in the LayerTree.
      * Layers are directly put to the given parent group so they appear as "leafs" in the LayerTree.
      *
      * @param  {Object} treeNodesJson Child section of the LayerTree structure
@@ -264,6 +256,8 @@ Ext.define('CpsiMapview.view.LayerTree', {
                 var mapLyr = BasiGX.util.Layer.getLayerBy('layerKey', child.id);
                 if (mapLyr) {
                     parentGroup.getLayers().insertAt(0, mapLyr);
+                } else {
+                    Ext.Logger.warn('Layer with layerKey ' + child.id + ' not found in map layers');
                 }
             }
         });
