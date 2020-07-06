@@ -98,7 +98,7 @@ Ext.define('CpsiMapview.view.LayerTree', {
 
     /**
      * Guesses the mapcomponent and assigns the appropriate layers store, if one
-     * could be guessed. 
+     * could be guessed.
      */
     autoConnectToMap: function () {
 
