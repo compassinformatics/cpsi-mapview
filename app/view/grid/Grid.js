@@ -66,7 +66,7 @@ Ext.define('CpsiMapview.view.grid.Grid', {
             stroke: new ol.style.Stroke({
                 width: 3,
                 color: '#0ff'
-            })            
+            })
         }),
         bind: {
             map: '{map}'
