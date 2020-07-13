@@ -54,7 +54,7 @@ Ext.define('CpsiMapview.controller.button.SpatialQueryButtonController', {
             view.queryLayer = BasiGX.util.Layer.
                 getLayerByName(view.queryLayerName);
         }
-        
+
         if (!view.queryLayer) {
             Ext.Logger.warn('No queryLayer found in the map for the SpatialQueryButton with the name: ' + view.queryLayerName);
         }
