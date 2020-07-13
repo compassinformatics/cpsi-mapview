@@ -23,6 +23,8 @@ Ext.define('CpsiMapview.view.toolbar.CircleSelectionToolbar', {
 
     controller: 'cmv_circle_selection_toolbar',
 
+    cls: 'cmv_circle_selection_toolbar',
+
     name: 'circleSelectionTool',
 
     dock: 'top',
