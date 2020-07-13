@@ -57,7 +57,7 @@ Ext.define('CpsiMapview.controller.button.SpatialQueryButtonController', {
         
         if (!view.queryLayer) {
             Ext.Logger.warn('No queryLayer found in the map for the SpatialQueryButton with the name: ' + view.queryLayerName);
-        }        
+        }
     },
 
     /**
