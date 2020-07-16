@@ -480,7 +480,6 @@ Ext.define('CpsiMapview.factory.Layer', {
             isNumericDependent: Ext.isDefined(layerConf.numericitem),
             styles: layerConf.styles,
             stylesBaseUrl: layerConf.stylesBaseUrl || '',
-            stylesForceNumericFilterVals: layerConf.stylesForceNumericFilterVals,
             sldUrl: layerConf.sldUrl,
             sldUrlLabel: layerConf.sldUrlLabel
         };
@@ -502,7 +501,7 @@ Ext.define('CpsiMapview.factory.Layer', {
 
         if (sldUrl) {
             // load and parse style and apply it to layer
-            LayerFactory.loadSld(wfsLayer, sldUrl, layerConf.stylesForceNumericFilterVals);
+            LayerFactory.loadSld(wfsLayer, sldUrl);
         }
 
         if (layerConf.tooltipsConfig) {
@@ -702,7 +701,6 @@ Ext.define('CpsiMapview.factory.Layer', {
             isVt: true,
             styles: layerConf.styles,
             stylesBaseUrl: layerConf.stylesBaseUrl || '',
-            stylesForceNumericFilterVals: layerConf.stylesForceNumericFilterVals,
             toolTipConfig: layerConf.tooltipsConfig,
             sldUrl: layerConf.sldUrl,
             sldUrlLabel: layerConf.sldUrlLabel
@@ -724,7 +722,7 @@ Ext.define('CpsiMapview.factory.Layer', {
         }
         if (sldUrl) {
             // load and parse style and apply it to layer
-            LayerFactory.loadSld(vtLayer, sldUrl, layerConf.stylesForceNumericFilterVals);
+            LayerFactory.loadSld(vtLayer, sldUrl);
         }
 
         if (layerConf.tooltipsConfig) {
@@ -840,7 +838,7 @@ Ext.define('CpsiMapview.factory.Layer', {
      * @param  {ol.layer.Vector} mapLayer The layer to apply the style to
      * @param  {String} sldUrl   The URL to the SLD
      */
-    loadSld: function (mapLayer, sldUrl, forceNumericFilterVals) {
+    loadSld: function (mapLayer, sldUrl) {
         Ext.Ajax.request({
             url: sldUrl,
             method: 'GET',
@@ -851,11 +849,6 @@ Ext.define('CpsiMapview.factory.Layer', {
 
                 sldParser.readStyle(sldXml)
                     .then(function (gs) {
-
-                        if (forceNumericFilterVals) {
-                            // transform filter values to numbers ('1' => 1)
-                            gs = LayerFactory.forceNumericFilterValues(gs);
-                        }
 
                         olParser.writeStyle(gs).then(function (olStyle) {
                             mapLayer.setStyle(olStyle);
@@ -910,24 +903,6 @@ Ext.define('CpsiMapview.factory.Layer', {
         mapPanel.on('cmv-map-pointerrestout', function () {
             CpsiMapview.view.layer.ToolTip.clear();
         });
-    },
-
-    /**
-     * Transforms the filter values in the given GeoStyler style object to
-     * a number (if numeric).
-     *
-     * @param  {Object} gsStyle GeoStyler style object
-     * @return {Object}         GeoStyler style object with numeric filter vals
-     */
-    forceNumericFilterValues: function (gsStyle) {
-        Ext.each(gsStyle.rules, function (rule) {
-            var filterVal = rule.filter[2];
-            if (Ext.isNumeric(filterVal)) {
-                rule.filter[2] = parseFloat(filterVal);
-            }
-        });
-
-        return gsStyle;
     },
 
     /**
@@ -997,9 +972,8 @@ Ext.define('CpsiMapview.factory.Layer', {
                     // TODO following code duplicated in CpsiMapview.view.layer.StyleSwitcherRadioGroup
                     var sldUrl = newLayer.get('stylesBaseUrl') + activeStyle;
                     // transform filter values to numbers ('1' => 1)
-                    var forceNumericFilterVals = newLayer.get('stylesForceNumericFilterVals');
                     // load and parse SLD and apply it to layer
-                    LayerFactory.loadSld(newLayer, sldUrl, forceNumericFilterVals);
+                    LayerFactory.loadSld(newLayer, sldUrl);
                     newLayerSource.clear();
                     newLayerSource.refresh();
 

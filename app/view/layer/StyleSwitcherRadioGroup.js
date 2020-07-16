@@ -167,10 +167,8 @@ Ext.define('CpsiMapview.view.layer.StyleSwitcherRadioGroup', {
                     }
 
                 }
-                // transform filter values to numbers ('1' => 1)
-                var forceNumericFilterVals = layer.get('stylesForceNumericFilterVals');
                 // load and parse SLD and apply it to layer
-                LayerFactory.loadSld(layer, sldUrl, forceNumericFilterVals);
+                LayerFactory.loadSld(layer, sldUrl);
 
                 if ((layer.get('isWfs') || layer.get('isVt')) && layerTreePanel) {
                     // force update of corresponding layer node UI (e.g. legend)
