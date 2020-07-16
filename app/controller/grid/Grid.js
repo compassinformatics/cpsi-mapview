@@ -396,6 +396,40 @@ Ext.define('CpsiMapview.controller.grid.Grid', {
         store.reload();
     },
 
+
+    /**
+     * Hide and show the map layer with the grid
+     * Although the layer has no styling we need to hide
+     * any selections which are visible
+     */
+    toggleLayerVisibility: function (show) {
+
+        var me = this;
+        var grid = me.getView();
+        var store = grid.getStore();
+
+        if (store.isEmptyStore !== true) {
+            var layer = store.getLayer();
+            layer.setVisible(show);
+        }
+    },
+
+    /**
+     * Template method for Ext.Component that
+     * can be overridden
+     */
+    onHide: function () {
+        this.toggleLayerVisibility(false);
+    },
+
+    /**
+    * Template method for Ext.Component that
+    * can be overridden
+    */
+    onShow: function () {
+        this.toggleLayerVisibility(true);
+    },
+
     /**
     * Clear both the grid filters and any spatial filter.
     * This will cause the store to reload.
