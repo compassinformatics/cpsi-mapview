@@ -158,7 +158,7 @@ Ext.define('CpsiMapview.controller.button.DigitizeButtonController', {
                 me.modifyInteraction.setActive(true);
             }
             if (me.getView().getUseContextMenu()) {
-                me.map.getViewport().addEventListener('contextmenu', me.showContextMenu.bind(me));
+                me.map.getViewport().addEventListener('contextmenu', me.contextHandler);
             }
         } else {
             if (type === 'Polygon') {
@@ -168,7 +168,7 @@ Ext.define('CpsiMapview.controller.button.DigitizeButtonController', {
                 me.removeCircleSelectToolbar();
             }
             if (me.getView().getUseContextMenu()) {
-                me.map.getViewport().removeEventListener('contextmenu', me.showContextMenu.bind(me));
+                me.map.getViewport().removeEventListener('contextmenu', me.contextHandler);
             }
             me.drawInteraction.setActive(false);
 
@@ -207,7 +207,8 @@ Ext.define('CpsiMapview.controller.button.DigitizeButtonController', {
         // suppress default browser behaviour
         evt.preventDefault();
 
-        var me = this;
+        var me = this.scope;
+
         var radioGroupItems = [];
         if (me.contextMenuGroupsCounter === 0) {
             radioGroupItems.push(me.getRadioGroupItem(0, true));
@@ -640,5 +641,17 @@ Ext.define('CpsiMapview.controller.button.DigitizeButtonController', {
             }]
         });
         me.win.showAt(100, 100);
+    },
+
+    init: function () {
+
+        var me = this;
+
+        // create an object for the contextmenu eventhandler
+        // so it can be removed correctly
+        me.contextHandler = {
+            handleEvent: me.showContextMenu,
+            scope: me
+        };
     }
 });
