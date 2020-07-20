@@ -523,6 +523,10 @@ Ext.define('CpsiMapview.controller.button.DigitizeButtonController', {
         if (this.resultLayer) {
             this.map.removeLayer(this.resultLayer);
         }
+
+        if (this.circleToolbar) {
+            this.circleToolbar.destroy();
+        }
     },
 
     /**
