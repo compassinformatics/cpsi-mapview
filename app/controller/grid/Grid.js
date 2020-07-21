@@ -301,9 +301,7 @@ Ext.define('CpsiMapview.controller.grid.Grid', {
             me.originalPageSize = store.pageSize;
         }
 
-        if (!me.originalHeight) {
-            me.originalHeight = grid.getHeight();
-        }
+        var originalHeight = grid.getHeight();
 
         if (checked) {
             store.pageSize = me.originalPageSize;
@@ -314,7 +312,7 @@ Ext.define('CpsiMapview.controller.grid.Grid', {
             store.startIndex = 0;
             // avoid the grid resizing to fill up the whole screen
             // set it to the height before paging was deactivated
-            grid.setHeight(me.originalHeight);
+            grid.setHeight(originalHeight);
         }
 
         store.loadWfs();
