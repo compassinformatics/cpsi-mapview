@@ -490,13 +490,12 @@ Ext.define('CpsiMapview.controller.grid.Grid', {
 
         var gridStoreType = viewModel.get('gridStoreType');
         var layerName = viewModel.get('gridLayerName');
-        var vectorLayerKey = viewModel.get('vectorLayerKey');
 
         // TODO check why we can't simply add a {'queryLayerName'} binding in
         // the grid view - already created ?
         var spatialQueryButton = viewModel.getView().down('cmv_spatial_query_button');
         spatialQueryButton.setQueryLayerName(layerName);
-        spatialQueryButton.setVectorLayerKey(vectorLayerKey);
+        spatialQueryButton.setVectorLayerKey(layerName); // this name will have _spatialfilter appended to it
 
         // dynamically create the store based on the config setting
 
