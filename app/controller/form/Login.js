@@ -153,7 +153,7 @@ Ext.define('CpsiMapview.controller.form.Login', {
 
     },
 
-    init: function () {
+    initViewModel: function () {
         this.tryAutomaticLogin();
     }
 
