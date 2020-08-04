@@ -488,6 +488,10 @@ Ext.define('CpsiMapview.controller.grid.Grid', {
     */
     initViewModel: function (viewModel) {
 
+        var me = this;
+
+        me.addChildModelListener();
+
         var gridStoreType = viewModel.get('gridStoreType');
         var layerName = viewModel.get('gridLayerName');
 
@@ -513,10 +517,5 @@ Ext.define('CpsiMapview.controller.grid.Grid', {
         };
 
         viewModel.setStores(stores);
-    },
-
-    init: function () {
-        var me = this;
-        me.addChildModelListener();
     }
 });
