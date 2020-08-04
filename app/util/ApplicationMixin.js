@@ -61,7 +61,7 @@ Ext.define('CpsiMapview.util.ApplicationMixin', {
         if (Ext.Array.some(me.serviceUrls, urlTest) === true) {
             if (Ext.Array.some(me.excludedUrls, urlTest) === false) {
 
-                var responseType = response.getResponseHeader('content-type') || null;
+                var responseType = response.responseType ? response.responseType: response.getResponseHeader('content-type');
 
                 // check for geojson (coming from MapServer)
                 if (responseType && responseType.includes('subtype=geojson')) {
