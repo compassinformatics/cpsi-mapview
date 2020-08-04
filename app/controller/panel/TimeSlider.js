@@ -155,11 +155,11 @@ Ext.define('CpsiMapview.controller.panel.TimeSlider', {
         var timeIncrementUnit = view.timeIncrementUnit || 'year';
         var dateFormat = '';
         switch (timeIncrementUnit) {
-        case 'month':
-            dateFormat = 'm/Y';
-            break;
-        default:
-            dateFormat = 'Y';
+            case 'month':
+                dateFormat = 'm/Y';
+                break;
+            default:
+                dateFormat = 'Y';
         }
         return Ext.Date.format(
             me.getDateForSliderValue(sliderValue),
@@ -178,12 +178,12 @@ Ext.define('CpsiMapview.controller.panel.TimeSlider', {
         var view = me.getView();
         var timeIncrementUnit = view.timeIncrementUnit || 'year';
         switch (timeIncrementUnit) {
-        case 'month':
-            var month = sliderValue % 12;
-            var year = (sliderValue - month) / 12;
-            return new Date(1900 + year, month, 1);
-        default:
-            return new Date(1900 + sliderValue, 0, 1);
+            case 'month':
+                var month = sliderValue % 12;
+                var year = (sliderValue - month) / 12;
+                return new Date(1900 + year, month, 1);
+            default:
+                return new Date(1900 + sliderValue, 0, 1);
         }
     },
 
@@ -208,16 +208,16 @@ Ext.define('CpsiMapview.controller.panel.TimeSlider', {
         var minValue = 0;
         var maxValue = 100;
         switch (timeIncrementUnit) {
-        case 'month':
-            minValue = Ext.Date.getFirstDateOfMonth(startDate).getYear()
+            case 'month':
+                minValue = Ext.Date.getFirstDateOfMonth(startDate).getYear()
                     * 12 + Ext.Date.getFirstDateOfMonth(startDate).getMonth();
-            maxValue = Ext.Date.getLastDateOfMonth(endDate).getYear()
+                maxValue = Ext.Date.getLastDateOfMonth(endDate).getYear()
                     * 12 + Ext.Date.getLastDateOfMonth(endDate).getMonth();
-            break;
-        default:
-            minValue = startDate.getYear();
-            maxValue = endDate.getYear();
-            break;
+                break;
+            default:
+                minValue = startDate.getYear();
+                maxValue = endDate.getYear();
+                break;
         }
 
         // use passed starting date if selected date is not set
@@ -228,17 +228,17 @@ Ext.define('CpsiMapview.controller.panel.TimeSlider', {
         var rangeLower = 50;
         var rangeUpper = 50;
         switch (timeIncrementUnit) {
-        case 'month':
-            var value = Ext.Date.getFirstDateOfMonth(selDate).getYear()
+            case 'month':
+                var value = Ext.Date.getFirstDateOfMonth(selDate).getYear()
                     * 12 + Ext.Date.getFirstDateOfMonth(selDate).getMonth();
-            rangeLower = value;
-            rangeUpper = isRange ? value + 1 : maxValue;
-            break;
-        default:
-            value = selDate.getYear();
-            rangeLower = value;
-            rangeUpper = isRange ? value + 1 : maxValue;
-            break;
+                rangeLower = value;
+                rangeUpper = isRange ? value + 1 : maxValue;
+                break;
+            default:
+                value = selDate.getYear();
+                rangeLower = value;
+                rangeUpper = isRange ? value + 1 : maxValue;
+                break;
         }
 
         return {
