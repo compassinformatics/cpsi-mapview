@@ -61,19 +61,23 @@ Ext.define('CpsiMapview.util.ApplicationMixin', {
         if (Ext.Array.some(me.serviceUrls, urlTest) === true) {
             if (Ext.Array.some(me.excludedUrls, urlTest) === false) {
 
-                var responseType = response.responseType ? response.responseType : null;
+                var responseType = response.getResponseHeader('content-type') || null;
 
-                if (!responseType) {
-                    // check for geojson (coming from MapServer)
-                    var headers = response.getAllResponseHeaders();
-                    if (headers['content-type'].includes('subtype=geojson')) {
-                        responseType = 'geojson';
-                    }
+                // check for geojson (coming from MapServer)
+                if (responseType && responseType.includes('subtype=geojson')) {
+                    responseType = 'geojson';
                 }
 
                 switch (responseType) {
                     case 'json':
-                        result = response.responseJson;
+                    case 'application/json':
+                        if (response.responseJson) {
+                            result = response.responseJson;
+                        }
+                        else {
+                            result = JSON.parse(response.responseText);
+                        }
+
                         if (result.success !== true) {
                             switch (result.errorCode) {
                                 case me.errorCode.UserTokenExpired:
