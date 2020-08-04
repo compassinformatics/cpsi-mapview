@@ -30,59 +30,59 @@ Ext.define('CpsiMapview.factory.Layer', {
         var mapLayer;
 
         switch (layerType) {
-        case 'wms':
-            mapLayer = LayerFactory.createWms(layerConf);
-            break;
-        case 'wfs':
-            mapLayer = LayerFactory.createWfs(layerConf);
-            break;
-        case 'xyz':
-            mapLayer = LayerFactory.createXyz(layerConf);
-            break;
-        case 'osm':
-            mapLayer = LayerFactory.createOsm(layerConf);
-            break;
-        case 'empty':
-            mapLayer = LayerFactory.createEmptyLayer(layerConf);
-            break;
-        case 'bing_aerial':
-            mapLayer = LayerFactory.createBing(layerConf, 'Aerial');
-            break;
-        case 'google_roadmap':
-            mapLayer = LayerFactory.createGoogle(layerConf, 'google.maps.MapTypeId.ROADMAP');
-            break;
-        case 'google_terrain':
-            mapLayer = LayerFactory.createGoogle(layerConf, 'google.maps.MapTypeId.TERRAIN');
-            break;
-        case 'google_hybrid':
-            mapLayer = LayerFactory.createGoogle(layerConf, 'google.maps.MapTypeId.HYBRID');
-            break;
-        case 'google_satellite':
-            mapLayer = LayerFactory.createGoogle(layerConf, 'google.maps.MapTypeId.SATELLITE');
-            break;
-        case 'nasa':
-            mapLayer = LayerFactory.createNasa(layerConf);
-            break;
-        case 'os':
-            mapLayer = LayerFactory.createOs(layerConf);
-            break;
-        case 'arcgiscache':
-            mapLayer = LayerFactory.createArcGisCache(layerConf);
-            break;
-        case 'arcgisrest':
-            mapLayer = LayerFactory.createArcGisRest(layerConf);
-            break;
-        case 'switchlayer':
-            mapLayer = LayerFactory.createSwitchLayer(layerConf);
-            break;
-        case 'vt':
-            mapLayer = LayerFactory.createVectorTilesLayer(layerConf);
-            break;
-        case 'vtwms':
-            mapLayer = LayerFactory.createVectorTilesWmsLayer(layerConf);
-            break;
-        default:
-            Ext.log.warn('Layer type not known');
+            case 'wms':
+                mapLayer = LayerFactory.createWms(layerConf);
+                break;
+            case 'wfs':
+                mapLayer = LayerFactory.createWfs(layerConf);
+                break;
+            case 'xyz':
+                mapLayer = LayerFactory.createXyz(layerConf);
+                break;
+            case 'osm':
+                mapLayer = LayerFactory.createOsm(layerConf);
+                break;
+            case 'empty':
+                mapLayer = LayerFactory.createEmptyLayer(layerConf);
+                break;
+            case 'bing_aerial':
+                mapLayer = LayerFactory.createBing(layerConf, 'Aerial');
+                break;
+            case 'google_roadmap':
+                mapLayer = LayerFactory.createGoogle(layerConf, 'google.maps.MapTypeId.ROADMAP');
+                break;
+            case 'google_terrain':
+                mapLayer = LayerFactory.createGoogle(layerConf, 'google.maps.MapTypeId.TERRAIN');
+                break;
+            case 'google_hybrid':
+                mapLayer = LayerFactory.createGoogle(layerConf, 'google.maps.MapTypeId.HYBRID');
+                break;
+            case 'google_satellite':
+                mapLayer = LayerFactory.createGoogle(layerConf, 'google.maps.MapTypeId.SATELLITE');
+                break;
+            case 'nasa':
+                mapLayer = LayerFactory.createNasa(layerConf);
+                break;
+            case 'os':
+                mapLayer = LayerFactory.createOs(layerConf);
+                break;
+            case 'arcgiscache':
+                mapLayer = LayerFactory.createArcGisCache(layerConf);
+                break;
+            case 'arcgisrest':
+                mapLayer = LayerFactory.createArcGisRest(layerConf);
+                break;
+            case 'switchlayer':
+                mapLayer = LayerFactory.createSwitchLayer(layerConf);
+                break;
+            case 'vt':
+                mapLayer = LayerFactory.createVectorTilesLayer(layerConf);
+                break;
+            case 'vtwms':
+                mapLayer = LayerFactory.createVectorTilesWmsLayer(layerConf);
+                break;
+            default:
+                Ext.log.warn('Layer type not known');
             //do nothing, and return empty layer
         }
 
