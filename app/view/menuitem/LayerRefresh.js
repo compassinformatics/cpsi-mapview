@@ -6,7 +6,9 @@
 Ext.define('CpsiMapview.view.menuitem.LayerRefresh', {
     extend: 'Ext.menu.Item',
     xtype: 'cmv_menuitem_layerrefresh',
-    requires: [],
+    requires: [
+        'CpsiMapview.util.Layer'
+    ],
 
     /**
      * The connected layer for this item.
@@ -20,7 +22,6 @@ Ext.define('CpsiMapview.view.menuitem.LayerRefresh', {
      * @cfg {String}
      */
     text: 'Refresh',
-
 
     /**
      * @private
@@ -46,20 +47,8 @@ Ext.define('CpsiMapview.view.menuitem.LayerRefresh', {
      */
     handlerFunc: function () {
         var me = this;
-        var source = me.layer.getSource();
-
-        // mostly WMS layers
-        if (source.updateParams) {
-            var params = source.getParams();
-            params.noCache = new Date().getMilliseconds();
-            source.updateParams(params);
-            source.refresh();
-        } else if (me.layer.get('isWfs') === true) {
-            // for WFS trigger reload of source
-            source.clear();
-        } else {
-            // only refresh for other layers and sources (to not loose data)
-            source.refresh();
-        }
+        var layer = me.layer;
+        var layerUtil = CpsiMapview.util.Layer;
+        layerUtil.layerRefresh(layer);
     }
 });
