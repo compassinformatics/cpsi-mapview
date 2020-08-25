@@ -1,0 +1,101 @@
+# Pipeline to build and minify the project
+
+# Useful links
+# https://adamtheautomator.com/azure-devops-pipelines-powershell/
+# https://aka.ms/yaml
+
+trigger:
+  - master
+
+pool:
+  vmImage: 'windows-2019'
+
+# inbuilt variables at https://docs.microsoft.com/en-us/azure/devops/pipelines/build/variables?view=azure-devops&tabs=yaml
+
+variables:
+    SENCHA_EXT_VERSION: '6.2.0'
+    SENCHA_CMD_VERSION: '6.5.2'
+
+# first get the ExtJS framework and unzip it, unless this has already been cached
+
+steps:
+- task: CacheBeta@1
+  inputs:
+    key: ext
+    path: $(System.DefaultWorkingDirectory)/ext
+    cacheHitVar: CACHE_RESTORED
+  displayName: 'Get Cached ExtJS Framework'
+
+- powershell: Invoke-WebRequest -Uri "http://cdn.sencha.com/ext/gpl/ext-$($env:SENCHA_EXT_VERSION)-gpl.zip" -OutFile "ExtJS.zip"
+  condition: ne(variables.CACHE_RESTORED, 'true')
+  displayName: 'Download ExtJS Framework'
+
+- task: ExtractFiles@1
+  inputs:
+    archiveFilePatterns: '$(System.DefaultWorkingDirectory)/ExtJS.zip'
+    destinationFolder: '$(System.DefaultWorkingDirectory)'
+    # set following or it will delete the zip!
+    cleanDestinationFolder: false 
+  condition: ne(variables.CACHE_RESTORED, 'true')
+  displayName: 'Unzip ExtJS Framework'
+
+# rename the framework folder to ext
+- powershell: Rename-Item -Path ext-$($env:SENCHA_EXT_VERSION) -newName ext
+  condition: ne(variables.CACHE_RESTORED, 'true')
+  displayName: 'Rename ExtJS Framework Folder'
+
+# now let's download and install SenchaCmd
+
+- task: CacheBeta@1
+  inputs:
+    key: sencha-cmd
+    path: $(System.DefaultWorkingDirectory)/sencha-cmd
+    cacheHitVar: CMD_CACHE_RESTORED
+  displayName: 'Get Cached SenchaCmd'
+
+- powershell: Invoke-WebRequest -Uri "http://cdn.sencha.com/cmd/$($env:SENCHA_CMD_VERSION)/jre/SenchaCmd-$($env:SENCHA_CMD_VERSION)-windows-64bit.zip" -OutFile "SenchaCmd.zip"
+  condition: ne(variables.CMD_CACHE_RESTORED, 'true')
+  displayName: 'Download SenchaCmd'
+
+- task: ExtractFiles@1
+  inputs:
+    archiveFilePatterns: "$(System.DefaultWorkingDirectory)/SenchaCmd.zip"
+    destinationFolder:  $(System.DefaultWorkingDirectory)/sencha-cmd
+  condition: ne(variables.CMD_CACHE_RESTORED, 'true')
+  displayName: 'Unzip SenchaCmd'
+
+- powershell: $senchaCmdExists = Test-Path -Path "$(System.DefaultWorkingDirectory)/sencha-cmd/sencha.exe"
+  displayName: 'Check if SenchaCmd is Installed'
+
+# Run the SenchaCmd installer
+# https://docs.sencha.com/cmd/guides/intro_to_cmd.html#intro_to_cmd_-_installing_sencha_cmd_silently
+# https://docs.microsoft.com/en-us/azure/devops/pipelines/tasks/utility/powershell?view=azure-devops
+- powershell: ./SenchaCmd-6.5.2.15-windows-64bit.exe -q -dir "."
+  workingDirectory:  $(System.DefaultWorkingDirectory)/sencha-cmd
+  displayName: 'Install SenchaCmd'
+  condition: ne(variables.senchaCmdExists, True)
+
+# Now we can begin the production build process
+
+- script: git submodule update --init --recursive
+  displayName: 'Update git Dependencies'
+
+- script: |
+    npm install
+  displayName: 'Install NodeJS Dependencies'
+
+- script: npm test
+  displayName: 'Run Tests'
+
+- script: |
+     $(System.DefaultWorkingDirectory)/sencha-cmd/sencha which
+     $(System.DefaultWorkingDirectory)/sencha-cmd/sencha -info app build
+  displayName: 'Build Production'
+
+# Now publish the build
+# https://docs.microsoft.com/en-us/azure/devops/pipelines/artifacts/build-artifacts?view=azure-devops&tabs=yaml
+- task: PublishBuildArtifacts@1
+  inputs:
+    pathtoPublish: '$(System.DefaultWorkingDirectory)/build/production/CpsiMapview'
+    artifactName: CpsiMapview
+  displayName: 'Publish Output'

@@ -30,59 +30,59 @@ Ext.define('CpsiMapview.factory.Layer', {
         var mapLayer;
 
         switch (layerType) {
-        case 'wms':
-            mapLayer = LayerFactory.createWms(layerConf);
-            break;
-        case 'wfs':
-            mapLayer = LayerFactory.createWfs(layerConf);
-            break;
-        case 'xyz':
-            mapLayer = LayerFactory.createXyz(layerConf);
-            break;
-        case 'osm':
-            mapLayer = LayerFactory.createOsm(layerConf);
-            break;
-        case 'empty':
-            mapLayer = LayerFactory.createEmptyLayer(layerConf);
-            break;
-        case 'bing_aerial':
-            mapLayer = LayerFactory.createBing(layerConf, 'Aerial');
-            break;
-        case 'google_roadmap':
-            mapLayer = LayerFactory.createGoogle(layerConf, 'google.maps.MapTypeId.ROADMAP');
-            break;
-        case 'google_terrain':
-            mapLayer = LayerFactory.createGoogle(layerConf, 'google.maps.MapTypeId.TERRAIN');
-            break;
-        case 'google_hybrid':
-            mapLayer = LayerFactory.createGoogle(layerConf, 'google.maps.MapTypeId.HYBRID');
-            break;
-        case 'google_satellite':
-            mapLayer = LayerFactory.createGoogle(layerConf, 'google.maps.MapTypeId.SATELLITE');
-            break;
-        case 'nasa':
-            mapLayer = LayerFactory.createNasa(layerConf);
-            break;
-        case 'os':
-            mapLayer = LayerFactory.createOs(layerConf);
-            break;
-        case 'arcgiscache':
-            mapLayer = LayerFactory.createArcGisCache(layerConf);
-            break;
-        case 'arcgisrest':
-            mapLayer = LayerFactory.createArcGisRest(layerConf);
-            break;
-        case 'switchlayer':
-            mapLayer = LayerFactory.createSwitchLayer(layerConf);
-            break;
-        case 'vt':
-            mapLayer = LayerFactory.createVectorTilesLayer(layerConf);
-            break;
-        case 'vtwms':
-            mapLayer = LayerFactory.createVectorTilesWmsLayer(layerConf);
-            break;
-        default:
-            Ext.log.warn('Layer type not known');
+            case 'wms':
+                mapLayer = LayerFactory.createWms(layerConf);
+                break;
+            case 'wfs':
+                mapLayer = LayerFactory.createWfs(layerConf);
+                break;
+            case 'xyz':
+                mapLayer = LayerFactory.createXyz(layerConf);
+                break;
+            case 'osm':
+                mapLayer = LayerFactory.createOsm(layerConf);
+                break;
+            case 'empty':
+                mapLayer = LayerFactory.createEmptyLayer(layerConf);
+                break;
+            case 'bing_aerial':
+                mapLayer = LayerFactory.createBing(layerConf, 'Aerial');
+                break;
+            case 'google_roadmap':
+                mapLayer = LayerFactory.createGoogle(layerConf, 'google.maps.MapTypeId.ROADMAP');
+                break;
+            case 'google_terrain':
+                mapLayer = LayerFactory.createGoogle(layerConf, 'google.maps.MapTypeId.TERRAIN');
+                break;
+            case 'google_hybrid':
+                mapLayer = LayerFactory.createGoogle(layerConf, 'google.maps.MapTypeId.HYBRID');
+                break;
+            case 'google_satellite':
+                mapLayer = LayerFactory.createGoogle(layerConf, 'google.maps.MapTypeId.SATELLITE');
+                break;
+            case 'nasa':
+                mapLayer = LayerFactory.createNasa(layerConf);
+                break;
+            case 'os':
+                mapLayer = LayerFactory.createOs(layerConf);
+                break;
+            case 'arcgiscache':
+                mapLayer = LayerFactory.createArcGisCache(layerConf);
+                break;
+            case 'arcgisrest':
+                mapLayer = LayerFactory.createArcGisRest(layerConf);
+                break;
+            case 'switchlayer':
+                mapLayer = LayerFactory.createSwitchLayer(layerConf);
+                break;
+            case 'vt':
+                mapLayer = LayerFactory.createVectorTilesLayer(layerConf);
+                break;
+            case 'vtwms':
+                mapLayer = LayerFactory.createVectorTilesWmsLayer(layerConf);
+                break;
+            default:
+                Ext.log.warn('Layer type not known');
             //do nothing, and return empty layer
         }
 
@@ -110,7 +110,7 @@ Ext.define('CpsiMapview.factory.Layer', {
             // indicator if a refresh option is offered in layer context menu
             var allowRefresh = layerConf.refreshLayerOption !== false;
             mapLayer.set('refreshLayerOption', allowRefresh);
-            // indicator if a label option is drawn in layer context menu
+            // indicator if a label option is drawn in layer context menu for wms layers
             mapLayer.set('labelClassName', layerConf.labelClassName);
             // indicator if an opacity slider is offered in layer context menu
             var allowOpacitySlider = layerConf.opacitySlider !== false;
@@ -174,18 +174,17 @@ Ext.define('CpsiMapview.factory.Layer', {
         var resolution = mapPanel.olMap.getView().getResolution();
 
         var resultLayer;
+        var olVisibility = { openLayers: { visibility: layerConf.visibility } };
         if (resolution < layerConf.switchResolution) {
             var confBelowSwitchResolution = layerConf.layers[1];
             // apply overall visibility to sub layer
-            confBelowSwitchResolution.openLayers.visibility =
-                layerConf.visibility;
+            Ext.Object.merge(confBelowSwitchResolution, olVisibility);
             resultLayer = LayerFactory.createLayer(confBelowSwitchResolution);
             resultLayer.set('currentSwitchType', 'below_switch_resolution');
         } else {
             var confAboveSwitchResolution = layerConf.layers[0];
             // apply overall visibility to sub layer
-            confAboveSwitchResolution.openLayers.visibility =
-                layerConf.visibility;
+            Ext.Object.merge(confAboveSwitchResolution, olVisibility);
             resultLayer = LayerFactory.createLayer(confAboveSwitchResolution);
             resultLayer.set('currentSwitchType', 'above_switch_resolution');
         }
@@ -212,19 +211,30 @@ Ext.define('CpsiMapview.factory.Layer', {
         var olSourceProps = this.ol2PropsToOlSourceProps(layerConf.openLayers);
         var olLayerProps = this.ol2PropsToOlLayerProps(layerConf.openLayers);
 
+        var serverOptions = {};
+
+        // force all keys to be uppercase
+        Ext.Object.each(layerConf.serverOptions, function (key, value) {
+            serverOptions[key.toUpperCase()] = value;
+        });
+
         // derive STYLES parameter: either directly set in serverOptions or we
         // we take the first of a possible SLD style list
-        var styles = layerConf.serverOptions.styles;
+        var styles = serverOptions.STYLES || '';
         var activatedStyle;
         if (Ext.isArray(layerConf.styles) && layerConf.styles.length) {
-            styles = layerConf.styles[0];
-            activatedStyle = layerConf.styles[0];
+            // check if first possible SLD style list is an object (with STYLES
+            // name and UI alias) or if the STYLES name is directly provided.
+            var firstStyle = layerConf.styles[0];
+            var stylesWmsParam =
+                Ext.isObject(firstStyle) ? firstStyle.name : firstStyle;
+            styles = stylesWmsParam;
+            activatedStyle = stylesWmsParam;
         }
 
         var olSourceConf = {
             url: layerConf.url,
             params: {
-                'LAYERS': layerConf.serverOptions.layers,
                 'STYLES': styles,
                 'TRANSPARENT': true,
                 'TILED': !singleTile
@@ -232,6 +242,14 @@ Ext.define('CpsiMapview.factory.Layer', {
             ratio: singleTile ? 1 : undefined,
             crossOrigin: 'anonymous'
         };
+
+        // apply any WMS serverOptions from the config to the params
+        olSourceConf.params = Ext.apply(olSourceConf.params, serverOptions);
+
+        if (!olSourceConf.params.LAYERS) {
+            Ext.log.warn('LAYERS parameter not set on WMS');
+        }
+
         olSourceConf = Ext.apply(olSourceConf, olSourceProps);
 
         var olLayerConf = {
@@ -399,14 +417,21 @@ Ext.define('CpsiMapview.factory.Layer', {
                     var contentType = xhr.getResponseHeader('Content-Type');
                     var format = vectorSource.getFormat();
 
-                    if (contentType.indexOf('application/json') !== -1) {
-                        var features = format.readFeatures(
-                            xhr.responseText
-                        );
-                        vectorSource.addFeatures(features);
-                        vectorSource.dispatchEvent('vectorloadend');
-                    } else {
+                    // on occasion a WFS response from MapServer is empty with no error
+                    // but with HTTP status 200 (for unknown reasons)
+                    // fail here to avoid OL parsing errors
+                    if (xhr.responseText === '') {
                         onError();
+                    } else {
+                        if (contentType.indexOf('application/json') !== -1) {
+                            var features = format.readFeatures(
+                                xhr.responseText
+                            );
+                            vectorSource.addFeatures(features);
+                            vectorSource.dispatchEvent('vectorloadend');
+                        } else {
+                            onError();
+                        }
                     }
                 } else {
                     onError();
@@ -455,7 +480,8 @@ Ext.define('CpsiMapview.factory.Layer', {
             isNumericDependent: Ext.isDefined(layerConf.numericitem),
             styles: layerConf.styles,
             stylesBaseUrl: layerConf.stylesBaseUrl || '',
-            stylesForceNumericFilterVals: layerConf.stylesForceNumericFilterVals
+            sldUrl: layerConf.sldUrl,
+            sldUrlLabel: layerConf.sldUrlLabel
         };
         olLayerConf = Ext.apply(olLayerConf, olLayerProps);
 
@@ -465,13 +491,17 @@ Ext.define('CpsiMapview.factory.Layer', {
         // we take the first of a possible SLD style list
         var sldUrl = layerConf.sldUrl;
         if (Ext.isArray(layerConf.styles) && layerConf.styles.length) {
-            sldUrl = wfsLayer.get('stylesBaseUrl') + layerConf.styles[0];
-            wfsLayer.set('activatedStyle', layerConf.styles[0]);
+            // check if first SLD style in list is an object (with SLD file
+            // name and UI alias) or if the SLD file name is directly provided
+            var firstStyle = layerConf.styles[0];
+            var style = Ext.isObject(firstStyle) ? firstStyle.name : firstStyle;
+            sldUrl = wfsLayer.get('stylesBaseUrl') + style;
+            wfsLayer.set('activatedStyle', style);
         }
 
         if (sldUrl) {
             // load and parse style and apply it to layer
-            LayerFactory.loadSld(wfsLayer, sldUrl, layerConf.stylesForceNumericFilterVals);
+            LayerFactory.loadSld(wfsLayer, sldUrl);
         }
 
         if (layerConf.tooltipsConfig) {
@@ -671,8 +701,9 @@ Ext.define('CpsiMapview.factory.Layer', {
             isVt: true,
             styles: layerConf.styles,
             stylesBaseUrl: layerConf.stylesBaseUrl || '',
-            stylesForceNumericFilterVals: layerConf.stylesForceNumericFilterVals,
-            toolTipConfig: layerConf.tooltipsConfig
+            toolTipConfig: layerConf.tooltipsConfig,
+            sldUrl: layerConf.sldUrl,
+            sldUrlLabel: layerConf.sldUrlLabel
         };
         olLayerConf = Ext.apply(olLayerConf, olLayerProps);
 
@@ -682,12 +713,16 @@ Ext.define('CpsiMapview.factory.Layer', {
         // we take the first of a possible SLD style list
         var sldUrl;
         if (Ext.isArray(layerConf.styles) && layerConf.styles.length) {
-            sldUrl = vtLayer.get('stylesBaseUrl') + layerConf.styles[0];
-            vtLayer.set('activatedStyle', layerConf.styles[0]);
+            // check if first SLD style in list is an object (with SLD file
+            // name and UI alias) or if the SLD file name is directly provided
+            var firstStyle = layerConf.styles[0];
+            var style = Ext.isObject(firstStyle) ? firstStyle.name : firstStyle;
+            sldUrl = vtLayer.get('stylesBaseUrl') + style;
+            vtLayer.set('activatedStyle', style);
         }
         if (sldUrl) {
             // load and parse style and apply it to layer
-            LayerFactory.loadSld(vtLayer, sldUrl, layerConf.stylesForceNumericFilterVals);
+            LayerFactory.loadSld(vtLayer, sldUrl);
         }
 
         if (layerConf.tooltipsConfig) {
@@ -803,7 +838,7 @@ Ext.define('CpsiMapview.factory.Layer', {
      * @param  {ol.layer.Vector} mapLayer The layer to apply the style to
      * @param  {String} sldUrl   The URL to the SLD
      */
-    loadSld: function (mapLayer, sldUrl, forceNumericFilterVals) {
+    loadSld: function (mapLayer, sldUrl) {
         Ext.Ajax.request({
             url: sldUrl,
             method: 'GET',
@@ -814,11 +849,6 @@ Ext.define('CpsiMapview.factory.Layer', {
 
                 sldParser.readStyle(sldXml)
                     .then(function (gs) {
-
-                        if (forceNumericFilterVals) {
-                            // transform filter values to numbers ('1' => 1)
-                            gs = LayerFactory.forceNumericFilterValues(gs);
-                        }
 
                         olParser.writeStyle(gs).then(function (olStyle) {
                             mapLayer.setStyle(olStyle);
@@ -873,24 +903,6 @@ Ext.define('CpsiMapview.factory.Layer', {
         mapPanel.on('cmv-map-pointerrestout', function () {
             CpsiMapview.view.layer.ToolTip.clear();
         });
-    },
-
-    /**
-     * Transforms the filter values in the given GeoStyler style object to
-     * a number (if numeric).
-     *
-     * @param  {Object} gsStyle GeoStyler style object
-     * @return {Object}         GeoStyler style object with numeric filter vals
-     */
-    forceNumericFilterValues: function (gsStyle) {
-        Ext.each(gsStyle.rules, function (rule) {
-            var filterVal = rule.filter[2];
-            if (Ext.isNumeric(filterVal)) {
-                rule.filter[2] = parseFloat(filterVal);
-            }
-        });
-
-        return gsStyle;
     },
 
     /**
@@ -960,9 +972,8 @@ Ext.define('CpsiMapview.factory.Layer', {
                     // TODO following code duplicated in CpsiMapview.view.layer.StyleSwitcherRadioGroup
                     var sldUrl = newLayer.get('stylesBaseUrl') + activeStyle;
                     // transform filter values to numbers ('1' => 1)
-                    var forceNumericFilterVals = newLayer.get('stylesForceNumericFilterVals');
                     // load and parse SLD and apply it to layer
-                    LayerFactory.loadSld(newLayer, sldUrl, forceNumericFilterVals);
+                    LayerFactory.loadSld(newLayer, sldUrl);
                     newLayerSource.clear();
                     newLayerSource.refresh();
 

@@ -33,7 +33,7 @@ Ext.define('CpsiMapview.view.button.DigitizeButton', {
 
     config: {
         /**
-         * The type to draw. Can be Point, Polygon or LineString
+         * The type to draw. Can be Point, Polygon, LineString or Circle
          */
         type: 'Point',
 
@@ -53,7 +53,7 @@ Ext.define('CpsiMapview.view.button.DigitizeButton', {
         useContextMenu: false,
 
         /**
-         * Shall the drawn feature be removed when a new gets drawn?
+         * Should the drawn feature be removed when a new feature gets drawn?
          */
         clearDrawnFeature: true,
 
@@ -88,7 +88,23 @@ Ext.define('CpsiMapview.view.button.DigitizeButton', {
          */
         pointExtentBuffer: 0,
 
-        resultLayer: null
+        /**
+         * Set a layer to store the solver results
+         * If not set a layer will be created and added to the map automatically
+         */
+        resultLayer: null,
+
+        /**
+         * Set a layer to store the features drawn by a user (points, polygons_
+         * If not set a layer will be created and added to the map automatically
+         */
+        drawLayer: null,
+
+        /**
+        * Should the results and draw layers be reset if the
+        * tool is deactivated?
+        */
+        resetOnToggle: true
     },
 
     /**
@@ -108,7 +124,6 @@ Ext.define('CpsiMapview.view.button.DigitizeButton', {
      */
     listeners: {
         toggle: 'onToggle',
-        beforedestroy: 'onBeforeDestroy',
-        responseFeatures: 'onResponseFeatures'
+        beforedestroy: 'onBeforeDestroy'
     }
 });

@@ -110,11 +110,11 @@ Ext.define('CpsiMapview.controller.grid.Grid', {
 
     /**
      * Applies both attribute and spatial filters to
-     * any associated WMS and vector layer
+     * any associated WMS and vector layer and forces a reload of both
      *
      * @private
      */
-    filterAssociatedLayers: function () {
+    updateAssociatedLayers: function () {
 
         var me = this;
         var grid = me.getView();
@@ -219,7 +219,64 @@ Ext.define('CpsiMapview.controller.grid.Grid', {
         store.loadWfs();
 
 
-        this.filterAssociatedLayers();
+        this.updateAssociatedLayers();
+    },
+
+
+    /**
+     * If there is an edit / view window for individual records
+     * in the grid then open it with this function
+     *
+     * @param {Ext.grid.View} grid
+     * @param {Ext.data.Model} record
+     * @private
+     */
+    onRowDblClick: function (grid, record) {
+
+        var me = this;
+        var vm = me.getViewModel();
+        var associatedEditWindow = vm.get('associatedEditWindow');
+        var associatedEditModel = vm.get('associatedEditModel');
+
+        // get a reference to the model class so we can use the
+        // static .load function without creating a new empty model
+        var modelPrototype = Ext.ClassManager.get(associatedEditModel);
+
+        if (associatedEditWindow && modelPrototype) {
+
+            // if the record is already open in a window then simply bring that window to the front
+            var recId = record.getId();
+            var windowXType = Ext.ClassManager.get(associatedEditWindow).prototype.getXType();
+            var existingWindows = Ext.ComponentQuery.query(windowXType);
+            var rec, recordWindow;
+
+            Ext.each(existingWindows, function (w) {
+                rec = w.getViewModel().get('currentRecord');
+                if (rec.getId() == recId) {
+                    recordWindow = w;
+                    return false;
+                }
+            });
+
+            if (recordWindow) {
+                Ext.WindowManager.bringToFront(recordWindow);
+            } else {
+                // load the record into a new window
+                grid.mask('Loading Record...');
+                modelPrototype.load(recId, {
+                    success: function (rec) {
+                        var win = Ext.create(associatedEditWindow);
+                        var vm = win.getViewModel();
+                        vm.set('currentRecord', rec);
+                        win.show();
+                    },
+                    callback: function () {
+                        grid.unmask();
+                    },
+                    scope: this
+                });
+            }
+        }
     },
     /**
     * Enable and disable paging for the grid.
@@ -240,17 +297,22 @@ Ext.define('CpsiMapview.controller.grid.Grid', {
         var store = grid.getStore();
 
         // save the initial store parameters
-
         if (!me.originalPageSize) {
             me.originalPageSize = store.pageSize;
         }
+
+        var originalHeight = grid.getHeight();
 
         if (checked) {
             store.pageSize = me.originalPageSize;
             store.startIndex = 0; // reset each time // me.startIndex;
         } else {
             store.pageSize = null;
+            store.currentPage = 1;
             store.startIndex = 0;
+            // avoid the grid resizing to fill up the whole screen
+            // set it to the height before paging was deactivated
+            grid.setHeight(originalHeight);
         }
 
         store.loadWfs();
@@ -272,6 +334,7 @@ Ext.define('CpsiMapview.controller.grid.Grid', {
             return;
         }
 
+        var originalMsg = grid.loadMask.msg;
         grid.setLoading('Exporting to Excel...');
 
         // later in an event listeners
@@ -281,7 +344,94 @@ Ext.define('CpsiMapview.controller.grid.Grid', {
             fileName: grid.exportFileName
         }).then(function () {
             grid.setLoading(false);
+            grid.loadMask.msg = originalMsg;
         });
+    },
+
+    /**
+    * Whenever columns are shown or hidden update
+    * the WFS propertyName so only data to
+    * be displayed is returned. The idProperty will
+    * always be returned even if the column is hidden.
+    *
+    */
+    getVisibleColumns: function () {
+
+        var me = this;
+        var grid = me.getView();
+        var store = grid.getStore();
+
+        var visibleColumnNames, idProperty;
+
+        if (!store.isEmptyStore) {
+            visibleColumnNames = Ext.Array.pluck(grid.getVisibleColumns(), 'dataIndex');
+            idProperty = store.model.prototype.idField.name;
+
+            // add the idProperty as the first item in the list
+            // if not already in list
+            if (visibleColumnNames.indexOf(idProperty) === -1) {
+                visibleColumnNames.unshift(idProperty);
+            }
+            // remove any null columns which may have been created by
+            // selection checkboxes for example
+            visibleColumnNames = Ext.Array.clean(visibleColumnNames);
+            store.propertyName = visibleColumnNames.join(',');
+        }
+    },
+
+    onColumnHide: function () {
+        this.getVisibleColumns();
+    },
+
+    onColumnsReconfigure: function () {
+        this.getVisibleColumns();
+    },
+
+    onColumnShow: function () {
+
+        var me = this;
+        var grid = me.getView();
+        var store = grid.getStore();
+
+        me.getVisibleColumns();
+
+        // when a new column is displayed
+        // query the server again to retrieve the data
+        store.reload();
+    },
+
+
+    /**
+     * Hide and show the map layer with the grid
+     * Although the layer has no styling we need to hide
+     * any selections which are visible
+     */
+    toggleLayerVisibility: function (show) {
+
+        var me = this;
+        var grid = me.getView();
+        var store = grid.getStore();
+
+        if (store.isEmptyStore !== true) {
+            var layer = store.getLayer();
+            layer.setVisible(show);
+        }
+    },
+
+    /**
+     * Template method for Ext.Component that
+     * can be overridden
+     */
+    onHide: function () {
+        this.toggleLayerVisibility(false);
+    },
+
+    /**
+    * Template method for Ext.Component that
+    * can be overridden
+    */
+    onShow: function () {
+        this.toggleLayerVisibility(true);
     },
 
     /**
@@ -291,8 +441,42 @@ Ext.define('CpsiMapview.controller.grid.Grid', {
     * @private
     */
     clearFilters: function () {
-        this.spatialFilter = null;
-        this.getView().getPlugin('gridfilters').clearFilters();
+        var me = this;
+        var view = me.getView();
+        me.spatialFilter = null;
+        view.getPlugin('gridfilters').clearFilters();
+
+        var spatialQueryButton = view.down('cmv_spatial_query_button');
+        if (spatialQueryButton !== null) {
+            spatialQueryButton.fireEvent('clearAssociatedPermanentLayer');
+            spatialQueryButton.toggle(false);
+        }
+    },
+
+    /**
+    * If any models associated with the grid are edited
+    * (for example in a child form) then automatically update
+    * the grid and associated layers
+    *
+    * @private
+    */
+    addChildModelListener: function () {
+
+        var me = this;
+        var vm = me.getViewModel();
+        var associatedEditModel = vm.get('associatedEditModel');
+
+        if (associatedEditModel) {
+            var modelPrototype = Ext.ClassManager.get(associatedEditModel);
+            Ext.util.Observable.observe(modelPrototype, {
+                modelsaved: function () {
+                    var grid = me.getView();
+                    var store = grid.getStore();
+                    store.loadWfs();
+                    me.updateAssociatedLayers();
+                }
+            });
+        }
     },
 
     /**
@@ -304,6 +488,10 @@ Ext.define('CpsiMapview.controller.grid.Grid', {
     */
     initViewModel: function (viewModel) {
 
+        var me = this;
+
+        me.addChildModelListener();
+
         var gridStoreType = viewModel.get('gridStoreType');
         var layerName = viewModel.get('gridLayerName');
 
@@ -311,6 +499,7 @@ Ext.define('CpsiMapview.controller.grid.Grid', {
         // the grid view - already created ?
         var spatialQueryButton = viewModel.getView().down('cmv_spatial_query_button');
         spatialQueryButton.setQueryLayerName(layerName);
+        spatialQueryButton.setVectorLayerKey(layerName); // this name will have _spatialfilter appended to it
 
         // dynamically create the store based on the config setting
 

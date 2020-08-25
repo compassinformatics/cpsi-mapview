@@ -97,22 +97,34 @@ Ext.define('CpsiMapview.plugin.TreeColumnStyleSwitcher', {
         me.callParent();
 
         // wait until all layers are loaded to the map
-        var mapCmp = CpsiMapview.view.main.Map.guess();
-        mapCmp.on('cmv-init-layersadded', function () {
+        var layerTree = treeColumn.up('treepanel');
+        layerTree.on('cmv-init-layertree', function () {
+            // render radio groups on initialisation
+            me.cleanupAllRadioGroups();
+            me.renderRadioGroups();
 
             // ensure the radio groups are re-rendered every time the tree view
             // changes (e.g.) layer visibility is changed
-            treeColumn.up('treepanel').getView().on('itemupdate', function () {
+            layerTree.getView().on('refresh', function () {
                 Ext.defer(function () {
                     me.cleanupAllRadioGroups();
                     me.renderRadioGroups();
                 }, 1);
             });
+        });
 
-            // Unfortunately we have to defer cascading of the LayerTree nodes.
-            // Otherwise they are not ready and we do not have a fitting event.
+        // ensure that the radio groups are rendered after a node has been
+        // dragged and dropped
+        treeColumn.up('treepanel').on('drop', function (node, data) {
             Ext.defer(function () {
-                me.renderRadioGroups();
+                me.cleanupAllRadioGroups();
+                // updates the whole node for the layer and forces the
+                // me.renderRadioGroups via 'itemupdate' event
+                // directly executing me.renderRadioGroups leaves some artifacts
+                if (data.records && data.records.length > 0 && data.records[0].getOlLayer()) {
+                    var layer = data.records[0].getOlLayer();
+                    treeColumn.up('treepanel').updateLayerNodeUi(layer);
+                }
             }, 1);
         });
     },
@@ -133,8 +145,8 @@ Ext.define('CpsiMapview.plugin.TreeColumnStyleSwitcher', {
             if (!node.get('isLayerGroup') && node.get('text') !== 'root') {
                 var lyrRecId = node.get('id');
                 var placeholderDomId = THIS_CLS.getDomId(lyrRecId);
-                var placeholderDiv =
-                    Ext.DomQuery.select('#' + placeholderDomId)[0];
+                // use fly to avoid Ext element cache which raises error
+                var placeholderDiv = Ext.fly(placeholderDomId);
                 var olLayer = node.getOlLayer();
 
                 if (placeholderDiv && olLayer.get('styles')) {
@@ -160,5 +172,7 @@ Ext.define('CpsiMapview.plugin.TreeColumnStyleSwitcher', {
         Ext.each(me.radioGroups, function (rg) {
             rg.destroy();
         });
+
+        me.radioGroups = [];
     }
 });

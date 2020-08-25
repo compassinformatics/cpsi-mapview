@@ -7,9 +7,10 @@ Ext.define('CpsiMapview.controller.button.DigitizeButtonController', {
         'BasiGX.util.Map',
         'BasiGX.util.MsgBox',
         'Ext.menu.Menu',
-        'Ext.window.Window',
+        'CpsiMapview.view.window.MinimizableWindow',
         'GeoExt.component.FeatureRenderer',
-        'GeoExt.data.store.Features'
+        'GeoExt.data.store.Features',
+        'CpsiMapview.view.toolbar.CircleSelectionToolbar'
     ],
 
     alias: 'controller.cmv_digitize_button',
@@ -46,6 +47,18 @@ Ext.define('CpsiMapview.controller.button.DigitizeButtonController', {
     modifyInteraction: null,
 
     /**
+     * CircleToolbar that will be set
+     * when pressing a button of type `Circle`
+     */
+    circleToolbar: null,
+
+    /**
+     * Parent to add the circleToolbar to. MUST
+     * implement the method `addDocked()`.
+     */
+    circleToolbarParent: null,
+
+    /**
      * The index of the currently active group
      * Only used when `useContextMenu` is true
      */
@@ -62,7 +75,7 @@ Ext.define('CpsiMapview.controller.button.DigitizeButtonController', {
      * @param {Ext.button.Button} btn The button that has been pressed
      * @param {boolean} pressed The toggle state of the button
      */
-    onToggle: function(btn, pressed) {
+    onToggle: function (btn, pressed) {
         var me = this;
         var view = me.getView();
 
@@ -71,29 +84,43 @@ Ext.define('CpsiMapview.controller.button.DigitizeButtonController', {
             me.map = BasiGX.util.Map.getMapComponent().map;
         }
 
-        // create a temporary draw layer
-        if (!me.drawLayer) {
-            me.drawLayer = new ol.layer.Vector({
-                source: new ol.source.Vector(),
-                displayInLayerSwitcher: false
-            });
-            me.map.addLayer(me.drawLayer);
+        // use default cmv_map Ext.panel.Panel for circle toolbar if not defined
+        if (!me.circleToolbarParent) {
+            me.circleToolbarParent = Ext.ComponentQuery.query('cmv_map')[0];
         }
 
+        // create a temporary draw layer unless one has already been set
+
+        if (!me.drawLayer) {
+            if (view.drawLayer) {
+                me.drawLayer = view.drawLayer;
+            } else {
+                me.drawLayer = new ol.layer.Vector({
+                    source: new ol.source.Vector(),
+                    displayInLayerSwitcher: false
+                });
+                me.map.addLayer(me.drawLayer);
+            }
+        }
+
+        var type = view.getType();
         // create the draw interaction
         if (!me.drawInteraction) {
-            var type = view.getType();
             var drawInteractionConfig = {
                 type: view.getMulti() ? 'Multi' + type : type,
                 source: me.drawLayer.getSource(),
-                condition: function(e) {
+                condition: function (e) {
                     // enable drawing with left mouse only
                     return e.originalEvent && e.originalEvent.buttons === 1;
                 }
             };
+            if (type === 'Circle') {
+                // Circle type does not support "multi", so we make sure that it is set appropriately
+                drawInteractionConfig.type = type;
+            }
             me.drawInteraction = new ol.interaction.Draw(drawInteractionConfig);
             // register listeners
-            me.drawInteraction.on('drawend', me.handleDrawEnd, me);
+            me.drawInteraction.on('drawend', type === 'Circle' ? me.handleCircleDrawEnd : me.handleDrawEnd, me);
             me.map.addInteraction(me.drawInteraction);
         }
 
@@ -101,7 +128,7 @@ Ext.define('CpsiMapview.controller.button.DigitizeButtonController', {
         if (type === 'Polygon' && !me.modifyInteraction) {
             var modifyInteractionConfig = {
                 source: me.drawLayer.getSource(),
-                deleteCondition: function(e) {
+                deleteCondition: function (e) {
                     return e.type === 'click' && e.originalEvent.ctrlKey;
                 }
             };
@@ -121,8 +148,8 @@ Ext.define('CpsiMapview.controller.button.DigitizeButtonController', {
                     source: new ol.source.Vector(),
                     style: view.getResultLayerStyle()
                 });
+                me.map.addLayer(me.resultLayer);
             }
-            me.map.addLayer(me.resultLayer);
         }
 
         if (pressed) {
@@ -131,23 +158,29 @@ Ext.define('CpsiMapview.controller.button.DigitizeButtonController', {
                 me.modifyInteraction.setActive(true);
             }
             if (me.getView().getUseContextMenu()) {
-                me.map.getViewport().addEventListener('contextmenu', me.showContextMenu.bind(me));
+                me.map.getViewport().addEventListener('contextmenu', me.contextHandler);
             }
         } else {
             if (type === 'Polygon') {
                 me.modifyInteraction.setActive(false);
             }
+            if (type === 'Circle' && me.circleToolbar != null) {
+                me.removeCircleSelectToolbar();
+            }
             if (me.getView().getUseContextMenu()) {
-                me.map.getViewport().removeEventListener('contextmenu', me.showContextMenu.bind(me));
+                me.map.getViewport().removeEventListener('contextmenu', me.contextHandler);
             }
             me.drawInteraction.setActive(false);
-            me.drawLayer.getSource().clear();
-            if (me.resultLayer) {
-                me.resultLayer.getSource().clear();
+
+            if (me.getView().getResetOnToggle()) {
+                me.drawLayer.getSource().clear();
+                if (me.resultLayer) {
+                    me.resultLayer.getSource().clear();
+                }
+                // reset context menu entries
+                me.activeGroupIdx = 0;
+                me.contextMenuGroupsCounter = 0;
             }
-            // reset context menu entries
-            me.activeGroupIdx = 0;
-            me.contextMenuGroupsCounter = 0;
         }
     },
 
@@ -157,7 +190,7 @@ Ext.define('CpsiMapview.controller.button.DigitizeButtonController', {
      * @param {boolean} checked Boolean indicating if the radio shall be checked
      * @returns {object} An config object to create an Ext.form.field.Radio
      */
-    getRadioGroupItem: function(idx, checked) {
+    getRadioGroupItem: function (idx, checked) {
         return {
             boxLabel: 'Group ' + (idx + 1).toString(),
             name: 'radiobutton',
@@ -170,11 +203,12 @@ Ext.define('CpsiMapview.controller.button.DigitizeButtonController', {
      * Method shows the context menu on mouse right click
      * @param {Event} evt The browser event
      */
-    showContextMenu: function(evt) {
+    showContextMenu: function (evt) {
         // suppress default browser behaviour
         evt.preventDefault();
 
-        var me = this;
+        var me = this.scope;
+
         var radioGroupItems = [];
         if (me.contextMenuGroupsCounter === 0) {
             radioGroupItems.push(me.getRadioGroupItem(0, true));
@@ -189,7 +223,7 @@ Ext.define('CpsiMapview.controller.button.DigitizeButtonController', {
             renderTo: Ext.getBody(),
             items: [{
                 text: 'Start new Group',
-                handler: function(){
+                handler: function () {
                     me.contextMenuGroupsCounter++;
                     me.activeGroupIdx = me.contextMenuGroupsCounter;
                 }
@@ -203,7 +237,7 @@ Ext.define('CpsiMapview.controller.button.DigitizeButtonController', {
                         vertical: true,
                         items: radioGroupItems,
                         listeners: {
-                            'change': function(radioGroup, newVal){
+                            'change': function (radioGroup, newVal) {
                                 me.activeGroupIdx = newVal.radiobutton;
                             }
                         }
@@ -219,11 +253,66 @@ Ext.define('CpsiMapview.controller.button.DigitizeButtonController', {
      * to the `prepareRequestParams` function
      * @param {DrawEvent} evt The OpenLayers draw event containing the features
      */
-    handleDrawEnd: function(evt) {
+    handleDrawEnd: function (evt) {
         // evt.feature if filled after drawend, only contains current finished feature.
         // evt.features is set on modifyend and will contain all the current features of that geom-type
         var feat = evt.feature ? evt.feature : evt.features.getArray();
         this.prepareRequestParams(feat);
+    },
+
+    /**
+     * Handles the draw end event of the circle type by getting the feature and passing it
+     * to the CircleSelection component
+     * @param {DrawEvent} evt The OpenLayers draw event containing the features
+     */
+    handleCircleDrawEnd: function (evt) {
+        var me = this;
+        // deactivate the creation of another circle
+        me.drawInteraction.setActive(false);
+        me.circleToolbar = Ext.create('CpsiMapview.view.toolbar.CircleSelectionToolbar', {
+            feature: evt.feature,
+        });
+        me.circleToolbar.getController().on({
+            circleSelectApply: me.onCircleSelectApply,
+            circleSelectCancel: me.onCircleSelectCancel,
+            scope: me
+        });
+        me.circleToolbarParent.addDocked(me.circleToolbar);
+    },
+
+    /**
+     * Handles the `apply` event of the CircleSelection by passing the created circle
+     * to the `handleDrawEnd` function. Also handles the cleanup of the CircleSelection toolbar
+     * and enables the drawing interaction
+     * @param {ol.Feature} feat
+     */
+    onCircleSelectApply: function (feat) {
+        var me = this;
+        var evt = { feature: feat };
+        me.handleDrawEnd(evt);
+        me.removeCircleSelectToolbar();
+        me.drawInteraction.setActive(true);
+    },
+
+    /**
+     * Handles the `cancel` event of the CircleSelection by cleaning up the CircleSelection toolbar
+     * and enabling the drawing interaction
+     * @param {ol.Feature} feat
+     */
+    onCircleSelectCancel: function () {
+        var me = this;
+        me.removeLastDigitizeFeature();
+        me.removeCircleSelectToolbar();
+        me.drawInteraction.setActive(true);
+    },
+
+    /**
+     * Handles the removal of the CircleSelect toolbar
+     */
+    removeCircleSelectToolbar: function () {
+        var me = this;
+        me.circleToolbarParent.removeDocked(me.circleToolbar);
+        me.circleToolbar = null;
     },
 
     /**
@@ -232,7 +321,7 @@ Ext.define('CpsiMapview.controller.button.DigitizeButtonController', {
      * @param {array[ol.Feature]|ol.Feature} feat The feature or array of features
      *   that should be used in the request
      */
-    prepareRequestParams: function(feat) {
+    prepareRequestParams: function (feat) {
         var me = this;
         var view = me.getView();
         var type = view.getType();
@@ -251,7 +340,7 @@ Ext.define('CpsiMapview.controller.button.DigitizeButtonController', {
                     // have the property `group` set to the current active
                     // group index (which defaults to 0 if not set).
                     return f.getGeometry().getType() === 'Point' &&
-                      f.get('group') === me.activeGroupIdx;
+                        f.get('group') === me.activeGroupIdx;
                 }));
             }
             // The Netsolver endpoint expects bbox to be sent within a request.
@@ -273,6 +362,17 @@ Ext.define('CpsiMapview.controller.button.DigitizeButtonController', {
                 format.writeFeature(feat);
             jsonParams = {
                 geometry3857: Ext.JSON.decode(geoJson).geometry
+            };
+        }
+        else if (type === 'Circle') {
+            // ol circle objects consist of a center coordinate and a radius in the
+            // unit of the projection. In order to convert it into a geoJSON, we have
+            // to convert the circle to a polygon first.
+            var circleAsPolygon = new ol.geom.Polygon.fromCircle(feat.getGeometry());
+            var polygonAsFeature = new ol.Feature({ geometry: circleAsPolygon });
+            var polyGeoJson = format.writeFeature(polygonAsFeature);
+            jsonParams = {
+                geometry3857: Ext.JSON.decode(polyGeoJson).geometry
             };
         }
         me.doAjaxRequest(jsonParams, searchParams);
@@ -308,11 +408,11 @@ Ext.define('CpsiMapview.controller.button.DigitizeButtonController', {
             url: url,
             method: 'POST',
             jsonData: jsonParams,
-            callback: function() {
+            callback: function () {
                 mapComponent.setLoading(false);
             },
             success: me.handleApiResponse.bind(me),
-            failure: function(response) {
+            failure: function (response) {
                 me.removeLastDigitizeFeature();
 
                 var errorMessage = 'Error while requesting the API endpoint';
@@ -333,7 +433,7 @@ Ext.define('CpsiMapview.controller.button.DigitizeButtonController', {
      * @param {string} response The response from the API. This method
      * expects features in GeoJSON format.
      */
-    handleApiResponse: function(response) {
+    handleApiResponse: function (response) {
         var me = this;
         var view = me.getView();
         var format = new ol.format.GeoJSON();
@@ -352,7 +452,7 @@ Ext.define('CpsiMapview.controller.button.DigitizeButtonController', {
             if (json.success && json.data && json.data.features) {
                 var features = json.data.features;
                 var olFeatsForActiveGroup = [];
-                Ext.each(features, function(feat) {
+                Ext.each(features, function (feat) {
                     // api will respond with non unique ids, which
                     // will collide with OpenLayers feature ids not
                     // being unique. Thats why we delete it here.
@@ -363,7 +463,7 @@ Ext.define('CpsiMapview.controller.button.DigitizeButtonController', {
                 });
                 // remove all features from the current active group
                 var allFeatures = me.resultLayer.getSource().getFeatures();
-                Ext.each(allFeatures, function(f){
+                Ext.each(allFeatures, function (f) {
                     if (f.get('group') === me.activeGroupIdx) {
                         me.resultLayer.getSource().removeFeature(f);
                     }
@@ -386,7 +486,7 @@ Ext.define('CpsiMapview.controller.button.DigitizeButtonController', {
                 me.removeLastDigitizeFeature();
 
                 BasiGX.error('Could not find features in the response: ' +
-                  (json.message ? json.message : JSON.stringify(json)));
+                    (json.message ? json.message : JSON.stringify(json)));
             }
         } else {
             BasiGX.error('Response was empty');
@@ -396,7 +496,7 @@ Ext.define('CpsiMapview.controller.button.DigitizeButtonController', {
     /**
      * Removes the last drawn feature from the vector source (and from the map).
      */
-    removeLastDigitizeFeature: function() {
+    removeLastDigitizeFeature: function () {
         var me = this;
         var source = me.drawLayer.getSource();
         var features = source.getFeatures();
@@ -410,7 +510,7 @@ Ext.define('CpsiMapview.controller.button.DigitizeButtonController', {
     /**
      * Remove the interaction when this component gets destroyed
      */
-    onBeforeDestroy: function() {
+    onBeforeDestroy: function () {
         if (this.drawInteraction) {
             this.map.removeInteraction(this.drawInteraction);
         }
@@ -422,6 +522,10 @@ Ext.define('CpsiMapview.controller.button.DigitizeButtonController', {
         }
         if (this.resultLayer) {
             this.map.removeLayer(this.resultLayer);
+        }
+
+        if (this.circleToolbar) {
+            this.circleToolbar.destroy();
         }
     },
 
@@ -445,7 +549,7 @@ Ext.define('CpsiMapview.controller.button.DigitizeButtonController', {
      * Method may be removed as its actually a showcase, like `zoomToFeatures`
      * @param {*} response
      */
-    onResponseFeatures: function() {
+    onResponseFeatures: function () {
         // the code below is just a show case representing how the response
         // features can be used within a feature grid.
         var me = this;
@@ -455,7 +559,7 @@ Ext.define('CpsiMapview.controller.button.DigitizeButtonController', {
             map: me.map
         });
 
-        featStore.filterBy(function(rec){
+        featStore.filterBy(function (rec) {
             return rec.get('geometry').getType() !== 'Point';
         });
 
@@ -481,7 +585,7 @@ Ext.define('CpsiMapview.controller.button.DigitizeButtonController', {
         if (me.win) {
             me.win.destroy();
         }
-        me.win = Ext.create('Ext.window.Window', {
+        me.win = Ext.create('CpsiMapview.view.window.MinimizableWindow', {
             height: 500,
             width: 300,
             layout: 'fit',
@@ -517,7 +621,7 @@ Ext.define('CpsiMapview.controller.button.DigitizeButtonController', {
                     text: 'Length',
                     dataIndex: 'segmentLength',
                     flex: 1,
-                    renderer: function(val){
+                    renderer: function (val) {
                         return Ext.String.format(
                             '{0} m',
                             val.toFixed(0).toString()
@@ -541,5 +645,17 @@ Ext.define('CpsiMapview.controller.button.DigitizeButtonController', {
             }]
         });
         me.win.showAt(100, 100);
+    },
+
+    init: function () {
+
+        var me = this;
+
+        // create an object for the contextmenu eventhandler
+        // so it can be removed correctly
+        me.contextHandler = {
+            handleEvent: me.showContextMenu,
+            scope: me
+        };
     }
 });

@@ -6,7 +6,11 @@ Ext.define('CpsiMapview.controller.button.StreetViewTool', {
 
     alias: 'controller.cmv_streetview_tool',
 
-    requires: ['Ext.window.Window', 'BasiGX.util.Map', 'BasiGX.util.Layer'],
+    requires: [
+        'CpsiMapview.view.window.MinimizableWindow',
+        'BasiGX.util.Map',
+        'BasiGX.util.Layer'
+    ],
 
     /**
      * The OL map work / sync with this tool.
@@ -143,7 +147,9 @@ Ext.define('CpsiMapview.controller.button.StreetViewTool', {
             }
             // cleanup
             me.vectorLayer.getSource().clear();
-            me.streetViewWin.close();
+            if (me.streetViewWin) {
+                me.streetViewWin.close();
+            }
         }
 
         // activate / deactivate click
@@ -211,7 +217,7 @@ Ext.define('CpsiMapview.controller.button.StreetViewTool', {
         var view = me.getView();
 
         if (!me.streetViewWin) {
-            me.streetViewWin = Ext.create('Ext.window.Window', {
+            me.streetViewWin = Ext.create('CpsiMapview.view.window.MinimizableWindow', {
                 title: view.svWinTitlePrefix,
                 width: view.svWinWidth,
                 height: view.svWinHeight,

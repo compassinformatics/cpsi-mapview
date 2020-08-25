@@ -40,17 +40,34 @@ Ext.define('CpsiMapview.view.layer.StyleSwitcherRadioGroup', {
 
         // create a 'radiofield' for each style connected to the layer
         Ext.each(layerStyles, function (layerStyle) {
+
+            var layerTitle;
+            var layerName;
+
+            // check if style has title property
+            if (layerStyle['title'] && layerStyle['name']) {
+                // has title property
+                layerTitle = layerStyle['title'];
+                layerName = layerStyle['name'];
+            } else {
+                // does not have title property
+                // title generated from stlye name
+                layerTitle = me.getLayerStyleLabel(layerStyle);
+                layerName = layerStyle;
+            }
+
             radioButtons.push({
                 name: 'sldstyle' + salt,
-                boxLabel: me.getLayerStyleLabel(layerStyle),
-                inputValue: layerStyle,
-                checked: me.getCheckedState(layerStyle),
+                boxLabel: layerTitle,
+                inputValue: layerName,
+                checked: me.getCheckedState(layerName),
                 listeners: {
                     change: me.onStyleChange,
                     scope: me
                 }
             });
-        });
+        }
+        );
 
         me.items = radioButtons;
 
@@ -59,7 +76,7 @@ Ext.define('CpsiMapview.view.layer.StyleSwitcherRadioGroup', {
 
     /**
      * Returns the human readable label for the given style.
-     * If WFS we remove the '_' and the .xml file ending. For other layer types
+     * If WFS or VT we remove the '_' and the .xml file ending. For other layer types
      * we return the input value.
      *
      * @param  {String} layerStyle The style name to get the label for
@@ -134,10 +151,24 @@ Ext.define('CpsiMapview.view.layer.StyleSwitcherRadioGroup', {
             } else if (layer.get('isWfs') || layer.get('isVt')) {
 
                 var sldUrl = layer.get('stylesBaseUrl') + newStyle;
-                // transform filter values to numbers ('1' => 1)
-                var forceNumericFilterVals = layer.get('stylesForceNumericFilterVals');
+
+                var hasLabels = CpsiMapview.util.Legend.hasLabels;
+
+                // use style with label if one was specified
+                if (layer.get('labelsActive') === true && !Ext.isEmpty(layer.get('styles')) && hasLabels(layer.get('styles'))) {
+                    var styleObj = layer.get('styles').find(function (style) {
+                        return style.name === newStyle;
+                    });
+                    if (styleObj && !Ext.isEmpty(styleObj.label)) {
+                        sldUrl = layer.get('stylesBaseUrl') + styleObj.label;
+                        layer.set('activeLabelStyle', sldUrl);
+                    } else {
+                        layer.set('activeLabelStyle', undefined);
+                    }
+
+                }
                 // load and parse SLD and apply it to layer
-                LayerFactory.loadSld(layer, sldUrl, forceNumericFilterVals);
+                LayerFactory.loadSld(layer, sldUrl);
 
                 if ((layer.get('isWfs') || layer.get('isVt')) && layerTreePanel) {
                     // force update of corresponding layer node UI (e.g. legend)

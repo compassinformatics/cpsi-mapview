@@ -6,6 +6,7 @@
 Ext.define('CpsiMapview.view.menuitem.LayerGrid', {
     extend: 'Ext.menu.Item',
     xtype: 'cmv_menuitem_layergrid',
+
     /**
      * The connected layer for this item.
      *
@@ -72,17 +73,40 @@ Ext.define('CpsiMapview.view.menuitem.LayerGrid', {
 
         if (existingGrids.length > 0) {
             // get the parent window of the grid
-            gridWindow = existingGrids[0].up('.window');
+            gridWindow = existingGrids[0].up('window');
         } else {
 
             Ext.apply(windowConfig, {
                 title: title,
+                layout: 'fit',
                 items: [{
                     xtype: gridXType
-                }]
-            });
+                }],
+                listeners: {
+                    hide: function () {
+                        var me = this;
+                        var queryButton = me.down('cmv_spatial_query_button');
+                        if (queryButton !== null) {
+                            queryButton.fireEvent('hideAssociatedPermanentLayer');
+                            queryButton.toggle(false);
+                        }
+                        // hide the layer with the grid (to hide selections)
+                        var grid = me.down('grid');
+                        grid.fireEvent('hide');
+                    },
+                    show: function () {
+                        var me = this;
+                        var queryButton = me.down('cmv_spatial_query_button');
+                        if (queryButton !== null) {
+                            queryButton.fireEvent('showAssociatedPermanentLayer');
+                        }
 
-            gridWindow = Ext.create('Ext.window.Window', windowConfig);
+                        var grid = me.down('grid');
+                        grid.fireEvent('show');
+                    }
+                }
+            });
+            gridWindow = Ext.create('CpsiMapview.view.window.MinimizableWindow', windowConfig);
         }
         gridWindow.show();
     }

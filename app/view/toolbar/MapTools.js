@@ -70,7 +70,7 @@ Ext.define('CpsiMapview.view.toolbar.MapTools', {
                         title: 'Info',
                         message: msg,
                         buttons: Ext.MessageBox.OK,
-                        icon:  Ext.MessageBox.INFO,
+                        icon: Ext.MessageBox.INFO,
                     });
                 },
                 'cmv-spatial-query-error': function () {
@@ -78,7 +78,7 @@ Ext.define('CpsiMapview.view.toolbar.MapTools', {
                         title: 'Error',
                         message: 'WFS query not successful',
                         buttons: Ext.MessageBox.OK,
-                        icon:  Ext.MessageBox.ERROR,
+                        icon: Ext.MessageBox.ERROR,
                     });
                 }
             }
@@ -95,7 +95,12 @@ Ext.define('CpsiMapview.view.toolbar.MapTools', {
             tooltip: 'Point',
             apiUrl: 'https://pmstipperarydev.compass.ie/pmspy/netsolver',
             useContextMenu: true,
-            pointExtentBuffer: 50
+            pointExtentBuffer: 50,
+            listeners: {
+                responseFeatures: function () {
+                    this.getController().onResponseFeatures();
+                }
+            }
         }, {
             xtype: 'cmv_digitize_button',
             type: 'LineString',
@@ -105,12 +110,28 @@ Ext.define('CpsiMapview.view.toolbar.MapTools', {
             type: 'Polygon',
             tooltip: 'Polygon',
             apiUrl: 'https://pmstipperarydev.compass.ie/WebServices/roadschedule/cutWithPolygon',
-            clearDrawnFeature: false
+            clearDrawnFeature: false,
+            listeners: {
+                responseFeatures: function () {
+                    this.getController().onResponseFeatures();
+                }
+            }
+        }, {
+            xtype: 'cmv_digitize_button',
+            type: 'Circle',
+            tooltip: 'Circle',
+            apiUrl: 'https://pmstipperarydev.compass.ie/WebServices/roadschedule/cutWithPolygon',
+            clearDrawnFeature: false,
+            listeners: {
+                responseFeatures: function () {
+                    this.getController().onResponseFeatures();
+                }
+            }
         }, {
             xtype: 'cmv_streetview_tool'
         }, {
             xtype: 'cmv_timeslider',
-            startDate: new Date(2014, 0, 1),
+            startDate: new Date(1946, 0, 1),
             endDate: new Date(2020, 11, 30)
         }, {
             xtype: 'cmv_numericattributeslider',

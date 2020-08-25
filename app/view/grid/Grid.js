@@ -62,6 +62,10 @@ Ext.define('CpsiMapview.view.grid.Grid', {
                     color: '#0ff',
                     width: 3
                 })
+            }),
+            stroke: new ol.style.Stroke({
+                width: 3,
+                color: '#0ff'
             })
         }),
         bind: {
@@ -75,8 +79,15 @@ Ext.define('CpsiMapview.view.grid.Grid', {
     * Functions attached to various listeners on the grid
     */
     listeners: {
-        filterchange: 'filterAssociatedLayers',
-        itemcontextmenu: 'onItemContextMenu'
+        filterchange: 'updateAssociatedLayers',
+        itemcontextmenu: 'onItemContextMenu',
+        columnhide: 'onColumnHide',
+        columnshow: 'onColumnShow',
+        rowdblclick: 'onRowDblClick',
+        // ensure columns are set when the store is bound to the grid
+        reconfigure: 'onColumnsReconfigure',
+        hide: 'onHide',
+        show: 'onShow'
     },
 
     /**
@@ -85,6 +96,52 @@ Ext.define('CpsiMapview.view.grid.Grid', {
     dockedItems: [{
         xtype: 'toolbar',
         dock: 'top',
+        items: [{
+            xtype: 'button',
+            text: 'Clear Filters',
+            glyph: 'f0b0@FontAwesome',
+            handler: 'clearFilters'
+        },
+        {
+            xtype: 'button',
+            text: 'Clear Sorting',
+            glyph: 'f039@FontAwesome',
+            handler: 'onClearSort'
+        }, '->',
+        {
+            xtype: 'cmv_spatial_query_button',
+            drawGeometryType: 'Polygon',
+            text: 'Select by Shape',
+            spatialOperator: 'intersect',
+            toggleGroup: 'map',
+            triggerWfsRequest: false,
+            displayPermanently: true,
+            glyph: 'xf044@FontAwesome',
+            listeners: {
+                'cmv-spatial-query-filter': 'onSpatialFilter'
+            }
+        },
+        {
+            xtype: 'button',
+            bind: {
+                pressed: '{isGroupEditingEnabled}',
+                hidden: '{!isGroupEditingVisible}'
+            },
+            text: 'Group Edit',
+            enableToggle: true,
+            glyph: 'xf040@FontAwesome',
+            toggleHandler: 'onGroupEditToggle'
+        },
+        {
+            xtype: 'button',
+            text: 'Export to Excel',
+            glyph: 'xf1c3@FontAwesome',
+            handler: 'exportToExcel'
+        }]
+    },
+    {
+        xtype: 'toolbar',
+        dock: 'bottom',
         items: [
             {
                 xtype: 'gx_wfspaging_toolbar',
@@ -92,33 +149,13 @@ Ext.define('CpsiMapview.view.grid.Grid', {
                 bind: {
                     store: '{gridstore}'
                 }
-            }, {
+            },
+            {
                 xtype: 'checkbox',
+                itemId: 'pagingCheckbox',
                 checked: true,
                 boxLabel: 'Page Records?',
                 handler: 'togglePaging'
-            },
-            '->',
-            {
-                xtype: 'cmv_spatial_query_button',
-                drawGeometryType: 'Polygon',
-                spatialOperator: 'intersect',
-                toggleGroup: 'map',
-                triggerWfsRequest: false,
-                glyph: 'xf044@FontAwesome',
-                listeners: {
-                    'cmv-spatial-query-filter': 'onSpatialFilter'
-                }
-            },
-            {
-                xtype: 'button',
-                text: 'Clear Filters',
-                handler: 'clearFilters'
-            },
-            {
-                xtype: 'button',
-                glyph: 'xf1c3@FontAwesome',
-                handler: 'exportToExcel'
             }]
-    }]
+    }],
 });

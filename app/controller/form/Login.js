@@ -56,7 +56,7 @@ Ext.define('CpsiMapview.controller.form.Login', {
 
         loginData[tokenName] = response.data;
         me.updateCookie(loginData);
-        me.getView().fireEvent('login', loginData);
+        me.fireEvent('login', loginData);
     },
 
     logout: function () {
@@ -76,7 +76,7 @@ Ext.define('CpsiMapview.controller.form.Login', {
         loginData[tokenName] = '';
 
         me.updateCookie(loginData);
-        me.getView().fireEvent('logout');
+        me.fireEvent('logout');
     },
 
     updateCookie: function (loginData) {
@@ -121,7 +121,7 @@ Ext.define('CpsiMapview.controller.form.Login', {
                 }
                 else {
                     //username / password login failure
-                    me.getView().fireEvent('loginfail', result.statusText);
+                    me.fireEvent('loginfail', result.statusText);
                     if (showMask) {
                         view.unmask();
                     }
@@ -129,7 +129,7 @@ Ext.define('CpsiMapview.controller.form.Login', {
             },
             failure: function (result) {
                 // indicates HTTP failure
-                me.getView().fireEvent('loginfail', result.statusText);
+                me.fireEvent('loginfail', result.statusText);
                 if (showMask) {
                     view.unmask();
                 }
@@ -153,7 +153,7 @@ Ext.define('CpsiMapview.controller.form.Login', {
 
     },
 
-    init: function () {
+    initViewModel: function () {
         this.tryAutomaticLogin();
     }
 
