@@ -5,20 +5,13 @@
  * http://www.gnu.org/licenses/lgpl.html
  *
  * @description: This class provide aditional format to numbers by extending Ext.form.field.Number
+ *               Based on the original work by Greivin Britton brittongr@gmail.com, adapted for ExtJS 6.7
+ *               https://www.sencha.com/forum/showthread.php?147962-Number-Field-with-currency-symbol-thousand-separator-amp-international-support-ExtJS4
  *
  * @author: Greivin Britton
  * @email: brittongr@gmail.com
- * @version: 2 compatible with ExtJS 4
+ * @version: 2 compatible with ExtJS 4, upgraded for ExtJS 6.7
  */
-
-/***********************************
-
-GOT FROM HERE
-
-https://www.sencha.com/forum/showthread.php?147962-Number-Field-with-currency-symbol-thousand-separator-amp-international-support-ExtJS4
-
-
-***************************************/
 
 Ext.define('CpsiMapview.form.field.NumericField',
     {
@@ -75,7 +68,6 @@ Ext.define('CpsiMapview.form.field.NumericField',
          * @param {Number} value
          */
         getErrors: function (value) {
-            //return (value) ? CpsiMapview.view.field.NumericField.superclass.getErrors.call(this, this.rawToValue(value)) : CpsiMapview.view.field.NumericField.superclass.getErrors.call(this);
             return (value) ? this.callParent([this.rawToValue(value)]) : this.callParent(arguments);
         },
         /**
