@@ -1,4 +1,4 @@
-Ext.define('CpsiMapview.view.field.YearField', {
+Ext.define('CpsiMapview.form.field.YearField', {
     extend: 'Ext.form.field.Number',
     xtype: 'cmv_yearfield',
     fieldStyle: 'text-align: right;',
