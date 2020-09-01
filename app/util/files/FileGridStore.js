@@ -4,7 +4,7 @@ Ext.define('CpsiMapview.util.files.FileGridStore', {
     model: 'CpsiMapview.util.files.FileGridStoreModel',
     resuires: ['Ext.data.proxy.Rest'],
     autoSync: true,
-    autoLoad: false, 
+    autoLoad: false,
     beforeWriteHandler: function (/*store, action, rs, options, arg*/) {
         if (!this.parentId) {
             // do not attempt to load records if the parentId
