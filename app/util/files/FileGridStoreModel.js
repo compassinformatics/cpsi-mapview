@@ -12,7 +12,7 @@ Ext.define('CpsiMapview.util.files.FileGridStoreModel', {
         {
             name: 'lastUpdatedDateUtc',
             type: 'date',
-            dateFormat: Pms.util.Constants.ISO8601NoTimezone
+            dateFormat: 'Y-m-d\\TH:i:s'
         }
     ]
     //,
