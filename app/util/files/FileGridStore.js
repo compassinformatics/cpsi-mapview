@@ -2,9 +2,9 @@ Ext.define('CpsiMapview.util.files.FileGridStore', {
     extend: 'Ext.data.Store',
     alias: 'store.FileGridStore',
     model: 'CpsiMapview.util.files.FileGridStoreModel',
-    //restful: true,
+    resuires: ['Ext.data.proxy.Rest'],
     autoSync: true,
-    autoLoad: false, //false,
+    autoLoad: false, 
     beforeWriteHandler: function (/*store, action, rs, options, arg*/) {
         if (!this.parentId) {
             // do not attempt to load records if the parentId
@@ -81,7 +81,7 @@ Ext.define('CpsiMapview.util.files.FileGridStore', {
 
     constructor: function (config) {
         var me = this;
-        console.assert(!Ext.isEmpty(config.serviceUrl));
+        Ext.Assert.truthy(!Ext.isEmpty(config.serviceUrl), 'Service URL not specified');
 
         me.serviceURL = config.serviceUrl;
         this.callParent(arguments);

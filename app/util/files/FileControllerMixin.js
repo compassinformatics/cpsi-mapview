@@ -1,8 +1,11 @@
 ﻿Ext.define('CpsiMapview.util.files.FileControllerMixin', {
     extend: 'Ext.Mixin',
-    requires: ['CpsiMapview.util.files.Report'],
+    requires: [
+        'CpsiMapview.util.files.Report',
+        'CpsiMapview.util.files.FileUploadWindow'
+    ],
 
-    onAddFileClick: function (btn/*, e, eOpts*/) {
+    onAddFileClick: function (btn) {
         var grid = btn.up('grid');
         var vm = this.getView().viewModel;
         var fileUploadWin = Ext.create('CpsiMapview.util.files.FileUploadWindow', {
@@ -40,7 +43,7 @@
     */
 
 
-    onAttachmentSave: function (btn/*, evt*/) {
+    onAttachmentSave: function (btn) {
         // JSON error messages are wrapped up in HTML
         // responseText: '<pre style='word-wrap: break-word; white-space: pre-wrap;'>{'success':false,'message':'The cookie header with user token has not been provided.'}</pre>'
         // so get just the error message
@@ -52,7 +55,7 @@
         //unchanged into the document body.
 
         var win = btn.up('window');
-        var form = win.down('form'); //.getForm();
+        var form = win.down('form');
         if (form.isValid()) {
             var fileName = win.down('#filePath').getValue();
             var vm = this.getView().viewModel;

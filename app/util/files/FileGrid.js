@@ -3,7 +3,8 @@ Ext.define('CpsiMapview.util.files.FileGrid',
         extend: 'Ext.grid.Panel',
         xtype: 'cmv_filegrid',
         requires: [
-            'CpsiMapview.view.grid.ItemDeleter'
+            'CpsiMapview.view.grid.ItemDeleter',
+            'Ext.util.Format'
         ],
         loadMask: true,
         border: true,

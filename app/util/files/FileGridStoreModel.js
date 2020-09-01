@@ -15,13 +15,4 @@ Ext.define('CpsiMapview.util.files.FileGridStoreModel', {
             dateFormat: 'Y-m-d\\TH:i:s'
         }
     ]
-    //,
-    //proxy: {
-    //    type: 'rest',
-    //    url: '/webservices/limit/{0}/attachment',
-    //    reader: {
-    //        type: 'json',
-    //        rootProperty: 'data'
-    //    }
-    //}
 });
