@@ -1,4 +1,4 @@
-Ext.define('CpsiMapview.util.files.FileGridStoreModel', {
+Ext.define('CpsiMapview.model.fileupload.FileGridStoreModel', {
     extend: 'Ext.data.Model',
     alias: 'model.FileGridStoreModel',
     idProperty: 'attachmentId',

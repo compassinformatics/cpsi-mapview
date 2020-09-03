@@ -1,7 +1,7 @@
-Ext.define('CpsiMapview.util.files.FileGridStore', {
+Ext.define('CpsiMapview.store.fileupload.FileGridStore', {
     extend: 'Ext.data.Store',
     alias: 'store.FileGridStore',
-    model: 'CpsiMapview.util.files.FileGridStoreModel',
+    model: 'CpsiMapview.model.fileupload.FileGridStoreModel',
     resuires: ['Ext.data.proxy.Rest'],
     autoSync: true,
     autoLoad: false,
@@ -21,6 +21,8 @@ Ext.define('CpsiMapview.util.files.FileGridStore', {
     },
     getParentUrl: function () {
         var url = Ext.String.format(this.serviceURL + '/{0}/attachment', this.parentId);
+        //debugger;
+        //var url = Ext.String.format(this.serviceURL, this.parentId);
         return url;
     },
 
@@ -33,6 +35,7 @@ Ext.define('CpsiMapview.util.files.FileGridStore', {
 
     getAttachmentUrl: function (attachmentId) {
         return Ext.String.format('{0}/attachment/{1}', this.serviceURL, attachmentId);
+        //return Ext.String.format('{0}/{1}', this.serviceURL, attachmentId);
     },
 
     setParentId: function (parentId, load) {
@@ -50,11 +53,13 @@ Ext.define('CpsiMapview.util.files.FileGridStore', {
 
         // two URL formats are required
         // to GET and DELETE individual attachments
-        // /speed/sign/attachment/{attachmentId}
+        // /<baseUrl>/attachment/{attachmentId}
         // to GET a list and CREATE:
-        // /speed/sign/{signId}/attachment
-        var url1 = url + '/attachment/'; //{0}';
+        // /<baseUrl>/{parentId}/attachment
+        //var url1 = url + '/attachment/'; //{0}';
+        var url1 = Ext.String.format(url, '');
         var url2 = this.getParentUrl(url, parentId);
+        debugger;
         var api = {
             create: url2,
             read: url2,
@@ -81,6 +86,7 @@ Ext.define('CpsiMapview.util.files.FileGridStore', {
 
     constructor: function (config) {
         var me = this;
+        debugger;
         Ext.Assert.truthy(!Ext.isEmpty(config.serviceUrl), 'Service URL not specified');
 
         me.serviceURL = config.serviceUrl;

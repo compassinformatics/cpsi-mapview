@@ -1,11 +1,10 @@
 // define a simple Window class to hold the grid
-Ext.define('CpsiMapview.util.files.FileUploadWindow', {
+Ext.define('CpsiMapview.view.fileupload.FileUploadWindow', {
     extend: 'Ext.window.Window',
     xtype: 'cmv_fileuploadwindow',
     modal: true,
     layout: 'anchor',
     width: 500,
-    parentType: '',
     closeAction: 'destroy', // by default destroy the window when it is closed
     bind: {
         title: 'Associate a File with the {parentType}'

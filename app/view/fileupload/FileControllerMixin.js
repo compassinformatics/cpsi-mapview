@@ -1,28 +1,4 @@
-﻿Ext.define('CpsiMapview.util.files.FileControllerMixin', {
-    extend: 'Ext.Mixin',
-    requires: [
-        'CpsiMapview.util.files.Report',
-        'CpsiMapview.util.files.FileUploadWindow'
-    ],
-
-    onAddFileClick: function (btn) {
-        var grid = btn.up('grid');
-        var vm = this.getView().viewModel;
-        var fileUploadWin = Ext.create('CpsiMapview.util.files.FileUploadWindow', {
-            controller: this,
-            viewModel: vm,
-            listeners: {
-                fileadded: 'onFileAdded',
-                scope: this
-            },
-            uploadUrl: grid.store.getParentUrl(),
-            parentType: 'Speed Limit'
-        });
-
-        fileUploadWin.show();
-    },
-
-    /*
+﻿/*
     File uploads are not performed using normal 'Ajax' techniques, that is they are
     not performed using XMLHttpRequests.
     Instead the form is submitted in the standard manner with the DOM <form> element temporarily modified to have
@@ -40,7 +16,30 @@
     Be aware that file upload packets are sent with the content type multipart/form and some server
     technologies (notably JEE) may require some custom processing in order to retrieve parameter names
     and parameter values from the packet content.
-    */
+*/
+
+Ext.define('CpsiMapview.view.fileupload.FileControllerMixin', {
+    extend: 'Ext.Mixin',
+    requires: [
+        'CpsiMapview.view.fileupload.Report',
+        'CpsiMapview.view.fileupload.FileUploadWindow'
+    ],
+
+    onAddFileClick: function (btn) {
+        var grid = btn.up('grid');
+        var vm = this.getViewModel();
+        var fileUploadWin = Ext.create('CpsiMapview.view.fileupload.FileUploadWindow', {
+            controller: this,
+            viewModel: vm,
+            listeners: {
+                fileadded: 'onFileAdded',
+                scope: this
+            },
+            uploadUrl: grid.store.getParentUrl()
+        });
+
+        fileUploadWin.show();
+    },
 
 
     onAttachmentSave: function (btn) {
@@ -58,7 +57,8 @@
         var form = win.down('form');
         if (form.isValid()) {
             var fileName = win.down('#filePath').getValue();
-            var vm = this.getView().viewModel;
+            var vm = this.getViewModel();
+            debugger;
             form.submit({
                 clientValidation: true,
                 url: vm.getData().attachmentUploadUrl.replace('{0}', vm.getData().currentRecord.getId()),
@@ -135,14 +135,15 @@
         btn.up('window').close();
     },
 
-    onFileAdded: function () {
+    onFileAdded: function (file) {
         var v = this.getView();
-        v.getViewModel().getData().files.reload();
+        v.getViewModel().getStore('files').add(file)
+        v.getViewModel().getStore('files').reload();
         v.close();
     },
 
     onDownloadFileClick: function (grid, record, element, rowIndex/*, e, eOpts*/) {
-        var report = Ext.create('CpsiMapview.util.files.Report', {
+        var report = Ext.create('CpsiMapview.view.fileupload.Report', {
             renderTo: Ext.getBody()
         });
         var url = grid.store.getAttachmentUrlFromIdx(rowIndex);

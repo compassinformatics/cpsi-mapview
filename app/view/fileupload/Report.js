@@ -3,7 +3,7 @@ You can't download a file using a direct AJAX call so use this hidden iframe.
 See comments at https://stackoverflow.com/questions/20499959/extjs-4-downloading-a-file-through-ajax-call and
 https://stackoverflow.com/questions/18434962/extjs-handling-success-or-failure-when-doing-a-standard-submit-in-a-form
 */
-Ext.define('CpsiMapview.util.files.Report', {
+Ext.define('CpsiMapview.view.fileupload.Report', {
     extend: 'Ext.Component',
     autoEl: {
         tag: 'iframe',
