@@ -32,20 +32,19 @@ Ext.define('CpsiMapview.view.fileupload.FileGridController', {
         return url;
     },
     getAttachmentDeleteUrl: function(id) {
-        var vm = this.getViewModel();
         var url = this.getServiceUrl();
         url += (url.endsWith('/') ? '' : '/') + 'attachment/{0}';
         url = url.replace('{0}', id);
         return url;
     },
 
-    onAddFileClick: function (btn) {
+    onAddFileClick: function () {
         var vm = this.getViewModel();
         var fileUploadWin = Ext.create('CpsiMapview.view.fileupload.FileUploadWindow', {
             viewModel: {
-                data: { 
+                data: {
                     serviceUrl: vm.getData().serviceUrl,
-                    currentRecord: vm.getData().currentRecord 
+                    currentRecord: vm.getData().currentRecord
                 }
             },
             listeners: {
@@ -62,7 +61,7 @@ Ext.define('CpsiMapview.view.fileupload.FileGridController', {
             Ext.Ajax.request({
                 url: this.getAttachmentDeleteUrl(id),
                 method: 'DELETE',
-                success: function(response, opts) {
+                success: function() {
                     var store = gridView.getStore();
                     store.remove(rec);
                 },
