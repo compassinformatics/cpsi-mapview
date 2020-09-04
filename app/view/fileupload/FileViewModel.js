@@ -15,7 +15,7 @@ Ext.define('CpsiMapview.view.fileupload.FileViewModel', {
         parentId: function (get) {
             return get('currentRecord').getId();
         },
-        attachmentUploadUrl: function(get) {
+        attachmentUploadUrl: function() {
             var url = this.getStore('files').serviceUrl;
             return url + (url.endsWith('/') ? '' : '/') + '{0}/attachment';
         }

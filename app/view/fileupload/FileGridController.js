@@ -66,8 +66,7 @@ Ext.define('CpsiMapview.view.fileupload.FileGridController', {
         }
     },
 
-    onFileAdded: function (file) {
-        debugger;
+    onFileAdded: function () {
         var v = this.getView();
         var store = v.getViewModel().getStore('files');
         store.load();
