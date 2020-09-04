@@ -21,8 +21,6 @@ Ext.define('CpsiMapview.store.fileupload.FileGridStore', {
     },
     getParentUrl: function () {
         var url = Ext.String.format(this.serviceURL + '/{0}/attachment', this.parentId);
-        //debugger;
-        //var url = Ext.String.format(this.serviceURL, this.parentId);
         return url;
     },
 
@@ -35,7 +33,6 @@ Ext.define('CpsiMapview.store.fileupload.FileGridStore', {
 
     getAttachmentUrl: function (attachmentId) {
         return Ext.String.format('{0}/attachment/{1}', this.serviceURL, attachmentId);
-        //return Ext.String.format('{0}/{1}', this.serviceURL, attachmentId);
     },
 
     setParentId: function (parentId, load) {
@@ -59,14 +56,12 @@ Ext.define('CpsiMapview.store.fileupload.FileGridStore', {
         //var url1 = url + '/attachment/'; //{0}';
         var url1 = Ext.String.format(url, '');
         var url2 = this.getParentUrl(url, parentId);
-        debugger;
         var api = {
             create: url2,
             read: url2,
             update: null, // update is not used
             destroy: url1
         };
-
         return api;
     },
 
@@ -86,7 +81,6 @@ Ext.define('CpsiMapview.store.fileupload.FileGridStore', {
 
     constructor: function (config) {
         var me = this;
-        debugger;
         Ext.Assert.truthy(!Ext.isEmpty(config.serviceUrl), 'Service URL not specified');
 
         me.serviceURL = config.serviceUrl;

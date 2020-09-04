@@ -5,7 +5,8 @@ Ext.define('CpsiMapview.view.fileupload.FileGrid',
         requires: [
             'CpsiMapview.view.grid.ItemDeleter',
             'Ext.util.Format',
-            'CpsiMapview.view.fileupload.FileViewModel'
+            'CpsiMapview.view.fileupload.FileViewModel',
+            'CpsiMapview.view.fileupload.FileGridController'
         ],
         loadMask: true,
         border: true,
@@ -16,6 +17,7 @@ Ext.define('CpsiMapview.view.fileupload.FileGrid',
         sortableColumns: false,
         allowAddingAttachments: true,
         viewModel: 'cmv_fileviewmodel',
+        controller: 'cmv_filegridcontroller',
         bind: {
             store: '{files}'
         },

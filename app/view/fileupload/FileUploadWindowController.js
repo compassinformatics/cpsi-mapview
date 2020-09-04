@@ -18,29 +18,9 @@
     and parameter values from the packet content.
 */
 
-Ext.define('CpsiMapview.view.fileupload.FileControllerMixin', {
-    extend: 'Ext.Mixin',
-    requires: [
-        'CpsiMapview.view.fileupload.Report',
-        'CpsiMapview.view.fileupload.FileUploadWindow'
-    ],
-
-    onAddFileClick: function (btn) {
-        var grid = btn.up('grid');
-        var vm = this.getViewModel();
-        var fileUploadWin = Ext.create('CpsiMapview.view.fileupload.FileUploadWindow', {
-            controller: this,
-            viewModel: vm,
-            listeners: {
-                fileadded: 'onFileAdded',
-                scope: this
-            },
-            uploadUrl: grid.store.getParentUrl()
-        });
-
-        fileUploadWin.show();
-    },
-
+Ext.define('CpsiMapview.view.fileupload.FileUploadWindowController', {
+    extend: 'Ext.app.ViewController',
+    alias: 'controller.cmv_fileuploadwindowcontroller',
 
     onAttachmentSave: function (btn) {
         // JSON error messages are wrapped up in HTML
@@ -58,7 +38,6 @@ Ext.define('CpsiMapview.view.fileupload.FileControllerMixin', {
         if (form.isValid()) {
             var fileName = win.down('#filePath').getValue();
             var vm = this.getViewModel();
-            debugger;
             form.submit({
                 clientValidation: true,
                 url: vm.getData().attachmentUploadUrl.replace('{0}', vm.getData().currentRecord.getId()),
@@ -84,6 +63,7 @@ Ext.define('CpsiMapview.view.fileupload.FileControllerMixin', {
                     var msg = 'The file \'' + fileName + '\' has been associated with the ' + this.parentType;
                     Ext.Msg.alert('Success', msg, function () {
                         this.fireEvent('fileadded', newFiledata);
+                        win.close();
                     }, this);
 
                 },
@@ -109,47 +89,8 @@ Ext.define('CpsiMapview.view.fileupload.FileControllerMixin', {
         }
     },
 
-    onDeleteFileClick: function (grid, rowIndex, colIndex, item, e, rec/*, row*/) {
-        var removeRecord = function (rec, gridView) {
-            var store = gridView.getStore();
-            store.remove(rec);
-        };
-        if (item.ignoreConfirmation === true) {
-            removeRecord(rec, grid);
-        } else {
-            Ext.MessageBox.confirm('Delete Item?',
-                'Do you want to delete this item?',
-                function (btn) {
-                    if (btn === 'yes') {
-                        removeRecord(rec, grid);
-                        return true;
-                    } else {
-                        return false;
-                    }
-                },
-                this);
-        }
-    },
-
-    onAttachmentCancelUpload: function (btn/*, evt*/) {
-        btn.up('window').close();
-    },
-
-    onFileAdded: function (file) {
-        var v = this.getView();
-        v.getViewModel().getStore('files').add(file)
-        v.getViewModel().getStore('files').reload();
-        v.close();
-    },
-
-    onDownloadFileClick: function (grid, record, element, rowIndex/*, e, eOpts*/) {
-        var report = Ext.create('CpsiMapview.view.fileupload.Report', {
-            renderTo: Ext.getBody()
-        });
-        var url = grid.store.getAttachmentUrlFromIdx(rowIndex);
-        report.load({
-            url: url
-        });
+    onAttachmentCancelUpload: function (/*btn, evt*/) {
+        this.getView().close(); // btn.up('window').close();
     }
 
 });

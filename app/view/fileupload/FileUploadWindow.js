@@ -2,10 +2,14 @@
 Ext.define('CpsiMapview.view.fileupload.FileUploadWindow', {
     extend: 'Ext.window.Window',
     xtype: 'cmv_fileuploadwindow',
+    requires: [            
+        'CpsiMapview.view.fileupload.FileUploadWindowController'
+    ],
     modal: true,
     layout: 'anchor',
     width: 500,
-    closeAction: 'destroy', // by default destroy the window when it is closed
+    closeAction: 'destroy', // by default destroy the window when it is closed,
+    controller: 'cmv_fileuploadwindowcontroller',
     bind: {
         title: 'Associate a File with the {parentType}'
     },
