@@ -22,6 +22,19 @@ Ext.define('CpsiMapview.view.fileupload.FileUploadWindowController', {
     extend: 'Ext.app.ViewController',
     alias: 'controller.cmv_fileuploadwindowcontroller',
 
+    getServiceUrl: function() {
+        var vm = this.getViewModel();
+        var url = vm.getData().serviceUrl;
+        return url;
+    },
+    getAttachmentUploadUrl: function() {
+        var vm = this.getViewModel();
+        var url = this.getServiceUrl();
+        url += (url.endsWith('/') ? '' : '/') + '{0}/attachment';
+        url = url.replace('{0}', vm.getData().currentRecord.getId());
+        return url;
+    },
+
     onAttachmentSave: function (btn) {
         // JSON error messages are wrapped up in HTML
         // responseText: '<pre style='word-wrap: break-word; white-space: pre-wrap;'>{'success':false,'message':'The cookie header with user token has not been provided.'}</pre>'
@@ -37,10 +50,9 @@ Ext.define('CpsiMapview.view.fileupload.FileUploadWindowController', {
         var form = win.down('form');
         if (form.isValid()) {
             var fileName = win.down('#filePath').getValue();
-            var vm = this.getViewModel();
             form.submit({
                 clientValidation: true,
-                url: vm.getData().attachmentUploadUrl.replace('{0}', vm.getData().currentRecord.getId()),
+                url: this.getAttachmentUploadUrl(),
                 waitMsg: 'Uploading your file...',
                 scope: win,
                 success: function (form) {
@@ -49,7 +61,6 @@ Ext.define('CpsiMapview.view.fileupload.FileUploadWindowController', {
                     // create a new object containing the attributes of the attachment
                     // after it was successfully associated
                     // with the parent object. This record can then be added to a store
-
                     var newFiledata = {
                         attachementId: '',
                         name: name,

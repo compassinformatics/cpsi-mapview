@@ -26,35 +26,58 @@ Ext.define('CpsiMapview.view.fileupload.FileGridController', {
         'CpsiMapview.view.fileupload.FileUploadWindow'
     ],
 
+    getServiceUrl: function() {
+        var vm = this.getViewModel();
+        var url = vm.getData().serviceUrl;
+        return url;
+    },
+    getAttachmentDeleteUrl: function(id) {
+        var vm = this.getViewModel();
+        var url = this.getServiceUrl();
+        url += (url.endsWith('/') ? '' : '/') + 'attachment/{0}';
+        url = url.replace('{0}', id);
+        return url;
+    },
+
     onAddFileClick: function (btn) {
-        var grid = btn.up('grid');
         var vm = this.getViewModel();
         var fileUploadWin = Ext.create('CpsiMapview.view.fileupload.FileUploadWindow', {
-            //controller: this,
-            viewModel: vm,
+            viewModel: {
+                data: { 
+                    serviceUrl: vm.getData().serviceUrl,
+                    currentRecord: vm.getData().currentRecord 
+                }
+            },
             listeners: {
                 fileadded: 'onFileAdded',
                 scope: this
-            },
-            uploadUrl: grid.store.getParentUrl()
+            }
         });
-
         fileUploadWin.show();
     },
 
     onDeleteFileClick: function (grid, rowIndex, colIndex, item, e, rec/*, row*/) {
         var removeRecord = function (rec, gridView) {
-            var store = gridView.getStore();
-            store.remove(rec);
+            var id = CpsiMapview.model.fileupload.FileGridStoreModel.loadData(rec.data).getId();
+            Ext.Ajax.request({
+                url: this.getAttachmentDeleteUrl(id),
+                method: 'DELETE',
+                success: function(response, opts) {
+                    var store = gridView.getStore();
+                    store.remove(rec);
+                },
+                failure: function(){
+                }
+            });
         };
         if (item.ignoreConfirmation === true) {
-            removeRecord(rec, grid);
+            removeRecord.call(this, rec, grid);
         } else {
             Ext.MessageBox.confirm('Delete Item?',
                 'Do you want to delete this item?',
                 function (btn) {
                     if (btn === 'yes') {
-                        removeRecord(rec, grid);
+                        removeRecord.call(this, rec, grid);
                         return true;
                     } else {
                         return false;
@@ -64,10 +87,9 @@ Ext.define('CpsiMapview.view.fileupload.FileGridController', {
         }
     },
 
-    onFileAdded: function () {
-        var v = this.getView();
-        var store = v.getViewModel().getStore('files');
-        store.load();
+    onFileAdded: function (file) {
+        var store = this.getViewModel().getStore('files');
+        store.add(file);
     },
 
     onDownloadFileClick: function (grid, record, element, rowIndex/*, e, eOpts*/) {
