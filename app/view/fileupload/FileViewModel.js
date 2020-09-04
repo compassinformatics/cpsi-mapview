@@ -1,9 +1,6 @@
 Ext.define('CpsiMapview.view.fileupload.FileViewModel', {
     extend: 'Ext.app.ViewModel',
     alias: 'viewmodel.cmv_fileviewmodel',
-    //data: {
-    //    serviceUrl: '666'
-    //},
     stores: {
         files: {
             type: 'FileGridStore',

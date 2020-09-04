@@ -89,8 +89,8 @@ Ext.define('CpsiMapview.view.fileupload.FileUploadWindowController', {
         }
     },
 
-    onAttachmentCancelUpload: function (/*btn, evt*/) {
-        this.getView().close(); // btn.up('window').close();
+    onAttachmentCancelUpload: function () {
+        this.getView().close();
     }
 
 });
