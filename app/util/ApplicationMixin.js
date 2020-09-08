@@ -1,4 +1,4 @@
- 
+
 /**
  * A mapview Application mixin containing generic functions that can be reused
  * between applications
