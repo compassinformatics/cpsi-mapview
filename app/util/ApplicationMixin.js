@@ -1,3 +1,4 @@
+ 
 /**
  * A mapview Application mixin containing generic functions that can be reused
  * between applications
@@ -40,11 +41,11 @@ Ext.define('CpsiMapview.util.ApplicationMixin', {
         FileNotFound: 404
     },
 
-    onAjaxBeforeRequest: function (/*connection, options, eOpts*/) {
+    onAjaxBeforeRequest: function () {
         Ext.emptyFn();
     },
 
-    onAjaxRequestComplete: function (connection, response/*, options, eOpts*/) {
+    onAjaxRequestComplete: function (connection, response) {
 
         var me = this;
 
@@ -61,6 +62,7 @@ Ext.define('CpsiMapview.util.ApplicationMixin', {
         if (Ext.Array.some(me.serviceUrls, urlTest) === true) {
             if (Ext.Array.some(me.excludedUrls, urlTest) === false) {
 
+                // FORMS submission (i.e. attachments upoad) return bogus responses with no content-type
                 var responseType = response.responseType ? response.responseType: response.getResponseHeader ? response.getResponseHeader('content-type') : null;
 
                 // check for geojson (coming from MapServer)
@@ -95,7 +97,6 @@ Ext.define('CpsiMapview.util.ApplicationMixin', {
                         }
                         break;
                     case 'geojson':
-                        //result = JSON.parse(response.responseText);
                         break;
                     case 'xml':
                         result = response.responseXML;

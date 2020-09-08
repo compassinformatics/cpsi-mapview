@@ -35,16 +35,18 @@ Ext.define('CpsiMapview.view.fileupload.FileUploadWindowController', {
         return url;
     },
 
-    onAttachmentSave: function (btn) {
-        // JSON error messages are wrapped up in HTML
-        // responseText: '<pre style='word-wrap: break-word; white-space: pre-wrap;'>{'success':false,'message':'The cookie header with user token has not been provided.'}</pre>'
-        // so get just the error message
-        // relevant link http://stackoverflow.com/questions/18150134/response-of-a-submit-form-is-adding-pre-to-json
+    /*
+      JSON error messages are wrapped up in HTML
+      responseText: '<pre style='word-wrap: break-word; white-space: pre-wrap;'>{'success':false,'message':'The cookie header with user token has not been provided.'}</pre>'
+      so get just the error message
+      relevant link http://stackoverflow.com/questions/18150134/response-of-a-submit-form-is-adding-pre-to-json
 
-        //The server response is parsed by the browser to create the document for the IFRAME.
-        //If the server is using JSON to send the return object, then the Content-Type header
-        //must be set to 'text/html' (on the server-side) in order to tell the browser to insert the text
-        //unchanged into the document body.
+      The server response is parsed by the browser to create the document for the IFRAME.
+      If the server is using JSON to send the return object, then the Content-Type header
+      must be set to 'text/html' (on the server-side) in order to tell the browser to insert the text
+      unchanged into the document body.
+    */
+    onAttachmentSave: function (btn) {
 
         var win = btn.up('window');
         var form = win.down('form');
@@ -55,6 +57,11 @@ Ext.define('CpsiMapview.view.fileupload.FileUploadWindowController', {
                 url: this.getAttachmentUploadUrl(),
                 waitMsg: 'Uploading your file...',
                 scope: win,
+                options: {
+                    headers: {
+                        'Accept': 'text/json'
+                    }
+                },
                 success: function (form) {
                     var descrip = form.findField('documentDescription').getValue(),
                         name = form.findField('documentName').getValue();

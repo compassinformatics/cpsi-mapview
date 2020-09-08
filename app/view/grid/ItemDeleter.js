@@ -26,7 +26,8 @@ Ext.define('CpsiMapview.view.grid.ItemDeleter',
             text: ''
         },
 
-        itemIsDisabled: function (/*view, rowIndex, colIndex, item, record*/) {
+        // to be overridden in extended classes for custom disabling
+        itemIsDisabled: function () {
             return this.disabled;
         },
 
@@ -36,8 +37,6 @@ Ext.define('CpsiMapview.view.grid.ItemDeleter',
                 iconCls: 'icon-delete',
                 tooltip: this.tooltip,
                 handler: 'onDeleteFileClick',
-                // updated in 6.7 or get the following warning
-                // WARN: '[W] [Ext.grid.column.Action] The isDisabled config is deprecated. Use isActionDisabled to avoid conflict with Ext.Component#isDisabled().'
                 isActionDisabled: function (view, rowIndex, colIndex, item, record) {
                     return this.disabled || this.itemIsDisabled(view, rowIndex, colIndex, item, record);
                 }

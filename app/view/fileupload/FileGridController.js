@@ -23,7 +23,8 @@ Ext.define('CpsiMapview.view.fileupload.FileGridController', {
     alias: 'controller.cmv_filegridcontroller',
     requires: [
         'CpsiMapview.view.fileupload.Report',
-        'CpsiMapview.view.fileupload.FileUploadWindow'
+        'CpsiMapview.view.fileupload.FileUploadWindow',
+        'CpsiMapview.model.fileupload.FileGridStoreModel'
     ],
 
     getServiceUrl: function() {
@@ -55,7 +56,7 @@ Ext.define('CpsiMapview.view.fileupload.FileGridController', {
         fileUploadWin.show();
     },
 
-    onDeleteFileClick: function (grid, rowIndex, colIndex, item, e, rec/*, row*/) {
+    onDeleteFileClick: function (grid, rowIndex, colIndex, item, e, rec) {
         var removeRecord = function (rec, gridView) {
             var id = CpsiMapview.model.fileupload.FileGridStoreModel.loadData(rec.data).getId();
             Ext.Ajax.request({
