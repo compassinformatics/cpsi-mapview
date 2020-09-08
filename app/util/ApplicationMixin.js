@@ -9,6 +9,8 @@ Ext.define('CpsiMapview.util.ApplicationMixin', {
     // see https://docs.sencha.com/extjs/6.7.0/classic/Ext.app.Application.html#cfg-quickTips
     quickTips: false,
 
+    loginWindow: null,
+
     // when the platform is matched any properties are placed on the class
     platformConfig: {
         desktop: {
@@ -137,16 +139,26 @@ Ext.define('CpsiMapview.util.ApplicationMixin', {
     },
 
     /**
-     * Open the login form when the application is opened
+     * Open the login form when the application is opened. Attempt
+     * to login automatically if the user already has a cookie and token.
+     * If the form has already been created then simply show it.
      * */
     doLogin: function () {
-        Ext.create('CpsiMapview.view.form.Login', {
-            viewModel: {
-                tokenName: this.tokenName,
-                serviceUrl: '/WebServices/authorization/authenticate',
-                validateUrl: '/WebServices/authorization/validateToken'
-            }
-        });
+
+        var me = this;
+
+        if (!me.loginWindow) {
+            me.loginWindow = Ext.create('CpsiMapview.view.form.Login', {
+                viewModel: {
+                    tokenName: this.tokenName,
+                    serviceUrl: '/WebServices/authorization/authenticate',
+                    validateUrl: '/WebServices/authorization/validateToken'
+                }
+            });
+            me.loginWindow.getController().tryAutomaticLogin();
+        } else {
+            me.loginWindow.show();
+        }
     },
 
     /**
