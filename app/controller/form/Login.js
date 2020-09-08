@@ -34,6 +34,8 @@ Ext.define('CpsiMapview.controller.form.Login', {
             jsonData[tokenName] = token;
             jsonData = Ext.JSON.encode(jsonData);
             me.callLoginService(jsonData, serviceUrl, false);
+        } else {
+            me.getView().show();
         }
     },
 
@@ -95,7 +97,7 @@ Ext.define('CpsiMapview.controller.form.Login', {
         var me = this;
         var view = me.getView();
 
-        showMask = showMask && view && view.rendered;
+        showMask = showMask && view.rendered;
 
         if (showMask) {
             view.mask('Logging in');
@@ -115,9 +117,7 @@ Ext.define('CpsiMapview.controller.form.Login', {
 
                 if (response.success === true) {
                     me.login(response);
-                    if (view) {
-                        view.destroy();
-                    }
+                    view.close();
                 }
                 else {
                     //username / password login failure
@@ -125,6 +125,7 @@ Ext.define('CpsiMapview.controller.form.Login', {
                     if (showMask) {
                         view.unmask();
                     }
+                    view.show();
                 }
             },
             failure: function (result) {
@@ -133,6 +134,7 @@ Ext.define('CpsiMapview.controller.form.Login', {
                 if (showMask) {
                     view.unmask();
                 }
+                view.show();
             }
 
         });

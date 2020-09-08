@@ -16,7 +16,7 @@ Ext.define('CpsiMapview.view.form.Login', {
     bodyPadding: 10,
     title: 'Login Window',
     closable: false,
-    autoShow: true,
+    closeAction: 'hide',
     modal: true,
 
     items: {
