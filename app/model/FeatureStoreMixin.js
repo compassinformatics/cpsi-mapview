@@ -1,5 +1,8 @@
 /**
 * A model mixin to create feature stores for feature related fields
+* (custom fields such as CpsiMapview.field.Line and CpsiMapview.field.Polygon
+* Any fields which contain features will automatically have a featureStore
+* created and added to featureStores property e.g. featureStores.edges
 */
 Ext.define('CpsiMapview.model.FeatureStoreMixin', {
     extend: 'Ext.Mixin',
@@ -8,10 +11,9 @@ Ext.define('CpsiMapview.model.FeatureStoreMixin', {
         'BasiGX.util.Map'
     ],
     mixinConfig: {
-        after: {
-            constructor: 'createFeatureStores'
-        },
         before: {
+            // ensure stores are created before convert functions are run
+            constructor: 'createFeatureStores',
             destroy: 'destroyFeatureStores'
         }
     },
@@ -124,6 +126,8 @@ Ext.define('CpsiMapview.model.FeatureStoreMixin', {
 
     /**
      * For any feature based fields create an associated feature store
+     * These need to be created before the model
+     * constructor so that the featurestore is ready when any convert functions are run.
      **/
     createFeatureStores: function () {
         var me = this;
