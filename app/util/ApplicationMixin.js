@@ -1,3 +1,4 @@
+
 /**
  * A mapview Application mixin containing generic functions that can be reused
  * between applications
@@ -7,6 +8,8 @@ Ext.define('CpsiMapview.util.ApplicationMixin', {
 
     // see https://docs.sencha.com/extjs/6.7.0/classic/Ext.app.Application.html#cfg-quickTips
     quickTips: false,
+
+    loginWindow: null,
 
     // when the platform is matched any properties are placed on the class
     platformConfig: {
@@ -40,11 +43,11 @@ Ext.define('CpsiMapview.util.ApplicationMixin', {
         FileNotFound: 404
     },
 
-    onAjaxBeforeRequest: function (/*connection, options, eOpts*/) {
+    onAjaxBeforeRequest: function () {
         Ext.emptyFn();
     },
 
-    onAjaxRequestComplete: function (connection, response/*, options, eOpts*/) {
+    onAjaxRequestComplete: function (connection, response) {
 
         var me = this;
 
@@ -61,7 +64,8 @@ Ext.define('CpsiMapview.util.ApplicationMixin', {
         if (Ext.Array.some(me.serviceUrls, urlTest) === true) {
             if (Ext.Array.some(me.excludedUrls, urlTest) === false) {
 
-                var responseType = response.responseType ? response.responseType: response.getResponseHeader('content-type');
+                // FORMS submission (i.e. attachments upoad) return bogus responses with no content-type
+                var responseType = response.responseType ? response.responseType: response.getResponseHeader ? response.getResponseHeader('content-type') : null;
 
                 // check for geojson (coming from MapServer)
                 if (responseType && responseType.includes('subtype=geojson')) {
@@ -95,7 +99,6 @@ Ext.define('CpsiMapview.util.ApplicationMixin', {
                         }
                         break;
                     case 'geojson':
-                        //result = JSON.parse(response.responseText);
                         break;
                     case 'xml':
                         result = response.responseXML;
@@ -136,16 +139,26 @@ Ext.define('CpsiMapview.util.ApplicationMixin', {
     },
 
     /**
-     * Open the login form when the application is opened
+     * Open the login form when the application is opened. Attempt
+     * to login automatically if the user already has a cookie and token.
+     * If the form has already been created then simply show it.
      * */
     doLogin: function () {
-        Ext.create('CpsiMapview.view.form.Login', {
-            viewModel: {
-                tokenName: this.tokenName,
-                serviceUrl: '/WebServices/authorization/authenticate',
-                validateUrl: '/WebServices/authorization/validateToken'
-            }
-        });
+
+        var me = this;
+
+        if (!me.loginWindow) {
+            me.loginWindow = Ext.create('CpsiMapview.view.form.Login', {
+                viewModel: {
+                    tokenName: this.tokenName,
+                    serviceUrl: '/WebServices/authorization/authenticate',
+                    validateUrl: '/WebServices/authorization/validateToken'
+                }
+            });
+            me.loginWindow.getController().tryAutomaticLogin();
+        } else {
+            me.loginWindow.show();
+        }
     },
 
     /**
