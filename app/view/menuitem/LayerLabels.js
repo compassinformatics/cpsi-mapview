@@ -8,7 +8,8 @@ Ext.define('CpsiMapview.view.menuitem.LayerLabels', {
     extend: 'Ext.menu.CheckItem',
     xtype: 'cmv_menuitem_layerlabels',
     requires: [
-        'CpsiMapview.util.Legend'
+        'CpsiMapview.util.Legend',
+        'CpsiMapview.util.WmsFilter'
     ],
 
     /**
@@ -144,11 +145,14 @@ Ext.define('CpsiMapview.view.menuitem.LayerLabels', {
         var wmsSource = me.layer.getSource();
         var wmsParams = wmsSource.getParams();
 
+        // set the checkbox value, but no need to call onCheckChange again
+        var suppressEvents = true;
+
         if (wmsParams && !Ext.isEmpty(wmsParams.STYLES) &&
             wmsParams.STYLES.indexOf(me.labelClassName) !== -1) {
-            checkItem.setChecked(true);
+            checkItem.setChecked(true, suppressEvents);
         } else {
-            checkItem.setChecked(false);
+            checkItem.setChecked(false, suppressEvents);
         }
     },
 
@@ -246,9 +250,14 @@ Ext.define('CpsiMapview.view.menuitem.LayerLabels', {
             layer.set('labelsActive', false);
         }
 
+        // ensure there is a filter for every layer listed in the WMS request (required by MapServer)
+        var wmsFilterUtil = CpsiMapview.util.WmsFilter;
+        var wmsFilterString = wmsFilterUtil.getWmsFilterString(layer);
+
         var newParams = {
             LAYERS: layerList.join(','),
-            STYLES: stylesList.join(',')
+            STYLES: stylesList.join(','),
+            FILTER: wmsFilterString
         };
 
         wmsSource.updateParams(newParams);

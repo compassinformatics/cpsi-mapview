@@ -10,6 +10,7 @@ Ext.define('CpsiMapview.factory.Layer', {
         'CpsiMapview.util.Legend',
         'CpsiMapview.view.main.Map',
         'CpsiMapview.view.layer.ToolTip',
+        'CpsiMapview.util.WmsFilter',
         'BasiGX.util.Layer',
         'BasiGX.util.Map',
         'BasiGX.util.WFS',
@@ -949,16 +950,18 @@ Ext.define('CpsiMapview.factory.Layer', {
                         activeStyle += ',' + labelClassName;
                     }
 
-                    var wmsFilter = '';
-
                     if (filters && filters.length > 0) {
-                        wmsFilter = GeoExt.util.OGCFilter.getOgcFilterFromExtJsFilter(filters, 'wms', 'and', '1.1.0');
+                        newLayerSource.getParams().FILTER = GeoExt.util.OGCFilter.getOgcFilterFromExtJsFilter(filters, 'wms', 'and', '1.1.0');
                     }
+
+                    // ensure there is a filter for every layer listed in the WMS request (required by MapServer)
+                    var wmsFilterUtil = CpsiMapview.util.WmsFilter;
+                    var wmsFilterString = wmsFilterUtil.getWmsFilterString(newLayer);
 
                     // apply new style parameter and reload layer
                     var newParams = {
                         STYLES: activeStyle,
-                        FILTER: wmsFilter,
+                        FILTER: wmsFilterString,
                         cacheBuster: Math.random()
                     };
 
