@@ -34,7 +34,10 @@ Ext.define('CpsiMapview.field.Feature', {
             rec.beginEdit();
             featureStore.layer.getSource().addFeatures(features);
             rec.endEdit();
-            // Ext.Assert.falsey(rec.dirty);
+
+            //<debug>
+            Ext.Assert.falsey(rec.dirty);
+            //</debug>
         }
 
         return features;
