@@ -41,6 +41,7 @@ Ext.define('CpsiMapview.util.WmsFilter', {
             });
         }
 
+        //<debug>
         // number of filters must match number of layers for a MapServer WMS request
         if (finalFilters.length > 0) {
             Ext.Assert.truthy(finalFilters.length === layerList.length);
@@ -49,6 +50,7 @@ Ext.define('CpsiMapview.util.WmsFilter', {
         // currently we only allow a single layer and label layer - max 2
         Ext.Assert.truthy(layerList.length <= 2);
         Ext.Assert.truthy(finalFilters.length <= 2);
+        //</debug>
 
         var wmsFilterString = finalFilters.map(function (filter) {
             // wrap each filter in brackets
