@@ -17,6 +17,10 @@ Ext.define('CpsiMapview.view.LayerTree', {
         'CpsiMapview.plugin.TreeColumnStyleSwitcher'
     ],
 
+    statics: {
+        legendImgLookup: {}
+    },
+
     // So that instantiation works without errors, might be changed during
     // instantiation of the LayerTree.
     store: {},
