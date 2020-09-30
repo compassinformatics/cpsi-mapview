@@ -36,7 +36,7 @@ Ext.define('CpsiMapview.view.grid.ItemDeleter',
                 ignoreConfirmation: this.ignoreConfirmation,
                 iconCls: 'icon-delete',
                 tooltip: this.tooltip,
-                handler: 'onDeleteFileClick',
+                handler: 'onDeleteClick',
                 isActionDisabled: function (view, rowIndex, colIndex, item, record) {
                     return this.disabled || this.itemIsDisabled(view, rowIndex, colIndex, item, record);
                 }
