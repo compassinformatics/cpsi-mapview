@@ -1,8 +1,7 @@
 Ext.define('CpsiMapview.form.field.YearField', {
     extend: 'Ext.form.field.Number',
     xtype: 'cmv_yearfield',
-    fieldStyle: 'text-align: right;', // TODO has no effect?
-    // textAlign: 'right', // property not available
+    fieldStyle: 'text-align: right;',
     allowDecimals: false,
     minValue: 1990,
     maxValue: 2030,
