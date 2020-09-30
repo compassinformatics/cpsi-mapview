@@ -33,7 +33,7 @@ Ext.define('CpsiMapview.view.LayerTree', {
     },
     tools: [{
         xtype: 'button',
-        text: 'Add external WMS',
+        text: 'Add External Map Layer',
         listeners: {
             click: 'onAddWmsClick'
         }

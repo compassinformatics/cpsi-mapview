@@ -1,7 +1,7 @@
 Ext.define('CpsiMapview.view.addWms.AddWmsWindow', {
     xtype: 'cmv_add_wms_window',
 
-    extend: 'Ext.window.Window',
+    extend: 'CpsiMapview.view.window.MinimizableWindow',
     hidden: true,
 
     controller: 'cmv_add_wms_window',
