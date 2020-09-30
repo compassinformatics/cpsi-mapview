@@ -23,6 +23,9 @@ Ext.define('CpsiMapview.controller.addWms.AddWmsFormController', {
             }, 0);
         }
 
+        olLayer.set('refreshLayerOption', true);
+        olLayer.set('opacitySlider', true);
+
         map.removeLayer(olLayer);
         this.layerGroup.getLayers().push(olLayer);
     }
