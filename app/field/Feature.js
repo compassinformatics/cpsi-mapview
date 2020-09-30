@@ -38,7 +38,6 @@ Ext.define('CpsiMapview.field.Feature', {
 
             //<debug>
             // ensure the dirty state is not affected by the adding of converted features
-            debugger;
             Ext.Assert.truthy(originalDirtyState === rec.dirty);
             //</debug>
         }
