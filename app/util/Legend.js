@@ -6,7 +6,8 @@
 Ext.define('CpsiMapview.util.Legend', {
     alternateClassName: 'LegendUtil',
     requires: [
-        'BasiGX.util.Object'
+        'BasiGX.util.Object',
+        'CpsiMapview.util.Html'
     ],
 
     singleton: true,
