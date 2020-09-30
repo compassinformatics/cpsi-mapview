@@ -14,6 +14,7 @@ Ext.define('CpsiMapview.view.main.Map', {
         'CpsiMapview.view.toolbar.MinimizedWindows',
         'CpsiMapview.controller.panel.TimeSlider',
         'CpsiMapview.controller.MapController',
+        'CpsiMapview.view.linearReference.LinearReference',
 
         'BasiGX.util.Projection'
     ],
@@ -28,7 +29,12 @@ Ext.define('CpsiMapview.view.main.Map', {
     }, {
         xtype: 'cmv_mapfooter',
         dock: 'bottom'
-    }],
+    },
+    {
+        xtype: 'cmv_linear_reference',
+        dock: 'bottom'
+    }
+    ],
 
     items: [{
         xtype: 'gx_map',
