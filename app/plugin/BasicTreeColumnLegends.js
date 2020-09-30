@@ -45,7 +45,6 @@ Ext.define('CpsiMapview.plugin.BasicTreeColumnLegends', {
             return isChecked && !(layer instanceof ol.layer.Group);
         },
         getLegendHtml: function(rec) {
-            var me = this;
             var staticMe = CpsiMapview.plugin.BasicTreeColumnLegends;
             var layer = rec.data;
             var layerKey = layer.get('layerKey');

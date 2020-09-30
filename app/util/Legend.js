@@ -181,7 +181,7 @@ Ext.define('CpsiMapview.util.Legend', {
      */
     cacheLegendImgAsDataUrl: function(legendUrl, layerKey) {
         var legendImage = new Image();
-        legendImage.crossOrigin="anonymous";
+        legendImage.crossOrigin = 'anonymous';
         CpsiMapview.util.Html.addEvent(
             legendImage, 'load', function() {
 
