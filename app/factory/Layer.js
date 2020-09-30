@@ -118,6 +118,8 @@ Ext.define('CpsiMapview.factory.Layer', {
             mapLayer.set('opacitySlider', allowOpacitySlider);
             // the xtype of any associated grid
             mapLayer.set('gridXType', layerConf.gridXType);
+            // attribute grouping config
+            mapLayer.set('grouping', layerConf.grouping);
         }
 
         return mapLayer;
