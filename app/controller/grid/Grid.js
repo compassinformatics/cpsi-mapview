@@ -11,6 +11,7 @@ Ext.define('CpsiMapview.controller.grid.Grid', {
         'Ext.menu.Menu',
         'Ext.grid.filters.Filters',
         'BasiGX.util.Layer',
+        'CpsiMapview.util.WmsFilter',
         'GeoExt.util.OGCFilter'
     ],
 
@@ -122,8 +123,6 @@ Ext.define('CpsiMapview.controller.grid.Grid', {
 
         var store = grid.getStore();
         var filters = Ext.clone(store.getFilters().items); // otherwise the actual grid filters are modified
-
-        var wmsFilter = '';
         var wmsLayer = me.getLayerByKey(viewModel.get('wmsLayerKey'));
 
         if (me.spatialFilter) {
@@ -131,14 +130,28 @@ Ext.define('CpsiMapview.controller.grid.Grid', {
         }
 
         if (wmsLayer) {
-            if (filters.length > 0) {
-                wmsFilter = GeoExt.util.OGCFilter.getOgcFilterFromExtJsFilter(filters, 'wms', 'and', '1.1.0');
-            }
             var wmsSource = wmsLayer.getSource();
-            wmsSource.updateParams({
-                filter: wmsFilter,
-                cacheBuster: Math.random()
-            });
+            var wmsParams = wmsSource.getParams();
+
+            // save the current filter string
+            var originalFilterString = wmsParams.FILTER || '';
+
+            // set any new filter
+            if (filters.length > 0) {
+                wmsParams.FILTER = GeoExt.util.OGCFilter.getOgcFilterFromExtJsFilter(filters, 'wms', 'and', '1.1.0');
+            }
+
+            // ensure there is a filter for every layer listed in the WMS request (required by MapServer)
+            var wmsFilterUtil = CpsiMapview.util.WmsFilter;
+            var wmsFilterString = wmsFilterUtil.getWmsFilterString(wmsLayer);
+
+
+            if (originalFilterString !== wmsFilterString) {
+                wmsSource.updateParams({
+                    FILTER: wmsFilterString,
+                    cacheBuster: Math.random()
+                });
+            }
             // keep a reference to the raw filters so they can be applied to the vector layer
             // when switching - see LayerFactory
             wmsSource.set('additionalFilters', filters);

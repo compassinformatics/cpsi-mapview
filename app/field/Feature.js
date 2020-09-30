@@ -22,13 +22,24 @@ Ext.define('CpsiMapview.field.Feature', {
      * Load GeoJSON features into the field's feature store
      */
     convert: function (data, rec) {
+
         var me = this;
         var features = null;
         var featureStore = rec.featureStores ? rec.featureStores[me.name] : null;
 
         if (featureStore && data) {
             features = (new ol.format.GeoJSON().readFeatures(data));
+            // wrap an edit session around updating the field when first loaded
+            // to ensure the model is not marked as dirty
+            var originalDirtyState = rec.dirty;
+            rec.beginEdit();
             featureStore.layer.getSource().addFeatures(features);
+            rec.endEdit();
+
+            //<debug>
+            // ensure the dirty state is not affected by the adding of converted features
+            Ext.Assert.truthy(originalDirtyState === rec.dirty);
+            //</debug>
         }
 
         return features;

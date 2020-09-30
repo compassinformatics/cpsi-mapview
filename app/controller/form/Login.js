@@ -115,6 +115,10 @@ Ext.define('CpsiMapview.controller.form.Login', {
                 // call was successful, we should now have a token in the response.data property
                 var response = Ext.decode(result.responseText);
 
+                if (showMask) {
+                    view.unmask();
+                }
+
                 if (response.success === true) {
                     me.login(response);
                     view.close();
@@ -122,9 +126,6 @@ Ext.define('CpsiMapview.controller.form.Login', {
                 else {
                     //username / password login failure
                     me.fireEvent('loginfail', result.statusText);
-                    if (showMask) {
-                        view.unmask();
-                    }
                     view.show();
                 }
             },

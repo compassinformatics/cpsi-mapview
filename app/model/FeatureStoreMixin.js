@@ -90,7 +90,10 @@ Ext.define('CpsiMapview.model.FeatureStoreMixin', {
             // to trigger validation
             listeners: {
                 add: function (store, features) {
-                    me.set(field.name, features, { convert: false });
+                    // if in an edit session then this is in initial load from CpsiMapview.field.Feature
+                    // so avoid setting the model to dirty when updating the field
+                    var dirty = !me.editing;
+                    me.set(field.name, features, { convert: false, dirty: dirty });
                 },
                 clear: function () {
                     me.set(field.name, null, { convert: false });
