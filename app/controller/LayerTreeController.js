@@ -280,6 +280,9 @@ Ext.define('CpsiMapview.controller.LayerTreeController', {
         if (treeNodeConf.checked === false) {
             node.addCls('cpsi-tree-no-checkbox');
         }
-    }
+    },
 
+    onAddWmsClick: function () {
+        this.getView().fireEvent('addWmsClick');
+    }
 });

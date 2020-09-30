@@ -28,6 +28,16 @@ Ext.define('CpsiMapview.view.LayerTree', {
     hideHeaders: true,
     lines: false,
     flex: 1,
+    header: {
+        dock: 'bottom'
+    },
+    tools: [{
+        xtype: 'button',
+        text: 'Add external WMS',
+        listeners: {
+            click: 'onAddWmsClick'
+        }
+    }],
     columns: {
         header: false,
         items: [
