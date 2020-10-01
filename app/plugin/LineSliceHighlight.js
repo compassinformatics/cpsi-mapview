@@ -1,3 +1,6 @@
+/**
+ * With this plugin slices of LineString geometries can be highlighted.
+ */
 Ext.define('CpsiMapview.plugin.LineSliceHighlight', {
     extend: 'Ext.plugin.Abstract',
     alias: 'plugin.cmv_line_slice_highlight',
@@ -8,7 +11,7 @@ Ext.define('CpsiMapview.plugin.LineSliceHighlight', {
      */
     style: null,
 
-    constructor: function () {
+    init: function () {
         this.style = new ol.style.Style({
             stroke: new ol.style.Stroke({
                 color: 'red',
@@ -49,6 +52,12 @@ Ext.define('CpsiMapview.plugin.LineSliceHighlight', {
         return new ol.geom.LineString(coordinates);
     },
 
+    /**
+     * This methods highlights a slice of the given LineString geometry between start and end.
+     * @param {ol.geom.LineString} geometry
+     * @param {number} start
+     * @param {number} end
+     */
     highlightSlice: function (geometry, start, end) {
         var map = BasiGX.util.Map.getMapComponent().map;
 
@@ -67,6 +76,9 @@ Ext.define('CpsiMapview.plugin.LineSliceHighlight', {
         this.layer.getSource().addFeature(feature);
     },
 
+    /**
+     * This method removes the current highlight from the map.
+     */
     removeHighlight: function () {
         if (this.layer) {
             this.layer.setMap(null);
@@ -74,6 +86,10 @@ Ext.define('CpsiMapview.plugin.LineSliceHighlight', {
         }
     },
 
+    /**
+     * This method set the style for the highlight.
+     * @param {ol.style.Style} style
+     */
     setStyle: function (style) {
         this.style = style;
         if (this.layer) {

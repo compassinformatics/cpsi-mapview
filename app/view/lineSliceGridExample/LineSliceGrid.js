@@ -97,12 +97,12 @@ Ext.define('CpsiMapview.view.lineSliceGridExample.LineSliceGrid', {
             })
         }));
 
-        this.up('cmv_line_slice_grid_window').on('show', function () {
+        this.up('cmv_minimizable_window').on('show', function () {
             layer.setVisible(true);
             map.render();
         });
 
-        this.up('cmv_line_slice_grid_window').on('close', function () {
+        this.up('cmv_minimizable_window').on('close', function () {
             layer.setVisible(false);
             highlighter.removeHighlight();
             map.render();
