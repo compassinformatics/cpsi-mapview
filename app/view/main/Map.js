@@ -14,6 +14,7 @@ Ext.define('CpsiMapview.view.main.Map', {
         'CpsiMapview.view.toolbar.MinimizedWindows',
         'CpsiMapview.controller.panel.TimeSlider',
         'CpsiMapview.controller.MapController',
+        'CpsiMapview.plugin.FeatureInfoWindow',
 
         'BasiGX.util.Projection',
         'CpsiMapview.plugin.FeatureAttributeGrouping'
@@ -22,6 +23,12 @@ Ext.define('CpsiMapview.view.main.Map', {
     layout: 'fit',
 
     controller: 'cmv_map',
+
+    plugins: [
+        {
+            ptype: 'cmv_feature_info_window'
+        }
+    ],
 
     dockedItems: [{
         xtype: 'cmv_maptools',
