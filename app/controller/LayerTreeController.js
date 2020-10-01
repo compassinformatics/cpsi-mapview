@@ -189,8 +189,10 @@ Ext.define('CpsiMapview.controller.LayerTreeController', {
         var me = this;
         // go over all passed in tree childs nodes
         Ext.each(treeNodeChilds, function (child) {
+            // respect "isLeaf" for legacy reasons (but recommended using "leaf")
+            var isLeaf = Ext.isDefined(child.isLeaf) ? child.isLeaf : child.leaf;
             // layer groups --> folders in tree
-            if (child.isLeaf !== true) {
+            if (isLeaf !== true) {
                 // create empty layer group for this level
                 var layerGroup = new ol.layer.Group({
                     name: child.title,
