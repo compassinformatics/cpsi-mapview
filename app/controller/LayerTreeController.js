@@ -251,6 +251,12 @@ Ext.define('CpsiMapview.controller.LayerTreeController', {
      * @param {Object} treeNodeConf The tree node layer config JSON
      */
     applyTreeConfigsToNode: function (node, treeNodeConf) {
+        node.set('cls', treeNodeConf.cls);
+        node.set('expandable', Ext.isDefined(treeNodeConf.expandable) ? treeNodeConf.expandable : true);
+        node.set('glyph', treeNodeConf.glyph);
+        node.set('icon', treeNodeConf.icon);
+        node.set('qshowDelay', treeNodeConf.qshowDelay);
+
         node.set('text', treeNodeConf.text);
 
         // expand configured folders in this tree
