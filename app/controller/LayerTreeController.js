@@ -99,17 +99,22 @@ Ext.define('CpsiMapview.controller.LayerTreeController', {
                     node.addCls('cpsi-tree-node-baselayer');
                 }
 
+                // expand configured folders in this tree
+                if (data.leaf !== true && node.getOlLayer()) {
+                    var origFolderConf = node.getOlLayer().get('_origTreeConf');
+                    if (origFolderConf) {
+                        node.set('expanded', origFolderConf.expanded);
+                    }
+                }
+
                 // apply the text for tree node from corresponding tree-conf
                 if (node.getOlLayer()) {
-                    var origTreeConf = node.getOlLayer().get('_origTreeConf');
-                    if (origTreeConf) {
-                        node.set('text', origTreeConf.text);
+                    var origLeafConf = node.getOlLayer().get('_origTreeConf');
+                    if (origLeafConf) {
+                        node.set('text', origLeafConf.text);
                     }
                 }
             });
-
-            // expand all folders in this tree
-            me.getView().expandAll();
 
             // inform subscribers that LayerTree is ready
             me.getView().fireEvent('cmv-init-layertree', me);
@@ -199,6 +204,9 @@ Ext.define('CpsiMapview.controller.LayerTreeController', {
                     layers: [],
                 });
 
+                // preserve the original tree JSON config to re-use it later on
+                layerGroup.set('_origTreeConf', child);
+
                 var parentLayers = parentGroup.getLayers();
                 parentLayers.insertAt(0, layerGroup);
 
@@ -212,6 +220,9 @@ Ext.define('CpsiMapview.controller.LayerTreeController', {
                     // apply tree config to OL layer
                     // needed since the LayerTreeNode model derives them from OL layer
                     me.applyTreeConfigsToOlLayer(mapLyr, child);
+
+                    // preserve the original tree JSON config to re-use it later on
+                    mapLyr.set('_origTreeConf', child);
 
                     // add OL layer to parent OL LayerGroup
                     parentGroup.getLayers().insertAt(0, mapLyr);
@@ -239,9 +250,6 @@ Ext.define('CpsiMapview.controller.LayerTreeController', {
         olLayer.set('descTitle', treeNodeConf.text);
         // changes the icon in the layer tree leaf
         olLayer.set('iconCls', treeNodeConf.iconCls);
-
-        // preserve the original tree JSON config to re-use it later on
-        olLayer.set('_origTreeConf', treeNodeConf);
     }
 
 });

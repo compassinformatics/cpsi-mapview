@@ -4,6 +4,7 @@
     {
       "id": "overlay-folder",
       "title": "Layers",
+      "expanded": true,
       "children": [
         {
           "id": "LIGHT_UNIT_MVT",
@@ -20,15 +21,21 @@
           "leaf": true
         },
         {
-          "id": "BOREHOLE_WMS",
-          "leaf": true,
-          "text": "Borehole WMS"
-        },
-        {
-          "id": "BOREHOLE_WFS",
-          "leaf": true,
-          "text": "Borehole WFS (Time)",
-          "qtip": "Filter records with the timeslider control"
+          "title": "Borehole",
+          "expanded": false,
+          "children": [
+            {
+              "id": "BOREHOLE_WMS",
+              "leaf": true,
+              "text": "Borehole WMS"
+            },
+            {
+              "id": "BOREHOLE_WFS",
+              "leaf": true,
+              "text": "Borehole WFS (Time)",
+              "qtip": "Filter records with the timeslider control"
+            }
+          ]
         },
         {
           "id": "TIME_WFS_PROXY",
@@ -95,6 +102,7 @@
     {
       "id": "base-folder",
       "title": "Base Layers",
+      "expanded": true,
       "children": [
         {
           "id": "OSM_BACKGROUND",
