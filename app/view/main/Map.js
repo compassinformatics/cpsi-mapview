@@ -60,7 +60,9 @@ Ext.define('CpsiMapview.view.main.Map', {
 
     plugins: [
         {
-            ptype: 'cmv_feature_attribute_grouping'
+            ptype: 'cmv_feature_attribute_grouping',
+            startGroupingEvent: 'click',
+            endGroupingEvent: 'context'
         }
     ],
 
