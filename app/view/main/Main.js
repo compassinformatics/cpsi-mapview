@@ -18,8 +18,7 @@ Ext.define('CpsiMapview.view.main.Main', {
         'CpsiMapview.view.main.Map',
         'CpsiMapview.view.header.Panel',
         'CpsiMapview.view.LayerTree',
-        'CpsiMapview.view.grid.ExampleGrid',
-        'CpsiMapview.view.addWms.AddWmsWindow'
+        'CpsiMapview.view.grid.ExampleGrid'
     ],
 
     controller: 'cmv_main',
@@ -45,7 +44,5 @@ Ext.define('CpsiMapview.view.main.Main', {
         }
     }, {
         xtype: 'cmv_header'
-    }, {
-        xtype: 'cmv_add_wms_window'
     }]
 });

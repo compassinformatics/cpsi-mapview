@@ -6,7 +6,9 @@ Ext.define('CpsiMapview.controller.LayerTreeController', {
     requires: [
         'BasiGX.util.Map',
         'BasiGX.util.Layer',
-        'CpsiMapview.data.model.LayerTreeNode'
+        'CpsiMapview.data.model.LayerTreeNode',
+        'CpsiMapview.view.window.MinimizableWindow',
+        'CpsiMapview.view.addWms.AddWmsForm'
     ],
 
 
@@ -282,7 +284,30 @@ Ext.define('CpsiMapview.controller.LayerTreeController', {
         }
     },
 
-    onAddWmsClick: function () {
-        this.getView().fireEvent('addWmsClick');
+    /**
+     * This reacts on toggling the add wms Button in the layertree. It shows a window with an AddWmsForm.
+     * @param {Ext.button.Button} button
+     * @param {boolean} pressed
+     */
+    onAddWmsToggle: function (button, pressed) {
+        var me = this;
+
+        if (pressed) {
+            this.addWmsWindow = Ext.create('CpsiMapview.view.window.MinimizableWindow', {
+                items: [
+                    {
+                        xtype: 'cmv_add_wms_form'
+                    }
+                ],
+            });
+            this.addWmsWindow.show();
+            this.addWmsWindow.on('close', function () {
+                button.setPressed(false);
+                me.addWmsWindow = null;
+            });
+        } else if (this.addWmsWindow) {
+            this.addWmsWindow.destroy();
+            this.addWmsWindow = null;
+        }
     }
 });
