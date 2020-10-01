@@ -87,6 +87,7 @@ Ext.define('CpsiMapview.controller.LayerTreeController', {
             me.map.setLayerGroup(rootLayerGroup);
             // create a new LayerStore from the grouped layers
             var groupedLayerTreeStore = Ext.create('GeoExt.data.store.LayersTree', {
+                model: 'CpsiMapview.data.model.LayerTreeNode',
                 layerGroup: me.map.getLayerGroup(),
                 filters: layerFilter
             });
@@ -96,6 +97,14 @@ Ext.define('CpsiMapview.controller.LayerTreeController', {
                 var data = node.getData();
                 if (data.leaf && data.get('isBaseLayer')) {
                     node.addCls('cpsi-tree-node-baselayer');
+                }
+
+                // apply the text for tree node from corresponding tree-conf
+                if (node.getOlLayer()) {
+                    var origTreeConf = node.getOlLayer().get('_origTreeConf');
+                    if (origTreeConf) {
+                        node.set('text', origTreeConf.text);
+                    }
                 }
             });
 
@@ -196,12 +205,41 @@ Ext.define('CpsiMapview.controller.LayerTreeController', {
             } else {
                 // layers --> leafs in tree
                 var mapLyr = BasiGX.util.Layer.getLayerBy('layerKey', child.id);
+
                 if (mapLyr) {
+                    // apply tree config to OL layer
+                    // needed since the LayerTreeNode model derives them from OL layer
+                    me.applyTreeConfigsToOlLayer(mapLyr, child);
+
+                    // add OL layer to parent OL LayerGroup
                     parentGroup.getLayers().insertAt(0, mapLyr);
+
                 } else {
                     Ext.Logger.warn('Layer with layerKey ' + child.id + ' not found in map layers');
                 }
             }
         });
+    },
+
+    /**
+     * Applies the values from the tree layer config to OL the given
+     * OL layer.
+     *
+     * @param {ol.layer.Base} olLayer The OL layer to apply tree conf values to
+     * @param {Object} treeNodeConf The tree node layer config JSON
+     */
+    applyTreeConfigsToOlLayer: function (olLayer, treeNodeConf) {
+        // name gets transformed to text on the layer tree node
+        olLayer.set('name', treeNodeConf.text);
+        // description gets transformed to qtip on the layer tree node
+        olLayer.set('description', treeNodeConf.qtip);
+        // descTitle gets transformed to qtitle on the layer tree node
+        olLayer.set('descTitle', treeNodeConf.text);
+        // changes the icon in the layer tree leaf
+        olLayer.set('iconCls', treeNodeConf.iconCls);
+
+        // preserve the original tree JSON config to re-use it later on
+        olLayer.set('_origTreeConf', treeNodeConf);
     }
+
 });

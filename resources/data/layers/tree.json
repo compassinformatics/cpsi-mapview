@@ -11,7 +11,9 @@
         },
         {
           "id": "RUINS_WFS",
-          "isLeaf": true
+          "isLeaf": true,
+          "text": "Ruins",
+          "qtip": "Right-click for a layer grid"
         },
         {
           "id": "LIGHT_UNIT_WFS",
@@ -19,11 +21,14 @@
         },
         {
           "id": "BOREHOLE_WMS",
-          "isLeaf": true
+          "isLeaf": true,
+          "text": "Borehole WMS"
         },
         {
           "id": "BOREHOLE_WFS",
-          "isLeaf": true
+          "isLeaf": true,
+          "text": "Borehole WFS (Time)",
+          "qtip": "Filter records with the timeslider control"
         },
         {
           "id": "TIME_WFS_PROXY",
@@ -39,27 +44,51 @@
         },
         {
           "id": "WATERBODY_SWITCH_LAYER_FAR",
-          "isLeaf": true
+          "isLeaf": true,
+          "text": "Waterbody Switch Layer (far)"
         },
         {
           "id": "WATERBODY_SWITCH_LAYER_CLOSE",
-          "isLeaf": true
+          "isLeaf": true,
+          "text": "Waterbody Switch Layer (close)"
         },
         {
           "id": "WATERWAYS_VTWMS",
-          "isLeaf": true
+          "isLeaf": true,
+          "text": "Waterways VT WMS"
         },
         {
           "id": "GAS_WFS",
-          "isLeaf": true
+          "isLeaf": true,
+          "text": "GAS WFS"
         },
         {
           "id": "COUNTRY_WFS",
-          "isLeaf": true
+          "isLeaf": true,
+          "text": "Country WFS",
+          "qtip": "An OSM based WFS layer"
         },
         {
           "id": "OSM_WMS",
-          "isLeaf": true
+          "isLeaf": true,
+          "text": "kalle",
+          "qtip": "An OSM based WMS layer",
+          "iconCls": "map"
+        },
+        {
+          "id": "OSM_WMS2",
+          "isLeaf": true,
+          "text": "A WMS 2"
+        },
+        {
+          "id": "OSM_WMS3",
+          "isLeaf": true,
+          "text": "A WMS 3"
+        },
+        {
+          "id": "OSM_WMS4",
+          "isLeaf": true,
+          "text": "A WMS 4"
         }
       ]
     },
@@ -69,11 +98,17 @@
       "children": [
         {
           "id": "OSM_BACKGROUND",
-          "isLeaf": true
+          "isLeaf": true,
+          "text": "OpenStreetMap",
+          "qtip": "An OpenStreetMap based background layer",
+          "iconCls": "map"
         },
         {
           "id": "GREY_BACKGROUND",
-          "isLeaf": true
+          "isLeaf": true,
+          "text": "Grey Background",
+          "qtip": "This is the background layer",
+          "iconCls": "map"
         }
       ]
     }
