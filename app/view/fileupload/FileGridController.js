@@ -56,7 +56,7 @@ Ext.define('CpsiMapview.view.fileupload.FileGridController', {
         fileUploadWin.show();
     },
 
-    onDeleteFileClick: function (grid, rowIndex, colIndex, item, e, rec) {
+    onDeleteRowClick: function (grid, rowIndex, colIndex, item, e, rec) {
         var removeRecord = function (rec, gridView) {
             var id = CpsiMapview.model.fileupload.FileGridStoreModel.loadData(rec.data).getId();
             Ext.Ajax.request({
