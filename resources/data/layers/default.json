@@ -99,7 +99,6 @@
       "layerType": "wms",
       "layerKey": "OSM_WMS3",
       "helpPage": "OSM",
-      "iconCls": "map",
       "url": "https://ows.terrestris.de/osm-gray/service",
       "serverOptions": {
         "layers": "OSM-WMS"
