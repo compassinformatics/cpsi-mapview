@@ -14,3 +14,9 @@
         background-image: url(images/form/radio.png);
     }
 }
+
+.cpsi-tree-no-checkbox {
+    .x-tree-checkbox {
+        display: none;
+    }
+}

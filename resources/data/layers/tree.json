@@ -5,6 +5,7 @@
       "id": "overlay-folder",
       "title": "Layers",
       "expanded": true,
+      "checked": false,
       "children": [
         {
           "id": "LIGHT_UNIT_MVT",

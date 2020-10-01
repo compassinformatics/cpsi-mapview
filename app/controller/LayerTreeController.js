@@ -261,6 +261,13 @@ Ext.define('CpsiMapview.controller.LayerTreeController', {
 
         // expand configured folders in this tree
         node.set('expanded', treeNodeConf.expanded);
+
+        // hide checkbox on tree node if configured
+        // setting checked to undefined has no effect since GeoExt.data.model.LayerTreeNode
+        // overwrites this with the layer's visibility.
+        if (treeNodeConf.checked === false) {
+            node.addCls('cpsi-tree-no-checkbox');
+        }
     }
 
 });
