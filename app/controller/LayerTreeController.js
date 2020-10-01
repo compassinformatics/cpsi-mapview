@@ -99,21 +99,12 @@ Ext.define('CpsiMapview.controller.LayerTreeController', {
                     node.addCls('cpsi-tree-node-baselayer');
                 }
 
-                // expand configured folders in this tree
-                if (data.leaf !== true && node.getOlLayer()) {
-                    var origFolderConf = node.getOlLayer().get('_origTreeConf');
-                    if (origFolderConf) {
-                        node.set('expanded', origFolderConf.expanded);
-                    }
+                // apply properties for tree node from corresponding tree-conf
+                if (node.getOlLayer()) {
+                    var origTreeNodeConf = node.getOlLayer().get('_origTreeConf') || {};
+                    me.applyTreeConfigsToNode(node, origTreeNodeConf);
                 }
 
-                // apply the text for tree node from corresponding tree-conf
-                if (node.getOlLayer()) {
-                    var origLeafConf = node.getOlLayer().get('_origTreeConf');
-                    if (origLeafConf) {
-                        node.set('text', origLeafConf.text);
-                    }
-                }
             });
 
             // inform subscribers that LayerTree is ready
@@ -250,6 +241,20 @@ Ext.define('CpsiMapview.controller.LayerTreeController', {
         olLayer.set('descTitle', treeNodeConf.text);
         // changes the icon in the layer tree leaf
         olLayer.set('iconCls', treeNodeConf.iconCls);
+    },
+
+    /**
+     * Applies the values from the tree layer config to the given
+     * tree node instance.
+     *
+     * @param {Ext.data.NodeInterface} node The tree node to apply tree conf values to
+     * @param {Object} treeNodeConf The tree node layer config JSON
+     */
+    applyTreeConfigsToNode: function (node, treeNodeConf) {
+        node.set('text', treeNodeConf.text);
+
+        // expand configured folders in this tree
+        node.set('expanded', treeNodeConf.expanded);
     }
 
 });
