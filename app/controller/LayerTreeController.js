@@ -5,7 +5,8 @@ Ext.define('CpsiMapview.controller.LayerTreeController', {
 
     requires: [
         'BasiGX.util.Map',
-        'BasiGX.util.Layer'
+        'BasiGX.util.Layer',
+        'CpsiMapview.data.model.LayerTreeNode'
     ],
 
 
@@ -106,11 +107,6 @@ Ext.define('CpsiMapview.controller.LayerTreeController', {
             me.getView().setStore(groupedLayerTreeStore);
 
             me.getView().getRootNode().cascade(function (node) {
-                var data = node.getData();
-                if (data.leaf && data.get('isBaseLayer')) {
-                    node.addCls('cpsi-tree-node-baselayer');
-                }
-
                 // apply properties for tree node from corresponding tree-conf
                 if (node.getOlLayer()) {
                     var origTreeNodeConf = node.getOlLayer().get('_origTreeConf') || {};
