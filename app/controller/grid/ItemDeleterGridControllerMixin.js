@@ -22,7 +22,7 @@ Ext.define('CpsiMapview.controller.grid.ItemDeleterGridControllerMixin', {
     onRowDeleteCallback: Ext.emptyFn,
 
     // what to do for deleting
-    doDelete: function (record) {
+    onRowDelete: function (tableView, rowIndex, colIndex, item, e, record, tableRow) {
         record.erase({
             failure: this.onRowDeleteFail,
             success: this.onRowDeleteSuccess,
@@ -30,8 +30,8 @@ Ext.define('CpsiMapview.controller.grid.ItemDeleterGridControllerMixin', {
         });
     },
 
-    // what to do for not deleting
-    dontDelete: Ext.emptyFn,
+    // what to do for not deleting (either canceled by user or by business logic)
+    onRowDeleteCanceled: Ext.emptyFn,
 
     onDeleteRowClick: function (tableView, rowIndex, colIndex, item, e, record, tableRow) {
         var me = this;
@@ -39,21 +39,21 @@ Ext.define('CpsiMapview.controller.grid.ItemDeleterGridControllerMixin', {
         var goAhead = (me.beforeDelete ? me.beforeDelete(beforeDeleteConfig) : true);
         if (goAhead) {
             if (beforeDeleteConfig.avoidConfirmationRequest) {
-                me.doDelete(record);
+                me.onRowDelete(tableView, rowIndex, colIndex, item, e, record, tableRow);
             } else {
                 Ext.Msg.confirm('Delete', 'Are you sure you want to proceed with deletion?',
                     function (buttonId) {
                         if (buttonId == 'yes') {
-                            me.doDelete(record);
+                            me.onRowDelete(tableView, rowIndex, colIndex, item, e, record, tableRow);
                         } else {
-                            me.dontDelete(record);
+                            me.onRowDeleteCanceled(tableView, rowIndex, colIndex, item, e, record, tableRow);
                         }
                     }
                 );
             }
         }
         else {
-            me.dontDelete(record);
+            me.onRowDeleteCanceled(tableView, rowIndex, colIndex, item, e, record, tableRow);
         }
     }
 

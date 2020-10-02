@@ -62,19 +62,20 @@ Ext.define('CpsiMapview.view.fileupload.FileUploadWindowController', {
                         'Accept': 'text/json'
                     }
                 },
-                success: function (form) {
+                success: function (form, action) {
                     var descrip = form.findField('documentDescription').getValue(),
                         name = form.findField('documentName').getValue();
                     // create a new object containing the attributes of the attachment
                     // after it was successfully associated
                     // with the parent object. This record can then be added to a store
                     var newFiledata = {
-                        attachementId: '',
+                        attachementId: action.result.data.attachmentId,
                         name: name,
                         description: descrip,
                         extension: 'Extension',
                         fileName: fileName,
-                        fileSize: ''
+                        fileSize: '',
+                        lastUpdatedDateUtc: Date()
                     };
 
                     // now show a message box to show the file was successfully uploaded
