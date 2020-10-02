@@ -17,7 +17,7 @@ Ext.define('CpsiMapview.view.window.MinimizableWindow', {
 
     controller: 'cmv_minimizable_window',
 
-    constrain: true, // constrain within the viewport
+    constrainHeader: true, // constrain header within the viewport
 
     minimizable: true,
 

@@ -15,7 +15,8 @@ Ext.define('CpsiMapview.view.main.Map', {
         'CpsiMapview.controller.panel.TimeSlider',
         'CpsiMapview.controller.MapController',
 
-        'BasiGX.util.Projection'
+        'BasiGX.util.Projection',
+        'CpsiMapview.plugin.FeatureAttributeGrouping'
     ],
 
     layout: 'fit',
@@ -56,6 +57,14 @@ Ext.define('CpsiMapview.view.main.Map', {
     }, {
         xtype: 'cmv_minimized_windows_toolbar'
     }],
+
+    plugins: [
+        {
+            ptype: 'cmv_feature_attribute_grouping',
+            startGroupingEvent: 'click',
+            endGroupingEvent: 'context'
+        }
+    ],
 
     /**
      * Enables a click handler on the map which fires an event
@@ -284,6 +293,9 @@ Ext.define('CpsiMapview.view.main.Map', {
         }
 
         Ext.GlobalEvents.fireEvent('cmv-mapready', me);
+
+        var grouping = this.getPlugin('cmv_feature_attribute_grouping');
+        grouping.initGrouping(me.mapCmp, me.olMap);
     },
 
     /**

@@ -19,7 +19,8 @@ Ext.define('CpsiMapview.view.toolbar.MapTools', {
         'CpsiMapview.view.combo.Gazetteer',
         'CpsiMapview.view.button.StreetViewTool',
         'CpsiMapview.view.panel.TimeSlider',
-        'CpsiMapview.view.panel.NumericAttributeSlider'
+        'CpsiMapview.view.panel.NumericAttributeSlider',
+        'CpsiMapview.view.lineSliceGridExample.LineSliceGridButton'
     ],
 
     controller: 'cmv_map',
@@ -142,6 +143,8 @@ Ext.define('CpsiMapview.view.toolbar.MapTools', {
             increment: 10,
             currLowerValue: 50,
             currUpperValue: 100
+        }, {
+            xtype: 'cmv_line_slice_grid_button'
         }
     ],
 

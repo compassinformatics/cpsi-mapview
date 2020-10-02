@@ -1,81 +1,130 @@
 {
-  "id": "root",
-  "children": [
-    {
-      "id": "overlay-folder",
-      "title": "Layers",
-      "children": [
-        {
-          "id": "LIGHT_UNIT_MVT",
-          "isLeaf": true
-        },
-        {
-          "id": "RUINS_WFS",
-          "isLeaf": true
-        },
-        {
-          "id": "LIGHT_UNIT_WFS",
-          "isLeaf": true
-        },
-        {
-          "id": "BOREHOLE_WMS",
-          "isLeaf": true
-        },
-        {
-          "id": "BOREHOLE_WFS",
-          "isLeaf": true
-        },
-        {
-          "id": "TIME_WFS_PROXY",
-          "isLeaf": true
-        },
-        {
-          "id": "WORKS_EXPORT_WMS_PROXY",
-          "isLeaf": true
-        },
-        {
-          "id": "LIGHT_UNIT_SWITCH_LAYER_FAR",
-          "isLeaf": true
-        },
-        {
-          "id": "WATERBODY_SWITCH_LAYER_FAR",
-          "isLeaf": true
-        },
-        {
-          "id": "WATERBODY_SWITCH_LAYER_CLOSE",
-          "isLeaf": true
-        },
-        {
-          "id": "WATERWAYS_VTWMS",
-          "isLeaf": true
-        },
-        {
-          "id": "GAS_WFS",
-          "isLeaf": true
-        },
-        {
-          "id": "COUNTRY_WFS",
-          "isLeaf": true
-        },
-        {
-          "id": "OSM_WMS",
-          "isLeaf": true
-        }
-      ]
-    },
-    {
-      "id": "base-folder",
-      "title": "Base Layers",
-      "children": [
-        {
-          "id": "OSM_BACKGROUND",
-          "isLeaf": true
-        },
-        {
-          "id": "GREY_BACKGROUND",
-          "isLeaf": true
-        }
-      ]
-    }
-  ]
+  "defaults": {
+    "general": {}
+  },
+  "treeConfig": {
+    "id": "root",
+    "children": [
+      {
+        "id": "overlay-folder",
+        "title": "Layers",
+        "expanded": true,
+        "checked": false,
+        "children": [
+          {
+            "id": "LIGHT_UNIT_MVT",
+            "leaf": true
+          },
+          {
+            "id": "RUINS_WFS",
+            "leaf": true,
+            "text": "Ruins",
+            "qtip": "Right-click for a layer grid"
+          },
+          {
+            "id": "LIGHT_UNIT_WFS",
+            "leaf": true
+          },
+          {
+            "title": "Borehole",
+            "expanded": false,
+            "children": [
+              {
+                "id": "BOREHOLE_WMS",
+                "leaf": true,
+                "text": "Borehole WMS"
+              },
+              {
+                "id": "BOREHOLE_WFS",
+                "leaf": true,
+                "text": "Borehole WFS (Time)",
+                "qtip": "Filter records with the timeslider control"
+              }
+            ]
+          },
+          {
+            "id": "TIME_WFS_PROXY",
+            "leaf": true
+          },
+          {
+            "id": "WORKS_EXPORT_WMS_PROXY",
+            "leaf": true
+          },
+          {
+            "id": "LIGHT_UNIT_SWITCH_LAYER_FAR",
+            "leaf": true
+          },
+          {
+            "id": "WATERBODY_SWITCH_LAYER_FAR",
+            "leaf": true,
+            "text": "Waterbody Switch Layer (far)"
+          },
+          {
+            "id": "WATERBODY_SWITCH_LAYER_CLOSE",
+            "leaf": true,
+            "text": "Waterbody Switch Layer (close)"
+          },
+          {
+            "id": "WATERWAYS_VTWMS",
+            "leaf": true,
+            "text": "Waterways VT WMS"
+          },
+          {
+            "id": "GAS_WFS",
+            "leaf": true,
+            "text": "GAS WFS"
+          },
+          {
+            "id": "COUNTRY_WFS",
+            "leaf": true,
+            "text": "Country WFS",
+            "qtip": "An OSM based WFS layer"
+          },
+          {
+            "id": "OSM_WMS",
+            "leaf": true,
+            "text": "OSM WMS",
+            "qtip": "An OSM based WMS layer",
+            "iconCls": "map"
+          },
+          {
+            "id": "OSM_WMS2",
+            "leaf": true,
+            "text": "A WMS 2"
+          },
+          {
+            "id": "OSM_WMS3",
+            "leaf": true,
+            "text": "A WMS 3"
+          },
+          {
+            "id": "OSM_WMS4",
+            "leaf": true,
+            "text": "A WMS 4"
+          }
+        ]
+      },
+      {
+        "id": "base-folder",
+        "title": "Base Layers",
+        "expanded": true,
+        "children": [
+          {
+            "id": "OSM_BACKGROUND",
+            "leaf": true,
+            "text": "OpenStreetMap",
+            "qtip": "An OpenStreetMap based background layer",
+            "iconCls": "map"
+          },
+          {
+            "id": "GREY_BACKGROUND",
+            "leaf": true,
+            "text": "Grey Background",
+            "qtip": "This is the background layer",
+            "iconCls": "map"
+          }
+        ]
+      }
+    ]
+  }
 }

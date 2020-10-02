@@ -60,7 +60,7 @@ Ext.define('CpsiMapview.view.fileupload.FileGrid',
             {
                 xtype: 'cmv_itemdeleter',
                 itemId: 'itemDeleter',
-                ignoreConfirmation: false,
+                avoidConfirmationRequest: false,
                 deleteItemRequiredRole: this.deleteItemRequiredRole
             }
         ],

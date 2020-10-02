@@ -26,7 +26,9 @@ Ext.define('CpsiMapview.view.fileupload.FileGridController', {
         'CpsiMapview.view.fileupload.FileUploadWindow',
         'CpsiMapview.model.fileupload.FileGridStoreModel'
     ],
-
+    mixins: [
+        'CpsiMapview.controller.grid.ItemDeleterGridControllerMixin'
+    ],
     getServiceUrl: function() {
         var vm = this.getViewModel();
         var url = vm.getData().serviceUrl;
@@ -56,35 +58,19 @@ Ext.define('CpsiMapview.view.fileupload.FileGridController', {
         fileUploadWin.show();
     },
 
-    onDeleteFileClick: function (grid, rowIndex, colIndex, item, e, rec) {
-        var removeRecord = function (rec, gridView) {
-            var id = CpsiMapview.model.fileupload.FileGridStoreModel.loadData(rec.data).getId();
-            Ext.Ajax.request({
-                url: this.getAttachmentDeleteUrl(id),
-                method: 'DELETE',
-                success: function() {
-                    var store = gridView.getStore();
-                    store.remove(rec);
-                },
-                failure: function(){
-                }
-            });
-        };
-        if (item.ignoreConfirmation === true) {
-            removeRecord.call(this, rec, grid);
-        } else {
-            Ext.MessageBox.confirm('Delete Item?',
-                'Do you want to delete this item?',
-                function (btn) {
-                    if (btn === 'yes') {
-                        removeRecord.call(this, rec, grid);
-                        return true;
-                    } else {
-                        return false;
-                    }
-                },
-                this);
-        }
+    onRowDelete: function(tableView, rowIndex, colIndex, item, e, record/*, tableRow*/)
+    {
+        var id = CpsiMapview.model.fileupload.FileGridStoreModel.loadData(record.data).getId();
+        Ext.Ajax.request({
+            url: this.getAttachmentDeleteUrl(id),
+            method: 'DELETE',
+            success: function() {
+                var store = tableView.getStore();
+                store.remove(record);
+            },
+            failure: function(){
+            }
+        });
     },
 
     onFileAdded: function (file) {
@@ -92,11 +78,16 @@ Ext.define('CpsiMapview.view.fileupload.FileGridController', {
         store.add(file);
     },
 
-    onDownloadFileClick: function (grid, record, element, rowIndex/*, e, eOpts*/) {
+    getAttachmentUrl: function (attachmentId) {
+        var vm = this.getViewModel();
+        return Ext.String.format('{0}/attachment/{1}', vm.getData().serviceUrl, attachmentId);
+    },
+
+    onDownloadFileClick: function (grid, record/*, element, rowIndex, e, eOpts*/) {
         var report = Ext.create('CpsiMapview.view.fileupload.Report', {
             renderTo: Ext.getBody()
         });
-        var url = grid.store.getAttachmentUrlFromIdx(rowIndex);
+        var url = this.getAttachmentUrl(record.get('attachmentId'));
         report.load({
             url: url
         });
