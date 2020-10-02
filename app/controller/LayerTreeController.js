@@ -27,6 +27,15 @@ Ext.define('CpsiMapview.controller.LayerTreeController', {
      */
     initLayersAdded: false,
 
+    /**
+     * Holds the default values for tree nodes of the config file tree.json.
+     * Will be set in #makeLayerStore function.
+     *
+     * @private
+     * @readonly
+     */
+    treeConfDefaults: {},
+
     constructor: function () {
         var me = this;
 
@@ -81,8 +90,11 @@ Ext.define('CpsiMapview.controller.LayerTreeController', {
 
         var treeJsonPromise = me.loadTreeStructure();
         treeJsonPromise.then(function (treeJson) {
+            // save defaults for tree nodes from config
+            me.treeConfDefaults = treeJson.defaults || {};
+
             // get the root layer group holding the grouped map layers
-            var rootLayerGroup = me.getGroupedLayers(treeJson);
+            var rootLayerGroup = me.getGroupedLayers(treeJson.treeConfig);
 
             me.map.setLayerGroup(rootLayerGroup);
             // create a new LayerStore from the grouped layers
@@ -159,7 +171,7 @@ Ext.define('CpsiMapview.controller.LayerTreeController', {
      * @param  {Object} treeJson LayerTree structure
      * @return {ol.layer.Group}  Root layer group
      */
-    getGroupedLayers: function (treeJson) {
+    getGroupedLayers: function (treeConfJson) {
         var me = this;
 
         // wrapping all under the 'root' node aggregating all together
@@ -168,7 +180,7 @@ Ext.define('CpsiMapview.controller.LayerTreeController', {
             layers: []
         });
         // recursively create the OL layer group by the given tree structure
-        me.createOlLayerGroups(treeJson.children, rootLayerGroup);
+        me.createOlLayerGroups(treeConfJson.children, rootLayerGroup);
 
         return rootLayerGroup;
     },
@@ -185,6 +197,10 @@ Ext.define('CpsiMapview.controller.LayerTreeController', {
         var me = this;
         // go over all passed in tree childs nodes
         Ext.each(treeNodeChilds, function (child) {
+            // apply defaults for tree nodes from config
+            var generalDefaults = me.treeConfDefaults.general || {};
+            Ext.applyIf(child, generalDefaults);
+
             // respect "isLeaf" for legacy reasons (but recommended using "leaf")
             var isLeaf = Ext.isDefined(child.isLeaf) ? child.isLeaf : child.leaf;
             // layer groups --> folders in tree
