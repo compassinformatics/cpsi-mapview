@@ -448,6 +448,17 @@ Ext.define('CpsiMapview.controller.grid.Grid', {
     },
 
     /**
+    * Clear any sorters on the store
+    */
+    onClearSort: function () {
+        var me = this;
+        var grid = me.getView();
+        var store = grid.getStore();
+        store.getSorters().clear();
+        store.reload();
+    },
+
+    /**
     * Clear both the grid filters and any spatial filter.
     * This will cause the store to reload.
     *
