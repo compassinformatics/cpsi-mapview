@@ -104,10 +104,6 @@ Ext.define('CpsiMapview.factory.Layer', {
             mapLayer.set('legendWidth', layerConf.legendWidth);
             mapLayer.set('layerKey', layerConf.layerKey);
 
-            // this gets transformed to qtip on the layer tree node
-            mapLayer.set('description', layerConf.qtip);
-            // changes the icon in the layer tree leaf
-            mapLayer.set('iconCls', layerConf.iconCls);
             // indicator if a refresh option is offered in layer context menu
             var allowRefresh = layerConf.refreshLayerOption !== false;
             mapLayer.set('refreshLayerOption', allowRefresh);

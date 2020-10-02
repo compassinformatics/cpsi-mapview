@@ -87,6 +87,7 @@ Ext.define('CpsiMapview.controller.LayerTreeController', {
             me.map.setLayerGroup(rootLayerGroup);
             // create a new LayerStore from the grouped layers
             var groupedLayerTreeStore = Ext.create('GeoExt.data.store.LayersTree', {
+                model: 'CpsiMapview.data.model.LayerTreeNode',
                 layerGroup: me.map.getLayerGroup(),
                 filters: layerFilter
             });
@@ -97,10 +98,14 @@ Ext.define('CpsiMapview.controller.LayerTreeController', {
                 if (data.leaf && data.get('isBaseLayer')) {
                     node.addCls('cpsi-tree-node-baselayer');
                 }
-            });
 
-            // expand all folders in this tree
-            me.getView().expandAll();
+                // apply properties for tree node from corresponding tree-conf
+                if (node.getOlLayer()) {
+                    var origTreeNodeConf = node.getOlLayer().get('_origTreeConf') || {};
+                    me.applyTreeConfigsToNode(node, origTreeNodeConf);
+                }
+
+            });
 
             // inform subscribers that LayerTree is ready
             me.getView().fireEvent('cmv-init-layertree', me);
@@ -180,13 +185,18 @@ Ext.define('CpsiMapview.controller.LayerTreeController', {
         var me = this;
         // go over all passed in tree childs nodes
         Ext.each(treeNodeChilds, function (child) {
+            // respect "isLeaf" for legacy reasons (but recommended using "leaf")
+            var isLeaf = Ext.isDefined(child.isLeaf) ? child.isLeaf : child.leaf;
             // layer groups --> folders in tree
-            if (child.isLeaf !== true) {
+            if (isLeaf !== true) {
                 // create empty layer group for this level
                 var layerGroup = new ol.layer.Group({
                     name: child.title,
                     layers: [],
                 });
+
+                // preserve the original tree JSON config to re-use it later on
+                layerGroup.set('_origTreeConf', child);
 
                 var parentLayers = parentGroup.getLayers();
                 parentLayers.insertAt(0, layerGroup);
@@ -196,12 +206,68 @@ Ext.define('CpsiMapview.controller.LayerTreeController', {
             } else {
                 // layers --> leafs in tree
                 var mapLyr = BasiGX.util.Layer.getLayerBy('layerKey', child.id);
+
                 if (mapLyr) {
+                    // apply tree config to OL layer
+                    // needed since the LayerTreeNode model derives them from OL layer
+                    me.applyTreeConfigsToOlLayer(mapLyr, child);
+
+                    // preserve the original tree JSON config to re-use it later on
+                    mapLyr.set('_origTreeConf', child);
+
+                    // add OL layer to parent OL LayerGroup
                     parentGroup.getLayers().insertAt(0, mapLyr);
+
                 } else {
                     Ext.Logger.warn('Layer with layerKey ' + child.id + ' not found in map layers');
                 }
             }
         });
+    },
+
+    /**
+     * Applies the values from the tree layer config to OL the given
+     * OL layer.
+     *
+     * @param {ol.layer.Base} olLayer The OL layer to apply tree conf values to
+     * @param {Object} treeNodeConf The tree node layer config JSON
+     */
+    applyTreeConfigsToOlLayer: function (olLayer, treeNodeConf) {
+        // name gets transformed to text on the layer tree node
+        olLayer.set('name', treeNodeConf.text);
+        // description gets transformed to qtip on the layer tree node
+        olLayer.set('description', treeNodeConf.qtip);
+        // descTitle gets transformed to qtitle on the layer tree node
+        olLayer.set('descTitle', treeNodeConf.text);
+        // changes the icon in the layer tree leaf
+        olLayer.set('iconCls', treeNodeConf.iconCls);
+    },
+
+    /**
+     * Applies the values from the tree layer config to the given
+     * tree node instance.
+     *
+     * @param {Ext.data.NodeInterface} node The tree node to apply tree conf values to
+     * @param {Object} treeNodeConf The tree node layer config JSON
+     */
+    applyTreeConfigsToNode: function (node, treeNodeConf) {
+        node.set('cls', treeNodeConf.cls);
+        node.set('expandable', Ext.isDefined(treeNodeConf.expandable) ? treeNodeConf.expandable : true);
+        node.set('glyph', treeNodeConf.glyph);
+        node.set('icon', treeNodeConf.icon);
+        node.set('qshowDelay', treeNodeConf.qshowDelay);
+
+        node.set('text', treeNodeConf.text);
+
+        // expand configured folders in this tree
+        node.set('expanded', treeNodeConf.expanded);
+
+        // hide checkbox on tree node if configured
+        // setting checked to undefined has no effect since GeoExt.data.model.LayerTreeNode
+        // overwrites this with the layer's visibility.
+        if (treeNodeConf.checked === false) {
+            node.addCls('cpsi-tree-no-checkbox');
+        }
     }
+
 });
