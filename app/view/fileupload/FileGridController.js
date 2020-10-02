@@ -58,7 +58,7 @@ Ext.define('CpsiMapview.view.fileupload.FileGridController', {
         fileUploadWin.show();
     },
 
-    onRowDelete: function(tableView, rowIndex, colIndex, item, e, record, tableRow)
+    onRowDelete: function(tableView, rowIndex, colIndex, item, e, record/*, tableRow*/)
     {
         var id = CpsiMapview.model.fileupload.FileGridStoreModel.loadData(record.data).getId();
         Ext.Ajax.request({
@@ -83,7 +83,7 @@ Ext.define('CpsiMapview.view.fileupload.FileGridController', {
         return Ext.String.format('{0}/attachment/{1}', vm.getData().serviceUrl, attachmentId);
     },
 
-    onDownloadFileClick: function (grid, record, element, rowIndex/*, e, eOpts*/) {
+    onDownloadFileClick: function (grid, record/*, element, rowIndex, e, eOpts*/) {
         var report = Ext.create('CpsiMapview.view.fileupload.Report', {
             renderTo: Ext.getBody()
         });
