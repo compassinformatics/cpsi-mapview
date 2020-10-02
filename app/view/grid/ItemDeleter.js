@@ -6,7 +6,7 @@ Ext.define('CpsiMapview.view.grid.ItemDeleter',
         requiredRole: this.deleteItemRequiredRole,
         menuDisabled: true, // disable the column header menu containing sort/hide options
         iconCls: 'x-fa fa-delete',
-        ignoreConfirmation: false,
+        avoidConfirmationRequest: false,
         isActionColumn: true,
         hideable: false, // prevent the user from hiding this column
         draggable: false,
@@ -33,10 +33,10 @@ Ext.define('CpsiMapview.view.grid.ItemDeleter',
 
         items: [
             {
-                ignoreConfirmation: this.ignoreConfirmation,
+                avoidConfirmationRequest: this.avoidConfirmationRequest,
                 iconCls: 'icon-delete',
                 tooltip: this.tooltip,
-                handler: 'onDeleteClick',
+                handler: 'onDeleteRowClick',
                 isActionDisabled: function (view, rowIndex, colIndex, item, record) {
                     return this.disabled || this.itemIsDisabled(view, rowIndex, colIndex, item, record);
                 }
