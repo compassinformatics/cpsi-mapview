@@ -304,9 +304,9 @@ Ext.define('CpsiMapview.controller.LayerTreeController', {
         }
     },
 
-   /**
-   * Destroy any associated windows when this component gets destroyed
-   */
+    /**
+    * Destroy any associated windows when this component gets destroyed
+    */
     onBeforeDestroy: function () {
         if (this.addWmsWindow) {
             this.addWmsWindow.destroy();
