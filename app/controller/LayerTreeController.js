@@ -293,14 +293,14 @@ Ext.define('CpsiMapview.controller.LayerTreeController', {
         if (pressed) {
             if (!this.addWmsWindow) {
                 this.addWmsWindow = Ext.create(me.getView().addWmsWindowConfig);
-                this.addWmsWindow.on('hide', function () {
+                this.addWmsWindow.on('close', function () {
                     button.setPressed(false);
                 });
             }
             this.addWmsWindow.show();
 
         } else if (this.addWmsWindow) {
-            this.addWmsWindow.hide();
+            this.addWmsWindow.close();
         }
     },
 
