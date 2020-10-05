@@ -6,9 +6,7 @@ Ext.define('CpsiMapview.controller.LayerTreeController', {
     requires: [
         'BasiGX.util.Map',
         'BasiGX.util.Layer',
-        'CpsiMapview.data.model.LayerTreeNode',
-        'CpsiMapview.view.window.MinimizableWindow',
-        'CpsiMapview.view.addWms.AddWmsForm'
+        'CpsiMapview.data.model.LayerTreeNode'
     ],
 
 
@@ -293,13 +291,7 @@ Ext.define('CpsiMapview.controller.LayerTreeController', {
         var me = this;
 
         if (pressed) {
-            this.addWmsWindow = Ext.create('CpsiMapview.view.window.MinimizableWindow', {
-                items: [
-                    {
-                        xtype: 'cmv_add_wms_form'
-                    }
-                ],
-            });
+            this.addWmsWindow = Ext.create(me.getView().addWmsWindowConfig);
             this.addWmsWindow.show();
             this.addWmsWindow.on('close', function () {
                 button.setPressed(false);

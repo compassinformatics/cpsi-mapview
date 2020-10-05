@@ -13,7 +13,9 @@ Ext.define('CpsiMapview.view.LayerTree', {
         'CpsiMapview.view.menuitem.LayerOpacity',
         'CpsiMapview.view.menuitem.LayerGrid',
         'CpsiMapview.plugin.TreeColumnStyleSwitcher',
-        'CpsiMapview.controller.LayerTreeController'
+        'CpsiMapview.controller.LayerTreeController',
+        'CpsiMapview.view.window.MinimizableWindow',
+        'CpsiMapview.view.addWms.AddWmsForm'
     ],
 
     controller: 'cmv_layertree',
@@ -24,6 +26,19 @@ Ext.define('CpsiMapview.view.LayerTree', {
     rootVisible: false,
     viewConfig: {
         plugins: { ptype: 'treeviewdragdrop' }
+    },
+    config: {
+        /**
+        * The window configuration used for the Add WMS button
+        * Any xtypes used should be added to the requires property
+        */
+        addWmsWindowConfig: {
+            xtype: 'cmv_minimizable_window',
+            title: 'Add External Map Layer',
+            items: [{
+                xtype: 'cmv_add_wms_form'
+            }]
+        }
     },
     hideHeaders: true,
     lines: false,
