@@ -291,13 +291,24 @@ Ext.define('CpsiMapview.controller.LayerTreeController', {
         var me = this;
 
         if (pressed) {
-            this.addWmsWindow = Ext.create(me.getView().addWmsWindowConfig);
+            if (!this.addWmsWindow) {
+                this.addWmsWindow = Ext.create(me.getView().addWmsWindowConfig);
+                this.addWmsWindow.on('hide', function () {
+                    button.setPressed(false);
+                });
+            }
             this.addWmsWindow.show();
-            this.addWmsWindow.on('close', function () {
-                button.setPressed(false);
-                me.addWmsWindow = null;
-            });
+
         } else if (this.addWmsWindow) {
+            this.addWmsWindow.hide();
+        }
+    },
+
+   /**
+   * Destroy any associated windows when this component gets destroyed
+   */
+    onBeforeDestroy: function () {
+        if (this.addWmsWindow) {
             this.addWmsWindow.destroy();
             this.addWmsWindow = null;
         }

@@ -35,6 +35,7 @@ Ext.define('CpsiMapview.view.LayerTree', {
         addWmsWindowConfig: {
             xtype: 'cmv_minimizable_window',
             title: 'Add External Map Layer',
+            closeAction: 'hide',
             items: [{
                 xtype: 'cmv_add_wms_form'
             }]
