@@ -6,9 +6,7 @@ Ext.define('CpsiMapview.controller.LayerTreeController', {
     requires: [
         'BasiGX.util.Map',
         'BasiGX.util.Layer',
-        'CpsiMapview.data.model.LayerTreeNode',
-        'CpsiMapview.view.window.MinimizableWindow',
-        'CpsiMapview.view.addWms.AddWmsForm'
+        'CpsiMapview.data.model.LayerTreeNode'
     ],
 
 
@@ -293,19 +291,24 @@ Ext.define('CpsiMapview.controller.LayerTreeController', {
         var me = this;
 
         if (pressed) {
-            this.addWmsWindow = Ext.create('CpsiMapview.view.window.MinimizableWindow', {
-                items: [
-                    {
-                        xtype: 'cmv_add_wms_form'
-                    }
-                ],
-            });
+            if (!this.addWmsWindow) {
+                this.addWmsWindow = Ext.create(me.getView().addWmsWindowConfig);
+                this.addWmsWindow.on('close', function () {
+                    button.setPressed(false);
+                });
+            }
             this.addWmsWindow.show();
-            this.addWmsWindow.on('close', function () {
-                button.setPressed(false);
-                me.addWmsWindow = null;
-            });
+
         } else if (this.addWmsWindow) {
+            this.addWmsWindow.close();
+        }
+    },
+
+    /**
+    * Destroy any associated windows when this component gets destroyed
+    */
+    onBeforeDestroy: function () {
+        if (this.addWmsWindow) {
             this.addWmsWindow.destroy();
             this.addWmsWindow = null;
         }

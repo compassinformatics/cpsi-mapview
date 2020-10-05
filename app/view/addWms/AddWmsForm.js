@@ -3,6 +3,8 @@ Ext.define('CpsiMapview.view.addWms.AddWmsForm', {
 
     xtype: 'cmv_add_wms_form',
 
+    requires: ['CpsiMapview.controller.addWms.AddWmsFormController'],
+
     viewModel: {
         data: {
             queryParamsFieldSetTitle: 'Request parameters',
