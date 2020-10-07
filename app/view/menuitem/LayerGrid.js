@@ -107,6 +107,12 @@ Ext.define('CpsiMapview.view.menuitem.LayerGrid', {
                 }
             });
             gridWindow = Ext.create('CpsiMapview.view.window.MinimizableWindow', windowConfig);
+
+            // copy any ViewModel properties from the grid on to its containing window
+            // this allows helpUrl to be set at the grid level
+            var gridViewModelData = gridWindow.down(gridXType).getViewModel().getData();
+            // use apply rather than applyIf otherwise the default empty helpUrl is not overwritten
+            Ext.apply(gridWindow.getViewModel().getData(), gridViewModelData);
         }
         gridWindow.show();
     }
