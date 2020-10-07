@@ -73,6 +73,10 @@ Ext.define('CpsiMapview.controller.window.MinimizableWindow', {
         var me = this;
         var url = me.getViewModel().get('helpUrl');
 
+        if (!url) {
+            return;
+        }
+
         // TODO unsure why Ext.getApplication is sometimes undefined
         var app = Ext.getApplication ? Ext.getApplication() : Ext.app.Application.instance;
         var rootUrl = app.rootHelpUrl;
