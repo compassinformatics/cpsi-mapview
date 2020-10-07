@@ -17,7 +17,9 @@ Ext.define('CpsiMapview.model.grid.Grid', {
     data: {
         vectorLayerKey: null,
         wmsLayerKey: null,
-        gridStoreType: null
+        gridStoreType: null,
+        // when isSpatialGrid is set to false the 'Select by Shape' button will be hidden
+        isSpatialGrid: true
     },
 
     formulas: {
