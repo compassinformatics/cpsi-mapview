@@ -12,10 +12,13 @@ Ext.define('CpsiMapview.view.window.MinimizableWindow', {
     xtype: 'cmv_minimizable_window',
 
     requires: [
-        'CpsiMapview.controller.window.MinimizableWindow'
+        'CpsiMapview.controller.window.MinimizableWindow',
+        'CpsiMapview.model.window.MinimizableWindow'
     ],
 
     controller: 'cmv_minimizable_window',
+
+    viewModel: 'cmv_minimizable_window',
 
     constrainHeader: true, // constrain header within the viewport
 
@@ -36,6 +39,15 @@ Ext.define('CpsiMapview.view.window.MinimizableWindow', {
     minimizeTo: null,
 
     resizeHandles: 's w nw se sw', // don't add a resizer to the top-right (n e ne) as it blocks the close button
+
+    tools: [{
+        type: 'help',
+        tooltip: 'Get Help',
+        callback: 'onHelp',
+        bind: {
+            hidden: '{!helpUrl}'
+        }
+    }],
 
     listeners: {
         minimize: 'onMinimize',
