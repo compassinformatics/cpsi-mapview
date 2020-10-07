@@ -114,14 +114,14 @@
             "leaf": true,
             "text": "OpenStreetMap",
             "qtip": "An OpenStreetMap based background layer",
-            "iconCls": "map"
+            "cls": "cpsi-tree-node-baselayer"
           },
           {
             "id": "GREY_BACKGROUND",
             "leaf": true,
             "text": "Grey Background",
             "qtip": "This is the background layer",
-            "iconCls": "map"
+            "cls": "cpsi-tree-node-baselayer"
           }
         ]
       }
