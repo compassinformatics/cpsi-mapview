@@ -43,11 +43,13 @@ Ext.define('CpsiMapview.view.fileupload.FileGridController', {
 
     onAddFileClick: function () {
         var vm = this.getViewModel();
+        var data = vm.getData();
         var fileUploadWin = Ext.create('CpsiMapview.view.fileupload.FileUploadWindow', {
             viewModel: {
                 data: {
-                    serviceUrl: vm.getData().serviceUrl,
-                    currentRecord: vm.getData().currentRecord
+                    serviceUrl: data.serviceUrl,
+                    currentRecord: data.currentRecord,
+                    parentType: data.parentType
                 }
             },
             listeners: {
