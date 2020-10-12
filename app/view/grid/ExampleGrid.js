@@ -53,7 +53,8 @@ Ext.define('CpsiMapview.view.grid.ExampleGridModel', {
     data: {
         vectorLayerKey: 'RUINS_WFS',
         gridStoreType: 'GridExample',
-        gridLayerName: 'GridExampleLayer' // TODO this is duplicated in layerOptions above
+        gridLayerName: 'GridExampleLayer', // TODO this is duplicated in layerOptions above
+        helpUrl: 'https://github.com/compassinformatics/cpsi-mapview/blob/master/app/view/grid/ExampleGrid.js'
     }
 });
 

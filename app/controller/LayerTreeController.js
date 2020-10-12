@@ -280,6 +280,37 @@ Ext.define('CpsiMapview.controller.LayerTreeController', {
         if (treeNodeConf.checked === false) {
             node.addCls('cpsi-tree-no-checkbox');
         }
-    }
+    },
 
+    /**
+     * This reacts on toggling the add wms Button in the layertree. It shows a window with an AddWmsForm.
+     * @param {Ext.button.Button} button
+     * @param {boolean} pressed
+     */
+    onAddWmsToggle: function (button, pressed) {
+        var me = this;
+
+        if (pressed) {
+            if (!this.addWmsWindow) {
+                this.addWmsWindow = Ext.create(me.getView().addWmsWindowConfig);
+                this.addWmsWindow.on('close', function () {
+                    button.setPressed(false);
+                });
+            }
+            this.addWmsWindow.show();
+
+        } else if (this.addWmsWindow) {
+            this.addWmsWindow.close();
+        }
+    },
+
+    /**
+    * Destroy any associated windows when this component gets destroyed
+    */
+    onBeforeDestroy: function () {
+        if (this.addWmsWindow) {
+            this.addWmsWindow.destroy();
+            this.addWmsWindow = null;
+        }
+    }
 });

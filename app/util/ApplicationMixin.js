@@ -30,6 +30,9 @@ Ext.define('CpsiMapview.util.ApplicationMixin', {
     // URLs to ignore for errors
     excludedUrls: [],
 
+    // URL to use as the root for any window helpUrl
+    rootHelpUrl: '',
+
     tokenName: 'cookietoken',
 
     errorCode: {

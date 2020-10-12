@@ -21,7 +21,26 @@ Ext.define('CpsiMapview.data.model.LayerTreeNode', {
             convert: function(v, record) {
                 return record.getOlLayerProp(record.descriptionTitleProperty, '') || record.get('text');
             }
+        },
+        {
+            name: '__toggleMode',
+            type: 'string',
+            defaultValue: 'ol3'
         }
-    ]
+    ],
 
+    /**
+     * Only toggle checkboxes if the layer is in the layer tree
+     * This avoids a costly refresh of the entire tree
+     * @param {any} evt
+     */
+    onLayerVisibleChange: function (evt) {
+        var layer = evt.target;
+
+        if (layer.get('displayInLayerSwitcher') !== false) {
+            if (!this.__updating) {
+                this.set('checked', layer.get('visible'));
+            }
+        }
+    }
 });
