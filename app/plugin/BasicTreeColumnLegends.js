@@ -48,6 +48,16 @@ Ext.define('CpsiMapview.plugin.BasicTreeColumnLegends', {
             var staticMe = CpsiMapview.plugin.BasicTreeColumnLegends;
             var layer = rec.data;
             var layerKey = layer.get('layerKey');
+
+            // a layer can have different legends for different styles
+            // ensure each of these are cached
+            if (layer.getSource) {
+                var styles = layer.getSource().getParams().STYLES;
+                if (styles) {
+                    layerKey += styles.toUpperCase();
+                }
+            }
+
             var legendUrl = layer.get('legendUrl');
             var w = layer.get('legendWidth');
             var h = layer.get('legendHeight');
