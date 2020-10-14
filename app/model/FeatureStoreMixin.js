@@ -95,7 +95,7 @@ Ext.define('CpsiMapview.model.FeatureStoreMixin', {
                     var dirty = !me.editing;
                     me.set(field.name, features, { convert: false, dirty: dirty });
                 },
-                clear: function (store) {
+                clear: function () {
                     me.set(field.name, null, { convert: false });
                 },
                 remove: function (store, records) {
