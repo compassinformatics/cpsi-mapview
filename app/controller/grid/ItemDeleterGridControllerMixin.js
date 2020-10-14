@@ -4,10 +4,6 @@
  *
  *  - beforeDelete          => if returns "false" deletion is aborted, runs BEFORE the user is asked for confirmation
  *
- *  - onRowDeleteFail       => do something if the delete failed
- *  - onRowDeleteSuccess    => do something if the delete succeeded
- *  - onRowDeleteCallback   => do something whether the delete succeeded or failed
- *
  *  - onRowDelete           => the actual deletion implementation, if the user confirms
  *  - onRowDeleteCancelled  => in case we want to do something when the user doesn't confirm or beforeDelete returns false
  */
@@ -15,7 +11,7 @@
 Ext.define('CpsiMapview.controller.grid.ItemDeleterGridControllerMixin', {
     extend: 'Ext.Mixin',
 
-    beforeDelete: function(/*config*/) {return true;},
+    beforeDelete: function (/*config*/) { return true; },
     onRowDeleteFail: Ext.emptyFn,
     onRowDeleteSuccess: Ext.emptyFn,
     onRowDeleteCallback: Ext.emptyFn,
@@ -24,12 +20,7 @@ Ext.define('CpsiMapview.controller.grid.ItemDeleterGridControllerMixin', {
     * Function to run when a user selects to delete a row. Override this as required.
     */
     onRowDelete: function (tableView, rowIndex, colIndex, item, e, record) {
-
-        record.erase({
-            failure: this.onRowDeleteFail,
-            success: this.onRowDeleteSuccess,
-            callback: this.onRowDeleteCallback
-        });
+        tableView.getStore().remove(record);
     },
 
     /**
