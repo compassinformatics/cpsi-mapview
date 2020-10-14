@@ -1,4 +1,3 @@
-
 /**
  *  To be mixed in to the controller of a grid which uses ItemDeleter
  *  Can be provided with the following custom handlers
@@ -9,8 +8,8 @@
  *  - onRowDeleteSuccess    => do something if the delete succeeded
  *  - onRowDeleteCallback   => do something whether the delete succeeded or failed
  *
- *  - doDelete              => the actual deletion implementation, if the user confirms
- *  - dontDelete            => in case we want to do something when the user doesn't confirim or beforeDelete returns false
+ *  - onRowDelete           => the actual deletion implementation, if the user confirms
+ *  - onRowDeleteCancelled  => in case we want to do something when the user doesn't confirm or beforeDelete returns false
  */
 
 Ext.define('CpsiMapview.controller.grid.ItemDeleterGridControllerMixin', {
@@ -21,8 +20,11 @@ Ext.define('CpsiMapview.controller.grid.ItemDeleterGridControllerMixin', {
     onRowDeleteSuccess: Ext.emptyFn,
     onRowDeleteCallback: Ext.emptyFn,
 
-    // what to do for deleting
-    onRowDelete: function (tableView, rowIndex, colIndex, item, e, record /*, tableRow*/) {
+    /**
+    * Function to run when a user selects to delete a row. Override this as required.
+    */
+    onRowDelete: function (tableView, rowIndex, colIndex, item, e, record) {
+
         record.erase({
             failure: this.onRowDeleteFail,
             success: this.onRowDeleteSuccess,
@@ -30,8 +32,10 @@ Ext.define('CpsiMapview.controller.grid.ItemDeleterGridControllerMixin', {
         });
     },
 
-    // what to do for not deleting (either canceled by user or by business logic)
-    onRowDeleteCanceled: Ext.emptyFn,
+    /**
+    * Function to run when delete is cancelled by the user or by business logic. Override this as required.
+    */
+    onRowDeleteCancelled: Ext.emptyFn,
 
     onDeleteRowClick: function (tableView, rowIndex, colIndex, item, e, record, tableRow) {
         var me = this;
@@ -46,14 +50,14 @@ Ext.define('CpsiMapview.controller.grid.ItemDeleterGridControllerMixin', {
                         if (buttonId == 'yes') {
                             me.onRowDelete(tableView, rowIndex, colIndex, item, e, record, tableRow);
                         } else {
-                            me.onRowDeleteCanceled(tableView, rowIndex, colIndex, item, e, record, tableRow);
+                            me.onRowDeleteCancelled(tableView, rowIndex, colIndex, item, e, record, tableRow);
                         }
                     }
                 );
             }
         }
         else {
-            me.onRowDeleteCanceled(tableView, rowIndex, colIndex, item, e, record, tableRow);
+            me.onRowDeleteCancelled(tableView, rowIndex, colIndex, item, e, record, tableRow);
         }
     }
 
