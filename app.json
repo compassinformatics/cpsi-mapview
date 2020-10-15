@@ -253,6 +253,24 @@
       "path": "https://cdn.jsdelivr.net/gh/highsource/w3c-schemas@1.4.0/scripts/lib/XLink_1_0.js"
     },
     {
+        "path": "https://cdn.jsdelivr.net/gh/highsource/ogc-schemas@2.6.1/scripts/lib/ISO19139_GSS_20060504.js"
+    },
+    {
+        "path": "https://cdn.jsdelivr.net/gh/highsource/ogc-schemas@2.6.1/scripts/lib/ISO19139_GSR_20060504.js"
+    },
+    {
+        "path": "https://cdn.jsdelivr.net/gh/highsource/ogc-schemas@2.6.1/scripts/lib/ISO19139_GTS_20060504.js"
+    },
+    {
+        "path": "https://cdn.jsdelivr.net/gh/highsource/ogc-schemas@2.6.1/scripts/lib/ISO19139_GMD_20060504.js"
+    },
+    {
+        "path": "https://cdn.jsdelivr.net/gh/highsource/ogc-schemas@2.6.1/scripts/lib/ISO19139_GCO_20060504.js"
+    },
+    {
+        "path": "https://cdn.jsdelivr.net/gh/highsource/ogc-schemas@2.6.1/scripts/lib/GML_3_2_0.js"
+    },
+    {
       "path": "https://maps.googleapis.com/maps/api/js?v=3.36&key=INSERT_YOUR_API_KEY_HERE",
       "remote": true
     },

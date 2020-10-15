@@ -261,7 +261,9 @@ Ext.define('CpsiMapview.factory.Layer', {
             isNumericDependent: Ext.isDefined(layerConf.numericitem), // TODO docs
             isWms: true, // TODO docs
             styles: layerConf.styles, // TODO docs
-            activatedStyle: activatedStyle
+            activatedStyle: activatedStyle,
+            url: layerConf.url,
+            layers: olSourceConf.params.LAYERS
         };
         olLayerConf = Ext.apply(olLayerConf, olLayerProps);
 
