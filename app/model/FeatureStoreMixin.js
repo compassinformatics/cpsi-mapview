@@ -98,9 +98,18 @@ Ext.define('CpsiMapview.model.FeatureStoreMixin', {
                 clear: function () {
                     me.set(field.name, null, { convert: false });
                 },
-                remove: function (store) {
+                remove: function (store, records) {
                     var features = store.getRange(); // get all remaining features
                     me.set(field.name, features, { convert: false });
+                    // currently binding is from layer to store, not store to layer
+                    // manually remove features linked to records removed from the store
+                    // see https://github.com/geoext/geoext3/issues/636
+                    Ext.each(records, function (r) {
+                        var feat = r.getFeature();
+                        if (feat) {
+                            store.layer.getSource().removeFeature(feat);
+                        }
+                    });
                 }
             }
         });
