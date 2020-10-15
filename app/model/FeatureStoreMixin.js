@@ -105,9 +105,17 @@ Ext.define('CpsiMapview.model.FeatureStoreMixin', {
                     // manually remove features linked to records removed from the store
                     // see https://github.com/geoext/geoext3/issues/636
                     Ext.each(records, function (r) {
-                        var feat = r.getFeature();
-                        if (feat) {
-                            store.layer.getSource().removeFeature(feat);
+                        var feature = r.getFeature();
+                        var source = store.layer.getSource();
+                        if (feature) {
+                            var featureKey = ol.getUid(feature).toString();
+                            // TODO fix this hack
+                            // currently a feature can be removed from a layer triggering the
+                            // remove event on the grid - which in turn tries to remove the feature
+                            // from the layer throwing an error. This check prevents this.
+                            if (source.featureChangeKeys_[featureKey]) {
+                                source.removeFeature(feature);
+                            }
                         }
                     });
                 }
