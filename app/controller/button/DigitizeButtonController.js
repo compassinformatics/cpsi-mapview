@@ -477,13 +477,9 @@ Ext.define('CpsiMapview.controller.button.DigitizeButtonController', {
                 if (view.getClearDrawnFeature()) {
                     drawSource.clear();
                 } else if (featureCount > 1) {
-                    // keep the last drawn feature and remove any older ones
-                    var reverse = true;
-                    Ext.each(drawSource.getFeatures(), function (feat, index) {
-                        if (index < (featureCount -1)) {
-                            drawSource.removeFeature(drawSource.getFeatures()[index]);
-                        }
-                    }, me, reverse);
+                    // keep the last drawn feature and remove the oldest one
+                    // it seems that the a half-completed draw polygon can consist of multiple features
+                    drawSource.removeFeature(drawSource.getFeatures()[0]);
                 }
                 // The response from the API, parsed as OpenLayers features, will be
                 // fired here and the event can be used application-wide to access
