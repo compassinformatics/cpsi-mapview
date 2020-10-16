@@ -455,7 +455,7 @@ Ext.define('CpsiMapview.controller.button.DigitizeButtonController', {
                 Ext.each(features, function (feat) {
                     // api will respond with non unique ids, which
                     // will collide with OpenLayers feature ids not
-                    // being unique. Thats why we delete it here.
+                    // being unique. That's why we delete it here.
                     delete feat.id;
                     // set the current active group as property
                     feat.properties.group = me.activeGroupIdx;
@@ -472,14 +472,21 @@ Ext.define('CpsiMapview.controller.button.DigitizeButtonController', {
                 me.resultLayer.getSource().addFeatures(olFeatsForActiveGroup);
 
                 var drawSource = me.drawLayer.getSource();
+                var featureCount = drawSource.getFeatures().length;
+
                 if (view.getClearDrawnFeature()) {
                     drawSource.clear();
-                } else if (drawSource.getFeatures().length > 1) {
-                    // keep the last drawn feature and remove the first (older) one
-                    drawSource.removeFeature(drawSource.getFeatures()[0]);
+                } else if (featureCount > 1) {
+                    // keep the last drawn feature and remove any older ones
+                    var reverse = true;
+                    Ext.each(drawSource.getFeatures(), function (feat, index) {
+                        if (index < (featureCount -1)) {
+                            drawSource.removeFeature(drawSource.getFeatures()[index]);
+                        }
+                    }, me, reverse);
                 }
                 // The response from the API, parsed as OpenLayers features, will be
-                // fired here and the event can be used applicationwide to access
+                // fired here and the event can be used application-wide to access
                 // and handle the feature response.
                 me.getView().fireEvent('responseFeatures', olFeatsForActiveGroup);
             } else {
