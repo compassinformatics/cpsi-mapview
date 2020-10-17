@@ -914,87 +914,110 @@ Ext.define('CpsiMapview.factory.Layer', {
      */
     handleSwitchLayerOnResolutionChange: function(evt) {
         var resolution = evt.target.getResolution();
-        var allLayers = BasiGX.util.Map.getMapComponent().getMap().getLayers();
-        var overlayGroup = BasiGX.util.Layer.getLayerByName('Layers', allLayers);
+        var layerCollection = BasiGX.util.Map.getMapComponent().getMap().getLayers();
 
-        if (!Ext.isDefined(overlayGroup)) {
-            return;
-        }
-        var overlayCollection = overlayGroup.getLayers();
+        LayerFactory.checkSwitchLayersRecursively(layerCollection, resolution);
+    },
 
-        overlayCollection.forEach(function (layer, index) {
+    /**
+     * Traverses layertree including subgroups and
+     * changes switch layers if necessary
+     * @param {*} overlayCollection the layers of the map
+     * @param {*} resolution the current resolution of the map
+     */
+    checkSwitchLayersRecursively: function(overlayCollection, resolution) {
 
-            if(layer.get('isSwitchLayer') && LayerFactory.isLayerSwitchNecessary(layer, resolution)){
+        overlayCollection.forEach(function (layerOrGroup, index){
 
-                var switchConfiguration = layer.get('switchConfiguration');
-                // restore current layer visibility
-                switchConfiguration.visibility = layer.getVisible();
-                // also apply current filter and selected style
+            if(layerOrGroup instanceof ol.layer.Layer){
 
-                var activeStyle = layer.get('activatedStyle');
-                var filters = layer.getSource().get('additionalFilters');
+                var layer = layerOrGroup;
 
-                var newLayer = LayerFactory.createSwitchLayer(switchConfiguration);
-                var newLayerSource = newLayer.getSource();
-                // store filters for either layer type so they can be retrieved when switching
-                newLayerSource.set('additionalFilters', filters);
+                var isSwitchLayer = layer.get('isSwitchLayer');
+                var switchNecessary = false;
 
-                // add original tree config (from tree.json) to new layer
-                var origTreeNodeConf = newLayer.get('_origTreeConf');
-                if (!origTreeNodeConf) {
-                    origTreeNodeConf = CpsiMapview.controller.LayerTreeController.getTreeNodeConf(newLayer.get('layerKey'));
-                    newLayer.set('_origTreeConf', origTreeNodeConf);
+                if(isSwitchLayer){
+                    switchNecessary = LayerFactory.isLayerSwitchNecessary(layer, resolution);
                 }
 
-                if (newLayer.get('isWms')) {
+                if(isSwitchLayer && switchNecessary){
 
-                    activeStyle = LegendUtil.getWmsStyleFromSldFile(activeStyle);
+                    var switchConfiguration = layer.get('switchConfiguration');
+                    // restore current layer visibility
+                    switchConfiguration.visibility = layer.getVisible();
+                    // also apply current filter and selected style
 
-                    // check if a label STYLES parameter was added --> keep this
-                    // the STYLES value (SLD) for the labels
-                    var labelClassName = newLayer.get('labelClassName');
-                    if (newLayer.get('labelsActive') === true) {
-                        activeStyle += ',' + labelClassName;
+                    var activeStyle = layer.get('activatedStyle');
+                    var filters = layer.getSource().get('additionalFilters');
+
+                    var newLayer = LayerFactory.createSwitchLayer(switchConfiguration);
+                    var newLayerSource = newLayer.getSource();
+                    // store filters for either layer type so they can be retrieved when switching
+                    newLayerSource.set('additionalFilters', filters);
+
+                    // add original tree config (from tree.json) to new layer
+                    var origTreeNodeConf = newLayer.get('_origTreeConf');
+                    if (!origTreeNodeConf) {
+                        origTreeNodeConf = CpsiMapview.controller.LayerTreeController.getTreeNodeConf(newLayer.get('layerKey'));
+                        newLayer.set('_origTreeConf', origTreeNodeConf);
                     }
 
-                    if (filters && filters.length > 0) {
-                        newLayerSource.getParams().FILTER = GeoExt.util.OGCFilter.getOgcFilterFromExtJsFilter(filters, 'wms', 'and', '1.1.0');
+                    if (newLayer.get('isWms')) {
+
+                        activeStyle = LegendUtil.getWmsStyleFromSldFile(activeStyle);
+
+                        // check if a label STYLES parameter was added --> keep this
+                        // the STYLES value (SLD) for the labels
+                        var labelClassName = newLayer.get('labelClassName');
+                        if (newLayer.get('labelsActive') === true) {
+                            activeStyle += ',' + labelClassName;
+                        }
+
+                        if (filters && filters.length > 0) {
+                            newLayerSource.getParams().FILTER = GeoExt.util.OGCFilter.getOgcFilterFromExtJsFilter(filters, 'wms', 'and', '1.1.0');
+                        }
+
+                        // ensure there is a filter for every layer listed in the WMS request (required by MapServer)
+                        var wmsFilterUtil = CpsiMapview.util.WmsFilter;
+                        var wmsFilterString = wmsFilterUtil.getWmsFilterString(newLayer);
+
+                        // apply new style parameter and reload layer
+                        var newParams = {
+                            STYLES: activeStyle,
+                            FILTER: wmsFilterString,
+                            cacheBuster: Math.random()
+                        };
+
+                        newLayerSource.updateParams(newParams);
+
+                    } else if (newLayer.get('isWfs') || newLayer.get('isVt')) {
+
+                        var wmsLayerName = layer.getSource().getParams()['LAYERS'].split(',')[0];
+                        activeStyle = LegendUtil.getSldFileFromWmsStyle(activeStyle, wmsLayerName);
+
+                        // TODO following code duplicated in CpsiMapview.view.layer.StyleSwitcherRadioGroup
+                        var sldUrl = newLayer.get('stylesBaseUrl') + activeStyle;
+                        // transform filter values to numbers ('1' => 1)
+                        // load and parse SLD and apply it to layer
+                        LayerFactory.loadSld(newLayer, sldUrl);
+                        newLayerSource.clear();
+                        newLayerSource.refresh();
+
+                    } else {
+                        Ext.Logger.info('Layer type not supported in StyleSwitcherRadioGroup');
                     }
 
-                    // ensure there is a filter for every layer listed in the WMS request (required by MapServer)
-                    var wmsFilterUtil = CpsiMapview.util.WmsFilter;
-                    var wmsFilterString = wmsFilterUtil.getWmsFilterString(newLayer);
+                    overlayCollection.setAt(index, newLayer);
+                    newLayer.set('activatedStyle', activeStyle);
 
-                    // apply new style parameter and reload layer
-                    var newParams = {
-                        STYLES: activeStyle,
-                        FILTER: wmsFilterString,
-                        cacheBuster: Math.random()
-                    };
+                    LayerFactory.updateLayerTreeForSwitchLayers();
 
-                    newLayerSource.updateParams(newParams);
-
-                } else if (newLayer.get('isWfs') || newLayer.get('isVt')) {
-
-                    var wmsLayerName = layer.getSource().getParams()['LAYERS'].split(',')[0];
-                    activeStyle = LegendUtil.getSldFileFromWmsStyle(activeStyle, wmsLayerName);
-
-                    // TODO following code duplicated in CpsiMapview.view.layer.StyleSwitcherRadioGroup
-                    var sldUrl = newLayer.get('stylesBaseUrl') + activeStyle;
-                    // transform filter values to numbers ('1' => 1)
-                    // load and parse SLD and apply it to layer
-                    LayerFactory.loadSld(newLayer, sldUrl);
-                    newLayerSource.clear();
-                    newLayerSource.refresh();
-
-                } else {
-                    Ext.Logger.info('Layer type not supported in StyleSwitcherRadioGroup');
                 }
+            }
 
-                overlayCollection.setAt(index, newLayer);
-                newLayer.set('activatedStyle', activeStyle);
-
-                LayerFactory.updateLayerTreeForSwitchLayers();
+            else if(layerOrGroup instanceof ol.layer.Group){
+                var newOverlayCollection = layerOrGroup.getLayers();
+                LayerFactory.checkSwitchLayersRecursively(newOverlayCollection, resolution);
             }
         });
     },
@@ -1045,5 +1068,4 @@ Ext.define('CpsiMapview.factory.Layer', {
             }
         });
     }
-
 });
