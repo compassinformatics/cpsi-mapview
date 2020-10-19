@@ -51,7 +51,7 @@ Ext.define('CpsiMapview.plugin.BasicTreeColumnLegends', {
 
             // a layer can have different legends for different styles
             // ensure each of these are cached
-            if (layer.getSource) {
+            if (layer.getSource && layer.getSource().getParams) {
                 var styles = layer.getSource().getParams().STYLES;
                 if (styles) {
                     layerKey += styles.toUpperCase();
