@@ -38,8 +38,6 @@ Ext.define('CpsiMapview.view.window.MinimizableWindow', {
      */
     minimizeTo: null,
 
-    resizeHandles: 's w nw se sw', // don't add a resizer to the top-right (n e ne) as it blocks the close button
-
     tools: [{
         type: 'help',
         tooltip: 'Get Help',
