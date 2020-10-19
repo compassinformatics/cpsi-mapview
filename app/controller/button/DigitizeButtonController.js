@@ -193,7 +193,7 @@ Ext.define('CpsiMapview.controller.button.DigitizeButtonController', {
             if (modifiable && type === 'Point') {
                 me.deleteInteraction.setActive(true);
             }
-            if (me.getView().getUseContextMenu()) {
+            if (me.getView().getGroups() || me.getView().getClearable()) {
                 me.map.getViewport().addEventListener('contextmenu', me.contextHandler);
             }
             // if another digitize button is pressed then this would come before the onToggle of the other button
@@ -212,7 +212,7 @@ Ext.define('CpsiMapview.controller.button.DigitizeButtonController', {
             if (type === 'Circle' && me.circleToolbar != null) {
                 me.removeCircleSelectToolbar();
             }
-            if (me.getView().getUseContextMenu()) {
+            if (me.getView().getGroups() || me.getView().getClearable()) {
                 me.map.getViewport().removeEventListener('contextmenu', me.contextHandler);
             }
 
@@ -253,6 +253,7 @@ Ext.define('CpsiMapview.controller.button.DigitizeButtonController', {
         evt.preventDefault();
 
         var me = this.scope;
+        var view = me.getView();
 
         var radioGroupItems = [];
         if (me.contextMenuGroupsCounter === 0) {
@@ -262,11 +263,10 @@ Ext.define('CpsiMapview.controller.button.DigitizeButtonController', {
                 radioGroupItems.push(me.getRadioGroupItem(i, me.activeGroupIdx === i));
             }
         }
-        var menu = Ext.create('Ext.menu.Menu', {
-            width: 100,
-            plain: true,
-            renderTo: Ext.getBody(),
-            items: [{
+
+        var menuItems;
+        if (view.getGroups()) {
+            menuItems = [{
                 text: 'Start new Group',
                 handler: function () {
                     me.contextMenuGroupsCounter++;
@@ -284,11 +284,34 @@ Ext.define('CpsiMapview.controller.button.DigitizeButtonController', {
                         listeners: {
                             'change': function (radioGroup, newVal) {
                                 me.activeGroupIdx = newVal.radiobutton;
+                                me.updateDrawSource();
                             }
                         }
                     }]
                 }
-            }]
+            }];
+            if (view.getClearable()) {
+                menuItems.push({
+                    text: 'Clear Active Group',
+                    handler: function () {
+                        me.clearActiveGroup();
+                    }
+                });
+            }
+        } else if (view.getClearable()) {
+            menuItems = [{
+                text: 'Clear All',
+                handler: function () {
+                    me.clearActiveGroup();
+                }
+            }];
+        }
+
+        var menu = Ext.create('Ext.menu.Menu', {
+            width: 100,
+            plain: true,
+            renderTo: Ext.getBody(),
+            items: menuItems
         });
         menu.showAt(evt.x, evt.y);
     },
@@ -847,6 +870,22 @@ Ext.define('CpsiMapview.controller.button.DigitizeButtonController', {
             }]
         });
         me.win.showAt(100, 100);
+    },
+
+    /**
+     * Clears all features of the active group from the result source
+     */
+    clearActiveGroup: function () {
+        var me = this;
+        var resultSource = me.resultLayer.getSource();
+        resultSource.getFeatures()
+            .filter(function (feature) {
+                return feature.get('group') === me.activeGroupIdx;
+            })
+            .forEach(function (feature) {
+                resultSource.removeFeature(feature);
+            });
+        this.updateDrawSource();
     },
 
     init: function () {
