@@ -101,6 +101,7 @@ Ext.define('CpsiMapview.plugin.FeatureInfoWindow', {
             this.window.removeAll(true);
         } else {
             this.window = Ext.create('CpsiMapview.view.window.MinimizableWindow', {
+                title: 'Feature Information',
                 width: 400
             });
 
