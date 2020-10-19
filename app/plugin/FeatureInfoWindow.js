@@ -4,7 +4,9 @@ Ext.define('CpsiMapview.plugin.FeatureInfoWindow', {
     pluginId: 'cmv_feature_info_window',
 
     requires: [
-        'Ext.window.Window',
+        'Ext.Component',
+        'CpsiMapview.view.window.MinimizableWindow',
+        'BasiGX.view.grid.FeaturePropertyGrid',
         'BasiGX.util.Map'
     ],
 
@@ -15,42 +17,62 @@ Ext.define('CpsiMapview.plugin.FeatureInfoWindow', {
         var map = mapComp.getMap();
 
         map.on('singleclick', function (evt) {
-            var layers = [];
-            var resolution = map.getView().getResolution();
-            var projection = map.getView().getProjection();
-            map.forEachLayerAtPixel(evt.pixel, function (layer) {
-                layers.push(layer);
-            }, undefined, function (layer) {
-                return layer.get('featureInfoWindow');
-            });
-
-            if (layers.length) {
-                var window = me.showFeatureInfo(map, evt);
-
-                layers.forEach(function (layer) {
-                    var url = layer.getSource().getGetFeatureInfoUrl(evt.coordinate, resolution, projection, {
-                        INFO_FORMAT: 'geojson'
-                    });
-
-                    Ext.Ajax.request({
-                        url: url
-                    }).then(function (response) {
-                        var featureCollection = JSON.parse(response.responseText);
-                        window.add(me.createFeatureCollectionPanel(featureCollection));
-                    });
-                });
-            } else {
-                if (me.highlightSource) {
-                    me.highlightSource.clear();
-                }
-                if (me.window) {
-                    me.window.destroy();
-                }
-            }
+            me.requestFeatureInfos(mapComp, evt);
         });
     },
 
-    showFeatureInfo: function (map, evt) {
+    requestFeatureInfos: function (mapComp, evt) {
+        var me = this;
+
+        var map = mapComp.getMap();
+
+        var layers = [];
+        var resolution = map.getView().getResolution();
+        var projection = map.getView().getProjection();
+
+        var format = new ol.format.GeoJSON();
+
+        map.forEachLayerAtPixel(evt.pixel, function (layer) {
+            layers.push(layer);
+        }, undefined, function (layer) {
+            return layer.get('featureInfoWindow');
+        });
+
+        var window = me.openFeatureInfoWindow(map, evt);
+
+        if (layers.length <= 1) {
+            window.setLayout('fit');
+        } else {
+            window.setLayout({
+                type: 'accordion',
+                titleCollapse: false,
+                animate: true
+            });
+        }
+
+        if (layers.length === 0) {
+            window.add(Ext.create('Ext.Component', {
+                html: '<span>No results found</span>'
+            }));
+        } else {
+            layers.forEach(function (layer) {
+                var url = layer.getSource().getGetFeatureInfoUrl(evt.coordinate, resolution, projection, {
+                    INFO_FORMAT: 'geojson'
+                });
+
+                Ext.Ajax.request({
+                    url: url
+                }).then(function (response) {
+                    var features = format.readFeatures(response.responseText);
+                    window.add(me.createFeaturePanels(mapComp, layer, features));
+                }).then(undefined, function (error) {
+                    console.error(error);
+                });
+            });
+        }
+    },
+
+    openFeatureInfoWindow: function (map, evt) {
         var me = this;
 
         if (!this.highlightSource) {
@@ -76,67 +98,39 @@ Ext.define('CpsiMapview.plugin.FeatureInfoWindow', {
         this.highlightSource.addFeature(feature);
 
         if (this.window) {
-            this.window.destroy();
+            this.window.removeAll(true);
+        } else {
+            this.window = Ext.create('CpsiMapview.view.window.MinimizableWindow', {
+                width: 400
+            });
+
+            this.window.on('close', function () {
+                me.window = null;
+                me.highlightSource.clear();
+            });
         }
 
-        this.window = Ext.create('Ext.window.Window', {
-            layout: {
-                type: 'accordion',
-                titleCollapse: false,
-                animate: true
-            },
-            width: 300
-        });
         this.window.show();
-
-        this.window.on('close', function () {
-            me.highlightSource.clear();
-        });
 
         return this.window;
     },
 
-    createFeatureCollectionPanel: function (featureCollection) {
-        var me = this;
-
-        return Ext.create('Ext.panel.Panel', {
-            title: featureCollection.name,
-            items: featureCollection.features.map(function (geojsonFeature) {
-                return me.createFeatureGrid(geojsonFeature);
-            })
+    createFeaturePanels: function (mapComp, layer, features) {
+        return features.map(function (feature) {
+            return Ext.create('BasiGX.view.grid.FeaturePropertyGrid', {
+                title: layer.get('name'),
+                olFeature: feature,
+                propertyWhiteList: Object.keys(feature.getProperties()),
+                scrollable: true,
+                nameColumnWidth: 150,
+                viewConfig: {
+                    enableTextSelection: true,
+                    // the following is needed to make `enableTextSelection` work. See https://stackoverflow.com/questions/42760943
+                    getRowClass: function () {
+                        return this.enableTextSelection ? 'x-selectable' : '';
+                    }
+                }
+            });
         });
     },
-
-    createFeatureGrid: function (geoJsonFeature) {
-        var props = geoJsonFeature.properties;
-
-        var data = Object.keys(props)
-            .filter(function (key) {
-                return key !== 'geometry';
-            })
-            .map(function (key) {
-                return {
-                    key: key,
-                    value: props[key]
-                };
-            });
-
-        var store = Ext.create('Ext.data.Store', {
-            data: data
-        });
-
-        return Ext.create('Ext.grid.Panel', {
-            store: store,
-            columns: [
-                {
-                    dataIndex: 'key'
-                },
-                {
-                    dataIndex: 'value'
-                }
-            ],
-            scrollable: true,
-            layout: 'fit'
-        });
-    }
 });
