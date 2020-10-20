@@ -38,12 +38,12 @@ Ext.define('CpsiMapview.plugin.FeatureInfoWindow', {
             return layer.get('featureInfoWindow');
         });
 
-        var window = me.openFeatureInfoWindow(map, evt);
+        var win = me.openFeatureInfoWindow(map, evt);
 
         if (layers.length <= 1) {
-            window.setLayout('fit');
+            win.setLayout('fit');
         } else {
-            window.setLayout({
+            win.setLayout({
                 type: 'accordion',
                 titleCollapse: false,
                 animate: true
@@ -51,7 +51,7 @@ Ext.define('CpsiMapview.plugin.FeatureInfoWindow', {
         }
 
         if (layers.length === 0) {
-            window.add(Ext.create('Ext.Component', {
+            win.add(Ext.create('Ext.Component', {
                 html: '<span>No results found</span>'
             }));
         } else {
@@ -64,8 +64,9 @@ Ext.define('CpsiMapview.plugin.FeatureInfoWindow', {
                     url: url
                 }).then(function (response) {
                     var features = format.readFeatures(response.responseText);
-                    window.add(me.createFeaturePanels(mapComp, layer, features));
+                    win.add(me.createFeaturePanels(mapComp, layer, features));
                 }).then(undefined, function (error) {
+                    Ext.log(error);
                     console.error(error);
                 });
             });
@@ -101,7 +102,10 @@ Ext.define('CpsiMapview.plugin.FeatureInfoWindow', {
             this.window.removeAll(true);
         } else {
             this.window = Ext.create('CpsiMapview.view.window.MinimizableWindow', {
-                width: 400
+                width: 400,
+                layout: {
+                    type: 'accordion'
+                }
             });
 
             this.window.on('close', function () {
