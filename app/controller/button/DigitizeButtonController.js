@@ -160,7 +160,10 @@ Ext.define('CpsiMapview.controller.button.DigitizeButtonController', {
             if (me.getView().getUseContextMenu()) {
                 me.map.getViewport().addEventListener('contextmenu', me.contextHandler);
             }
-            me.map.set('defaultClickEnabled', false);
+            // if another digitize button is pressed then this would come before the onToggle of the other button
+            setTimeout(function () {
+                me.map.set('defaultClickEnabled', false);
+            }, 0);
         } else {
             if (type === 'Polygon') {
                 me.modifyInteraction.setActive(false);
