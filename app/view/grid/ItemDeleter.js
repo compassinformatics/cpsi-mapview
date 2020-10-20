@@ -43,7 +43,7 @@ Ext.define('CpsiMapview.view.grid.ItemDeleter',
                         return this.disabled || this.itemIsDisabled(view, rowIndex, colIndex, item, record);
                     }
                 }
-            ]
+            ];
         }
     });
 
