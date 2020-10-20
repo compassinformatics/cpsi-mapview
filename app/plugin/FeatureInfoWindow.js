@@ -1,3 +1,8 @@
+/**
+ * This is a plugin for the `GeoExt.component.Map` component. It provides a window that opens on a singleclick on the map.
+ * All WMS that have the property `featureInfoWindow` set to true will be queried for feature info in format `geojson`.
+ * The resulting informations will be shown in property grids.
+ */
 Ext.define('CpsiMapview.plugin.FeatureInfoWindow', {
     extend: 'Ext.plugin.Abstract',
     alias: 'plugin.cmv_feature_info_window',
@@ -10,29 +15,42 @@ Ext.define('CpsiMapview.plugin.FeatureInfoWindow', {
         'BasiGX.util.Map'
     ],
 
+    /**
+     * A source containing a feature that highlights the click on the map.
+     * @property {ol.source.Vector}
+     */
+    highlightSource: null,
+
     init: function () {
         var me = this;
 
-        var mapComp = BasiGX.util.Map.getMapComponent();
+        var mapComp = me.getCmp();
         var map = mapComp.getMap();
 
         map.on('singleclick', function (evt) {
             if (map.get('defaultClickEnabled')) {
-                me.requestFeatureInfos(mapComp, evt);
+                me.requestFeatureInfos(evt);
             }
         });
     },
 
-    requestFeatureInfos: function (mapComp, evt) {
+    /**
+     * This method queries all configured layers for feature information. It calls the methods to highlight the click,
+     * open a window and display the information
+     * @param {ol.MapBrowserEvent} evt
+     */
+    requestFeatureInfos: function (evt) {
         var me = this;
 
+        var mapComp = me.getCmp();
         var map = mapComp.getMap();
 
         var layers = [];
         var resolution = map.getView().getResolution();
         var projection = map.getView().getProjection();
-
         var format = new ol.format.GeoJSON();
+
+        this.highlightClick(evt);
 
         map.forEachLayerAtPixel(evt.pixel, function (layer) {
             layers.push(layer);
@@ -40,7 +58,7 @@ Ext.define('CpsiMapview.plugin.FeatureInfoWindow', {
             return layer.get('featureInfoWindow');
         });
 
-        var win = me.openFeatureInfoWindow(map, evt);
+        var win = me.openFeatureInfoWindow();
 
         if (layers.length <= 1) {
             win.setLayout('fit');
@@ -66,17 +84,21 @@ Ext.define('CpsiMapview.plugin.FeatureInfoWindow', {
                     url: url
                 }).then(function (response) {
                     var features = format.readFeatures(response.responseText);
-                    win.add(me.createFeaturePanels(mapComp, layer, features));
+                    win.add(me.createFeaturePanels(layer, features));
                 }).then(undefined, function (error) {
-                    Ext.log(error);
-                    console.error(error);
+                    Ext.log.error(error);
                 });
             });
         }
     },
 
-    openFeatureInfoWindow: function (map, evt) {
+    /**
+     * This method highlights the clicked point on the map.
+     * @param {ol.MapBrowserEvent} evt
+     */
+    highlightClick: function (evt) {
         var me = this;
+        var map = me.getCmp().getMap();
 
         if (!this.highlightSource) {
             this.highlightSource = new ol.source.Vector();
@@ -99,6 +121,14 @@ Ext.define('CpsiMapview.plugin.FeatureInfoWindow', {
 
         var feature = new ol.Feature(new ol.geom.Point(evt.coordinate));
         this.highlightSource.addFeature(feature);
+    },
+
+    /**
+     * This method opens a window to display the results in.
+     * @returns {CpsiMapview.view.window.MinimizableWindow}
+     */
+    openFeatureInfoWindow: function () {
+        var me = this;
 
         if (this.window) {
             this.window.removeAll(true);
@@ -122,7 +152,13 @@ Ext.define('CpsiMapview.plugin.FeatureInfoWindow', {
         return this.window;
     },
 
-    createFeaturePanels: function (mapComp, layer, features) {
+    /**
+     * This method returns a property grid for every feature given.
+     * @param {ol.layer.Layer} layer
+     * @param {ol.Feature[]} features
+     * @returns {BasiGX.view.grid.FeaturePropertyGrid[]}
+     */
+    createFeaturePanels: function ( layer, features) {
         return features.map(function (feature) {
             return Ext.create('BasiGX.view.grid.FeaturePropertyGrid', {
                 title: layer.get('name'),
