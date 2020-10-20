@@ -9,7 +9,7 @@ Ext.define('CpsiMapview.plugin.FeatureInfoWindow', {
     pluginId: 'cmv_feature_info_window',
 
     requires: [
-        'Ext.Component',
+        'Ext.panel.Panel',
         'CpsiMapview.view.window.MinimizableWindow',
         'BasiGX.view.grid.FeaturePropertyGrid',
         'BasiGX.util.Map'
@@ -61,18 +61,18 @@ Ext.define('CpsiMapview.plugin.FeatureInfoWindow', {
         var win = me.openFeatureInfoWindow();
 
         if (layers.length <= 1) {
-            win.setLayout('fit');
+            win.getLayout().setConfig({
+                hideCollapseTool: true
+            });
         } else {
-            win.setLayout({
-                type: 'accordion',
-                titleCollapse: false,
-                animate: true
+            win.getLayout().setConfig({
+                hideCollapseTool: false
             });
         }
 
         if (layers.length === 0) {
-            win.add(Ext.create('Ext.Component', {
-                html: '<span>No results found</span>'
+            win.add(Ext.create('Ext.panel.Panel', {
+                title: 'No results found'
             }));
         } else {
             layers.forEach(function (layer) {
@@ -137,7 +137,9 @@ Ext.define('CpsiMapview.plugin.FeatureInfoWindow', {
                 title: 'Feature Information',
                 width: 400,
                 layout: {
-                    type: 'accordion'
+                    type: 'accordion',
+                    titleCollapse: false,
+                    animate: true
                 }
             });
 
