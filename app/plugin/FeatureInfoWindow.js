@@ -17,7 +17,9 @@ Ext.define('CpsiMapview.plugin.FeatureInfoWindow', {
         var map = mapComp.getMap();
 
         map.on('singleclick', function (evt) {
-            me.requestFeatureInfos(mapComp, evt);
+            if (map.get('defaultClickEnabled')) {
+                me.requestFeatureInfos(mapComp, evt);
+            }
         });
     },
 

@@ -299,7 +299,11 @@ Ext.define('CpsiMapview.view.main.Map', {
         Ext.GlobalEvents.fireEvent('cmv-mapready', me);
 
         var grouping = this.getPlugin('cmv_feature_attribute_grouping');
-        grouping.initGrouping(me.mapCmp, me.olMap);
+        if (grouping) {
+            grouping.initGrouping(me.mapCmp, me.olMap);
+        }
+
+        me.olMap.set('defaultClickEnabled', true);
     },
 
     /**
