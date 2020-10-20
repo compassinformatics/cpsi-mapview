@@ -160,6 +160,7 @@ Ext.define('CpsiMapview.controller.button.DigitizeButtonController', {
             if (me.getView().getUseContextMenu()) {
                 me.map.getViewport().addEventListener('contextmenu', me.contextHandler);
             }
+            me.map.set('defaultClickEnabled', false);
         } else {
             if (type === 'Polygon') {
                 me.modifyInteraction.setActive(false);
@@ -181,6 +182,7 @@ Ext.define('CpsiMapview.controller.button.DigitizeButtonController', {
                 me.activeGroupIdx = 0;
                 me.contextMenuGroupsCounter = 0;
             }
+            me.map.set('defaultClickEnabled', true);
         }
     },
 

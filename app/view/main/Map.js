@@ -302,6 +302,8 @@ Ext.define('CpsiMapview.view.main.Map', {
         if (grouping) {
             grouping.initGrouping(me.mapCmp, me.olMap);
         }
+
+        me.olMap.set('defaultClickEnabled', true);
     },
 
     /**
