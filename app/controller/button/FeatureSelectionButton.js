@@ -6,7 +6,7 @@ Ext.define('CpsiMapview.controller.button.FeatureSelectionButtonController', {
 
     alias: 'controller.cmv_feature_selection_btn',
 
-    requires: ['Ext.window.Toast'],
+    requires: [],
 
     /**
     * The OpenLayers map. If not given, will be auto-detected.
@@ -26,7 +26,7 @@ Ext.define('CpsiMapview.controller.button.FeatureSelectionButtonController', {
      * @property
      * @readonly
      */
-    filterMode: 'ADD', // ADD or NEW
+    filterMode: 'ADD_TO_SELECTION', // ADD_TO_SELECTION or NEW_SELECTION
 
     /**
      * The feature IDs (FIDs) used for filtering.
@@ -68,10 +68,7 @@ Ext.define('CpsiMapview.controller.button.FeatureSelectionButtonController', {
         }
 
         if (!view.queryLayer) {
-            me.findQueryLayer();
-
-            // save the ID property name for future use
-            me.idProperty = view.queryLayer.get('idProperty');
+            me.findWfsLayer();
         }
 
         if (pressed) {
@@ -102,14 +99,14 @@ Ext.define('CpsiMapview.controller.button.FeatureSelectionButtonController', {
                         {
                             text: 'Add to selection',
                             handler: function (menu) {
-                                me.filterMode = 'ADD';
+                                me.filterMode = 'ADD_TO_SELECTION';
                                 me.modeSelector.setText(menu.text);
                             }
                         },
                         {
                             text: 'New selection',
                             handler: function (menu) {
-                                me.filterMode = 'NEW';
+                                me.filterMode = 'NEW_SELECTION';
                                 me.modeSelector.setText(menu.text);
                             }
                         },
@@ -130,20 +127,25 @@ Ext.define('CpsiMapview.controller.button.FeatureSelectionButtonController', {
     },
 
     /**
-     * Function to determine the query layer if not yet defined in class
+     * Function to determine the WFS layer to connect the click handler if not
+     * yet defined.
      */
-    findQueryLayer: function () {
-        //TODO move to common sub-class
+    findWfsLayer: function () {
         var me = this;
         var view = me.getView();
-        if (!view.queryLayer && view.queryLayerName) {
-            view.queryLayer = BasiGX.util.Layer.
-                getLayerByName(view.queryLayerName);
+
+        if (!view.queryLayer && view.vectorLayerKey) {
+            view.queryLayer = BasiGX.util.Layer.getLayerBy(
+                'layerKey', view.vectorLayerKey
+            );
         }
 
         if (!view.queryLayer) {
             Ext.Logger.warn('No queryLayer found in the map for the FeaureSelectionButton with the name: ' + view.queryLayerName);
         }
+
+        // save the ID property name for future use
+        me.idProperty = view.queryLayer.get('idProperty');
     },
 
     /**
@@ -156,7 +158,7 @@ Ext.define('CpsiMapview.controller.button.FeatureSelectionButtonController', {
         var view = me.getView();
 
         // clear FIDs to filter when we have a new selection
-        if (me.filterMode === 'NEW') {
+        if (me.filterMode === 'NEW_SELECTION') {
             me.fidsToFilter = [];
         }
 
@@ -183,7 +185,7 @@ Ext.define('CpsiMapview.controller.button.FeatureSelectionButtonController', {
 
         var uniqueFids = Ext.Array.unique(me.fidsToFilter);
         if (uniqueFids.length === 0) {
-            //TODO inform user or clear filters (mode = "NEW")
+            //TODO inform user or clear filters (mode = "NEW_SELECTION")
             return;
         }
 
@@ -193,7 +195,7 @@ Ext.define('CpsiMapview.controller.button.FeatureSelectionButtonController', {
             operator: 'in'
         });
 
-        if (me.filterMode === 'NEW') {
+        if (me.filterMode === 'NEW_SELECTION') {
             // removes all filters from grid without reloading WFS store
             view.fireEvent('cmv-reset-grid-filters');
         }

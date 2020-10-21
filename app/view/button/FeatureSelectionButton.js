@@ -1,15 +1,17 @@
 /**
- * This class is the button of cpsi mapview application that can be used to
- * ...
+ * This class represents a button, which is mainly used within a feature grid
+ * (CpsiMapview.view.grid.Grid) and allows the user to select features on the
+ * map by clicking when the button is pressed.
+ * For selection the ID of the clicked feature is detected and forwarded to the
+ * owner grid and its underlying WFS store.
  *
- * @class CpsiMapview.view.button.SpatialQueryButton
+ * @class CpsiMapview.view.button.FeatureSelectionButton
  */
 Ext.define('CpsiMapview.view.button.FeatureSelectionButton', {
     extend: 'Ext.button.Button',
     xtype: 'cmv_feature_selection_button',
 
     requires: [
-        // 'CpsiMapview.model.button.SpatialQueryButton',
         'CpsiMapview.controller.button.FeatureSelectionButtonController'
     ],
 
@@ -18,21 +20,10 @@ Ext.define('CpsiMapview.view.button.FeatureSelectionButton', {
 
     config: {
         /**
-         * The name of the layer to query
-         * This property will be ignored if queryLayer is defined
-         */
-        queryLayerName: null,
-
-        /**
          * The layerKey property of the layer to query
          */
         vectorLayerKey: null
     },
-
-    /**
-     * The viewModel for this class
-     */
-    // viewModel: 'cmv_spatial_query_btn',
 
     /**
      * The controller for this class
@@ -48,13 +39,6 @@ Ext.define('CpsiMapview.view.button.FeatureSelectionButton', {
      * The layer to query
      */
     queryLayer: null,
-
-    /**
-     * The name of the layer to query
-     * This property will be ignored if queryLayer is defined
-     */
-    //TODO set to null
-    queryLayerName: 'Ruins',
 
     /**
      * Enable toggle
