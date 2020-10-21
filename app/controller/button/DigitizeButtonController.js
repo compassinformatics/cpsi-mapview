@@ -79,6 +79,10 @@ Ext.define('CpsiMapview.controller.button.DigitizeButtonController', {
         var me = this;
         var view = me.getView();
 
+        var deleteCondition = function (evt) {
+            return ol.events.condition.platformModifierKeyOnly(evt) && ol.events.condition.singleClick(evt);
+        };
+
         // guess the map if not given
         if (!me.map) {
             me.map = BasiGX.util.Map.getMapComponent().map;
@@ -128,13 +132,23 @@ Ext.define('CpsiMapview.controller.button.DigitizeButtonController', {
         if (!me.modifyInteraction && type !== 'Circle') {
             var modifyInteractionConfig = {
                 source: me.drawLayer.getSource(),
-                deleteCondition: function (e) {
-                    return e.type === 'click' && e.originalEvent.ctrlKey;
-                }
+                deleteCondition: deleteCondition
             };
             me.modifyInteraction = new ol.interaction.Modify(modifyInteractionConfig);
             me.modifyInteraction.on('modifyend', me.handleModifyEnd, me);
             me.map.addInteraction(me.modifyInteraction);
+        }
+
+        if (!me.deleteInteraction && type === 'Point') {
+            me.deleteInteraction = new ol.interaction.Pointer({
+                handleEvent: function (evt) {
+                    if (deleteCondition(evt)) {
+                        return me.handlePointDelete(evt);
+                    }
+                    return true;
+                }
+            });
+            me.map.addInteraction(me.deleteInteraction);
         }
 
         // create a result layer unless one has already been set
@@ -157,6 +171,9 @@ Ext.define('CpsiMapview.controller.button.DigitizeButtonController', {
             if (type !== 'Circle') {
                 me.modifyInteraction.setActive(true);
             }
+            if (type === 'Point') {
+                me.deleteInteraction.setActive(true);
+            }
             if (me.getView().getUseContextMenu()) {
                 me.map.getViewport().addEventListener('contextmenu', me.contextHandler);
             }
@@ -168,6 +185,9 @@ Ext.define('CpsiMapview.controller.button.DigitizeButtonController', {
             me.drawInteraction.setActive(false);
             if (type !== 'Circle') {
                 me.modifyInteraction.setActive(false);
+            }
+            if (type === 'Point') {
+                me.deleteInteraction.setActive(false);
             }
             if (type === 'Circle' && me.circleToolbar != null) {
                 me.removeCircleSelectToolbar();
@@ -364,6 +384,45 @@ Ext.define('CpsiMapview.controller.button.DigitizeButtonController', {
                 Ext.log.error(err);
             })
             .then(me.updateDrawSource.bind(me));
+    },
+
+    /**
+     * Handles the click registered by the pointer interaction. If it returns false all other interaction at this point
+     * are ignored
+     * @param {ol.MapBrowserEvent} evt
+     */
+    handlePointDelete: function (evt) {
+        var me = this;
+
+        var features = me.map.getFeaturesAtPixel(evt.pixel, {
+            layerFilter: function (layer) {
+                return layer === me.drawLayer;
+            }
+        });
+        if (features.length) {
+            var drawFeature = features[0];
+
+            var points = me.getSolverPoints()
+                .splice(drawFeature.get('index'), 1);
+
+            var resultPromise;
+
+            if (Ext.isEmpty(points)) {
+                me.handleFinalResult([]);
+            } else {
+                resultPromise = me.getNetByPoints(points);
+            }
+
+            resultPromise
+                .then(me.handleFinalResult.bind(me))
+                .then(undefined, function (err) {
+                    Ext.log.error(err);
+                })
+                .then(me.updateDrawSource.bind(me));
+            return false;
+        } else {
+            return true;
+        }
     },
 
     /**
