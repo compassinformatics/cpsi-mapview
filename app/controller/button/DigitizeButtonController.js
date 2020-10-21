@@ -162,6 +162,13 @@ Ext.define('CpsiMapview.controller.button.DigitizeButtonController', {
             me.map.addInteraction(me.deleteInteraction);
         }
 
+        if (!me.snapInteraction && type !== 'Circle') {
+            me.snapInteraction = new ol.interaction.Snap({
+                source: me.drawLayer.getSource()
+            });
+            me.map.addInteraction(me.snapInteraction);
+        }
+
         // create a result layer unless one has already been set
         if (!me.resultLayer) {
             if (view.resultLayer) {
@@ -181,6 +188,7 @@ Ext.define('CpsiMapview.controller.button.DigitizeButtonController', {
             me.drawInteraction.setActive(true);
             if (modifiable && type !== 'Circle') {
                 me.modifyInteraction.setActive(true);
+                me.snapInteraction.setActive(true);
             }
             if (modifiable && type === 'Point') {
                 me.deleteInteraction.setActive(true);
@@ -196,6 +204,7 @@ Ext.define('CpsiMapview.controller.button.DigitizeButtonController', {
             me.drawInteraction.setActive(false);
             if (modifiable && type !== 'Circle') {
                 me.modifyInteraction.setActive(false);
+                me.snapInteraction.setActive(false);
             }
             if (modifiable && type === 'Point') {
                 me.deleteInteraction.setActive(false);
