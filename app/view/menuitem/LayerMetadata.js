@@ -41,14 +41,6 @@ Ext.define('CpsiMapview.view.menuitem.LayerMetadata', {
     handlerFunc: function () {
         var me = this;
 
-        /**
-         * Helper function to notify user
-         * that metadata is not availble
-         */
-        function alert_no_metadata(){
-            alert('No metadata available.');
-        }
-
         // retrive layername for different types of layers
         var layerName;
         if(me.layer.get('isWfs')){
@@ -62,8 +54,7 @@ Ext.define('CpsiMapview.view.menuitem.LayerMetadata', {
             // because other layers do not come from MapServer
             // VectorTiles are an exception: the config does
             // not provide easy access to name and baseurl
-            alert_no_metadata();
-
+            me.alertNoMetadata();
             return;
         }
 
@@ -131,7 +122,7 @@ Ext.define('CpsiMapview.view.menuitem.LayerMetadata', {
 
                     // case no metadata could be extracted
                     if(Ext.Object.isEmpty(source)){
-                        alert_no_metadata();
+                        me.alertNoMetadata();
                     }
                     // metadata is fine and can be displayed
                     else{
@@ -162,12 +153,19 @@ Ext.define('CpsiMapview.view.menuitem.LayerMetadata', {
                     }
                 }
                 catch(err) {
-                    alert_no_metadata();
+                    me.alertNoMetadata();
                 }
             },
             failure: function() {
-                alert_no_metadata();
+                me.alertNoMetadata();
             }
         });
+    },
+
+    /**
+    * Notifies user that metadata is not availble
+    */
+    alertNoMetadata: function(){
+        alert('No metadata available.');
     }
 });
