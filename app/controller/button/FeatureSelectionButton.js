@@ -69,6 +69,9 @@ Ext.define('CpsiMapview.controller.button.FeatureSelectionButtonController', {
 
         if (!view.queryLayer) {
             me.findQueryLayer();
+
+            // save the ID property name for future use
+            me.idProperty = view.queryLayer.get('idProperty');
         }
 
         if (pressed) {
@@ -168,13 +171,12 @@ Ext.define('CpsiMapview.controller.button.FeatureSelectionButtonController', {
                     if (Ext.isArray(origFeats)) {
                         // add all sub-feature due to clustering
                         Ext.each(origFeats, function (origFeat) {
-                            //TODO read out ID field
-                            me.fidsToFilter.push(origFeat.get('osm_id'));
+                            me.fidsToFilter.push(origFeat.get(me.idProperty));
                         });
                     }
                 } else {
-                    //TODO read out ID field
-                    me.fidsToFilter.push(feature.get('osm_id'));
+                    // "normal" layers without clustering
+                    me.fidsToFilter.push(feature.get(me.idProperty));
                 }
             }
         });
@@ -186,8 +188,7 @@ Ext.define('CpsiMapview.controller.button.FeatureSelectionButtonController', {
         }
 
         var extInFilter = new Ext.util.Filter({
-            //TODO read out ID field
-            property: 'osm_id',
+            property: me.idProperty,
             value   : uniqueFids,
             operator: 'in'
         });
