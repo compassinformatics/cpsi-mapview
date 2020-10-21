@@ -125,7 +125,7 @@ Ext.define('CpsiMapview.controller.button.DigitizeButtonController', {
         }
 
         // create the modify interaction
-        if (type === 'Polygon' && !me.modifyInteraction) {
+        if (!me.modifyInteraction && type !== 'Circle') {
             var modifyInteractionConfig = {
                 source: me.drawLayer.getSource(),
                 deleteCondition: function (e) {
@@ -154,7 +154,7 @@ Ext.define('CpsiMapview.controller.button.DigitizeButtonController', {
 
         if (pressed) {
             me.drawInteraction.setActive(true);
-            if (type === 'Polygon') {
+            if (type !== 'Circle') {
                 me.modifyInteraction.setActive(true);
             }
             if (me.getView().getUseContextMenu()) {
@@ -166,7 +166,7 @@ Ext.define('CpsiMapview.controller.button.DigitizeButtonController', {
             }, 0);
         } else {
             me.drawInteraction.setActive(false);
-            if (type === 'Polygon') {
+            if (type !== 'Circle') {
                 me.modifyInteraction.setActive(false);
             }
             if (type === 'Circle' && me.circleToolbar != null) {
@@ -326,7 +326,32 @@ Ext.define('CpsiMapview.controller.button.DigitizeButtonController', {
 
         switch (view.getType()) {
             case 'Point':
-                // TODO
+                // find modified feature
+                var drawFeature = me.map.getFeaturesAtPixel(evt.mapBrowserEvent.pixel, {
+                    layerFilter: function (layer) {
+                        return layer === me.drawLayer;
+                    }
+                })[0];
+
+                var index = drawFeature.get('index');
+                var points = me.getSolverPoints();
+
+                if (index === points.length - 1) {
+                    points.splice(index, 1, drawFeature);
+                    resultPromise = me.getNetByPoints(points);
+                } else {
+                    // we first get the corrected point from the netsolver and then recalculate the whole path
+                    resultPromise = me.getNetByPoints([drawFeature])
+                        .then(function (features) {
+                            if (features) {
+                                var newFeature = features[0];
+                                newFeature.set('index', index);
+                                points.splice(index, 1, newFeature);
+                                return me.getNetByPoints(points);
+                            }
+                        });
+                }
+
                 break;
             case 'Polygon':
                 resultPromise = me.getNetByPolygon(evt.features.getArray()[0]);
@@ -560,7 +585,15 @@ Ext.define('CpsiMapview.controller.button.DigitizeButtonController', {
         var featureCount = drawSource.getFeatures().length;
         var type = view.getType();
 
-        if (type === 'Polygon' || type === 'Circle') {
+        if (type === 'Point') {
+            drawSource.clear();
+
+            var drawFeatures = this.getSolverPoints()
+                .map(function (feature) {
+                    return feature.clone();
+                });
+            drawSource.addFeatures(drawFeatures);
+        } else if (type === 'Polygon' || type === 'Circle') {
             if (view.getClearDrawnFeature()) {
                 drawSource.clear();
             } else if (featureCount > 1) {
