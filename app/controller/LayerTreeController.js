@@ -9,6 +9,45 @@ Ext.define('CpsiMapview.controller.LayerTreeController', {
         'CpsiMapview.data.model.LayerTreeNode'
     ],
 
+    statics: {
+        /**
+         * Detects the original tree node config from tree.json file for a
+         * layer identified by the given layerKey.
+         *
+         * @param {String} layerKey Identifier of the layer to get node conf for
+         * @param {Object} childNodeConf Conf to start with (root if not given)
+         */
+        getTreeNodeConf: function (layerKey, childNodeConf) {
+            var nodeConf = null;
+            var staticMe = CpsiMapview.controller.LayerTreeController;
+            if (!childNodeConf) {
+                childNodeConf = CpsiMapview.treeConfig;
+            }
+
+            if (childNodeConf.id === layerKey) {
+                return childNodeConf;
+            } else {
+                // exit for leafs
+                if (childNodeConf.leaf === true) {
+                    return null;
+                }
+                // iterate recursively over all child nodes
+                for (var i = 0; i < childNodeConf.children.length; i += 1) {
+                    var currentChild = childNodeConf.children[i];
+                    // Search in the current child
+                    nodeConf = staticMe.getTreeNodeConf(layerKey, currentChild);
+
+                    // Return result immediately if the node conf has been found
+                    if (nodeConf !== null) {
+                        return nodeConf;
+                    }
+                }
+            }
+
+            return nodeConf;
+        }
+    },
+
 
     /**
      * Mode in order to steer how the layers in tree will be structured.
@@ -112,8 +151,10 @@ Ext.define('CpsiMapview.controller.LayerTreeController', {
                     var origTreeNodeConf = node.getOlLayer().get('_origTreeConf') || {};
                     me.applyTreeConfigsToNode(node, origTreeNodeConf);
                 }
-
             });
+
+            // preserve tree config to access later on
+            CpsiMapview.treeConfig = treeJson.treeConfig;
 
             // inform subscribers that LayerTree is ready
             me.getView().fireEvent('cmv-init-layertree', me);
