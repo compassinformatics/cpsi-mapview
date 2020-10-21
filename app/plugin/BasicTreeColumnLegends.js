@@ -47,9 +47,21 @@ Ext.define('CpsiMapview.plugin.BasicTreeColumnLegends', {
         getLegendHtml: function(rec) {
             var staticMe = CpsiMapview.plugin.BasicTreeColumnLegends;
             var layer = rec.data;
+            var layerKey = layer.get('layerKey');
+
+            // a layer can have different legends for different styles
+            // ensure each of these are cached
+            if (layer.getSource && layer.getSource().getParams) {
+                var styles = layer.getSource().getParams().STYLES;
+                if (styles) {
+                    layerKey += styles.toUpperCase();
+                }
+            }
+
             var legendUrl = layer.get('legendUrl');
             var w = layer.get('legendWidth');
             var h = layer.get('legendHeight');
+
             if (!legendUrl) {
                 legendUrl = LegendUtil.createGetLegendGraphicUrl(layer);
             }
@@ -64,15 +76,28 @@ Ext.define('CpsiMapview.plugin.BasicTreeColumnLegends', {
                 w = h = 1;
             }
 
-            var ns = 'CpsiMapview.plugin.BasicTreeColumnLegends';
-            return '<img' +
-                ' class="cpsi-layer-legend"' +
-                ' src="' + legendUrl + '"' +
-                (w ? ' width="' + w + '"' : '') +
-                (h ? ' height="' + h + '"' : '') +
-                ' onerror="' + ns + '.checkCleanup(this);"' +
-                ' onload="' + ns + '.checkCleanup(this);"' +
-                '/>';
+            var legendDataUrl = CpsiMapview.view.LayerTree.legendImgLookup[layerKey];
+            if (!legendDataUrl) {
+                // load the legend image and cache it in an static lookup for later re-use
+                // without any server request
+
+                // check if there is an ongoing loading for the legend of this layer
+                // since getLegendHtml is executed several times for one refresh due to
+                // unkwon reasons
+                // Flag set / reset in LegendUtil.getLegendImgHtmlTpl
+                var isLoading = LegendUtil['legendLoading_' + layerKey];
+                if (isLoading) {
+                    // skip loading
+                    return LegendUtil.getLegendImgHtmlTpl(legendUrl, w, h);
+                }
+
+                LegendUtil.cacheLegendImgAsDataUrl(legendUrl, layerKey);
+
+            } else {
+                legendUrl = legendDataUrl;
+            }
+
+            return LegendUtil.getLegendImgHtmlTpl(legendUrl, w, h);
         }
     },
 

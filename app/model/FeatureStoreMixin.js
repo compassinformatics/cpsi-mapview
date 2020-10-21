@@ -98,9 +98,26 @@ Ext.define('CpsiMapview.model.FeatureStoreMixin', {
                 clear: function () {
                     me.set(field.name, null, { convert: false });
                 },
-                remove: function (store) {
+                remove: function (store, records) {
                     var features = store.getRange(); // get all remaining features
                     me.set(field.name, features, { convert: false });
+                    // currently binding is from layer to store, not store to layer
+                    // manually remove features linked to records removed from the store
+                    // see https://github.com/geoext/geoext3/issues/636
+                    Ext.each(records, function (r) {
+                        var feature = r.getFeature();
+                        var source = store.layer.getSource();
+                        if (feature) {
+                            var featureKey = ol.getUid(feature).toString();
+                            // TODO fix this hack
+                            // currently a feature can be removed from a layer triggering the
+                            // remove event on the grid - which in turn tries to remove the feature
+                            // from the layer throwing an error. This check prevents this.
+                            if (source.featureChangeKeys_[featureKey]) {
+                                source.removeFeature(feature);
+                            }
+                        }
+                    });
                 }
             }
         });

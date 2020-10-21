@@ -12,6 +12,19 @@
 .cpsi-tree-node-baselayer {
     .x-tree-checkbox {
         background-image: url(images/form/radio.png);
+        margin-right: 4px;
+        width: 15px;
+        height: 15px;
+        background-position: 0px 0px;
+    }
+
+    .x-tree-checkbox:before {
+        content: "";
+    }
+
+    .x-tree-checkbox-checked {
+        font: 18px/1 ExtJS;
+        background-position: 0px -15px;
     }
 }
 

@@ -30,9 +30,14 @@ Ext.define('CpsiMapview.field.Polygon', {
         var feats, gj = null;
 
         feats = polygonLayer.getSource().getFeatures();
-        if (feats.length === 1) {
+
+        if (feats.length >= 1) {
+
+            if (feats.length > 1) {
+                Ext.log.warn('Multiple polygons found in the polygon feature layer');
+            }
             var writer = new ol.format.GeoJSON();
-            var geom = feats[0].getGeometry();
+            var geom = feats[feats.length -1].getGeometry(); // get the last created feature
             if (geom.getType() === 'Circle') {
                 // ol.geom.Circle is not supported
                 // in GeoJSON https://stackoverflow.com/questions/16942697/geojson-circles-supported-or-not

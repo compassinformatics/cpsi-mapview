@@ -122,6 +122,9 @@ Ext.define('CpsiMapview.view.grid.Grid', {
                     triggerWfsRequest: false,
                     displayPermanently: true,
                     glyph: 'xf044@FontAwesome',
+                    bind: {
+                        hidden: '{!isSpatialGrid}'
+                    },
                     listeners: {
                         'cmv-spatial-query-filter': 'onSpatialFilter'
                     }

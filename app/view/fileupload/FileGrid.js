@@ -61,7 +61,10 @@ Ext.define('CpsiMapview.view.fileupload.FileGrid',
                 xtype: 'cmv_itemdeleter',
                 itemId: 'itemDeleter',
                 avoidConfirmationRequest: false,
-                deleteItemRequiredRole: this.deleteItemRequiredRole
+                deleteItemRequiredRole: this.deleteItemRequiredRole,
+                bind: {
+                    hidden: '{hideDeleteFileButton}'
+                }
             }
         ],
         tbar: [
@@ -73,14 +76,16 @@ Ext.define('CpsiMapview.view.fileupload.FileGrid',
                 cls: 'bordered-button',
                 infoIconTooltip: this.addFileInfoIconTooltip,
                 requiredRole: this.addFileRequiredRole,
-                tooltip: Ext.String.format(
-                    'Associate a File with the {0} - files can only be added after the {0} has been saved',
-                    this.parentType),
                 listeners: {
                     click: 'onAddFileClick'
                 },
+                style: {
+                    pointerEvents: 'all'
+                },
                 bind: {
-                    disabled: '{currentRecord.phantom}'
+                    disabled: '{currentRecord.phantom}',
+                    tooltip:'Associate a File with the {parentType} - files can only be added after the {parentType} has been saved',
+                    hidden: '{hideAddFileButton}'
                 }
             }
         ]

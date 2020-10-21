@@ -33,8 +33,15 @@ Ext.define('CpsiMapview.controller.grid.Grid', {
 
         var me = this;
 
+        var geom = feature.getGeometry();
+
+        // check for null features
+        if (!geom) {
+            return;
+        }
+
         // TODO check for feature type when zooming
-        var extent = feature.getGeometry().getExtent();
+        var extent = geom.getExtent();
         var view = me.getView();
         // as this is a point then buffer it by the extentBuffer property
         extent = ol.extent.buffer(extent, view.extentBuffer);
@@ -498,6 +505,17 @@ Ext.define('CpsiMapview.controller.grid.Grid', {
     */
     onShow: function () {
         this.toggleLayerVisibility(true);
+    },
+
+    /**
+    * Clear any sorters on the store
+    */
+    onClearSort: function () {
+        var me = this;
+        var grid = me.getView();
+        var store = grid.getStore();
+        store.getSorters().clear();
+        store.reload();
     },
 
     /**

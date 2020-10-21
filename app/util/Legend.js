@@ -6,7 +6,8 @@
 Ext.define('CpsiMapview.util.Legend', {
     alternateClassName: 'LegendUtil',
     requires: [
-        'BasiGX.util.Object'
+        'BasiGX.util.Object',
+        'CpsiMapview.util.Html'
     ],
 
     singleton: true,
@@ -150,5 +151,63 @@ Ext.define('CpsiMapview.util.Legend', {
         var reducedLayerList = Ext.Array.unique(layerList);
 
         return reducedLayerList.join(',');
+    },
+
+    /**
+     * Returns a string-based HTML template for a legend image.
+     * Can be used within CpsiMapview.plugin.BasicTreeColumnLegend.
+     *
+     * @param {String} legendUrl The URL to the legend image
+     * @param {Number} width Width of the legend image
+     * @param {Number} height Height of the legend image
+     */
+    getLegendImgHtmlTpl: function (legendUrl, width, height) {
+        var ns = 'CpsiMapview.plugin.BasicTreeColumnLegends';
+        return '<img' +
+            ' class="cpsi-layer-legend"' +
+            ' src="' + legendUrl + '"' +
+            (width ? ' width="' + width + '"' : '') +
+            (height ? ' height="' + height + '"' : '') +
+            ' onerror="' + ns + '.checkCleanup(this);"' +
+            ' onload="' + ns + '.checkCleanup(this);"' +
+            '/>';
+    },
+
+    /**
+     * Caches the given legend image for a layer as dataURL in the
+     * static lookup of CpsiMapview.view.LayerTree.
+     *
+     * @param {String} legendUrl The URL to the legend image
+     * @param {String} layerKey The key / ID of the layer (used for storing in lookup)
+     */
+    cacheLegendImgAsDataUrl: function(legendUrl, layerKey) {
+        var legendImage = new Image();
+        legendImage.crossOrigin = 'anonymous';
+        CpsiMapview.util.Html.addEvent(
+            legendImage, 'load', function() {
+
+                // set width and height
+                var width = this.naturalWidth;
+                var height = this.naturalHeight;
+                // convert to base64 to avoid
+                // reloading of the image
+                var canvas = document.createElement('canvas');
+                canvas.width = width;
+                canvas.height = height;
+
+                var ctx = canvas.getContext('2d');
+                ctx.drawImage(this, 0, 0);
+                var legendDataUrl = canvas.toDataURL('image/png');
+
+                // store in cache for later reuse
+                CpsiMapview.view.LayerTree.legendImgLookup[layerKey] = legendDataUrl;
+
+                LegendUtil['legendLoading_' + layerKey] = false;
+            });
+
+        LegendUtil['legendLoading_' + layerKey] = true;
+
+        // set original legend url to trigger loading
+        legendImage.src = legendUrl;
     }
 });

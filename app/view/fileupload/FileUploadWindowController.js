@@ -79,7 +79,7 @@ Ext.define('CpsiMapview.view.fileupload.FileUploadWindowController', {
                     };
 
                     // now show a message box to show the file was successfully uploaded
-                    var msg = 'The file \'' + fileName + '\' has been associated with the ' + this.parentType;
+                    var msg = 'The file \'' + fileName + '\' has been associated with the ' + this.getViewModel().getData().parentType;
                     Ext.Msg.alert('Success', msg, function () {
                         this.fireEvent('fileadded', newFiledata);
                         win.close();

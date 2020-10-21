@@ -31,16 +31,19 @@ Ext.define('CpsiMapview.view.grid.ItemDeleter',
             return this.disabled;
         },
 
-        items: [
-            {
-                avoidConfirmationRequest: this.avoidConfirmationRequest,
-                iconCls: 'icon-delete',
-                tooltip: this.tooltip,
-                handler: 'onDeleteRowClick',
-                isActionDisabled: function (view, rowIndex, colIndex, item, record) {
-                    return this.disabled || this.itemIsDisabled(view, rowIndex, colIndex, item, record);
+        constructor: function() {
+            this.callParent(arguments);
+            this.items = [
+                {
+                    avoidConfirmationRequest: this.avoidConfirmationRequest,
+                    iconCls: 'icon-delete',
+                    tooltip: 'Delete',
+                    handler: 'onDeleteRowClick',
+                    isActionDisabled: function (view, rowIndex, colIndex, item, record) {
+                        return this.disabled || this.itemIsDisabled(view, rowIndex, colIndex, item, record);
+                    }
                 }
-            }
-        ]
+            ];
+        }
     });
 

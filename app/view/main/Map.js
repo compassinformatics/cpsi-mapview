@@ -14,6 +14,7 @@ Ext.define('CpsiMapview.view.main.Map', {
         'CpsiMapview.view.toolbar.MinimizedWindows',
         'CpsiMapview.controller.panel.TimeSlider',
         'CpsiMapview.controller.MapController',
+        'CpsiMapview.plugin.FeatureInfoWindow',
 
         'BasiGX.util.Projection',
         'CpsiMapview.plugin.FeatureAttributeGrouping'
@@ -51,6 +52,11 @@ Ext.define('CpsiMapview.view.main.Map', {
                 zoom: 8
             })
         }),
+        plugins: [
+            {
+                ptype: 'cmv_feature_info_window'
+            }
+        ],
         listeners: {
             afterrender: 'afterMapRender'
         }
@@ -295,7 +301,11 @@ Ext.define('CpsiMapview.view.main.Map', {
         Ext.GlobalEvents.fireEvent('cmv-mapready', me);
 
         var grouping = this.getPlugin('cmv_feature_attribute_grouping');
-        grouping.initGrouping(me.mapCmp, me.olMap);
+        if (grouping) {
+            grouping.initGrouping(me.mapCmp, me.olMap);
+        }
+
+        me.olMap.set('defaultClickEnabled', true);
     },
 
     /**
