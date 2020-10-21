@@ -42,9 +42,19 @@ Ext.define('CpsiMapview.controller.button.DigitizeButtonController', {
 
     /**
      * OpenLayers modify interaction
-     * Used in polygon draw mode only
+     * Used in polygon and point draw mode
      */
     modifyInteraction: null,
+
+    /**
+     * OpenLayers pointer interaction for deleting points
+     */
+    deleteInteraction: null,
+
+    /**
+     * OpenLayers snap interaction for better vertex selection
+     */
+    snapInteraction: null,
 
     /**
      * CircleToolbar that will be set
@@ -78,6 +88,7 @@ Ext.define('CpsiMapview.controller.button.DigitizeButtonController', {
     onToggle: function (btn, pressed) {
         var me = this;
         var view = me.getView();
+        var modifiable = view.getModifiable();
 
         var deleteCondition = function (evt) {
             return ol.events.condition.platformModifierKeyOnly(evt) && ol.events.condition.singleClick(evt);
@@ -129,7 +140,7 @@ Ext.define('CpsiMapview.controller.button.DigitizeButtonController', {
         }
 
         // create the modify interaction
-        if (!me.modifyInteraction && type !== 'Circle') {
+        if (modifiable && !me.modifyInteraction && type !== 'Circle') {
             var modifyInteractionConfig = {
                 source: me.drawLayer.getSource(),
                 deleteCondition: deleteCondition
@@ -139,7 +150,7 @@ Ext.define('CpsiMapview.controller.button.DigitizeButtonController', {
             me.map.addInteraction(me.modifyInteraction);
         }
 
-        if (!me.deleteInteraction && type === 'Point') {
+        if (modifiable && !me.deleteInteraction && type === 'Point') {
             me.deleteInteraction = new ol.interaction.Pointer({
                 handleEvent: function (evt) {
                     if (deleteCondition(evt)) {
@@ -168,10 +179,10 @@ Ext.define('CpsiMapview.controller.button.DigitizeButtonController', {
 
         if (pressed) {
             me.drawInteraction.setActive(true);
-            if (type !== 'Circle') {
+            if (modifiable && type !== 'Circle') {
                 me.modifyInteraction.setActive(true);
             }
-            if (type === 'Point') {
+            if (modifiable && type === 'Point') {
                 me.deleteInteraction.setActive(true);
             }
             if (me.getView().getUseContextMenu()) {
@@ -183,10 +194,10 @@ Ext.define('CpsiMapview.controller.button.DigitizeButtonController', {
             }, 0);
         } else {
             me.drawInteraction.setActive(false);
-            if (type !== 'Circle') {
+            if (modifiable && type !== 'Circle') {
                 me.modifyInteraction.setActive(false);
             }
-            if (type === 'Point') {
+            if (modifiable && type === 'Point') {
                 me.deleteInteraction.setActive(false);
             }
             if (type === 'Circle' && me.circleToolbar != null) {

@@ -104,7 +104,13 @@ Ext.define('CpsiMapview.view.button.DigitizeButton', {
         * Should the results and draw layers be reset if the
         * tool is deactivated?
         */
-        resetOnToggle: true
+        resetOnToggle: true,
+
+        /**
+         * Determines if the drawn points and polygons are modifiable and if vertices can
+         * get deleted
+         */
+        modifiable: true
     },
 
     /**
