@@ -31,7 +31,15 @@ Ext.define('CpsiMapview.view.menuitem.LayerMetadata', {
 
         me.handler = me.handlerFunc;
 
+        var hasMetadata = false;
+        if (me.layer) {
+            hasMetadata = me.layer.get('hasMetadata');
+        }
+
         me.callParent();
+
+        me.setHidden(!hasMetadata);
+
     },
 
     /**
@@ -126,7 +134,7 @@ Ext.define('CpsiMapview.view.menuitem.LayerMetadata', {
                     }
                     // metadata is fine and can be displayed
                     else{
-                        var windowTitle = 'Metadata '+ me.layer.get('name');
+                        var windowTitle = me.layer.get('name') + ' Metadata' ;
 
                         // check if window already exists
                         // identified by window title

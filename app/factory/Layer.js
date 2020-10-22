@@ -118,6 +118,8 @@ Ext.define('CpsiMapview.factory.Layer', {
             mapLayer.set('featureInfoWindow', layerConf.featureInfoWindow);
             // attribute grouping config
             mapLayer.set('grouping', layerConf.grouping);
+            // if layer has metadata
+            mapLayer.set('hasMetadata', layerConf.hasMetadata);
         }
 
         return mapLayer;
