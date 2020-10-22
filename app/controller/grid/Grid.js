@@ -150,6 +150,8 @@ Ext.define('CpsiMapview.controller.grid.Grid', {
             // set any new filter
             if (filters.length > 0) {
                 wmsParams.FILTER = GeoExt.util.OGCFilter.getOgcFilterFromExtJsFilter(filters, 'wms', 'and', '1.1.0');
+            } else {
+                wmsParams.FILTER = ''; // ensure the filter is reset if no filters are set
             }
 
             // ensure there is a filter for every layer listed in the WMS request (required by MapServer)
