@@ -50,6 +50,11 @@ Ext.define('CpsiMapview.view.button.FeatureSelectionButton', {
     queryLayer: null,
 
     /**
+     * Flag steering if a message is showm if no features are selected
+     */
+    showNoSelectionMessage: true,
+
+    /**
      * Enable toggle
      */
     enableToggle: true,

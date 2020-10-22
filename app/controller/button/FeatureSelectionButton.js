@@ -6,7 +6,7 @@ Ext.define('CpsiMapview.controller.button.FeatureSelectionButtonController', {
 
     alias: 'controller.cmv_feature_selection_btn',
 
-    requires: [],
+    requires: ['Ext.window.Toast'],
 
     /**
     * The OpenLayers map. If not given, will be auto-detected.
@@ -182,6 +182,7 @@ Ext.define('CpsiMapview.controller.button.FeatureSelectionButtonController', {
         }
 
         // collect all IDs of clicked features
+        var clickedFeatureIds = [];
         me.map.forEachFeatureAtPixel(evt.pixel, function(feature, layer) {
             // add check for correct layer
             if (layer && layer.id === view.queryLayer.id) {
@@ -193,21 +194,29 @@ Ext.define('CpsiMapview.controller.button.FeatureSelectionButtonController', {
                         // add all sub-feature due to clustering
                         Ext.each(origFeats, function (origFeat) {
                             me.fidsToFilter.push(origFeat.get(me.idProperty));
+                            clickedFeatureIds.push(origFeat.get(me.idProperty));
                         });
                     }
                 } else {
                     // "normal" layers without clustering
                     me.fidsToFilter.push(feature.get(me.idProperty));
+                    clickedFeatureIds.push(feature.get(me.idProperty));
                 }
             }
         });
 
-        var uniqueFids = Ext.Array.unique(me.fidsToFilter);
-        if (uniqueFids.length === 0) {
-            //TODO inform user or clear filters (mode = "NEW_SELECTION")
+        // inform that no feature was hit on the map
+        if (clickedFeatureIds.length === 0) {
+            if (view.showNoSelectionMessage) {
+                Ext.toast('No feature(s) at clicked position.', null, 'br');
+            }
+
+            view.fireEvent('cmv-no-feature-selected', view);
             return;
         }
 
+        // create ExtJS "IN" filter with unique values
+        var uniqueFids = Ext.Array.unique(me.fidsToFilter);
         var extInFilter = new Ext.util.Filter({
             property: me.idProperty,
             value   : uniqueFids,
