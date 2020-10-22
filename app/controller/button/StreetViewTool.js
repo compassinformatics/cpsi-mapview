@@ -141,6 +141,10 @@ Ext.define('CpsiMapview.controller.button.StreetViewTool', {
                 // add layer and raise layer to top of stack
                 overlayLayers.insertAt(overlayLayers.getLength(), me.vectorLayer);
             }
+            // disable any other map tools
+            setTimeout(function () {
+                me.map.set('defaultClickEnabled', false);
+            }, 100);
         } else {
             if (overlayLayers) {
                 overlayLayers.remove(me.vectorLayer);
@@ -150,6 +154,11 @@ Ext.define('CpsiMapview.controller.button.StreetViewTool', {
             if (me.streetViewWin) {
                 me.streetViewWin.close();
             }
+
+            // re-enable any other map tools
+            setTimeout(function () {
+                me.map.set('defaultClickEnabled', true);
+            }, 0);
         }
 
         // activate / deactivate click
