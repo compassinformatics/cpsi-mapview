@@ -75,12 +75,12 @@ Ext.define('CpsiMapview.controller.button.FeatureSelectionButtonController', {
             // create and show selector UI
             me.addModeSelectorUi();
 
-            // if another button is pressed then this would come before the
-            // onToggle of the other button
+            // add a timeout of 100 to ensure any other button
+            // in the group doesn't set defaultClickEnabled to true afterwards
             setTimeout(function () {
                 // disable default GetFeatureInfo click tool
                 me.map.set('defaultClickEnabled', false);
-            }, 0);
+            }, 100);
 
             me.map.on('click', me.onMapClick, me);
         } else {
@@ -161,10 +161,11 @@ Ext.define('CpsiMapview.controller.button.FeatureSelectionButtonController', {
 
         if (!view.queryLayer) {
             Ext.Logger.warn('No queryLayer found in the map for the FeaureSelectionButton with the name: ' + view.queryLayerName);
+        } else {
+            // save the ID property name for future use
+            me.idProperty = view.queryLayer.get('idProperty');
         }
 
-        // save the ID property name for future use
-        me.idProperty = view.queryLayer.get('idProperty');
     },
 
     /**
@@ -185,7 +186,7 @@ Ext.define('CpsiMapview.controller.button.FeatureSelectionButtonController', {
         var clickedFeatureIds = [];
         me.map.forEachFeatureAtPixel(evt.pixel, function(feature, layer) {
             // add check for correct layer
-            if (layer && layer.id === view.queryLayer.id) {
+            if (layer && view.queryLayer && (layer.id === view.queryLayer.id)) {
 
                 var source = view.queryLayer.getSource();
                 if (source instanceof ol.source.Cluster) {
