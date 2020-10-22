@@ -37,9 +37,7 @@ Ext.define('CpsiMapview.view.menuitem.LayerMetadata', {
         }
 
         me.callParent();
-
         me.setHidden(!hasMetadata);
-
     },
 
     /**
