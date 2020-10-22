@@ -131,7 +131,6 @@ Ext.define('CpsiMapview.view.grid.Grid', {
                 },
                 {
                     xtype: 'cmv_feature_selection_button',
-                    text: 'Select',
                     toggleGroup: 'map',
                     triggerWfsRequest: false,
                     glyph: 'xf245@FontAwesome',

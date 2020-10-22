@@ -25,6 +25,15 @@ Ext.define('CpsiMapview.view.button.FeatureSelectionButton', {
         vectorLayerKey: null
     },
 
+    viewModel: {
+        data: {
+            text: 'Select',
+            tooltip: 'Select features on the map by click.',
+            addToSelectionLabel: 'Add to Selection',
+            newSelectionLabel: 'New Selection'
+        }
+    },
+
     /**
      * The controller for this class
      */
@@ -54,6 +63,7 @@ Ext.define('CpsiMapview.view.button.FeatureSelectionButton', {
     },
 
     bind: {
+        text: '{text}',
         tooltip: '{tooltip}'
     },
 

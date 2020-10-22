@@ -92,19 +92,26 @@ Ext.define('CpsiMapview.controller.button.FeatureSelectionButtonController', {
 
         if (!me.modeSelector) {
             me.modeSelector = Ext.create('Ext.button.Split', {
-                text: 'Add to selection',
+                viewModel: me.getViewModel(),
+                bind: {
+                    text: '{addToSelectionLabel}'
+                },
                 hidden: true,
                 menu: new Ext.menu.Menu({
                     items: [
                         {
-                            text: 'Add to selection',
+                            bind: {
+                                text: '{addToSelectionLabel}'
+                            },
                             handler: function (menu) {
                                 me.filterMode = 'ADD_TO_SELECTION';
                                 me.modeSelector.setText(menu.text);
                             }
                         },
                         {
-                            text: 'New selection',
+                            bind: {
+                                text: '{newSelectionLabel}'
+                            },
                             handler: function (menu) {
                                 me.filterMode = 'NEW_SELECTION';
                                 me.modeSelector.setText(menu.text);
@@ -165,7 +172,7 @@ Ext.define('CpsiMapview.controller.button.FeatureSelectionButtonController', {
         // collect all IDs of clicked features
         me.map.forEachFeatureAtPixel(evt.pixel, function(feature, layer) {
             // add check for correct layer
-            if (layer.id === view.queryLayer.id) {
+            if (layer && layer.id === view.queryLayer.id) {
 
                 var source = view.queryLayer.getSource();
                 if (source instanceof ol.source.Cluster) {
