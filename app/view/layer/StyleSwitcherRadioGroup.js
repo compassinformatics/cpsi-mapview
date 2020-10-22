@@ -6,9 +6,9 @@ Ext.define('CpsiMapview.view.layer.StyleSwitcherRadioGroup', {
     xtype: 'cmv_layer_styleswitcher_radiogroup',
     requires: [
         'Ext.form.field.Radio',
-        'CpsiMapview.util.Legend'
+        'CpsiMapview.util.Legend',
+        'CpsiMapview.util.Style'
     ],
-
 
     /** @private */
     simpleValue: true,
