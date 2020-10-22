@@ -51,11 +51,18 @@ Ext.define('CpsiMapview.view.menuitem.LayerMetadata', {
 
         // retrive layername for different types of layers
         var layerName;
+        var baseurl;
         if(me.layer.get('isWfs')){
             layerName = me.layer.get('featureType');
+            baseurl = me.layer.get('url');
         }
         else if(me.layer.get('isWms')){
             layerName = me.layer.get('layers');
+            baseurl = me.layer.get('url');
+        }
+        else if(me.layer.get('isVt')){
+            layerName = me.layer.get('layerIdentificationName');
+            baseurl = me.layer.get('baseurl');
         }
         else{
             // Currently only metadata from WMS and WFS can be received
@@ -67,7 +74,6 @@ Ext.define('CpsiMapview.view.menuitem.LayerMetadata', {
         }
 
         // build url to Metadata XML
-        var baseurl = me.layer.get('url');
         var requestUrl = baseurl + '&REQUEST=GetMetadata' + '&layer=' + layerName;
 
         Ext.Ajax.request({

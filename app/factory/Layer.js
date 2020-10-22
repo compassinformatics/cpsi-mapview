@@ -708,7 +708,9 @@ Ext.define('CpsiMapview.factory.Layer', {
             stylesBaseUrl: layerConf.stylesBaseUrl || '',
             toolTipConfig: layerConf.tooltipsConfig,
             sldUrl: layerConf.sldUrl,
-            sldUrlLabel: layerConf.sldUrlLabel
+            sldUrlLabel: layerConf.sldUrlLabel,
+            baseurl: layerConf.baseurl,
+            layerIdentificationName: layerConf.layerIdentificationName
         };
         olLayerConf = Ext.apply(olLayerConf, olLayerProps);
 
