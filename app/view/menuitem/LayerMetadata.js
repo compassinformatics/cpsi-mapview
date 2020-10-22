@@ -174,6 +174,6 @@ Ext.define('CpsiMapview.view.menuitem.LayerMetadata', {
     * Notifies user that metadata is not availble
     */
     alertNoMetadata: function(){
-        alert('No metadata available.');
+        Ext.Msg.alert('Info', 'Metadata is not available.');
     }
 });
