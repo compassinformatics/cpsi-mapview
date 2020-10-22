@@ -955,6 +955,13 @@ Ext.define('CpsiMapview.factory.Layer', {
                     // also apply current filter and selected style
 
                     var activeStyle = layer.get('activatedStyle');
+
+                    // TODO fix this warning and ensure a style is set
+                    if (!activeStyle) {
+                        Ext.Logger.warn('activeStyle not set for ' + layer.get('layerKey'));
+                        activeStyle = '';
+                    }
+
                     var filters = layer.getSource().get('additionalFilters');
 
                     var newLayer = LayerFactory.createSwitchLayer(switchConfiguration);
