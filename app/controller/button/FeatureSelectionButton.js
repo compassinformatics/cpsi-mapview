@@ -75,11 +75,23 @@ Ext.define('CpsiMapview.controller.button.FeatureSelectionButtonController', {
             // create and show selector UI
             me.addModeSelectorUi();
 
+            // if another button is pressed then this would come before the
+            // onToggle of the other button
+            setTimeout(function () {
+                // disable default GetFeatureInfo click tool
+                me.map.set('defaultClickEnabled', false);
+            }, 0);
+
             me.map.on('click', me.onMapClick, me);
         } else {
             me.modeSelector.hide();
 
             me.map.un('click', me.onMapClick, me);
+
+            setTimeout(function () {
+                // enable default GetFeatureInfo click tool
+                me.map.set('defaultClickEnabled', true);
+            }, 0);
         }
 
     },
