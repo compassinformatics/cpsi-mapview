@@ -14,7 +14,15 @@ module.exports = {
         "LegendUtil": false,
         "GeoStylerSLDParser": false,
         "GeoStylerOpenlayersParser": false,
-        "google": false
+        "google": false,
+        "XLink_1_0": false,
+        "ISO19139_GMD_20060504": false,
+        "ISO19139_GCO_20060504": false,
+        "ISO19139_GTS_20060504": false,
+        "ISO19139_GSS_20060504": false,
+        "ISO19139_GSR_20060504": false,
+        "GML_3_2_0": false,
+        "Jsonix": false
     },
     "parserOptions": {
         "ecmaVersion": 5

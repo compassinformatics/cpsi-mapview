@@ -118,6 +118,8 @@ Ext.define('CpsiMapview.factory.Layer', {
             mapLayer.set('featureInfoWindow', layerConf.featureInfoWindow);
             // attribute grouping config
             mapLayer.set('grouping', layerConf.grouping);
+            // if layer has metadata
+            mapLayer.set('hasMetadata', layerConf.hasMetadata);
         }
 
         return mapLayer;
@@ -261,7 +263,9 @@ Ext.define('CpsiMapview.factory.Layer', {
             isNumericDependent: Ext.isDefined(layerConf.numericitem), // TODO docs
             isWms: true, // TODO docs
             styles: layerConf.styles, // TODO docs
-            activatedStyle: activatedStyle
+            activatedStyle: activatedStyle,
+            url: layerConf.url,
+            layers: olSourceConf.params.LAYERS
         };
         olLayerConf = Ext.apply(olLayerConf, olLayerProps);
 
@@ -704,7 +708,9 @@ Ext.define('CpsiMapview.factory.Layer', {
             stylesBaseUrl: layerConf.stylesBaseUrl || '',
             toolTipConfig: layerConf.tooltipsConfig,
             sldUrl: layerConf.sldUrl,
-            sldUrlLabel: layerConf.sldUrlLabel
+            sldUrlLabel: layerConf.sldUrlLabel,
+            baseurl: layerConf.baseurl,
+            layerIdentificationName: layerConf.layerIdentificationName
         };
         olLayerConf = Ext.apply(olLayerConf, olLayerProps);
 
