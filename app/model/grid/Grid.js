@@ -18,6 +18,7 @@ Ext.define('CpsiMapview.model.grid.Grid', {
         vectorLayerKey: null,
         wmsLayerKey: null,
         gridStoreType: null,
+        allowFeatureSelection: false,
         // when isSpatialGrid is set to false the 'Select by Shape' button will be hidden
         isSpatialGrid: true
     },
@@ -29,6 +30,12 @@ Ext.define('CpsiMapview.model.grid.Grid', {
         isGroupEditingVisible: function () {
             // can be overridden in subclasses
             return false;
+        },
+        useSimpleSelection: function () {
+            return !this.get('allowFeatureSelection') && this.get('isSpatialGrid');
+        },
+        useAdvancedSelection: function () {
+            return this.get('allowFeatureSelection') && this.get('isSpatialGrid');
         }
     }
 });
