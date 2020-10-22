@@ -49,7 +49,7 @@ Ext.define('CpsiMapview.view.LayerTree', {
         /**
          * Steers if the style switcher radio groups are directly rendered under
          * the corresponding layer tree node (`true`) or if they are provided in
-         * the context menu.
+         * the context menu (`false`).
          * @cfg
          */
         styleSwitcherBelowNode: false
@@ -77,8 +77,7 @@ Ext.define('CpsiMapview.view.LayerTree', {
                 flex: 1,
                 plugins: [{
                     ptype: 'cmv_basic_tree_column_legend'
-                },
-                {
+                }, {
                     ptype: 'cmv_tree_column_context_menu',
                     menuItems: [
                         'cmv_menuitem_layerrefresh',
@@ -93,13 +92,18 @@ Ext.define('CpsiMapview.view.LayerTree', {
         ]
     },
 
+    /**
+     * @private
+     */
     initComponent: function () {
         var me = this;
 
-        // add plugin or context menu item to show style switcher radio groups
+        // decide where to render style switcher radio groups
         if (me.styleSwitcherBelowNode) {
+            // add plugin to render style switcher permanently below tree nodes
             me.columns.items[0].plugins.push({ptype: 'cmv_tree_column_style_switcher'});
         } else {
+            // add context menu item showing the style switcher
             Ext.each(me.columns.items[0].plugins, function (plugin) {
                 if (plugin.ptype === 'cmv_tree_column_context_menu') {
                     plugin.menuItems.push('cmv_menuitem_layer_styleswitcher');
@@ -121,7 +125,7 @@ Ext.define('CpsiMapview.view.LayerTree', {
     },
 
     /**
-     * Refreshes the rendering of the tree layer node text for the given layer.
+     * Refreshes the rendering of the layer tree node text for the given layer.
      *
      * @param {ol.layer.Base} layer The layer to update the node text
      */

@@ -15,7 +15,7 @@ Ext.define('CpsiMapview.util.Style', {
      * types we return the input value.
      *
      * @param  {String} layerStyle The style name to get the label for
-     * @param  {ol.layer.Base} layerStyle The layer to get style label for
+     * @param  {ol.layer.Base} layer The layer to get style label for
      * @return {String} Human readable label
      */
     getLayerStyleLabel: function (layerStyle, layer) {
@@ -34,7 +34,7 @@ Ext.define('CpsiMapview.util.Style', {
      * style label (by #getLayerStyleLabel) is returned.
      *
      * @param  {String} layerStyle The style name to get the title for
-     * @param  {ol.layer.Base} layerStyle The layer to get style title for
+     * @param  {ol.layer.Base} layer The layer to get style title for
      * @return {String}            Human readable title
      */
     getLayerStyleTitle: function (layerStyleName, layer) {

@@ -1,5 +1,5 @@
 /**
- * MenuItem to show ...
+ * MenuItem to show a radio group in order to switch the style for the layer.
  *
  * @class CpsiMapview.view.menuitem.LayerStyleSwitcher
  */

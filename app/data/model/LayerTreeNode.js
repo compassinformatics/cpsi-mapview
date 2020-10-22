@@ -28,7 +28,7 @@ Ext.define('CpsiMapview.data.model.LayerTreeNode', {
             defaultValue: 'ol3'
         },
         {
-            // overwrite the text property to add custom behaviour
+            // overwrite the text property to add custom behavior
             name: 'text',
             type: 'string',
             persist: false,
@@ -48,7 +48,7 @@ Ext.define('CpsiMapview.data.model.LayerTreeNode', {
 
                     var olLayer = record.getOlLayer();
                     if (olLayer && olLayer.get('activatedStyle')) {
-                        // get activate style
+                        // get activated layer style
                         var activeStyle = olLayer.get('activatedStyle');
                         var styleTitle = CpsiMapview.util.Style.getLayerStyleTitle(activeStyle, olLayer);
                         // apply node name + style name
