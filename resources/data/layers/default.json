@@ -202,11 +202,12 @@
     {
       "layerType": "switchlayer",
       "layerKey": "WATERBODY_SWITCH_LAYER",
-      "visibility": false,
+      "visibility": true,
       "layers": [
         {
           "layerType": "wms",
           "layerKey": "WATERBODY_SWITCH_LAYER_FAR",
+          "hasMetadata": true,
           "serverOptions": {
             "layers": "waterbodies"
           },
@@ -222,6 +223,7 @@
         {
           "layerType": "wfs",
           "layerKey": "WATERBODY_SWITCH_LAYER_CLOSE",
+          "hasMetadata": true,
           "geometryProperty": "msGeometry",
           "featureType": "waterbodies",
           "noCluster": true,
@@ -255,6 +257,7 @@
       "layerKey": "BOREHOLE_WFS",
       "geometryProperty": "msGeometry",
       "featureType": "Boreholes",
+      "hasMetadata": true,
       "openLayers": {
         "opacity": 0.9,
         "visibility": false
@@ -266,6 +269,8 @@
     {
       "layerType": "wms",
       "layerKey": "BOREHOLE_WMS",
+      "featureType": "Boreholes",
+      "hasMetadata": true,
       "serverOptions": {
         "layers": "Boreholes",
         "version": "1.3.0"
@@ -291,6 +296,9 @@
       "layerType": "vtwms",
       "layerKey": "WATERWAYS_VTWMS",
       "url": "https://w08-mapserver.compass.ie/mapserver/?map=/MapServer/apps/mapview-demo/example.map&SERVICE=WMS&VERSION=1.3.0&REQUEST=GetMap&FORMAT=image%2Fpng&TRANSPARENT=true&LAYERS=waterways&TILED=false&CRS=EPSG%3A3857&WIDTH={width}&HEIGHT={height}&BBOX={bbox}&STYLES=Waterways&FORMAT=mvt",
+      "hasMetadata": true,
+      "baseurl": "https://w08-mapserver.compass.ie/mapserver/?map=/MapServer/apps/mapview-demo/example.map&",
+      "layerIdentificationName": "waterways",
       "openLayers": {
         "visibility": false
       },
@@ -320,6 +328,7 @@
       "layerKey": "RUINS_WFS",
       "geometryProperty": "msGeometry",
       "featureType": "ruins",
+      "hasMetadata": true,
       "sldUrl": "https://w08-mapserver.compass.ie/mapserver/?map=/MapServer/apps/mapview-demo/example.map&SERVICE=WMS&VERSION=1.3.0&REQUEST=GetStyles&LAYERS=ruins",
       "tooltipsConfig": [
         {

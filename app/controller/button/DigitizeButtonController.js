@@ -42,9 +42,19 @@ Ext.define('CpsiMapview.controller.button.DigitizeButtonController', {
 
     /**
      * OpenLayers modify interaction
-     * Used in polygon draw mode only
+     * Used in polygon and point draw mode
      */
     modifyInteraction: null,
+
+    /**
+     * OpenLayers pointer interaction for deleting points
+     */
+    deleteInteraction: null,
+
+    /**
+     * OpenLayers snap interaction for better vertex selection
+     */
+    snapInteraction: null,
 
     /**
      * CircleToolbar that will be set
@@ -78,6 +88,10 @@ Ext.define('CpsiMapview.controller.button.DigitizeButtonController', {
     onToggle: function (btn, pressed) {
         var me = this;
         var view = me.getView();
+
+        var deleteCondition = function (evt) {
+            return ol.events.condition.platformModifierKeyOnly(evt) && ol.events.condition.singleClick(evt);
+        };
 
         // guess the map if not given
         if (!me.map) {
@@ -125,16 +139,33 @@ Ext.define('CpsiMapview.controller.button.DigitizeButtonController', {
         }
 
         // create the modify interaction
-        if (type === 'Polygon' && !me.modifyInteraction) {
+        if (!me.modifyInteraction && type !== 'Circle') {
             var modifyInteractionConfig = {
                 source: me.drawLayer.getSource(),
-                deleteCondition: function (e) {
-                    return e.type === 'click' && e.originalEvent.ctrlKey;
-                }
+                deleteCondition: deleteCondition
             };
             me.modifyInteraction = new ol.interaction.Modify(modifyInteractionConfig);
-            me.modifyInteraction.on('modifyend', me.handleDrawEnd, me);
+            me.modifyInteraction.on('modifyend', me.handleModifyEnd, me);
             me.map.addInteraction(me.modifyInteraction);
+        }
+
+        if (!me.deleteInteraction && type === 'Point') {
+            me.deleteInteraction = new ol.interaction.Pointer({
+                handleEvent: function (evt) {
+                    if (deleteCondition(evt)) {
+                        return me.handlePointDelete(evt);
+                    }
+                    return true;
+                }
+            });
+            me.map.addInteraction(me.deleteInteraction);
+        }
+
+        if (!me.snapInteraction && type !== 'Circle') {
+            me.snapInteraction = new ol.interaction.Snap({
+                source: me.drawLayer.getSource()
+            });
+            me.map.addInteraction(me.snapInteraction);
         }
 
         // create a result layer unless one has already been set
@@ -154,27 +185,31 @@ Ext.define('CpsiMapview.controller.button.DigitizeButtonController', {
 
         if (pressed) {
             me.drawInteraction.setActive(true);
-            if (type === 'Polygon') {
+            if (type !== 'Circle') {
                 me.modifyInteraction.setActive(true);
+                me.snapInteraction.setActive(true);
             }
-            if (me.getView().getUseContextMenu()) {
-                me.map.getViewport().addEventListener('contextmenu', me.contextHandler);
+            if (type === 'Point') {
+                me.deleteInteraction.setActive(true);
             }
+            me.map.getViewport().addEventListener('contextmenu', me.contextHandler);
             // if another digitize button is pressed then this would come before the onToggle of the other button
             setTimeout(function () {
                 me.map.set('defaultClickEnabled', false);
             }, 0);
         } else {
-            if (type === 'Polygon') {
+            me.drawInteraction.setActive(false);
+            if (type !== 'Circle') {
                 me.modifyInteraction.setActive(false);
+                me.snapInteraction.setActive(false);
+            }
+            if (type === 'Point') {
+                me.deleteInteraction.setActive(false);
             }
             if (type === 'Circle' && me.circleToolbar != null) {
                 me.removeCircleSelectToolbar();
             }
-            if (me.getView().getUseContextMenu()) {
-                me.map.getViewport().removeEventListener('contextmenu', me.contextHandler);
-            }
-            me.drawInteraction.setActive(false);
+            me.map.getViewport().removeEventListener('contextmenu', me.contextHandler);
 
             if (me.getView().getResetOnToggle()) {
                 me.drawLayer.getSource().clear();
@@ -213,6 +248,7 @@ Ext.define('CpsiMapview.controller.button.DigitizeButtonController', {
         evt.preventDefault();
 
         var me = this.scope;
+        var view = me.getView();
 
         var radioGroupItems = [];
         if (me.contextMenuGroupsCounter === 0) {
@@ -222,47 +258,207 @@ Ext.define('CpsiMapview.controller.button.DigitizeButtonController', {
                 radioGroupItems.push(me.getRadioGroupItem(i, me.activeGroupIdx === i));
             }
         }
+
+        var menuItems;
+        if (view.getGroups()) {
+            menuItems = [
+                {
+                    text: 'Start new Group',
+                    handler: function () {
+                        me.contextMenuGroupsCounter++;
+                        me.activeGroupIdx = me.contextMenuGroupsCounter;
+                    }
+                }, {
+                    text: 'Active Group',
+                    menu: {
+                        name: 'active-group-submenu',
+                        items: [{
+                            xtype: 'radiogroup',
+                            columns: 1,
+                            vertical: true,
+                            items: radioGroupItems,
+                            listeners: {
+                                'change': function (radioGroup, newVal) {
+                                    me.activeGroupIdx = newVal.radiobutton;
+                                    me.updateDrawSource();
+                                }
+                            }
+                        }]
+                    }
+                }, {
+                    text: 'Clear Active Group',
+                    handler: function () {
+                        me.clearActiveGroup();
+                    }
+                }
+            ];
+        } else {
+            menuItems = [{
+                text: 'Clear All',
+                handler: function () {
+                    me.clearActiveGroup();
+                    me.drawLayer.getSource().clear();
+                }
+            }];
+        }
+
         var menu = Ext.create('Ext.menu.Menu', {
             width: 100,
             plain: true,
             renderTo: Ext.getBody(),
-            items: [{
-                text: 'Start new Group',
-                handler: function () {
-                    me.contextMenuGroupsCounter++;
-                    me.activeGroupIdx = me.contextMenuGroupsCounter;
-                }
-            }, {
-                text: 'Active Group',
-                menu: {
-                    name: 'active-group-submenu',
-                    items: [{
-                        xtype: 'radiogroup',
-                        columns: 1,
-                        vertical: true,
-                        items: radioGroupItems,
-                        listeners: {
-                            'change': function (radioGroup, newVal) {
-                                me.activeGroupIdx = newVal.radiobutton;
-                            }
-                        }
-                    }]
-                }
-            }]
+            items: menuItems
         });
         menu.showAt(evt.x, evt.y);
     },
 
     /**
-     * Handles the draw end event by getting the features and passing them
-     * to the `prepareRequestParams` function
-     * @param {DrawEvent} evt The OpenLayers draw event containing the features
+     * Returns all features in the active group from the result layer
+     * @returns {ol.Feature[]}
+     */
+    getActiveGroupFeatures: function () {
+        var me = this;
+        return this.resultLayer.getSource().getFeatures()
+            .filter(function (feature) {
+                return feature.get('group') === me.activeGroupIdx;
+            });
+    },
+
+    /**
+     * Returns only the solver points from the result layer in correct order
+     * @returns {ol.Feature[]}
+     */
+    getSolverPoints: function () {
+        return this.getActiveGroupFeatures()
+            .filter(function (feature) {
+                return feature.getGeometry() instanceof ol.geom.Point;
+            })
+            .sort(function (a, b) {
+                return a.get('index') - b.get('index');
+            });
+    },
+
+    /**
+     * Handles the drawend event and gets the netsolver result which is passed to `handleFinalResult`
+     * @param {ol.interaction.Draw.Event} evt The OpenLayers draw event containing the features
      */
     handleDrawEnd: function (evt) {
-        // evt.feature if filled after drawend, only contains current finished feature.
-        // evt.features is set on modifyend and will contain all the current features of that geom-type
-        var feat = evt.feature ? evt.feature : evt.features.getArray();
-        this.prepareRequestParams(feat);
+        var me = this;
+        var view = me.getView();
+
+        var resultPromise;
+
+        switch (view.getType()) {
+            case 'Point':
+                var points = me.getSolverPoints();
+                resultPromise = me.getNetByPoints(points.concat([evt.feature]));
+                break;
+            case 'Polygon':
+                resultPromise = me.getNetByPolygon(evt.feature);
+                break;
+            case 'Circle':
+                resultPromise = me.getNetByCircle(evt.feature);
+                break;
+            default:
+                BasiGX.warn('Please implement your custom handler here for ' + view.getType());
+                return;
+        }
+
+        resultPromise
+            .then(me.handleFinalResult.bind(me))
+            .then(undefined, function (err) {
+                Ext.log.error(err);
+            })
+            .then(me.updateDrawSource.bind(me));
+    },
+
+
+    /**
+     * Handles the modifyend event and gets the netsolver result which is passed to `handleFinalResult`
+     * @param {ol.interaction.Modify.Event} evt The OpenLayers modify event containing the features
+     */
+    handleModifyEnd: function (evt) {
+        var me = this;
+        var view = me.getView();
+
+        var resultPromise;
+
+        switch (view.getType()) {
+            case 'Point':
+                // find modified feature
+                var drawFeature = me.map.getFeaturesAtPixel(evt.mapBrowserEvent.pixel, {
+                    layerFilter: function (layer) {
+                        return layer === me.drawLayer;
+                    }
+                })[0];
+
+                var index = drawFeature.get('index');
+                var points = me.getSolverPoints();
+
+                if (index === points.length - 1) {
+                    points.splice(index, 1, drawFeature);
+                    resultPromise = me.getNetByPoints(points);
+                } else {
+                    // we first get the corrected point from the netsolver and then recalculate the whole path
+                    resultPromise = me.getNetByPoints([drawFeature])
+                        .then(function (features) {
+                            if (features) {
+                                var newFeature = features[0];
+                                newFeature.set('index', index);
+                                points.splice(index, 1, newFeature);
+                                return me.getNetByPoints(points);
+                            }
+                        });
+                }
+
+                break;
+            case 'Polygon':
+                resultPromise = me.getNetByPolygon(evt.features.getArray()[0]);
+                break;
+        }
+
+        resultPromise
+            .then(me.handleFinalResult.bind(me))
+            .then(undefined, function (err) {
+                Ext.log.error(err);
+            })
+            .then(me.updateDrawSource.bind(me));
+    },
+
+    /**
+     * Handles the click registered by the pointer interaction. If it returns false all other interaction at this point
+     * are ignored
+     * @param {ol.MapBrowserEvent} evt
+     */
+    handlePointDelete: function (evt) {
+        var me = this;
+
+        var features = me.map.getFeaturesAtPixel(evt.pixel, {
+            layerFilter: function (layer) {
+                return layer === me.drawLayer;
+            }
+        });
+        if (features && features.length) {
+            var drawFeature = features[0];
+
+            var points = me.getSolverPoints();
+            points.splice(drawFeature.get('index'), 1);
+
+            if (Ext.isEmpty(points)) {
+                me.handleFinalResult([]);
+                me.updateDrawSource();
+            } else {
+                me.getNetByPoints(points)
+                    .then(me.handleFinalResult.bind(me))
+                    .then(undefined, function (err) {
+                        Ext.log.error(err);
+                    })
+                    .then(me.updateDrawSource.bind(me));
+            }
+
+            return false;
+        } else {
+            return true;
+        }
     },
 
     /**
@@ -293,7 +489,7 @@ Ext.define('CpsiMapview.controller.button.DigitizeButtonController', {
      */
     onCircleSelectApply: function (feat) {
         var me = this;
-        var evt = { feature: feat };
+        var evt = {feature: feat};
         me.handleDrawEnd(evt);
         me.removeCircleSelectToolbar();
         me.drawInteraction.setActive(true);
@@ -306,7 +502,7 @@ Ext.define('CpsiMapview.controller.button.DigitizeButtonController', {
      */
     onCircleSelectCancel: function () {
         var me = this;
-        me.removeLastDigitizeFeature();
+        me.drawLayer.getSource().clear();
         me.removeCircleSelectToolbar();
         me.drawInteraction.setActive(true);
     },
@@ -321,77 +517,122 @@ Ext.define('CpsiMapview.controller.button.DigitizeButtonController', {
     },
 
     /**
-     * Prepares the API request with the given features and calls the `doAjaxRequest` method.
-     * If you need custom handling, just overwrite this method.
-     * @param {array[ol.Feature]|ol.Feature} feat The feature or array of features
-     *   that should be used in the request
+     * Asynchronously gets a path between the given points from the netsolver.
+     * @param {ol.Feature[]} features Expects the features in the correct order for solving. The coordinates of the last
+     *      feature will get corrected by the netsolver. The other coordinates need to be valid coordinates for the
+     *      netsolver (i.e. already corrected points)
+     * @returns {Ext.Promise<ol.Feature[]|undefined>}
      */
-    prepareRequestParams: function (feat) {
+    getNetByPoints: function (features) {
         var me = this;
         var view = me.getView();
-        var type = view.getType();
         var format = new ol.format.GeoJSON({
             dataProjection: me.map.getView().getProjection().getCode()
         });
-        var searchParams;
-        var jsonParams;
-        if (type === 'Point') {
-            var feats = me.resultLayer.getSource().getFeatures();
-            if (Ext.isEmpty(feats)) {
-                jsonParams = format.writeFeatures([]);
+        var jsonParams, searchParams;
+
+        features.forEach(function (feature, index) {
+            feature.set('index', index);
+        });
+
+        // The Netsolver endpoint expects bbox to be sent within a request.
+        // The lower left and upper right coordinates cannot be the same so
+        // we have to apply a small buffer on the point geometry to get a
+        // small bbox around the clicked point.
+        if (view.getPointExtentBuffer()) {
+            jsonParams = format.writeFeatures(features.slice(0, -1));
+            var extent = features[features.length - 1].getGeometry().getExtent();
+            var buffered = ol.extent.buffer(extent, view.getPointExtentBuffer());
+            searchParams = 'bbox=' + encodeURIComponent(buffered.join(','));
+        } else {
+            jsonParams = format.writeFeatures(features);
+        }
+
+        return me.doAjaxRequest(jsonParams, searchParams)
+            .then(me.parseNetsolverResponse.bind(me));
+    },
+
+    /**
+     * Asynchronously gets all lines inside the given polygon from the netsolver
+     * @param {ol.Feature} feat
+     * @returns {Ext.Promise<ol.Feature[]|undefined>}
+     */
+    getNetByPolygon: function (feat) {
+        var me = this;
+        var format = new ol.format.GeoJSON({
+            dataProjection: me.map.getView().getProjection().getCode()
+        });
+        var geoJson = format.writeFeature(feat);
+        var jsonParams = {
+            geometry3857: Ext.JSON.decode(geoJson).geometry
+        };
+        return me.doAjaxRequest(jsonParams)
+            .then(me.parseNetsolverResponse.bind(me));
+    },
+
+    /**
+     * Asynchronously gets all lines inside the given circle from the netsolver
+     * @param {ol.Feature} feat
+     * @returns {Ext.Promise<ol.Feature[]|undefined>}
+     */
+    getNetByCircle: function (feat) {
+        // ol circle objects consist of a center coordinate and a radius in the
+        // unit of the projection. In order to convert it into a geoJSON, we have
+        // to convert the circle to a polygon first.
+        var circleAsPolygon = new ol.geom.Polygon.fromCircle(feat.getGeometry());
+        var polygonAsFeature = new ol.Feature({geometry: circleAsPolygon});
+
+        return this.getNetByPolygon(polygonAsFeature);
+    },
+
+    /**
+     * Parses the netsolver result to openlayers features
+     * @param {XMLHttpRequest} response
+     * @returns {ol.Feature[]}
+     */
+    parseNetsolverResponse: function (response) {
+        if (response) {
+            var me = this;
+            var format = new ol.format.GeoJSON();
+            var json;
+
+            if (!Ext.isEmpty(response.responseText)) {
+                try {
+                    json = Ext.decode(response.responseText);
+                } catch (e) {
+                    BasiGX.error('Could not parse the response: ' +
+                        response.responseText);
+                    return;
+                }
+                if (json.success && json.data && json.data.features) {
+                    var features = json.data.features;
+
+                    return features.map(function (feat) {
+                        // api will respond with non unique ids, which
+                        // will collide with OpenLayers feature ids not
+                        // being unique. That's why we delete it here.
+                        delete feat.id;
+                        // set the current active group as property
+                        feat.properties.group = me.activeGroupIdx;
+                        return format.readFeature(feat);
+                    });
+                } else {
+                    BasiGX.error('Could not find features in the response: ' +
+                        (json.message ? json.message : JSON.stringify(json)));
+                }
             } else {
-                jsonParams = format.writeFeatures(feats.filter(function (f) {
-                    // parse all features that are of type point and that
-                    // have the property `group` set to the current active
-                    // group index (which defaults to 0 if not set).
-                    return f.getGeometry().getType() === 'Point' &&
-                        f.get('group') === me.activeGroupIdx;
-                }));
-            }
-            // The Netsolver endpoint expects bbox to be sent within a request.
-            // The lower left and upper right coordinates cannot be the same so
-            // we have to apply a small buffer on the point geometry to get a
-            // small bbox around the clicked point.
-            if (view.getPointExtentBuffer()) {
-                var extent = feat.getGeometry().getExtent();
-                var buffered = ol.extent.buffer(extent, view.getPointExtentBuffer());
-                searchParams = 'bbox=' + encodeURIComponent(buffered.join(','));
+                BasiGX.error('Response was empty');
             }
         }
-        else if (view.getType() === 'LineString') {
-            BasiGX.warn('Please implement your custom handler here for LineStrings');
-        }
-        else if (view.getType() === 'Polygon') {
-            var geoJson = Ext.isArray(feat) ?
-                format.writeFeature(feat[0]) :
-                format.writeFeature(feat);
-            jsonParams = {
-                geometry3857: Ext.JSON.decode(geoJson).geometry
-            };
-        }
-        else if (type === 'Circle') {
-            // ol circle objects consist of a center coordinate and a radius in the
-            // unit of the projection. In order to convert it into a geoJSON, we have
-            // to convert the circle to a polygon first.
-            var circleAsPolygon = new ol.geom.Polygon.fromCircle(feat.getGeometry());
-            var polygonAsFeature = new ol.Feature({ geometry: circleAsPolygon });
-            var polyGeoJson = format.writeFeature(polygonAsFeature);
-            jsonParams = {
-                geometry3857: Ext.JSON.decode(polyGeoJson).geometry
-            };
-        }
-        me.doAjaxRequest(jsonParams, searchParams);
     },
 
     /**
      * Issues an Ext.Ajax.request against the configured endpoint with
-     * the given params. Returned features will be added to the result
-     * layer, and the drawn features will be removed. Additionally,
-     * an event is fired with the response features to allow other
-     * components to make use of them.
+     * the given params.
      * @param {object} jsonParams Object containing the params to send
      * @param {string} searchParams The serarchParams which will be
      *   appended to the request url
+     * @returns {Ext.request.Base}
      */
     doAjaxRequest: function (jsonParams, searchParams) {
         var me = this;
@@ -409,16 +650,16 @@ Ext.define('CpsiMapview.controller.button.DigitizeButtonController', {
 
         mapComponent.setLoading(true);
 
-        Ext.Ajax.request({
+        return Ext.Ajax.request({
             url: url,
             method: 'POST',
             jsonData: jsonParams,
-            callback: function () {
+            success: function (response) {
                 mapComponent.setLoading(false);
+                return response;
             },
-            success: me.handleApiResponse.bind(me),
             failure: function (response) {
-                me.removeLastDigitizeFeature();
+                mapComponent.setLoading(false);
 
                 var errorMessage = 'Error while requesting the API endpoint';
 
@@ -431,87 +672,54 @@ Ext.define('CpsiMapview.controller.button.DigitizeButtonController', {
         });
     },
 
-    /**
-     * Parses the response with the GeoJSON Format of OpenLayers.
-     * Features will get set a new property `group` in order
-     * to maintain their membership to the current selected group.
-     * @param {string} response The response from the API. This method
-     * expects features in GeoJSON format.
-     */
-    handleApiResponse: function (response) {
+    updateDrawSource: function () {
         var me = this;
         var view = me.getView();
-        var format = new ol.format.GeoJSON();
-        var json;
 
-        if (!Ext.isEmpty(response.responseText)) {
-            try {
-                json = Ext.decode(response.responseText);
-            } catch (e) {
-                me.removeLastDigitizeFeature();
+        var drawSource = me.drawLayer.getSource();
+        var type = view.getType();
 
-                BasiGX.error('Could not parse the response: ' +
-                    response.responseText);
-                return;
-            }
-            if (json.success && json.data && json.data.features) {
-                var features = json.data.features;
-                var olFeatsForActiveGroup = [];
-                Ext.each(features, function (feat) {
-                    // api will respond with non unique ids, which
-                    // will collide with OpenLayers feature ids not
-                    // being unique. That's why we delete it here.
-                    delete feat.id;
-                    // set the current active group as property
-                    feat.properties.group = me.activeGroupIdx;
-                    olFeatsForActiveGroup.push(format.readFeature(feat));
+        if (type === 'Point') {
+            drawSource.clear();
+
+            var drawFeatures = this.getSolverPoints()
+                .map(function (feature) {
+                    return feature.clone();
                 });
-                // remove all features from the current active group
-                var allFeatures = me.resultLayer.getSource().getFeatures();
-                Ext.each(allFeatures, function (f) {
-                    if (f.get('group') === me.activeGroupIdx) {
-                        me.resultLayer.getSource().removeFeature(f);
-                    }
-                });
-                // add the new features for the current active group
-                me.resultLayer.getSource().addFeatures(olFeatsForActiveGroup);
-
-                var drawSource = me.drawLayer.getSource();
-                var featureCount = drawSource.getFeatures().length;
-
-                if (view.getClearDrawnFeature()) {
-                    drawSource.clear();
-                } else if (featureCount > 1) {
-                    // keep the last drawn feature and remove the oldest one
-                    // it seems that the a half-completed draw polygon can consist of multiple features
-                    drawSource.removeFeature(drawSource.getFeatures()[0]);
-                }
-                // The response from the API, parsed as OpenLayers features, will be
-                // fired here and the event can be used application-wide to access
-                // and handle the feature response.
-                me.getView().fireEvent('responseFeatures', olFeatsForActiveGroup);
-            } else {
-                me.removeLastDigitizeFeature();
-
-                BasiGX.error('Could not find features in the response: ' +
-                    (json.message ? json.message : JSON.stringify(json)));
+            drawSource.addFeatures(drawFeatures);
+        } else if (type === 'Polygon' || type === 'Circle') {
+            if (drawSource.getFeatures().length > 1) {
+                // keep the last drawn feature and remove the oldest one
+                // it seems that the a half-completed draw polygon can consist of multiple features
+                drawSource.removeFeature(drawSource.getFeatures()[0]);
             }
-        } else {
-            BasiGX.error('Response was empty');
         }
     },
 
     /**
-     * Removes the last drawn feature from the vector source (and from the map).
+     * Handles the final result from netsolver.
+     * Features will get set a new property `group` in order
+     * to maintain their membership to the current selected group.
+     * A responseFeatures event is fired.
+     * @param {undefined|ol.Feature[]} features The features returned from the API.
      */
-    removeLastDigitizeFeature: function () {
-        var me = this;
-        var source = me.drawLayer.getSource();
-        var features = source.getFeatures();
+    handleFinalResult: function (features) {
+        if (features) {
+            var me = this;
+            // remove all features from the current active group
+            var allFeatures = me.resultLayer.getSource().getFeatures();
+            Ext.each(allFeatures, function (f) {
+                if (f.get('group') === me.activeGroupIdx) {
+                    me.resultLayer.getSource().removeFeature(f);
+                }
+            });
+            // add the new features for the current active group
+            me.resultLayer.getSource().addFeatures(features);
 
-        if (features && features.length > 0) {
-            var lastFeature = features[features.length - 1];
-            source.removeFeature(lastFeature);
+            // The response from the API, parsed as OpenLayers features, will be
+            // fired here and the event can be used application-wide to access
+            // and handle the feature response.
+            me.getView().fireEvent('responseFeatures', features);
         }
     },
 
@@ -549,7 +757,6 @@ Ext.define('CpsiMapview.controller.button.DigitizeButtonController', {
             padding: [5, 5, 5, 5]
         });
     },
-
 
     /**
      * Showcasing the handling of the response features by adding them
@@ -653,6 +860,22 @@ Ext.define('CpsiMapview.controller.button.DigitizeButtonController', {
             }]
         });
         me.win.showAt(100, 100);
+    },
+
+    /**
+     * Clears all features of the active group from the result source
+     */
+    clearActiveGroup: function () {
+        var me = this;
+        var resultSource = me.resultLayer.getSource();
+        resultSource.getFeatures()
+            .filter(function (feature) {
+                return feature.get('group') === me.activeGroupIdx;
+            })
+            .forEach(function (feature) {
+                resultSource.removeFeature(feature);
+            });
+        this.updateDrawSource();
     },
 
     init: function () {

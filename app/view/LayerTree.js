@@ -13,6 +13,7 @@ Ext.define('CpsiMapview.view.LayerTree', {
         'CpsiMapview.view.menuitem.LayerOpacity',
         'CpsiMapview.view.menuitem.LayerGrid',
         'CpsiMapview.view.menuitem.LayerStyleSwitcher',
+        'CpsiMapview.view.menuitem.LayerMetadata',
         'CpsiMapview.plugin.TreeColumnStyleSwitcher',
         'CpsiMapview.controller.LayerTreeController',
         'CpsiMapview.view.window.MinimizableWindow',
@@ -83,7 +84,8 @@ Ext.define('CpsiMapview.view.LayerTree', {
                         'cmv_menuitem_layerrefresh',
                         'cmv_menuitem_layerlabels',
                         'cmv_menuitem_layeropacity',
-                        'cmv_menuitem_layergrid'
+                        'cmv_menuitem_layergrid',
+                        'cmv_menuitem_layermetadata'
                     ]
                 }, {
                     ptype: 'cmv_tree_inresolutionrange'
