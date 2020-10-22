@@ -26,6 +26,41 @@ Ext.define('CpsiMapview.data.model.LayerTreeNode', {
             name: '__toggleMode',
             type: 'string',
             defaultValue: 'ol3'
+        },
+        {
+            // overwrite the text property to add custom behaviour
+            name: 'text',
+            type: 'string',
+            persist: false,
+            convert: function(v, record) {
+                if (!v) {
+                    // folders / LayerGroups
+                    var layerGroup = record.getOlLayer();
+                    if (layerGroup) {
+                        return record.getOlLayer().get('name');
+                    }
+                }
+
+                // add layer style to node text if we have the style chooser
+                // in the context menu and not as direct item under the node
+                var layerTree = Ext.ComponentQuery.query('cmv_layertree')[0];
+                if (layerTree && layerTree.styleSwitcherBelowNode === false) {
+
+                    var olLayer = record.getOlLayer();
+                    if (olLayer && olLayer.get('activatedStyle')) {
+                        // get activate style
+                        var activeStyle = olLayer.get('activatedStyle');
+                        var styleTitle = CpsiMapview.util.Style.getLayerStyleTitle(activeStyle, olLayer);
+                        // apply node name + style name
+                        var treeNodeConf = olLayer.get('_origTreeConf');
+                        if (treeNodeConf && treeNodeConf.text && styleTitle) {
+                            return treeNodeConf.text + ' (' + styleTitle + ')';
+                        }
+                    }
+                }
+
+                return v;
+            }
         }
     ],
 

@@ -62,7 +62,10 @@ Ext.define('CpsiMapview.view.menuitem.LayerStyleSwitcher', {
      * @param {String} newStyleTitle Style title (human readable - 'My Style')
      * @param {ol.layer.Base} layer The layer where the style changed
      */
-    onLayerStyleChange: function () {
-        // TODO react on changed style
+    onLayerStyleChange: function (radioGrp, newStyle, newStyleTitle, layer) {
+        var layerTree = Ext.ComponentQuery.query('cmv_layertree')[0];
+        if (layerTree) {
+            layerTree.refreshLayerNodeText(layer);
+        }
     }
 });

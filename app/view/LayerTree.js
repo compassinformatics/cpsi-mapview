@@ -121,6 +121,16 @@ Ext.define('CpsiMapview.view.LayerTree', {
     },
 
     /**
+     * Refreshes the rendering of the tree layer node text for the given layer.
+     *
+     * @param {ol.layer.Base} layer The layer to update the node text
+     */
+    refreshLayerNodeText: function (layer) {
+        var node = this.getNodeForLayer(layer);
+        node.set('text', node.get('text'));
+    },
+
+    /**
      * Gets the layer node UI for the given layer.
      *
      * @param  {ol.layer.Base} layer The layer to update in the tree
