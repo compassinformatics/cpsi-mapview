@@ -34,6 +34,7 @@ Ext.define('CpsiMapview.view.layer.StyleSwitcherRadioGroup', {
      */
     initComponent: function () {
         var me = this;
+        var styleUtil = CpsiMapview.util.Style;
         var radioButtons = [];
         var layerStyles = me.layer.get('styles');
         var salt = Math.random();
@@ -52,7 +53,7 @@ Ext.define('CpsiMapview.view.layer.StyleSwitcherRadioGroup', {
             } else {
                 // does not have title property
                 // title generated from stlye name
-                layerTitle = me.getLayerStyleLabel(layerStyle);
+                layerTitle = styleUtil.getLayerStyleLabel(layerStyle, me.layer);
                 layerName = layerStyle;
             }
 
@@ -72,24 +73,6 @@ Ext.define('CpsiMapview.view.layer.StyleSwitcherRadioGroup', {
         me.items = radioButtons;
 
         me.callParent();
-    },
-
-    /**
-     * Returns the human readable label for the given style.
-     * If WFS or VT we remove the '_' and the .xml file ending. For other layer types
-     * we return the input value.
-     *
-     * @param  {String} layerStyle The style name to get the label for
-     * @return {String}            Human readable label
-     */
-    getLayerStyleLabel: function (layerStyle) {
-        if (this.layer.get('isWfs') || this.layer.get('isVt')) {
-            // remove _ and the .xml file ending
-            var legendUtil = CpsiMapview.util.Legend;
-            return legendUtil.getWmsStyleFromSldFile(layerStyle);
-        } else {
-            return layerStyle;
-        }
     },
 
     /**
