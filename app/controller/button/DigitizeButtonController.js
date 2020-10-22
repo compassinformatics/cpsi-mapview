@@ -88,7 +88,6 @@ Ext.define('CpsiMapview.controller.button.DigitizeButtonController', {
     onToggle: function (btn, pressed) {
         var me = this;
         var view = me.getView();
-        var modifiable = view.getModifiable();
 
         var deleteCondition = function (evt) {
             return ol.events.condition.platformModifierKeyOnly(evt) && ol.events.condition.singleClick(evt);
@@ -140,7 +139,7 @@ Ext.define('CpsiMapview.controller.button.DigitizeButtonController', {
         }
 
         // create the modify interaction
-        if (modifiable && !me.modifyInteraction && type !== 'Circle') {
+        if (!me.modifyInteraction && type !== 'Circle') {
             var modifyInteractionConfig = {
                 source: me.drawLayer.getSource(),
                 deleteCondition: deleteCondition
@@ -150,7 +149,7 @@ Ext.define('CpsiMapview.controller.button.DigitizeButtonController', {
             me.map.addInteraction(me.modifyInteraction);
         }
 
-        if (modifiable && !me.deleteInteraction && type === 'Point') {
+        if (!me.deleteInteraction && type === 'Point') {
             me.deleteInteraction = new ol.interaction.Pointer({
                 handleEvent: function (evt) {
                     if (deleteCondition(evt)) {
@@ -186,35 +185,31 @@ Ext.define('CpsiMapview.controller.button.DigitizeButtonController', {
 
         if (pressed) {
             me.drawInteraction.setActive(true);
-            if (modifiable && type !== 'Circle') {
+            if (type !== 'Circle') {
                 me.modifyInteraction.setActive(true);
                 me.snapInteraction.setActive(true);
             }
-            if (modifiable && type === 'Point') {
+            if (type === 'Point') {
                 me.deleteInteraction.setActive(true);
             }
-            if (me.getView().getGroups() || me.getView().getClearable()) {
-                me.map.getViewport().addEventListener('contextmenu', me.contextHandler);
-            }
+            me.map.getViewport().addEventListener('contextmenu', me.contextHandler);
             // if another digitize button is pressed then this would come before the onToggle of the other button
             setTimeout(function () {
                 me.map.set('defaultClickEnabled', false);
             }, 0);
         } else {
             me.drawInteraction.setActive(false);
-            if (modifiable && type !== 'Circle') {
+            if (type !== 'Circle') {
                 me.modifyInteraction.setActive(false);
                 me.snapInteraction.setActive(false);
             }
-            if (modifiable && type === 'Point') {
+            if (type === 'Point') {
                 me.deleteInteraction.setActive(false);
             }
             if (type === 'Circle' && me.circleToolbar != null) {
                 me.removeCircleSelectToolbar();
             }
-            if (me.getView().getGroups() || me.getView().getClearable()) {
-                me.map.getViewport().removeEventListener('contextmenu', me.contextHandler);
-            }
+            me.map.getViewport().removeEventListener('contextmenu', me.contextHandler);
 
             if (me.getView().getResetOnToggle()) {
                 me.drawLayer.getSource().clear();
@@ -266,43 +261,43 @@ Ext.define('CpsiMapview.controller.button.DigitizeButtonController', {
 
         var menuItems;
         if (view.getGroups()) {
-            menuItems = [{
-                text: 'Start new Group',
-                handler: function () {
-                    me.contextMenuGroupsCounter++;
-                    me.activeGroupIdx = me.contextMenuGroupsCounter;
-                }
-            }, {
-                text: 'Active Group',
-                menu: {
-                    name: 'active-group-submenu',
-                    items: [{
-                        xtype: 'radiogroup',
-                        columns: 1,
-                        vertical: true,
-                        items: radioGroupItems,
-                        listeners: {
-                            'change': function (radioGroup, newVal) {
-                                me.activeGroupIdx = newVal.radiobutton;
-                                me.updateDrawSource();
+            menuItems = [
+                {
+                    text: 'Start new Group',
+                    handler: function () {
+                        me.contextMenuGroupsCounter++;
+                        me.activeGroupIdx = me.contextMenuGroupsCounter;
+                    }
+                }, {
+                    text: 'Active Group',
+                    menu: {
+                        name: 'active-group-submenu',
+                        items: [{
+                            xtype: 'radiogroup',
+                            columns: 1,
+                            vertical: true,
+                            items: radioGroupItems,
+                            listeners: {
+                                'change': function (radioGroup, newVal) {
+                                    me.activeGroupIdx = newVal.radiobutton;
+                                    me.updateDrawSource();
+                                }
                             }
-                        }
-                    }]
-                }
-            }];
-            if (view.getClearable()) {
-                menuItems.push({
+                        }]
+                    }
+                }, {
                     text: 'Clear Active Group',
                     handler: function () {
                         me.clearActiveGroup();
                     }
-                });
-            }
-        } else if (view.getClearable()) {
+                }
+            ];
+        } else {
             menuItems = [{
                 text: 'Clear All',
                 handler: function () {
                     me.clearActiveGroup();
+                    me.drawLayer.getSource().clear();
                 }
             }];
         }
@@ -442,26 +437,24 @@ Ext.define('CpsiMapview.controller.button.DigitizeButtonController', {
                 return layer === me.drawLayer;
             }
         });
-        if (features.length) {
+        if (features && features.length) {
             var drawFeature = features[0];
 
-            var points = me.getSolverPoints()
-                .splice(drawFeature.get('index'), 1);
-
-            var resultPromise;
+            var points = me.getSolverPoints();
+            points.splice(drawFeature.get('index'), 1);
 
             if (Ext.isEmpty(points)) {
                 me.handleFinalResult([]);
+                me.updateDrawSource();
             } else {
-                resultPromise = me.getNetByPoints(points);
+                me.getNetByPoints(points)
+                    .then(me.handleFinalResult.bind(me))
+                    .then(undefined, function (err) {
+                        Ext.log.error(err);
+                    })
+                    .then(me.updateDrawSource.bind(me));
             }
 
-            resultPromise
-                .then(me.handleFinalResult.bind(me))
-                .then(undefined, function (err) {
-                    Ext.log.error(err);
-                })
-                .then(me.updateDrawSource.bind(me));
             return false;
         } else {
             return true;
@@ -496,7 +489,7 @@ Ext.define('CpsiMapview.controller.button.DigitizeButtonController', {
      */
     onCircleSelectApply: function (feat) {
         var me = this;
-        var evt = { feature: feat };
+        var evt = {feature: feat};
         me.handleDrawEnd(evt);
         me.removeCircleSelectToolbar();
         me.drawInteraction.setActive(true);
@@ -509,7 +502,7 @@ Ext.define('CpsiMapview.controller.button.DigitizeButtonController', {
      */
     onCircleSelectCancel: function () {
         var me = this;
-        me.removeLastDigitizeFeature();
+        me.drawLayer.getSource().clear();
         me.removeCircleSelectToolbar();
         me.drawInteraction.setActive(true);
     },
@@ -587,7 +580,7 @@ Ext.define('CpsiMapview.controller.button.DigitizeButtonController', {
         // unit of the projection. In order to convert it into a geoJSON, we have
         // to convert the circle to a polygon first.
         var circleAsPolygon = new ol.geom.Polygon.fromCircle(feat.getGeometry());
-        var polygonAsFeature = new ol.Feature({ geometry: circleAsPolygon });
+        var polygonAsFeature = new ol.Feature({geometry: circleAsPolygon});
 
         return this.getNetByPolygon(polygonAsFeature);
     },
@@ -684,7 +677,6 @@ Ext.define('CpsiMapview.controller.button.DigitizeButtonController', {
         var view = me.getView();
 
         var drawSource = me.drawLayer.getSource();
-        var featureCount = drawSource.getFeatures().length;
         var type = view.getType();
 
         if (type === 'Point') {
@@ -696,9 +688,7 @@ Ext.define('CpsiMapview.controller.button.DigitizeButtonController', {
                 });
             drawSource.addFeatures(drawFeatures);
         } else if (type === 'Polygon' || type === 'Circle') {
-            if (view.getClearDrawnFeature()) {
-                drawSource.clear();
-            } else if (featureCount > 1) {
+            if (drawSource.getFeatures().length > 1) {
                 // keep the last drawn feature and remove the oldest one
                 // it seems that the a half-completed draw polygon can consist of multiple features
                 drawSource.removeFeature(drawSource.getFeatures()[0]);

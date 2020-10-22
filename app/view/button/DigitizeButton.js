@@ -53,16 +53,6 @@ Ext.define('CpsiMapview.view.button.DigitizeButton', {
         groups: false,
 
         /**
-         * Should the tool allow to clear the results while active?
-         */
-        clearable: false,
-
-        /**
-         * Should the drawn feature be removed when a new feature gets drawn?
-         */
-        clearDrawnFeature: true,
-
-        /**
          * The default style to use for the result layer
          */
         resultLayerStyle: new ol.style.Style({
@@ -109,13 +99,7 @@ Ext.define('CpsiMapview.view.button.DigitizeButton', {
         * Should the results and draw layers be reset if the
         * tool is deactivated?
         */
-        resetOnToggle: true,
-
-        /**
-         * Determines if the drawn points and polygons are modifiable and if vertices can
-         * get deleted
-         */
-        modifiable: true
+        resetOnToggle: true
     },
 
     /**

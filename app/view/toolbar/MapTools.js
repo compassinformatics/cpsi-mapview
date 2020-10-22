@@ -96,7 +96,6 @@ Ext.define('CpsiMapview.view.toolbar.MapTools', {
             tooltip: 'Point',
             apiUrl: 'https://pmstipperarydev.compass.ie/pmspy/netsolver',
             groups: true,
-            clearable: true,
             pointExtentBuffer: 50,
             listeners: {
                 responseFeatures: function () {
@@ -112,8 +111,6 @@ Ext.define('CpsiMapview.view.toolbar.MapTools', {
             type: 'Polygon',
             tooltip: 'Polygon',
             apiUrl: 'https://pmstipperarydev.compass.ie/WebServices/roadschedule/cutWithPolygon',
-            clearable: true,
-            clearDrawnFeature: false,
             listeners: {
                 responseFeatures: function () {
                     this.getController().onResponseFeatures();
@@ -123,9 +120,7 @@ Ext.define('CpsiMapview.view.toolbar.MapTools', {
             xtype: 'cmv_digitize_button',
             type: 'Circle',
             tooltip: 'Circle',
-            clearable: true,
             apiUrl: 'https://pmstipperarydev.compass.ie/WebServices/roadschedule/cutWithPolygon',
-            clearDrawnFeature: false,
             listeners: {
                 responseFeatures: function () {
                     this.getController().onResponseFeatures();
