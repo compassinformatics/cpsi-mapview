@@ -6,6 +6,10 @@
 Ext.define('CpsiMapview.data.model.LayerTreeNode', {
     extend: 'GeoExt.data.model.LayerTreeNode',
 
+    requires: [
+        'CpsiMapview.util.Style'
+    ],
+
     /**
      * The layer property that will be used to hold a title for the description of the model in views.
      *
