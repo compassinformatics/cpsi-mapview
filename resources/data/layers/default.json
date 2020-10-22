@@ -158,12 +158,12 @@
       "styles": [
         {
           "name": "Test_Gas.xml",
-          "title": "Test GAS",
+          "title": "Gas Style",
           "label": "Test_Gas_label.xml"
         },
         {
           "name": "Test_Alternative_Gas_Style.xml",
-          "title": "CUSTOM TITLE",
+          "title": "Another Style",
           "label": "Test_Alternative_Gas_Style_label.xml"
         }
       ],

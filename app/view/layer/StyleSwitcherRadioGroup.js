@@ -30,10 +30,19 @@ Ext.define('CpsiMapview.view.layer.StyleSwitcherRadioGroup', {
     },
 
     /**
+     * Flag indicating if this radio group is directly rendered below the
+     * corresponding layer tree node (`true`) or within the context menu
+     * (`false`).
+     * @cfg
+     */
+    renderedBelowTreeNode: true,
+
+    /**
      * @private
      */
     initComponent: function () {
         var me = this;
+        var styleUtil = CpsiMapview.util.Style;
         var radioButtons = [];
         var layerStyles = me.layer.get('styles');
         var salt = Math.random();
@@ -52,7 +61,7 @@ Ext.define('CpsiMapview.view.layer.StyleSwitcherRadioGroup', {
             } else {
                 // does not have title property
                 // title generated from stlye name
-                layerTitle = me.getLayerStyleLabel(layerStyle);
+                layerTitle = styleUtil.getLayerStyleLabel(layerStyle, me.layer);
                 layerName = layerStyle;
             }
 
@@ -72,23 +81,10 @@ Ext.define('CpsiMapview.view.layer.StyleSwitcherRadioGroup', {
         me.items = radioButtons;
 
         me.callParent();
-    },
 
-    /**
-     * Returns the human readable label for the given style.
-     * If WFS or VT we remove the '_' and the .xml file ending. For other layer types
-     * we return the input value.
-     *
-     * @param  {String} layerStyle The style name to get the label for
-     * @return {String}            Human readable label
-     */
-    getLayerStyleLabel: function (layerStyle) {
-        if (this.layer.get('isWfs') || this.layer.get('isVt')) {
-            // remove _ and the .xml file ending
-            var legendUtil = CpsiMapview.util.Legend;
-            return legendUtil.getWmsStyleFromSldFile(layerStyle);
-        } else {
-            return layerStyle;
+        if (me.renderedBelowTreeNode === false) {
+            // adjust layout for usage in menu item
+            me.setStyle('paddingLeft', '5px');
         }
     },
 
@@ -119,6 +115,7 @@ Ext.define('CpsiMapview.view.layer.StyleSwitcherRadioGroup', {
      */
     onStyleChange: function (radioBtn, newVal) {
         var me = this;
+        var styleUtil = CpsiMapview.util.Style;
 
         if (newVal === true) {
             var layer = me.layer;
@@ -178,6 +175,9 @@ Ext.define('CpsiMapview.view.layer.StyleSwitcherRadioGroup', {
             } else {
                 Ext.Logger.info('Layer type not supported in StyleSwitcherRadioGroup');
             }
+
+            var styleTitle = styleUtil.getLayerStyleTitle(newStyle, layer);
+            me.fireEvent('cmv-layer-style-change', me, newStyle, styleTitle, layer);
         }
     }
 });

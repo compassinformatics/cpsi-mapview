@@ -12,6 +12,7 @@ Ext.define('CpsiMapview.view.LayerTree', {
         'CpsiMapview.view.menuitem.LayerLabels',
         'CpsiMapview.view.menuitem.LayerOpacity',
         'CpsiMapview.view.menuitem.LayerGrid',
+        'CpsiMapview.view.menuitem.LayerStyleSwitcher',
         'CpsiMapview.view.menuitem.LayerMetadata',
         'CpsiMapview.plugin.TreeColumnStyleSwitcher',
         'CpsiMapview.controller.LayerTreeController',
@@ -44,7 +45,15 @@ Ext.define('CpsiMapview.view.LayerTree', {
             items: [{
                 xtype: 'cmv_add_wms_form'
             }]
-        }
+        },
+
+        /**
+         * Steers if the style switcher radio groups are directly rendered under
+         * the corresponding layer tree node (`true`) or if they are provided in
+         * the context menu (`false`).
+         * @cfg
+         */
+        styleSwitcherBelowNode: false
     },
     hideHeaders: true,
     lines: false,
@@ -70,8 +79,6 @@ Ext.define('CpsiMapview.view.LayerTree', {
                 plugins: [{
                     ptype: 'cmv_basic_tree_column_legend'
                 }, {
-                    ptype: 'cmv_tree_column_style_switcher'
-                }, {
                     ptype: 'cmv_tree_column_context_menu',
                     menuItems: [
                         'cmv_menuitem_layerrefresh',
@@ -88,6 +95,28 @@ Ext.define('CpsiMapview.view.LayerTree', {
     },
 
     /**
+     * @private
+     */
+    initComponent: function () {
+        var me = this;
+
+        // decide where to render style switcher radio groups
+        if (me.styleSwitcherBelowNode) {
+            // add plugin to render style switcher permanently below tree nodes
+            me.columns.items[0].plugins.push({ptype: 'cmv_tree_column_style_switcher'});
+        } else {
+            // add context menu item showing the style switcher
+            Ext.each(me.columns.items[0].plugins, function (plugin) {
+                if (plugin.ptype === 'cmv_tree_column_context_menu') {
+                    plugin.menuItems.push('cmv_menuitem_layer_styleswitcher');
+                }
+            });
+        }
+
+        me.callParent(arguments);
+    },
+
+    /**
      * Updates the layer node UI for the given layer.
      *
      * @param  {ol.layer.Base} layer The layer to update in the tree
@@ -95,6 +124,16 @@ Ext.define('CpsiMapview.view.LayerTree', {
     updateLayerNodeUi: function (layer) {
         var node = this.getNodeForLayer(layer);
         node.triggerUIUpdate();
+    },
+
+    /**
+     * Refreshes the rendering of the layer tree node text for the given layer.
+     *
+     * @param {ol.layer.Base} layer The layer to update the node text
+     */
+    refreshLayerNodeText: function (layer) {
+        var node = this.getNodeForLayer(layer);
+        node.set('text', node.get('text'));
     },
 
     /**
