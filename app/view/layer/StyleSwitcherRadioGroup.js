@@ -30,6 +30,14 @@ Ext.define('CpsiMapview.view.layer.StyleSwitcherRadioGroup', {
     },
 
     /**
+     * Flag indicating if this radio group is directly rendered below the
+     * corresponding layer tree node (`true`) or within the context menu
+     * (`false`).
+     * @cfg
+     */
+    renderedBelowTreeNode: true,
+
+    /**
      * @private
      */
     initComponent: function () {
@@ -73,6 +81,11 @@ Ext.define('CpsiMapview.view.layer.StyleSwitcherRadioGroup', {
         me.items = radioButtons;
 
         me.callParent();
+
+        if (me.renderedBelowTreeNode === false) {
+            // adjust layout for usage in menu item
+            me.setStyle('paddingLeft', '5px');
+        }
     },
 
     /**
@@ -102,6 +115,7 @@ Ext.define('CpsiMapview.view.layer.StyleSwitcherRadioGroup', {
      */
     onStyleChange: function (radioBtn, newVal) {
         var me = this;
+        var styleUtil = CpsiMapview.util.Style;
 
         if (newVal === true) {
             var layer = me.layer;
@@ -161,6 +175,9 @@ Ext.define('CpsiMapview.view.layer.StyleSwitcherRadioGroup', {
             } else {
                 Ext.Logger.info('Layer type not supported in StyleSwitcherRadioGroup');
             }
+
+            var styleTitle = styleUtil.getLayerStyleTitle(newStyle, layer);
+            me.fireEvent('cmv-layer-style-change', me, newStyle, styleTitle, layer);
         }
     }
 });

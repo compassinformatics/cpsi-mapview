@@ -12,6 +12,7 @@ Ext.define('CpsiMapview.view.LayerTree', {
         'CpsiMapview.view.menuitem.LayerLabels',
         'CpsiMapview.view.menuitem.LayerOpacity',
         'CpsiMapview.view.menuitem.LayerGrid',
+        'CpsiMapview.view.menuitem.LayerStyleSwitcher',
         'CpsiMapview.plugin.TreeColumnStyleSwitcher',
         'CpsiMapview.controller.LayerTreeController',
         'CpsiMapview.view.window.MinimizableWindow',
@@ -43,7 +44,15 @@ Ext.define('CpsiMapview.view.LayerTree', {
             items: [{
                 xtype: 'cmv_add_wms_form'
             }]
-        }
+        },
+
+        /**
+         * Steers if the style switcher radio groups are directly rendered under
+         * the corresponding layer tree node (`true`) or if they are provided in
+         * the context menu.
+         * @cfg
+         */
+        styleSwitcherBelowNode: false
     },
     hideHeaders: true,
     lines: false,
@@ -68,9 +77,8 @@ Ext.define('CpsiMapview.view.LayerTree', {
                 flex: 1,
                 plugins: [{
                     ptype: 'cmv_basic_tree_column_legend'
-                }, {
-                    ptype: 'cmv_tree_column_style_switcher'
-                }, {
+                },
+                {
                     ptype: 'cmv_tree_column_context_menu',
                     menuItems: [
                         'cmv_menuitem_layerrefresh',
@@ -83,6 +91,23 @@ Ext.define('CpsiMapview.view.LayerTree', {
                 }]
             }
         ]
+    },
+
+    initComponent: function () {
+        var me = this;
+
+        // add plugin or context menu item to show style switcher radio groups
+        if (me.styleSwitcherBelowNode) {
+            me.columns.items[0].plugins.push({ptype: 'cmv_tree_column_style_switcher'});
+        } else {
+            Ext.each(me.columns.items[0].plugins, function (plugin) {
+                if (plugin.ptype === 'cmv_tree_column_context_menu') {
+                    plugin.menuItems.push('cmv_menuitem_layer_styleswitcher');
+                }
+            });
+        }
+
+        me.callParent(arguments);
     },
 
     /**
