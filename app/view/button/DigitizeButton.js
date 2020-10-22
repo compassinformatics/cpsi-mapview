@@ -48,14 +48,9 @@ Ext.define('CpsiMapview.view.button.DigitizeButton', {
         apiUrl: null,
 
         /**
-         * Shall the tool have a contextmenu on right-click?
+         * Should the tool use groups?
          */
-        useContextMenu: false,
-
-        /**
-         * Should the drawn feature be removed when a new feature gets drawn?
-         */
-        clearDrawnFeature: true,
+        groups: false,
 
         /**
          * The default style to use for the result layer
