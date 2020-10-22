@@ -43,6 +43,33 @@
             ]
           },
           {
+            "title": "Switch Group",
+            "expanded": false,
+            "children": [
+              {
+                "id": "WATERBODY_SWITCH_LAYER_FAR",
+                "leaf": true,
+                "text": "Waterbody Switch Layer (far)"
+              },
+              {
+                "id": "WATERBODY_SWITCH_LAYER_CLOSE",
+                "leaf": true,
+                "text": "Waterbody Switch Layer (close)"
+              },
+              {
+                "id": "BOREHOLE_WMS",
+                "leaf": true,
+                "text": "Borehole WMS"
+              },
+              {
+                "id": "BOREHOLE_WFS",
+                "leaf": true,
+                "text": "Borehole WFS (Time)",
+                "qtip": "Filter records with the timeslider control"
+              }
+            ]
+          },
+          {
             "id": "TIME_WFS_PROXY",
             "leaf": true
           },
@@ -53,16 +80,6 @@
           {
             "id": "LIGHT_UNIT_SWITCH_LAYER_FAR",
             "leaf": true
-          },
-          {
-            "id": "WATERBODY_SWITCH_LAYER_FAR",
-            "leaf": true,
-            "text": "Waterbody Switch Layer (far)"
-          },
-          {
-            "id": "WATERBODY_SWITCH_LAYER_CLOSE",
-            "leaf": true,
-            "text": "Waterbody Switch Layer (close)"
           },
           {
             "id": "WATERWAYS_VTWMS",
