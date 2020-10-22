@@ -11,7 +11,8 @@ Ext.define('CpsiMapview.view.grid.Grid', {
         'GeoExt.selection.FeatureModel',
         'BasiGX.util.Layer',
         'CpsiMapview.view.button.SpatialQueryButton',
-        'CpsiMapview.controller.grid.Grid'
+        'CpsiMapview.controller.grid.Grid',
+        'CpsiMapview.view.button.FeatureSelectionButton'
     ],
 
     xtype: 'cmv_grid',
@@ -109,20 +110,36 @@ Ext.define('CpsiMapview.view.grid.Grid', {
             handler: 'onClearSort'
         }, '->',
         {
-            xtype: 'cmv_spatial_query_button',
-            drawGeometryType: 'Polygon',
-            text: 'Select by Shape',
-            spatialOperator: 'intersect',
-            toggleGroup: 'map',
-            triggerWfsRequest: false,
-            displayPermanently: true,
-            glyph: 'xf044@FontAwesome',
-            bind: {
-                hidden: '{!isSpatialGrid}'
-            },
-            listeners: {
-                'cmv-spatial-query-filter': 'onSpatialFilter'
-            }
+            xtype: 'segmentedbutton',
+            allowDepress: true,
+            items: [
+                {
+                    xtype: 'cmv_spatial_query_button',
+                    drawGeometryType: 'Polygon',
+                    text: 'Select by Shape',
+                    spatialOperator: 'intersect',
+                    toggleGroup: 'map',
+                    triggerWfsRequest: false,
+                    displayPermanently: true,
+                    glyph: 'xf044@FontAwesome',
+                    bind: {
+                        hidden: '{!isSpatialGrid}'
+                    },
+                    listeners: {
+                        'cmv-spatial-query-filter': 'onSpatialFilter'
+                    }
+                },
+                {
+                    xtype: 'cmv_feature_selection_button',
+                    toggleGroup: 'map',
+                    triggerWfsRequest: false,
+                    glyph: 'xf245@FontAwesome',
+                    listeners: {
+                        'cmv-reset-grid-filters': 'resetFilters',
+                        'cmv-id-filter-set': 'onIdFilterSet'
+                    }
+                }
+            ]
         },
         {
             xtype: 'button',
