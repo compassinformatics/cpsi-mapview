@@ -32,38 +32,6 @@ Ext.define('CpsiMapview.view.main.Map', {
         dock: 'bottom'
     }],
 
-    items: [{
-        xtype: 'gx_map',
-        pointerRest: true,
-        pointerRestInterval: 500,
-        stateful: true,
-        stateId: 'cmv_mapstate',
-        map: new ol.Map({
-            // layers will be created from config in initComponent
-            layers: [],
-            controls: ol.control.defaults().extend([
-                new ol.control.FullScreen()
-            ]),
-            interactions: ol.interaction.defaults().extend([
-                new ol.interaction.DragRotateAndZoom()
-            ]),
-            view: new ol.View({
-                center: ol.proj.fromLonLat( [-8, 53.5] ),
-                zoom: 8
-            })
-        }),
-        plugins: [
-            {
-                ptype: 'cmv_feature_info_window'
-            }
-        ],
-        listeners: {
-            afterrender: 'afterMapRender'
-        }
-    }, {
-        xtype: 'cmv_minimized_windows_toolbar'
-    }],
-
     plugins: [
         {
             ptype: 'cmv_feature_attribute_grouping',
@@ -205,6 +173,43 @@ Ext.define('CpsiMapview.view.main.Map', {
      */
     initComponent: function () {
         var me = this;
+
+        // create a default map if one has not already been created in a derived class
+        if (!me.map) {
+            me.map = new ol.Map({
+                // layers will be created from config in initComponent
+                layers: [],
+                controls: ol.control.defaults().extend([
+                    new ol.control.FullScreen()
+                ]),
+                interactions: ol.interaction.defaults().extend([
+                    new ol.interaction.DragRotateAndZoom()
+                ]),
+                view: new ol.View({
+                    center: ol.proj.fromLonLat([-8, 53.5]),
+                    zoom: 8
+                })
+            });
+        }
+
+        me.items = [{
+            xtype: 'gx_map',
+            pointerRest: true,
+            pointerRestInterval: 500,
+            stateful: true,
+            stateId: 'cmv_mapstate',
+            map: me.map,
+            plugins: [
+                {
+                    ptype: 'cmv_feature_info_window'
+                }
+            ],
+            listeners: {
+                afterrender: 'afterMapRender'
+            }
+        }, {
+            xtype: 'cmv_minimized_windows_toolbar'
+        }];
 
         // Load layer JSON configuration
         Ext.Ajax.request({
