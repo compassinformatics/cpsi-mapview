@@ -192,24 +192,27 @@ Ext.define('CpsiMapview.view.main.Map', {
             });
         }
 
-        me.items = [{
-            xtype: 'gx_map',
-            pointerRest: true,
-            pointerRestInterval: 500,
-            stateful: true,
-            stateId: 'cmv_mapstate',
-            map: me.map,
-            plugins: [
-                {
-                    ptype: 'cmv_feature_info_window'
+        // create default items if not already been created in a derived class
+        if (!me.items) {
+            me.items = [{
+                xtype: 'gx_map',
+                pointerRest: true,
+                pointerRestInterval: 500,
+                stateful: true,
+                stateId: 'cmv_mapstate',
+                map: me.map,
+                plugins: [
+                    {
+                        ptype: 'cmv_feature_info_window'
+                    }
+                ],
+                listeners: {
+                    afterrender: 'afterMapRender'
                 }
-            ],
-            listeners: {
-                afterrender: 'afterMapRender'
-            }
-        }, {
-            xtype: 'cmv_minimized_windows_toolbar'
-        }];
+            }, {
+                xtype: 'cmv_minimized_windows_toolbar'
+            }];
+        }
 
         // Load layer JSON configuration
         Ext.Ajax.request({
