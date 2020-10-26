@@ -144,6 +144,7 @@ Ext.define('CpsiMapview.view.button.SpatialQueryButton', {
         clearAssociatedPermanentLayer: 'onClearAssociatedPermanentLayer',
         hideAssociatedPermanentLayer: 'onHideAssociatedPermanentLayer',
         showAssociatedPermanentLayer: 'onShowAssociatedPermanentLayer',
+        beforedestroy: 'onBeforeDestroy'
     },
 
     bind: {
@@ -155,14 +156,6 @@ Ext.define('CpsiMapview.view.button.SpatialQueryButton', {
     *
     * @cfg {Boolean} triggerWfsRequest Whether or not to trigger a Wfs GetFeatures request
     */
-    triggerWfsRequest: true,
-
-    /**
-     * Initializes this component
-     */
-    initComponent: function () {
-        var me = this;
-        me.callParent();
-    }
+    triggerWfsRequest: true
 
 });
