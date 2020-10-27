@@ -727,22 +727,33 @@ Ext.define('CpsiMapview.controller.button.DigitizeButtonController', {
      * Remove the interaction when this component gets destroyed
      */
     onBeforeDestroy: function () {
-        if (this.drawInteraction) {
-            this.map.removeInteraction(this.drawInteraction);
-        }
-        if (this.modifyInteraction) {
-            this.map.removeInteraction(this.modifyInteraction);
-        }
-        if (this.drawLayer) {
-            this.map.removeLayer(this.drawLayer);
-        }
-        if (this.resultLayer) {
-            this.map.removeLayer(this.resultLayer);
+
+        var me = this;
+        var btn = me.getView();
+
+        // detoggle button
+        me.onToggle(btn, false);
+
+        if (me.drawInteraction) {
+            me.map.removeInteraction(me.drawInteraction);
         }
 
-        if (this.circleToolbar) {
-            this.circleToolbar.destroy();
+        if (me.modifyInteraction) {
+            me.map.removeInteraction(me.modifyInteraction);
         }
+
+        if (me.drawLayer) {
+            me.map.removeLayer(me.drawLayer);
+        }
+
+        if (me.resultLayer) {
+            me.map.removeLayer(me.resultLayer);
+        }
+
+        if (me.circleToolbar) {
+            me.circleToolbar.destroy();
+        }
+
     },
 
     /**

@@ -35,6 +35,13 @@ Ext.define('CpsiMapview.controller.button.SpatialQueryButtonController', {
     permanentLayer: null,
 
     /**
+     * Flag indicating if the layer was created directly by the tool or
+     * is an existing layer passed as a configuration option
+     * @property {boolean}
+     */
+    permanentLayerCreatedByTool: false,
+
+    /**
     * The OpenLayers map. If not given, will be auto-detected
     */
     map: null,
@@ -92,6 +99,7 @@ Ext.define('CpsiMapview.controller.button.SpatialQueryButtonController', {
         var vectorLayerKey = view.getVectorLayerKey();
         me.permanentLayer = CpsiMapview.view.button.SpatialQueryButton.findAssociatedPermanentLayer(me.map, vectorLayerKey);
         if (me.permanentLayer === undefined) {
+            me.permanentLayerCreatedByTool = true; // add flag indicating the tool will handle the destruction of the layer
             me.permanentLayer = new ol.layer.Vector({ source: new ol.source.Vector() });
             me.permanentLayer.set('associatedLayerKey', vectorLayerKey);
             me.permanentLayer.set('isSpatialQueryLayer', true);
@@ -100,6 +108,7 @@ Ext.define('CpsiMapview.controller.button.SpatialQueryButtonController', {
             // connect hide and show to query layer hide and show
             me.connectQueryLayer();
         }
+
         var permanentLayerSource = me.permanentLayer.getSource();
         if (!me.drawQueryInteraction) {
             if (view.displayPermanently) {
@@ -146,9 +155,7 @@ Ext.define('CpsiMapview.controller.button.SpatialQueryButtonController', {
             }
         } else {
             // re-enable any other map tools
-            setTimeout(function () {
-                me.map.set('defaultClickEnabled', true);
-            }, 0);
+            me.map.set('defaultClickEnabled', true);
 
             me.drawQueryInteraction.setActive(false);
             if (view.displayPermanently) {
@@ -394,5 +401,29 @@ Ext.define('CpsiMapview.controller.button.SpatialQueryButtonController', {
             return;
         }
         CpsiMapview.view.button.SpatialQueryButton.hideAssociatedPermanentLayer(me.map, layerKey);
+    },
+
+    onBeforeDestroy: function () {
+        var me = this;
+        var view = me.getView();
+
+        // detoggle button
+        me.onSpatialQueryBtnToggle(view, false);
+
+        if (me.modifiyQueryInteraction) {
+            me.map.removeInteraction(me.modifiyQueryInteraction);
+        }
+
+        if (me.snapQueryInteraction) {
+            me.map.removeInteraction(me.snapQueryInteraction);
+        }
+
+        if (me.drawQueryInteraction) {
+            me.map.removeInteraction(me.drawQueryInteraction);
+        }
+
+        if (me.permanentLayer && me.permanentLayerCreatedByTool) {
+            me.map.removeLayer(me.permanentLayer);
+        }
     }
 });

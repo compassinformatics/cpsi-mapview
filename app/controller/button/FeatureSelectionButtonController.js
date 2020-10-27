@@ -230,6 +230,14 @@ Ext.define('CpsiMapview.controller.button.FeatureSelectionButtonController', {
         }
         // sets the ID filter in the grid
         view.fireEvent('cmv-id-filter-set', extInFilter);
+    },
+
+    onBeforeDestroy: function () {
+        var me = this;
+        var btn = me.getView();
+
+        // detoggle button
+        me.onBtnToggle(btn, false);
     }
 
 });

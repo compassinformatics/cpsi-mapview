@@ -171,13 +171,13 @@ Ext.define('CpsiMapview.controller.button.StreetViewTool', {
      */
     onBeforeDestroy: function () {
         var me = this;
-        var view = me.getView();
+        var btn = me.getView();
 
         // detoggle button, forces clearing layer
-        me.onToggle(view, false);
+        me.onToggle(btn, false);
         // remove GMaps events
         me.unregisterGmapsEvents();
-        // cleanup window
+        // clean-up window
         if (me.streetViewWin) {
             me.streetViewWin.close();
             me.streetViewWin = null;
