@@ -814,10 +814,6 @@ Ext.define('CpsiMapview.factory.Layer', {
             visible: ol2Conf.visibility,
             maxResolution: maxRes,
             minResolution: minRes
-            // no OL >=v3 pendant mapped yet
-            // numZoomLevels: ol2Conf.numZoomLevels,
-            // zoomOffset: ol2Conf.zoomOffset,
-            // resolutions: ol2Conf.resolutions
         };
         return olProps;
     },
