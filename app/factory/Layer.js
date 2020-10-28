@@ -812,6 +812,7 @@ Ext.define('CpsiMapview.factory.Layer', {
         var olProps = {
             opacity: ol2Conf.opacity,
             visible: ol2Conf.visibility,
+            extent: ol2Conf.extent, // undefined if not set
             maxResolution: maxRes,
             minResolution: minRes
         };
