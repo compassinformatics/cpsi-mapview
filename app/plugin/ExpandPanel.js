@@ -72,6 +72,9 @@ Ext.define('CpsiMapview.plugin.ExpandPanel', {
         me.maxedWin.show();
 
         me.maxTool.hide();
+
+        cmp.fireEvent('expand', cmp);
+        me.parentPanel.fireEvent('expand', cmp);
     },
 
     /**
@@ -85,5 +88,8 @@ Ext.define('CpsiMapview.plugin.ExpandPanel', {
         this.maxedWin.close();
 
         me.maxTool.show();
+
+        cmp.fireEvent('restore', cmp);
+        me.parentPanel.fireEvent('restore', cmp);
     }
 });
