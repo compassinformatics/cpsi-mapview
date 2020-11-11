@@ -54,7 +54,9 @@ Ext.define('CpsiMapview.plugin.ExpandPanel', {
         me.maxedWin = Ext.create('Ext.window.Window', {
             maximized: true,
             closable: false,
-
+            // the empty config object this avoids occasional errors mentioned 
+            // in https://forum.sencha.com/forum/showthread.php?469880-Cannot-read-property-viewModel-of-null
+            config: {},
             tools: [
                 {
                     type: 'restore',
