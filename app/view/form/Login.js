@@ -42,7 +42,6 @@ Ext.define('CpsiMapview.view.form.Login', {
             html: '<a href="/ManagementTool/Account/ForgotPassword" target="_blank">Forgotten Password?</a>'
         }, '->', {
             text: 'Login',
-            formBind: true,
             listeners: {
                 click: 'onLoginClick'
             }

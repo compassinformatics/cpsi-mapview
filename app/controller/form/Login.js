@@ -12,8 +12,15 @@ Ext.define('CpsiMapview.controller.form.Login', {
         }
     },
 
-    onLoginClick: function () {
-        this.attemptLogin();
+    onLoginClick: function (btn, e, eOpts) {
+        var form = btn.up('form');
+        var valid = true;
+        Ext.each(form.down('textfield'), function(field) {
+            valid = valid && !Ext.isEmpty(field.value);
+        });
+        if (valid) {
+            this.attemptLogin();
+        }
     },
 
     /**
