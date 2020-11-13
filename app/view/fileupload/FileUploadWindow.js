@@ -32,20 +32,20 @@ Ext.define('CpsiMapview.view.fileupload.FileUploadWindow', {
                     xtype: 'textfield',
                     name: 'documentName',
                     itemId: 'documentName',
-                    fieldLabel: 'Name',
+                    fieldLabel: 'Name*',
                     emptyText: 'Enter a name for the document...'
                 },
                 {
                     xtype: 'textfield',
                     name: 'documentDescription',
                     itemId: 'documentDescription',
-                    fieldLabel: 'Description',
+                    fieldLabel: 'Description*',
                     emptyText: 'Enter a description for the document...'
                 },
                 {
                     xtype: 'fileuploadfield',
                     emptyText: 'Select a file',
-                    fieldLabel: 'Document',
+                    fieldLabel: 'Document*',
                     name: 'filePath',
                     itemId: 'filePath',
                     buttonConfig: {
