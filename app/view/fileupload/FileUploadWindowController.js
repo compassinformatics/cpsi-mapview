@@ -69,7 +69,7 @@ Ext.define('CpsiMapview.view.fileupload.FileUploadWindowController', {
                     // after it was successfully associated
                     // with the parent object. This record can then be added to a store
                     var newFiledata = {
-                        attachementId: action.result.data.attachmentId,
+                        attachmentId: action.result.data.attachmentId,
                         name: name,
                         description: descrip,
                         extension: 'Extension',
