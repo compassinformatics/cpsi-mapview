@@ -85,11 +85,15 @@ Ext.define('CpsiMapview.plugin.ExpandPanel', {
         var cmp = this.getCmp();
 
         me.parentPanel.insert(me.positionInParentPanel, cmp);
-        this.maxedWin.close();
-
         me.maxTool.show();
 
         cmp.fireEvent('restore', cmp);
         me.parentPanel.fireEvent('restore', cmp);
+
+        setTimeout(function () {
+            me.maxedWin.close();
+        }, 0);
+
+
     }
 });
