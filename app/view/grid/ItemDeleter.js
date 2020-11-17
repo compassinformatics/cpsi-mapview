@@ -3,7 +3,6 @@ Ext.define('CpsiMapview.view.grid.ItemDeleter',
         extend: 'Ext.grid.column.Action',
         xtype: 'cmv_itemdeleter',
         width: 55,
-        requiredRole: this.deleteItemRequiredRole,
         menuDisabled: true, // disable the column header menu containing sort/hide options
         iconCls: 'x-fa fa-delete',
         avoidConfirmationRequest: false,
