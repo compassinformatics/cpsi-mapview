@@ -54,7 +54,6 @@ Ext.define('CpsiMapview.plugin.ExpandPanel', {
         me.maxedWin = Ext.create('Ext.window.Window', {
             maximized: true,
             closable: false,
-            modal: true,
             tools: [
                 {
                     type: 'restore',
@@ -85,11 +84,15 @@ Ext.define('CpsiMapview.plugin.ExpandPanel', {
         var cmp = this.getCmp();
 
         me.parentPanel.insert(me.positionInParentPanel, cmp);
-        this.maxedWin.close();
-
         me.maxTool.show();
 
         cmp.fireEvent('restore', cmp);
         me.parentPanel.fireEvent('restore', cmp);
+
+        setTimeout(function () {
+            me.maxedWin.close();
+        }, 0);
+
+
     }
 });

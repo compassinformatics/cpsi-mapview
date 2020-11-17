@@ -12,7 +12,7 @@ Ext.define('CpsiMapview.controller.form.Login', {
         }
     },
 
-    onLoginClick: function (btn, e, eOpts) {
+    onLoginClick: function (btn) {
         var form = btn.up('form');
         var valid = true;
         Ext.each(form.down('textfield'), function(field) {
