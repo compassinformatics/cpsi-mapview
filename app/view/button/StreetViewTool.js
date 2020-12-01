@@ -33,7 +33,14 @@ Ext.define('CpsiMapview.view.button.StreetViewTool', {
     name: 'streetViewToolButton',
 
     /**
-     * Enable toogle mode for the button.
+     * The tooltip to display when hovering over the button
+     *
+     * @private
+     */
+    tooltip: 'Activate the StreeView tool',
+
+    /**
+     * Enable toggle mode for the button.
      *
      * @cfg {Boolean}
      * @private
@@ -90,7 +97,7 @@ Ext.define('CpsiMapview.view.button.StreetViewTool', {
     svWinTitlePrefix: 'Google Street View',
 
     /**
-     * The label to be set infront of the image date of the SV panorama.
+     * The label to be set in front of the image date of the SV panorama.
      *
      * @cfg {String}
      */
