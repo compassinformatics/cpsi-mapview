@@ -37,7 +37,7 @@ Ext.define('CpsiMapview.view.button.StreetViewTool', {
      *
      * @private
      */
-    tooltip: 'Activate the StreeView tool',
+    tooltip: 'Activate the StreetView tool',
 
     /**
      * Enable toggle mode for the button.
