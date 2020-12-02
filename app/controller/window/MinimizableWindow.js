@@ -7,10 +7,16 @@ Ext.define('CpsiMapview.controller.window.MinimizableWindow', {
     alias: 'controller.cmv_minimizable_window',
 
     /**
-     * Create a hook for derived classes to add additional onClose
-     * functionality
+     * When closing the window in code make
+     * sure that the window is restored first so
+     * no orphaned toolbar window buttons are left behind
      */
-    onClose: Ext.emptyFn,
+    onClose: function () {
+        var me = this;
+        // trigger the restoreFromWindow to remove any associated toolbar
+        // button if the window is minimised
+        me.onShow();
+    },
 
     /**
      * Sets the window invisible and calls the addMinimizedWindow event
