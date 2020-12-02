@@ -21,7 +21,7 @@ variables:
 steps:
 - task: CacheBeta@1
   inputs:
-    key: ext
+    key: ext-6-2-0
     path: $(System.DefaultWorkingDirectory)/ext
     cacheHitVar: CACHE_RESTORED
   displayName: 'Get Cached ExtJS Framework'
@@ -48,7 +48,7 @@ steps:
 
 - task: CacheBeta@1
   inputs:
-    key: sencha-cmd
+    key: sencha-cmd-6-5-2
     path: $(System.DefaultWorkingDirectory)/sencha-cmd
     cacheHitVar: CMD_CACHE_RESTORED
   displayName: 'Get Cached SenchaCmd'
