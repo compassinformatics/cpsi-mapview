@@ -15,7 +15,7 @@ pool:
 variables:
     SENCHA_EXT_VERSION: '6.2.0'
     SENCHA_CMD_VERSION: '6.5.2'
-    ProgressPreference = 'SilentlyContinue'
+    ProgressPreference: 'SilentlyContinue'
     
 # first get the ExtJS framework and unzip it, unless this has already been cached
 steps:
