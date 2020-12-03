@@ -26,7 +26,9 @@ steps:
     cacheHitVar: CACHE_RESTORED
   displayName: 'Get Cached ExtJS Framework'
 
-- powershell: Invoke-WebRequest -Uri "http://cdn.sencha.com/ext/gpl/ext-$($env:SENCHA_EXT_VERSION)-gpl.zip" -OutFile "ExtJS.zip"
+# http://cdn.sencha.com/ext/gpl/ext-6.2.0-gpl.zip
+#- powershell: Invoke-WebRequest -Uri "http://cdn.sencha.com/ext/gpl/ext-$($env:SENCHA_EXT_VERSION)-gpl.zip" -OutFile "ExtJS.zip"
+- powershell: Invoke-WebRequest -Uri "http://w08-mapserver.compass.ie/sencha/ext-$($env:SENCHA_EXT_VERSION)-gpl.zip" -OutFile "ExtJS.zip"
   condition: ne(variables.CACHE_RESTORED, 'true')
   displayName: 'Download ExtJS Framework'
 
@@ -53,7 +55,9 @@ steps:
     cacheHitVar: CMD_CACHE_RESTORED
   displayName: 'Get Cached SenchaCmd'
 
-- powershell: Invoke-WebRequest -Uri "http://cdn.sencha.com/cmd/$($env:SENCHA_CMD_VERSION)/jre/SenchaCmd-$($env:SENCHA_CMD_VERSION)-windows-64bit.zip" -OutFile "SenchaCmd.zip"
+# http://cdn.sencha.com/cmd/6.5.2/jre/SenchaCmd-6.5.2-windows-64bit.zip
+#- powershell: Invoke-WebRequest -Uri "http://cdn.sencha.com/cmd/$($env:SENCHA_CMD_VERSION)/jre/SenchaCmd-$($env:SENCHA_CMD_VERSION)-windows-64bit.zip" -OutFile "SenchaCmd.zip"
+- powershell: Invoke-WebRequest -Uri "http://w08-mapserver.compass.ie/sencha/SenchaCmd-$($env:SENCHA_CMD_VERSION)-windows-64bit.zip" -OutFile "SenchaCmd.zip"
   condition: ne(variables.CMD_CACHE_RESTORED, 'true')
   displayName: 'Download SenchaCmd'
 
