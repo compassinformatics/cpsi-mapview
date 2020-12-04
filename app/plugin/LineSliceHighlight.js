@@ -95,5 +95,14 @@ Ext.define('CpsiMapview.plugin.LineSliceHighlight', {
         if (this.layer) {
             this.layer.setStyle(style);
         }
+    },
+
+    /**
+     * Remove any highlights and cleanup
+     */
+    destroy: function () {
+        this.removeHighlight();
+        this.style = null;
+        this.callParent();
     }
 });
