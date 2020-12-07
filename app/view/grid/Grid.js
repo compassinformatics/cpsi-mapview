@@ -55,6 +55,7 @@ Ext.define('CpsiMapview.view.grid.Grid', {
     selModel: {
         type: 'featuremodel',
         mode: 'SINGLE',
+        allowDeselect: true,
         mapSelection: true,
         selectStyle: new ol.style.Style({
             image: new ol.style.Circle({
