@@ -147,18 +147,21 @@ Ext.define('CpsiMapview.controller.button.StreetViewTool', {
             }, 100);
         } else {
             if (overlayLayers) {
-                overlayLayers.remove(me.vectorLayer);
+                if (overlayLayers.remove(me.vectorLayer)) {
+                    // re-enable any other map tools if the tool had been activated
+                    // we can check this as me.vectorLayer will have been added and remove
+                    // returns a layer when found
+                    setTimeout(function () {
+                        me.map.set('defaultClickEnabled', true);
+                    }, 0);
+                }
             }
+
             // cleanup
             me.vectorLayer.getSource().clear();
             if (me.streetViewWin) {
                 me.streetViewWin.close();
             }
-
-            // re-enable any other map tools
-            setTimeout(function () {
-                me.map.set('defaultClickEnabled', true);
-            }, 0);
         }
 
         // activate / deactivate click

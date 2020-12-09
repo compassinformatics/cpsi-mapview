@@ -154,8 +154,10 @@ Ext.define('CpsiMapview.controller.button.SpatialQueryButtonController', {
                 view.queryFeatures.on('add', me.getGeometryFromPolygonAndTriggerWfs, me);
             }
         } else {
-            // re-enable any other map tools
-            me.map.set('defaultClickEnabled', true);
+            // re-enable any other map tools if this tool was active
+            if (me.drawQueryInteraction.getActive() === true) {
+                me.map.set('defaultClickEnabled', true);
+            }
 
             me.drawQueryInteraction.setActive(false);
             if (view.displayPermanently) {

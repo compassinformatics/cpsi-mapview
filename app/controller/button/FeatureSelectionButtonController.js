@@ -41,7 +41,7 @@ Ext.define('CpsiMapview.controller.button.FeatureSelectionButtonController', {
         var ownerGrid = this.getView().up('grid');
         if (ownerGrid) {
             // reset FIDs if grid clears its filters
-            ownerGrid.on('cmv-clear-filters', function() {
+            ownerGrid.on('cmv-clear-filters', function () {
                 me.fidsToFilter = [];
             });
         }
@@ -84,14 +84,16 @@ Ext.define('CpsiMapview.controller.button.FeatureSelectionButtonController', {
 
             me.map.on('click', me.onMapClick, me);
         } else {
-            me.modeSelector.hide();
-
-            me.map.un('click', me.onMapClick, me);
 
             setTimeout(function () {
-                // enable default GetFeatureInfo click tool
-                me.map.set('defaultClickEnabled', true);
+                // enable default GetFeatureInfo click tool if it was already active
+                if (me.modeSelector) {
+                    me.map.set('defaultClickEnabled', true);
+                }
             }, 0);
+
+            me.modeSelector.hide();
+            me.map.un('click', me.onMapClick, me);
         }
 
     },
@@ -184,7 +186,7 @@ Ext.define('CpsiMapview.controller.button.FeatureSelectionButtonController', {
 
         // collect all IDs of clicked features
         var clickedFeatureIds = [];
-        me.map.forEachFeatureAtPixel(evt.pixel, function(feature, layer) {
+        me.map.forEachFeatureAtPixel(evt.pixel, function (feature, layer) {
             // add check for correct layer
             if (layer && view.queryLayer && (layer.id === view.queryLayer.id)) {
 
@@ -220,7 +222,7 @@ Ext.define('CpsiMapview.controller.button.FeatureSelectionButtonController', {
         var uniqueFids = Ext.Array.unique(me.fidsToFilter);
         var extInFilter = new Ext.util.Filter({
             property: me.idProperty,
-            value   : uniqueFids,
+            value: uniqueFids,
             operator: 'in'
         });
 

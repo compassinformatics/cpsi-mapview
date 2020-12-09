@@ -198,7 +198,15 @@ Ext.define('CpsiMapview.controller.button.DigitizeButtonController', {
                 me.map.set('defaultClickEnabled', false);
             }, 0);
         } else {
+            // only reset the defaultClickEnabled on the map if the tool
+            // was already active - as this function is called in onBeforeDestroy
+            // this is not always the case
+            if (me.drawInteraction.getActive() === true) {
+                me.map.set('defaultClickEnabled', true);
+            }
+
             me.drawInteraction.setActive(false);
+
             if (type !== 'Circle') {
                 me.modifyInteraction.setActive(false);
                 me.snapInteraction.setActive(false);
@@ -220,7 +228,6 @@ Ext.define('CpsiMapview.controller.button.DigitizeButtonController', {
                 me.activeGroupIdx = 0;
                 me.contextMenuGroupsCounter = 0;
             }
-            me.map.set('defaultClickEnabled', true);
         }
     },
 
