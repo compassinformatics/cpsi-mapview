@@ -111,7 +111,8 @@ Ext.define('CpsiMapview.controller.button.DigitizeButtonController', {
             } else {
                 me.drawLayer = new ol.layer.Vector({
                     source: new ol.source.Vector(),
-                    displayInLayerSwitcher: false
+                    displayInLayerSwitcher: false,
+                    style: view.getDrawLayerStyle()
                 });
                 me.map.addLayer(me.drawLayer);
             }
@@ -789,24 +790,8 @@ Ext.define('CpsiMapview.controller.button.DigitizeButtonController', {
             return rec.get('geometry').getType() !== 'Point';
         });
 
-        var selectStyle = new ol.style.Style({
-            image: new ol.style.Circle({
-                radius: 5,
-                fill: new ol.style.Fill({
-                    color: 'red'
-                }),
-                stroke: new ol.style.Stroke({
-                    color: 'red'
-                })
-            }),
-            width: 2,
-            fill: new ol.style.Fill({
-                color: 'red'
-            }),
-            stroke: new ol.style.Stroke({
-                color: 'red'
-            })
-        });
+        var view = me.getView();
+        var selectStyle = view.getResultLayerSelectStyle();
 
         if (me.win) {
             me.win.destroy();
