@@ -72,20 +72,20 @@ Ext.define('CpsiMapview.field.Line', {
         var style = new ol.style.Style({
             image: new ol.style.Circle({
                 radius: me.styleDefaults.radius,
+                // point fill
                 fill: new ol.style.Fill({
                     color: pointColor
                 }),
+                // point outline
                 stroke: new ol.style.Stroke({
                     color: lineColor
                 })
             }),
-            width: me.styleDefaults.width,
+            // line style
             stroke: new ol.style.Stroke({
-                color: lineColor
-            }),
-            fill: new ol.style.Fill({
-                color: pointColor
-            }),
+                color: lineColor,
+                width: me.styleDefaults.width
+            })
         });
 
         return style;
