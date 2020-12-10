@@ -43,7 +43,7 @@ Ext.define('CpsiMapview.view.button.DigitizeButton', {
         multi: false,
 
         /**
-         * URL needs to be set on instanciation of button
+         * URL needs to be set on instantiation of button
          */
         apiUrl: null,
 
@@ -71,6 +71,45 @@ Ext.define('CpsiMapview.view.button.DigitizeButton', {
             }),
             stroke: new ol.style.Stroke({
                 color: 'orange'
+            })
+        }),
+
+        /**
+        * The default style to use when features are selected
+        * in the result layer
+        */
+        drawLayerStyle: new ol.style.Style({
+            image: new ol.style.Circle({
+                radius: 5,
+                fill: new ol.style.Fill({
+                    color: 'red'
+                }),
+                stroke: new ol.style.Stroke({
+                    color: 'red'
+                })
+            })
+        }),
+
+        /**
+         * The default style to use when features are selected
+         * in the result layer
+         */
+        resultLayerSelectStyle: new ol.style.Style({
+            image: new ol.style.Circle({
+                radius: 5,
+                fill: new ol.style.Fill({
+                    color: 'red'
+                }),
+                stroke: new ol.style.Stroke({
+                    color: 'red'
+                })
+            }),
+            width: 2,
+            fill: new ol.style.Fill({
+                color: 'red'
+            }),
+            stroke: new ol.style.Stroke({
+                color: 'red'
             })
         }),
 
