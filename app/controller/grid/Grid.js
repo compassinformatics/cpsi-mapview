@@ -334,6 +334,10 @@ Ext.define('CpsiMapview.controller.grid.Grid', {
             });
 
             if (recordWindow) {
+                // if the window is minimised make sure it is restored
+                if (recordWindow.isMinimized) {
+                    recordWindow.show();
+                }
                 Ext.WindowManager.bringToFront(recordWindow);
             } else {
                 // load the record into a new window
