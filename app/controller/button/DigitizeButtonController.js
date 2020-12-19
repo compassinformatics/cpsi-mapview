@@ -214,9 +214,7 @@ Ext.define('CpsiMapview.controller.button.DigitizeButtonController', {
 
             if (me.getView().getResetOnToggle()) {
                 me.drawLayer.getSource().clear();
-                if (me.resultLayer) {
-                    me.resultLayer.getSource().clear();
-                }
+                me.clearResultLayer();
                 // reset context menu entries
                 me.activeGroupIdx = 0;
                 me.contextMenuGroupsCounter = 0;
@@ -707,15 +705,19 @@ Ext.define('CpsiMapview.controller.button.DigitizeButtonController', {
     handleFinalResult: function (features) {
         if (features) {
             var me = this;
+            var resultSource = me.resultLayer.getSource();
             // remove all features from the current active group
             var allFeatures = me.resultLayer.getSource().getFeatures();
             Ext.each(allFeatures, function (f) {
                 if (f.get('group') === me.activeGroupIdx) {
-                    me.resultLayer.getSource().removeFeature(f);
+                    resultSource.removeFeature(f);
                 }
             });
             // add the new features for the current active group
-            me.resultLayer.getSource().addFeatures(features);
+            resultSource.addFeatures(features);
+            // fire a custom event from the source so a listener can be added once
+            // all features have been added/removed
+            resultSource.dispatchEvent('featuresupdated');
 
             // The response from the API, parsed as OpenLayers features, will be
             // fired here and the event can be used application-wide to access
@@ -859,7 +861,23 @@ Ext.define('CpsiMapview.controller.button.DigitizeButtonController', {
     },
 
     /**
+     * Remove all features from the results layer and fire a custom featuresupdated event
+     * */
+    clearResultLayer: function () {
+
+        var me = this;
+
+        if (me.resultLayer) {
+            var resultSource = me.resultLayer.getSource();
+            resultSource.clear();
+            resultSource.dispatchEvent('featuresupdated');
+        }
+
+    },
+
+    /**
      * Clears all features of the active group from the result source
+     * and fire a custom featuresupdated event
      */
     clearActiveGroup: function () {
         var me = this;
@@ -871,6 +889,7 @@ Ext.define('CpsiMapview.controller.button.DigitizeButtonController', {
             .forEach(function (feature) {
                 resultSource.removeFeature(feature);
             });
+        resultSource.dispatchEvent('featuresupdated');
         this.updateDrawSource();
     },
 
