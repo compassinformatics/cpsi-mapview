@@ -49,7 +49,7 @@ Ext.define('CpsiMapview.controller.button.DigitizeButtonController', {
     /**
      * OpenLayers pointer interaction for deleting points
      */
-    deleteInteraction: null,
+    pointerInteraction: null,
 
     /**
      * OpenLayers snap interaction for better vertex selection
@@ -150,16 +150,19 @@ Ext.define('CpsiMapview.controller.button.DigitizeButtonController', {
             me.map.addInteraction(me.modifyInteraction);
         }
 
-        if (!me.deleteInteraction && type === 'Point') {
-            me.deleteInteraction = new ol.interaction.Pointer({
+        if (!me.pointerInteraction && type === 'Point') {
+            me.pointerInteraction = new ol.interaction.Pointer({
                 handleEvent: function (evt) {
                     if (deleteCondition(evt)) {
                         return me.handlePointDelete(evt);
                     }
+                    if (ol.events.condition.singleClick(evt)) {
+                        return me.handlePointClick(evt);
+                    }
                     return true;
                 }
             });
-            me.map.addInteraction(me.deleteInteraction);
+            me.map.addInteraction(me.pointerInteraction);
         }
 
         if (!me.snapInteraction && type !== 'Circle') {
@@ -191,7 +194,7 @@ Ext.define('CpsiMapview.controller.button.DigitizeButtonController', {
                 me.snapInteraction.setActive(true);
             }
             if (type === 'Point') {
-                me.deleteInteraction.setActive(true);
+                me.pointerInteraction.setActive(true);
             }
             me.map.getViewport().addEventListener('contextmenu', me.contextHandler);
             // if another digitize button is pressed then this would come before the onToggle of the other button
@@ -205,7 +208,7 @@ Ext.define('CpsiMapview.controller.button.DigitizeButtonController', {
                 me.snapInteraction.setActive(false);
             }
             if (type === 'Point') {
-                me.deleteInteraction.setActive(false);
+                me.pointerInteraction.setActive(false);
             }
             if (type === 'Circle' && me.circleToolbar != null) {
                 me.removeCircleSelectToolbar();
@@ -424,8 +427,8 @@ Ext.define('CpsiMapview.controller.button.DigitizeButtonController', {
     },
 
     /**
-     * Handles the click registered by the pointer interaction. If it returns false all other interaction at this point
-     * are ignored
+     * Handles a click registered by the pointer interaction if the deleteCondition is met.
+     * If it returns false all other interaction at this point are ignored
      * @param {ol.MapBrowserEvent} evt
      */
     handlePointDelete: function (evt) {
@@ -453,6 +456,34 @@ Ext.define('CpsiMapview.controller.button.DigitizeButtonController', {
                     })
                     .then(me.updateDrawSource.bind(me));
             }
+
+            return false;
+        } else {
+            return true;
+        }
+    },
+
+    /**
+     * Handles the click registered by the pointer interaction.
+     * If it returns false all other interaction at this point are ignored
+     * @param {ol.MapBrowserEvent} evt
+     */
+    handlePointClick: function (evt) {
+        var me = this;
+
+        var features = me.map.getFeaturesAtPixel(evt.pixel, {
+            layerFilter: function (layer) {
+                return layer === me.drawLayer;
+            }
+        });
+        if (features && features.length) {
+            var points = me.getSolverPoints();
+            me.getNetByPoints(points.concat([features[0]]))
+                .then(me.handleFinalResult.bind(me))
+                .then(undefined, function (err) {
+                    Ext.log.error(err);
+                })
+                .then(me.updateDrawSource.bind(me));
 
             return false;
         } else {
@@ -497,7 +528,6 @@ Ext.define('CpsiMapview.controller.button.DigitizeButtonController', {
     /**
      * Handles the `cancel` event of the CircleSelection by cleaning up the CircleSelection toolbar
      * and enabling the drawing interaction
-     * @param {ol.Feature} feat
      */
     onCircleSelectCancel: function () {
         var me = this;
@@ -776,7 +806,6 @@ Ext.define('CpsiMapview.controller.button.DigitizeButtonController', {
      * Showcasing the handling of the response features by adding them
      * to an `GeoExt.data.store.Features` and showing them in a grid.
      * Method may be removed as its actually a showcase, like `zoomToFeatures`
-     * @param {*} response
      */
     onResponseFeatures: function () {
         // the code below is just a show case representing how the response
