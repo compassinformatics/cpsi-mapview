@@ -81,6 +81,11 @@ Ext.define('CpsiMapview.controller.button.DigitizeButtonController', {
     contextMenuGroupsCounter: 0,
 
     /**
+     * Determines if event handling is blocked.
+     */
+    blockedEventHandling: false,
+
+    /**
      * Main handler which activates or deactives the interactions and listeners
      * @param {Ext.button.Button} btn The button that has been pressed
      * @param {boolean} pressed The toggle state of the button
@@ -90,7 +95,16 @@ Ext.define('CpsiMapview.controller.button.DigitizeButtonController', {
         var view = me.getView();
 
         var deleteCondition = function (evt) {
-            return ol.events.condition.platformModifierKeyOnly(evt) && ol.events.condition.singleClick(evt);
+            return ol.events.condition.singleClick(evt) && ol.events.condition.platformModifierKeyOnly(evt) && !me.blockedEventHandling;
+        };
+
+        var clickCondition = function (evt) {
+            return ol.events.condition.singleClick(evt) && !me.blockedEventHandling;
+        };
+
+        var noModifierCondition = function (evt) {
+            // the draw interaction needs the noModifierKeys condition, it does not work with the singleClick condition.
+            return ol.events.condition.noModifierKeys(evt) && !me.blockedEventHandling;
         };
 
         // guess the map if not given
@@ -124,10 +138,7 @@ Ext.define('CpsiMapview.controller.button.DigitizeButtonController', {
             var drawInteractionConfig = {
                 type: view.getMulti() ? 'Multi' + type : type,
                 source: me.drawLayer.getSource(),
-                condition: function (e) {
-                    // enable drawing with left mouse only
-                    return e.originalEvent && e.originalEvent.buttons === 1;
-                }
+                condition: noModifierCondition
             };
             if (type === 'Circle') {
                 // Circle type does not support "multi", so we make sure that it is set appropriately
@@ -143,6 +154,7 @@ Ext.define('CpsiMapview.controller.button.DigitizeButtonController', {
         if (!me.modifyInteraction && type !== 'Circle') {
             var modifyInteractionConfig = {
                 source: me.drawLayer.getSource(),
+                condition: noModifierCondition,
                 deleteCondition: deleteCondition
             };
             me.modifyInteraction = new ol.interaction.Modify(modifyInteractionConfig);
@@ -156,7 +168,8 @@ Ext.define('CpsiMapview.controller.button.DigitizeButtonController', {
                     if (deleteCondition(evt)) {
                         return me.handlePointDelete(evt);
                     }
-                    if (ol.events.condition.singleClick(evt)) {
+                    if (clickCondition(evt)) {
+                        console.log('click');
                         return me.handlePointClick(evt);
                     }
                     return true;
@@ -224,6 +237,16 @@ Ext.define('CpsiMapview.controller.button.DigitizeButtonController', {
             }
             me.map.set('defaultClickEnabled', true);
         }
+    },
+
+    blockEventHandling: function () {
+        var me = this;
+
+        me.blockedEventHandling = true;
+
+        setTimeout(function () {
+            me.blockedEventHandling = false;
+        }, 300);
     },
 
     /**
@@ -346,8 +369,9 @@ Ext.define('CpsiMapview.controller.button.DigitizeButtonController', {
     handleDrawEnd: function (evt) {
         var me = this;
         var view = me.getView();
-
         var resultPromise;
+
+        me.blockEventHandling();
 
         switch (view.getType()) {
             case 'Point':
@@ -365,8 +389,6 @@ Ext.define('CpsiMapview.controller.button.DigitizeButtonController', {
                 return;
         }
 
-        evt.stopPropagation();
-
         resultPromise
             .then(me.handleFinalResult.bind(me))
             .then(undefined, function (err) {
@@ -383,8 +405,9 @@ Ext.define('CpsiMapview.controller.button.DigitizeButtonController', {
     handleModifyEnd: function (evt) {
         var me = this;
         var view = me.getView();
-
         var resultPromise;
+
+        me.blockEventHandling();
 
         switch (view.getType()) {
             case 'Point':
@@ -442,6 +465,8 @@ Ext.define('CpsiMapview.controller.button.DigitizeButtonController', {
             }
         });
         if (features && features.length) {
+            me.blockEventHandling();
+
             var drawFeature = features[0];
 
             var points = me.getSolverPoints();
@@ -478,8 +503,12 @@ Ext.define('CpsiMapview.controller.button.DigitizeButtonController', {
                 return layer === me.drawLayer;
             }
         });
-        if (features && features.length) {
-            var points = me.getSolverPoints();
+
+        var points = me.getSolverPoints();
+
+        if (features && features.length && features[0] !== points[points.length - 1]) {
+            me.blockEventHandling();
+
             me.getNetByPoints(points.concat([features[0]]))
                 .then(me.handleFinalResult.bind(me))
                 .then(undefined, function (err) {
@@ -488,9 +517,9 @@ Ext.define('CpsiMapview.controller.button.DigitizeButtonController', {
                 .then(me.updateDrawSource.bind(me));
 
             return false;
-        } else {
-            return true;
         }
+
+        return true;
     },
 
     /**
@@ -500,6 +529,7 @@ Ext.define('CpsiMapview.controller.button.DigitizeButtonController', {
      */
     handleCircleDrawEnd: function (evt) {
         var me = this;
+        me.blockEventHandling();
         // deactivate the creation of another circle
         me.drawInteraction.setActive(false);
         me.circleToolbar = Ext.create('CpsiMapview.view.toolbar.CircleSelectionToolbar', {
