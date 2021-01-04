@@ -365,6 +365,8 @@ Ext.define('CpsiMapview.controller.button.DigitizeButtonController', {
                 return;
         }
 
+        evt.stopPropagation();
+
         resultPromise
             .then(me.handleFinalResult.bind(me))
             .then(undefined, function (err) {
