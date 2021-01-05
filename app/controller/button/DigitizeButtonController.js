@@ -99,12 +99,12 @@ Ext.define('CpsiMapview.controller.button.DigitizeButtonController', {
         };
 
         var clickCondition = function (evt) {
-            return ol.events.condition.singleClick(evt) && !me.blockedEventHandling;
+            return ol.events.condition.singleClick(evt) && ol.events.condition.noModifierKeys(evt) && !me.blockedEventHandling;
         };
 
-        var noModifierCondition = function (evt) {
-            // the draw interaction needs the noModifierKeys condition, it does not work with the singleClick condition.
-            return ol.events.condition.noModifierKeys(evt) && !me.blockedEventHandling;
+        var drawCondition = function (evt) {
+            // the draw interaction does not work with the singleClick condition.
+            return ol.events.condition.primaryAction(evt) && ol.events.condition.noModifierKeys(evt) && !me.blockedEventHandling;
         };
 
         // guess the map if not given
@@ -138,7 +138,7 @@ Ext.define('CpsiMapview.controller.button.DigitizeButtonController', {
             var drawInteractionConfig = {
                 type: view.getMulti() ? 'Multi' + type : type,
                 source: me.drawLayer.getSource(),
-                condition: noModifierCondition
+                condition: drawCondition
             };
             if (type === 'Circle') {
                 // Circle type does not support "multi", so we make sure that it is set appropriately
@@ -154,7 +154,7 @@ Ext.define('CpsiMapview.controller.button.DigitizeButtonController', {
         if (!me.modifyInteraction && type !== 'Circle') {
             var modifyInteractionConfig = {
                 source: me.drawLayer.getSource(),
-                condition: noModifierCondition,
+                condition: drawCondition,
                 deleteCondition: deleteCondition
             };
             me.modifyInteraction = new ol.interaction.Modify(modifyInteractionConfig);
