@@ -955,14 +955,13 @@ Ext.define('CpsiMapview.factory.Layer', {
                 } else if (newLayer.get('isWfs') || newLayer.get('isVt')) {
 
                     var wmsLayerName = layer.getSource().getParams()['LAYERS'].split(',')[0];
-                    activeStyle = LegendUtil.getSldFileFromWmsStyle(activeStyle, wmsLayerName);
-
+                    //activeStyle = LegendUtil.getSldFileFromWmsStyle(activeStyle, wmsLayerName);
+                    var sldFile = LegendUtil.getSldFileFromWmsStyle(activeStyle, wmsLayerName);
                     // TODO following code duplicated in CpsiMapview.view.layer.StyleSwitcherRadioGroup
-                    var sldUrl = newLayer.get('stylesBaseUrl') + activeStyle;
+                    var sldUrl = newLayer.get('stylesBaseUrl') + sldFile;
                     // transform filter values to numbers ('1' => 1)
-                    var forceNumericFilterVals = newLayer.get('stylesForceNumericFilterVals');
                     // load and parse SLD and apply it to layer
-                    LayerFactory.loadSld(newLayer, sldUrl, forceNumericFilterVals);
+                    LayerFactory.loadSld(newLayer, sldUrl);
                     newLayerSource.clear();
                     newLayerSource.refresh();
 
