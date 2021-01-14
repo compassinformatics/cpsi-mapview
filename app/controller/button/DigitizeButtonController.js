@@ -771,7 +771,7 @@ Ext.define('CpsiMapview.controller.button.DigitizeButtonController', {
             var originalSolverPoints = me.getSolverPoints();
             var originalLength = 0;
 
-            // get the original solver points
+            // get the original solver points before they are removed
             var resultSource = me.resultLayer.getSource();
             // remove all features from the current active group
             var allFeatures = me.resultLayer.getSource().getFeatures();
@@ -784,7 +784,7 @@ Ext.define('CpsiMapview.controller.button.DigitizeButtonController', {
             // add the new features for the current active group
             resultSource.addFeatures(features);
 
-            // now get the new solver points to see which points have been modified
+            // now get the new solver points once they have been added
             var newSolverPoints = me.getSolverPoints();
             var newLength = 0;
 
