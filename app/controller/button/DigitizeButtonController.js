@@ -551,7 +551,7 @@ Ext.define('CpsiMapview.controller.button.DigitizeButtonController', {
      */
     onCircleSelectApply: function (feat) {
         var me = this;
-        var evt = {feature: feat};
+        var evt = { feature: feat };
         me.handleDrawEnd(evt);
         me.removeCircleSelectToolbar();
         me.drawInteraction.setActive(true);
@@ -641,7 +641,7 @@ Ext.define('CpsiMapview.controller.button.DigitizeButtonController', {
         // unit of the projection. In order to convert it into a geoJSON, we have
         // to convert the circle to a polygon first.
         var circleAsPolygon = new ol.geom.Polygon.fromCircle(feat.getGeometry());
-        var polygonAsFeature = new ol.Feature({geometry: circleAsPolygon});
+        var polygonAsFeature = new ol.Feature({ geometry: circleAsPolygon });
 
         return this.getNetByPolygon(polygonAsFeature);
     },
@@ -767,19 +767,43 @@ Ext.define('CpsiMapview.controller.button.DigitizeButtonController', {
     handleFinalResult: function (features) {
         if (features) {
             var me = this;
+
+            var originalSolverPoints = me.getSolverPoints();
+            var originalLength = 0;
+
+            // get the original solver points before they are removed
             var resultSource = me.resultLayer.getSource();
             // remove all features from the current active group
             var allFeatures = me.resultLayer.getSource().getFeatures();
             Ext.each(allFeatures, function (f) {
                 if (f.get('group') === me.activeGroupIdx) {
+                    originalLength += f.get('length') ? f.get('length') : 0;
                     resultSource.removeFeature(f);
                 }
             });
             // add the new features for the current active group
             resultSource.addFeatures(features);
+
+            // now get the new solver points once they have been added
+            var newSolverPoints = me.getSolverPoints();
+            var newLength = 0;
+
+            Ext.each(features, function (f) {
+                newLength += f.get('length') ? f.get('length') : 0;
+            });
+
+            var modifications = {
+                originalLength: originalLength,
+                newLength: newLength,
+                originalSolverPoints: originalSolverPoints,
+                newSolverPoints: newSolverPoints
+            };
+
             // fire a custom event from the source so a listener can be added once
             // all features have been added/removed
-            resultSource.dispatchEvent('featuresupdated');
+            // the event object includes a custom modifications object containing
+            // details of before and after the solve
+            resultSource.dispatchEvent({ type: 'featuresupdated', modifications: modifications });
 
             // The response from the API, parsed as OpenLayers features, will be
             // fired here and the event can be used application-wide to access
