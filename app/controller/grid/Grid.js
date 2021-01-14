@@ -76,7 +76,16 @@ Ext.define('CpsiMapview.controller.grid.Grid', {
      */
     onItemContextMenu: function (grid, record, item, index, e) {
         var me = this;
-        var map = me.getViewModel().get('map');
+        var vm = me.getViewModel();
+        var map = vm.get('map');
+        var isSpatial = vm.get('isSpatialGrid');
+
+        // currently there is only one context-menu tool
+        // and it is spatial-related
+        // if more tools are added then remove this guard
+        if (!isSpatial) {
+            return;
+        }
 
         var contextMenu = Ext.create('Ext.menu.Menu', {
             defaults: {
@@ -84,6 +93,7 @@ Ext.define('CpsiMapview.controller.grid.Grid', {
             },
             items: [{
                 text: 'Zoom to Feature',
+                hidden: !isSpatial,
                 handler: function () {
                     me.zoomToFeature(record.getFeature(), map);
                 }
@@ -211,7 +221,7 @@ Ext.define('CpsiMapview.controller.grid.Grid', {
         if (me.idFilter) {
             // get OGC filter bodies for grid filters and spatial filter
             var standardOgcFilterBodies = [];
-            Ext.each(filters, function(filter) {
+            Ext.each(filters, function (filter) {
                 var filterBody = GeoExt.util.OGCFilter.getOgcFilterBodyFromExtJsFilterObject(filter, '2.0.0');
                 standardOgcFilterBodies.push(filterBody);
             });
