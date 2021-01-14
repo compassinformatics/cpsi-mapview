@@ -208,6 +208,7 @@ Ext.define('CpsiMapview.controller.button.DigitizeButtonController', {
             }
             if (type === 'Point') {
                 me.pointerInteraction.setActive(true);
+                me.drawLayer.setVisible(true);
             }
             me.map.getViewport().addEventListener('contextmenu', me.contextHandler);
             // if another digitize button is pressed then this would come before the onToggle of the other button
@@ -222,6 +223,9 @@ Ext.define('CpsiMapview.controller.button.DigitizeButtonController', {
             }
             if (type === 'Point') {
                 me.pointerInteraction.setActive(false);
+                // hide/show the draw layer based on if the tool is active
+                // but leave circle/polygon features visible
+                me.drawLayer.setVisible(false);
             }
             if (type === 'Circle' && me.circleToolbar != null) {
                 me.removeCircleSelectToolbar();
@@ -235,6 +239,7 @@ Ext.define('CpsiMapview.controller.button.DigitizeButtonController', {
                 me.activeGroupIdx = 0;
                 me.contextMenuGroupsCounter = 0;
             }
+
             me.map.set('defaultClickEnabled', true);
         }
     },
