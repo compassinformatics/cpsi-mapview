@@ -27,11 +27,16 @@ Ext.define('CpsiMapview.view.combo.Gazetteer', {
      */
     srs: 'EPSG:3857',
 
+    onFocus: Ext.emptyFn,
+
     /**
      * @private
      */
     initComponent: function () {
         var me = this;
+
+        // Enable the proxying of key events for the HTML input field
+        me.enableKeyEvents = true;
 
         // Add missing '/' to end of URL if missing
         if (me.url.slice(-1) !== '/') {
@@ -49,8 +54,17 @@ Ext.define('CpsiMapview.view.combo.Gazetteer', {
         me.callParent();
 
         me.on({
+            keyup: function () {
+                var val = me.getRawValue();
+
+                if (Ext.isEmpty(val)) {
+                    me.removeLocationFeature();
+                }
+
+            },
             beforequery: function () {
                 var val = this.getRawValue();
+
                 // set a key on the layer using the unique id of the combo
                 me.locationLayer.set('layerKey', me.id);
                 if (Ext.isEmpty(BasiGX.util.Layer.getLayersBy('layerKey', me.id))) {
@@ -59,6 +73,9 @@ Ext.define('CpsiMapview.view.combo.Gazetteer', {
                         me.map.addLayer(me.locationLayer);
                     }
                 }
+
+                // clear any previous query feature
+                me.removeLocationFeature();
 
                 if (val) {
                     // only trigger a request if text has been entered
