@@ -137,13 +137,6 @@ Ext.define('CpsiMapview.controller.button.SpatialQueryButtonController', {
             me.map.addInteraction(me.drawQueryInteraction);
         }
         if (pressed) {
-
-            // disable any other map tools - as this can be in a segmentedbutton which switches
-            // between tools add a 100ms timeout to ensure defaultClickEnabled is set to false (race condition)
-            setTimeout(function () {
-                me.map.set('defaultClickEnabled', false);
-            }, 100);
-
             me.drawQueryInteraction.setActive(true);
             if (view.displayPermanently) {
                 me.modifiyQueryInteraction.setActive(true);
@@ -154,9 +147,6 @@ Ext.define('CpsiMapview.controller.button.SpatialQueryButtonController', {
                 view.queryFeatures.on('add', me.getGeometryFromPolygonAndTriggerWfs, me);
             }
         } else {
-            // re-enable any other map tools
-            me.map.set('defaultClickEnabled', true);
-
             me.drawQueryInteraction.setActive(false);
             if (view.displayPermanently) {
                 me.modifiyQueryInteraction.setActive(false);
