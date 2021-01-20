@@ -124,6 +124,29 @@ Ext.define('CpsiMapview.util.ApplicationMixin', {
         var me = this;
         me.setupRequestHooks();
         me.doLogin();
+        // add a listener for whenever any button in the map toggleGroup is toggled
+        me.control({
+            'button[toggleGroup=map]': {
+                toggle: me.onMapToolsToggle
+            }
+        });
+    },
+
+    /**
+     * Whenever any tools that are part of the 'map' toggleGroup are toggled
+     * we check to see if any tools are still active.
+     * The defaultClickEnabled value is then used to check if the
+     * default CpsiMapview.plugin.FeatureInfoWindow tool should be active
+     * */
+    onMapToolsToggle: function () {
+
+        var buttonsInToggleGroup = Ext.ComponentQuery.query('button[toggleGroup=map]');
+        var pressedStates = Ext.Array.pluck(buttonsInToggleGroup, 'pressed');
+        var uniquePressedStates = Ext.Array.unique(pressedStates);
+        var activeTools = Ext.Array.contains(uniquePressedStates, true);
+
+        var map = BasiGX.util.Map.getMapComponent().map;
+        map.set('defaultClickEnabled', !activeTools);
     },
 
     /**

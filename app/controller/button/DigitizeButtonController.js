@@ -211,10 +211,6 @@ Ext.define('CpsiMapview.controller.button.DigitizeButtonController', {
                 me.drawLayer.setVisible(true);
             }
             me.map.getViewport().addEventListener('contextmenu', me.contextHandler);
-            // if another digitize button is pressed then this would come before the onToggle of the other button
-            setTimeout(function () {
-                me.map.set('defaultClickEnabled', false);
-            }, 0);
         } else {
             me.drawInteraction.setActive(false);
             if (type !== 'Circle') {
@@ -239,8 +235,6 @@ Ext.define('CpsiMapview.controller.button.DigitizeButtonController', {
                 me.activeGroupIdx = 0;
                 me.contextMenuGroupsCounter = 0;
             }
-
-            me.map.set('defaultClickEnabled', true);
         }
     },
 

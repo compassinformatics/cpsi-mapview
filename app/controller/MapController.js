@@ -50,9 +50,5 @@ Ext.define('CpsiMapview.controller.MapController', {
             btn.getViewModel().get('lineMeasureTooltip') :
             btn.getViewModel().get('polygonMeasureAreaTooltip');
         btn.tooltipStr = tTipStr;
-        btn.on('toggle', function (_, pressed) {
-            var map = BasiGX.util.Map.getMapComponent().map;
-            map.set('defaultClickEnabled', !pressed);
-        });
     },
 });
