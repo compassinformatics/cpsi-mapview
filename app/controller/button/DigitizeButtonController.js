@@ -234,7 +234,7 @@ Ext.define('CpsiMapview.controller.button.DigitizeButtonController', {
 
             if (me.getView().getResetOnToggle()) {
                 me.drawLayer.getSource().clear();
-                me.clearResultLayer();
+                me.clearActiveGroup();
                 // reset context menu entries
                 me.activeGroupIdx = 0;
                 me.contextMenuGroupsCounter = 0;
@@ -318,7 +318,7 @@ Ext.define('CpsiMapview.controller.button.DigitizeButtonController', {
                 }, {
                     text: 'Clear Active Group',
                     handler: function () {
-                        me.clearActiveGroup();
+                        me.clearActiveGroup(me.activeGroupIdx);
                     }
                 }
             ];
@@ -326,8 +326,8 @@ Ext.define('CpsiMapview.controller.button.DigitizeButtonController', {
             menuItems = [{
                 text: 'Clear All',
                 handler: function () {
-                    me.clearActiveGroup();
                     me.drawLayer.getSource().clear();
+                    me.clearActiveGroup(me.activeGroupIdx);
                 }
             }];
         }
@@ -762,6 +762,26 @@ Ext.define('CpsiMapview.controller.button.DigitizeButtonController', {
         }
     },
 
+    /***
+     * Get the total length of all features in the results layer
+     * If a feature does not have a length property it will be assumed to
+     * have a length of 0 (for example points)
+     * */
+    getResultGeometryLength: function () {
+
+        var me = this;
+        var allFeatures = me.resultLayer.getSource().getFeatures();
+        var resultLength = 0;
+
+        Ext.each(allFeatures, function (f) {
+            if (f.get('group') === me.activeGroupIdx) {
+                resultLength += f.get('length') ? f.get('length') : 0;
+            }
+        });
+
+        return resultLength;
+    },
+
     /**
      * Handles the final result from netsolver.
      * Features will get set a new property `group` in order
@@ -774,7 +794,7 @@ Ext.define('CpsiMapview.controller.button.DigitizeButtonController', {
             var me = this;
 
             var originalSolverPoints = me.getSolverPoints();
-            var originalLength = 0;
+            var originalLength = me.getResultGeometryLength();
 
             // get the original solver points before they are removed
             var resultSource = me.resultLayer.getSource();
@@ -782,7 +802,6 @@ Ext.define('CpsiMapview.controller.button.DigitizeButtonController', {
             var allFeatures = me.resultLayer.getSource().getFeatures();
             Ext.each(allFeatures, function (f) {
                 if (f.get('group') === me.activeGroupIdx) {
-                    originalLength += f.get('length') ? f.get('length') : 0;
                     resultSource.removeFeature(f);
                 }
             });
@@ -951,35 +970,45 @@ Ext.define('CpsiMapview.controller.button.DigitizeButtonController', {
     },
 
     /**
-     * Remove all features from the results layer and fire a custom featuresupdated event
-     * */
-    clearResultLayer: function () {
-
-        var me = this;
-
-        if (me.resultLayer) {
-            var resultSource = me.resultLayer.getSource();
-            resultSource.clear();
-            resultSource.dispatchEvent('featuresupdated');
-        }
-
-    },
-
-    /**
      * Clears all features of the active group from the result source
      * and fire a custom featuresupdated event
+     * If no activeGroupIdx is supplied then all features are removed from the
+     * resultLayer
      */
-    clearActiveGroup: function () {
+    clearActiveGroup: function (activeGroupIdx) {
         var me = this;
+
+        if (!me.resultLayer) {
+            // no results have been returned so nothing to clear
+            return;
+        }
+
+        var originalSolverPoints = me.getSolverPoints();
+        var originalLength = me.getResultGeometryLength();
+
         var resultSource = me.resultLayer.getSource();
-        resultSource.getFeatures()
-            .filter(function (feature) {
-                return feature.get('group') === me.activeGroupIdx;
-            })
-            .forEach(function (feature) {
-                resultSource.removeFeature(feature);
-            });
-        resultSource.dispatchEvent('featuresupdated');
+
+        if (Ext.isEmpty(activeGroupIdx)) {
+            // remove all features
+            resultSource.clear();
+        } else {
+            resultSource.getFeatures()
+                .filter(function (feature) {
+                    return feature.get('group') === activeGroupIdx;
+                })
+                .forEach(function (feature) {
+                    resultSource.removeFeature(feature);
+                });
+        }
+
+        var modifications = {
+            originalLength: originalLength,
+            newLength: 0,
+            originalSolverPoints: originalSolverPoints,
+            newSolverPoints: []
+        };
+
+        resultSource.dispatchEvent({ type: 'featuresupdated', modifications: modifications });
         this.updateDrawSource();
     },
 
