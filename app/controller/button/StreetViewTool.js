@@ -134,6 +134,8 @@ Ext.define('CpsiMapview.controller.button.StreetViewTool', {
         var overlayLayers;
         if (overlayGroup) {
             overlayLayers = overlayGroup.getLayers();
+        } else{
+            overlayLayers = me.map.getLayers();
         }
 
         if (pressed) {
