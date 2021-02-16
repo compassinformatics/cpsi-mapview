@@ -206,6 +206,7 @@ Ext.define('CpsiMapview.controller.grid.Grid', {
         var me = this;
 
         var view = me.getView();
+        view.setEmptyText('');
         view.setLoading();
 
         var filters = Ext.clone(store.getFilters().items);
