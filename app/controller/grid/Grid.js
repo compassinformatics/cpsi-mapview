@@ -251,9 +251,21 @@ Ext.define('CpsiMapview.controller.grid.Grid', {
     *
     * @private
     */
-    onWfsStoreAfterLoad: function () {
-        var view = this.getView();
-        view.setLoading(false);
+    onWfsStoreAfterLoad: function (store, features, success) {
+
+        var grid = this.getView();
+        var emptyText = '';
+
+        // display a message if the WFS request fails
+        if (success === false) {
+            emptyText = 'An error occurred loading the data. ';
+            if (store.pageSize === null) {
+                emptyText += 'Please uncheck "Page Records" to reduce the amount of records returned';
+            }
+        }
+
+        grid.setEmptyText(emptyText);
+        grid.setLoading(false);
     },
 
     /**
