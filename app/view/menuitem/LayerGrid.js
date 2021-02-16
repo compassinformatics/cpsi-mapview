@@ -83,7 +83,10 @@ Ext.define('CpsiMapview.view.menuitem.LayerGrid', {
                     xtype: gridXType
                 }],
                 listeners: {
-                    hide: function () {
+                    minimize: Ext.emptyFn,
+                    close: function () {
+                        // hide the spatial tool only when closed rather than when
+                        // minimising the window
                         var me = this;
                         var queryButton = me.down('cmv_spatial_query_button');
                         if (queryButton !== null) {
