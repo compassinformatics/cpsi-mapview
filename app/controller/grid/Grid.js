@@ -127,6 +127,32 @@ Ext.define('CpsiMapview.controller.grid.Grid', {
     },
 
     /**
+     * Update any associated layer tree node to indicate that the layer is filtered or unfiltered
+     * @param {any} layer
+     * @param {any} filters
+     */
+    updateLayerNodeUI: function (layer, filters) {
+
+        // Get a reference to the layer trees
+        var treePanels = Ext.ComponentQuery.query('cmv_layertree');
+        if (treePanels.length === 1) {
+            // we will only ever have one layer tree for an application
+            var treePanel = treePanels[0];
+            var node = treePanel.getNodeForLayer(layer);
+            if (node) {
+                if (Ext.isEmpty(filters)) {
+                    node.set('glyph', null);
+                    node.removeCls('cpsi-tree-node-filtered');
+                } else {
+                    node.set('glyph', 'f0b0@FontAwesome');
+                    node.addCls('cpsi-tree-node-filtered');
+                }
+                node.triggerUIUpdate();
+            }
+        }
+    },
+
+    /**
      * Applies both attribute and spatial filters to
      * any associated WMS and vector layer and forces a reload of both
      *
@@ -178,6 +204,7 @@ Ext.define('CpsiMapview.controller.grid.Grid', {
             // keep a reference to the raw filters so they can be applied to the vector layer
             // when switching - see LayerFactory
             wmsSource.set('additionalFilters', filters);
+            me.updateLayerNodeUI(wmsLayer, filters);
         }
 
         var vectorLayer = me.getLayerByKey(viewModel.get('vectorLayerKey'));
@@ -187,6 +214,7 @@ Ext.define('CpsiMapview.controller.grid.Grid', {
             vectorSource.set('additionalFilters', filters);
             vectorSource.clear();
             vectorSource.refresh();
+            me.updateLayerNodeUI(vectorLayer, filters);
         }
 
     },
