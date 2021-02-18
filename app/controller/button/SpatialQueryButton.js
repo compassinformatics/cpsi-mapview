@@ -138,6 +138,7 @@ Ext.define('CpsiMapview.controller.button.SpatialQueryButtonController', {
         }
         if (pressed) {
             me.drawQueryInteraction.setActive(true);
+            me.map.getViewport().addEventListener('contextmenu', me.contextHandler);
             if (view.displayPermanently) {
                 me.modifiyQueryInteraction.setActive(true);
                 me.snapQueryInteraction.setActive(true);
@@ -148,6 +149,7 @@ Ext.define('CpsiMapview.controller.button.SpatialQueryButtonController', {
             }
         } else {
             me.drawQueryInteraction.setActive(false);
+            me.map.getViewport().removeEventListener('contextmenu', me.contextHandler);
             if (view.displayPermanently) {
                 me.modifiyQueryInteraction.setActive(false);
                 me.snapQueryInteraction.setActive(false);
@@ -159,6 +161,34 @@ Ext.define('CpsiMapview.controller.button.SpatialQueryButtonController', {
         }
     },
 
+    /**
+     * Method shows the context menu on mouse right click
+     * @param {Event} evt The browser event
+     */
+    showContextMenu: function (evt) {
+        // suppress default browser behaviour
+        evt.preventDefault();
+
+        var me = this.scope;
+
+        var menu = Ext.create('Ext.menu.Menu', {
+            width: 100,
+            plain: true,
+            renderTo: Ext.getBody(),
+            items: [{
+                text: 'Clear Feature',
+                handler: function () {
+                    var view = me.getView();
+                    // remove the spatial filter on the layer by firing an event
+                    view.fireEvent('cmv-spatial-query-filter', null);
+                    // now remove the polygon from the layer
+                    me.onClearAssociatedPermanentLayer();
+                },
+                scope: me
+            }]
+        });
+        menu.showAt(evt.x, evt.y);
+    },
     /**
      * Connects the change:visible event of the query layer
      * to the permanent layer. Thereby, when the query layer
@@ -244,7 +274,7 @@ Ext.define('CpsiMapview.controller.button.SpatialQueryButtonController', {
     },
 
     /**
-     * Help method to create a polygon geometry from drawn irregular polygon.
+     * Helper method to create a polygon geometry from drawn irregular polygon.
      *
      * @param {Ext.Event} evt The add-Event containing drawn feature
      */
@@ -415,5 +445,17 @@ Ext.define('CpsiMapview.controller.button.SpatialQueryButtonController', {
         if (me.permanentLayer && me.permanentLayerCreatedByTool) {
             me.map.removeLayer(me.permanentLayer);
         }
+    },
+
+    init: function () {
+
+        var me = this;
+
+        // create an object for the contextmenu eventhandler
+        // so it can be removed correctly
+        me.contextHandler = {
+            handleEvent: me.showContextMenu,
+            scope: me
+        };
     }
 });
