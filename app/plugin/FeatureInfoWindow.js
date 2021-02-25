@@ -130,11 +130,17 @@ Ext.define('CpsiMapview.plugin.FeatureInfoWindow', {
     openFeatureInfoWindow: function () {
         var me = this;
 
+        // fix the maxHeight of the window to 80% of the viewport height
+        var maxHeight = Ext.getBody().getViewSize().height * 0.8;
+
         if (this.window) {
             this.window.removeAll(true);
         } else {
             this.window = Ext.create('CpsiMapview.view.window.MinimizableWindow', {
                 title: 'Feature Information',
+                closeAction: 'hide', // reuse the window for all requests so a user can fix the position
+                scollable: true,
+                maxHeight: maxHeight,
                 width: 400,
                 layout: {
                     type: 'accordion',
@@ -144,7 +150,6 @@ Ext.define('CpsiMapview.plugin.FeatureInfoWindow', {
             });
 
             this.window.on('close', function () {
-                me.window = null;
                 me.highlightSource.clear();
             });
         }
