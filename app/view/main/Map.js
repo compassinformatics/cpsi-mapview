@@ -326,7 +326,9 @@ Ext.define('CpsiMapview.view.main.Map', {
 
         // update permalink when visible map state changes
         me.permalinkProvider.on('statechange', function (stateProvider, stateId, state) {
-            me.updatePermalink(state);
+            if (stateId === 'cmv_mapstate') {
+                me.updatePermalink(state);
+            }
         });
 
         // restore the view state when navigating through the history, see
