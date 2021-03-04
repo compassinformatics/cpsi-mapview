@@ -517,17 +517,20 @@ Ext.define('CpsiMapview.controller.grid.Grid', {
         this.getVisibleColumns();
     },
 
-    onColumnShow: function () {
+    onColumnShow: function (ct, column) {
 
         var me = this;
         var grid = me.getView();
         var store = grid.getStore();
 
-        me.getVisibleColumns();
+        var idProperty = store.model.prototype.idField.name;
 
-        // when a new column is displayed
-        // query the server again to retrieve the data
-        store.reload();
+        if (column.dataIndex !== idProperty) {
+            // when a new column is displayed
+            // query the server again to retrieve the data
+            // idProperty will always be loaded so no need to reload in this case
+            store.reload();
+        }
     },
 
 
