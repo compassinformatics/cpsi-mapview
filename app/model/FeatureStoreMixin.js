@@ -19,7 +19,12 @@ Ext.define('CpsiMapview.model.FeatureStoreMixin', {
     },
 
     /**
-    Zoom to the extent of all features associated with the model
+     * The default buffer distance to use when zooming to points
+     */
+    extentBuffer: 100,
+
+    /**
+    Return the extent of all features associated with the model
     */
     getRecordBounds: function () {
 
@@ -40,6 +45,13 @@ Ext.define('CpsiMapview.model.FeatureStoreMixin', {
                     }
                 }
             });
+        }
+
+        // if the extent is a single point then buffer it by the extentBuffer property
+        if (bounds) {
+            if (bounds[3] - bounds[1] === 0 || bounds[2] - bounds[0] === 0) {
+                bounds = ol.extent.buffer(bounds, me.extentBuffer);
+            }
         }
 
         return bounds;
@@ -121,6 +133,7 @@ Ext.define('CpsiMapview.model.FeatureStoreMixin', {
                 }
             }
         });
+
         return featStore;
     },
 
@@ -157,10 +170,11 @@ Ext.define('CpsiMapview.model.FeatureStoreMixin', {
         }
 
         Ext.each(me.getFields(), function (f) {
-
             switch (true) {
                 case (f.type === 'line' || f.superclass.type == 'line'):
                 case (f.type === 'polygon' || f.superclass.type == 'polygon'):
+                case (f.type === 'point' || f.superclass.type == 'point'):
+
                     me.featureStores[f.name] = me.createFeatureStore(f);
                     break;
                 default:
