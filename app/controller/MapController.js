@@ -41,6 +41,10 @@ Ext.define('CpsiMapview.controller.MapController', {
      * @param {Ext.button.Button} btn The measure button
      */
     initializeMeasureBtn: function (btn) {
+
+        // avoid showing "null" in IE11 by setting to an empty string
+        btn.getViewModel().set('clickToDrawText', '');
+
         btn.setBind({
             text: '{measureTooltext}',
             tooltip: btn.measureType === 'line' ? '{lineMeasureTooltip}' :
