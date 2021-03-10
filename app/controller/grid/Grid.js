@@ -523,6 +523,7 @@ Ext.define('CpsiMapview.controller.grid.Grid', {
         var grid = me.getView();
         var store = grid.getStore();
 
+        me.getVisibleColumns();
         var idProperty = store.model.prototype.idField.name;
 
         if (column.dataIndex !== idProperty) {
