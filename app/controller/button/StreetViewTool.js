@@ -230,7 +230,18 @@ Ext.define('CpsiMapview.controller.button.StreetViewTool', {
                         // render SV panorama to body of the window
                         me.svDiv = Ext.getDom(win.body);
                     },
+                    resize: function () {
+                        // reload the panorama to fit the new window size
+                        if (me.svPanorama) {
+                            // for an open window use the current position
+                            me.showStreetViewWindow(me.svPanorama.getPosition());
+                        } else {
+                            // for a new window use the new position
+                            me.showStreetViewWindow(latLng);
+                        }
+                    },
                     destroy: function () {
+                        me.svPanorama = null;
                         me.unregisterGmapsEvents();
                         me.streetViewWin = null;
                         me.vectorLayer.getSource().clear();
