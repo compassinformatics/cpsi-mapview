@@ -1,5 +1,8 @@
 Ext.define('CpsiMapview.controller.form.Login', {
     extend: 'Ext.app.ViewController',
+    requires: [
+        'Ext.util.Cookies'
+    ],    
     alias: 'controller.cmv_login_form',
 
     /**
