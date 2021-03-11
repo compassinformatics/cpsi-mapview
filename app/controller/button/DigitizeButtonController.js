@@ -169,7 +169,10 @@ Ext.define('CpsiMapview.controller.button.DigitizeButtonController', {
                         return me.handlePointDelete(evt);
                     }
                     if (clickCondition(evt)) {
-                        console.log('click');
+                        // allow local drawing of features with no API calls
+                        if (!view.getApiUrl()) {
+                            return true;
+                        }
                         return me.handlePointClick(evt);
                     }
                     return true;
