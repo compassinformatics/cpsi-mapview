@@ -4,12 +4,17 @@
     position: absolute;
     background-color: transparent;
     // twice the height of a toolbar + padding
-    bottom: 36px;
-    height: 36px !important;
+    bottom: 0px;
+    height: 50px !important;
     // unfortunately, we have to use a hack here to overwrite
     // the 'top' property set by Ext, so that our bottom property
     // actually applies.
-    top: unset !important;
+    top: auto !important;
+    // add an outline around the button
+    .x-toolbar-item {
+        border-color: #778899;
+        border-width: medium;
+    }
 }
 
 .cmv_minimized_windows_toolbar .x-box-inner {
@@ -17,5 +22,5 @@
 }
 
 .cmv_minimized_windows_toolbar .x-toolbar-item {
-    top: unset !important;
+    top: auto !important;
 }
