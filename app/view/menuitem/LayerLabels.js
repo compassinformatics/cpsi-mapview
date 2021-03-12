@@ -250,17 +250,20 @@ Ext.define('CpsiMapview.view.menuitem.LayerLabels', {
             layer.set('labelsActive', false);
         }
 
+        wmsSource.getParams().LAYERS = layerList.join(',');
+
+        // once the LAYERS parameter has been updated
         // ensure there is a filter for every layer listed in the WMS request (required by MapServer)
         var wmsFilterUtil = CpsiMapview.util.WmsFilter;
         var wmsFilterString = wmsFilterUtil.getWmsFilterString(layer);
 
         var newParams = {
-            LAYERS: layerList.join(','),
-            STYLES: stylesList.join(','),
-            FILTER: wmsFilterString
+            FILTER: wmsFilterString,
+            STYLES: stylesList.join(',')
         };
 
         wmsSource.updateParams(newParams);
+
     },
 
     /**
@@ -279,7 +282,7 @@ Ext.define('CpsiMapview.view.menuitem.LayerLabels', {
         }
         if (me.hasMultiStyle) {
             var labelStyleUrls = [];
-            Ext.each(styles, function(style) {
+            Ext.each(styles, function (style) {
                 if (!Ext.isEmpty(style.label)) {
                     labelStyleUrls.push(stylesBaseUrl + style.label);
                 }

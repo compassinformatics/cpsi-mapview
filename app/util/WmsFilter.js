@@ -54,7 +54,11 @@ Ext.define('CpsiMapview.util.WmsFilter', {
 
         var wmsFilterString = finalFilters.map(function (filter) {
             // wrap each filter in brackets
-            return '(' + filter + ')';
+            if (Ext.String.startsWith(filter, '(') === false &&
+                Ext.String.endsWith(filter, ')') === false) {
+                filter = '(' + filter + ')';
+            }
+            return filter;
         }).join('');
 
         return wmsFilterString;
