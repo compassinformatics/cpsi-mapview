@@ -289,7 +289,7 @@ Ext.define('CpsiMapview.controller.grid.Grid', {
         if (success === false) {
             emptyText = 'An error occurred loading the data. ';
             if (store.pageSize === null) {
-                emptyText += 'Please uncheck "Page Records" to reduce the amount of records returned';
+                emptyText += 'Please check "Page Records" to reduce the amount of records returned';
             }
         }
 
