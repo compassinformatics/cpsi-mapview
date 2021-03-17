@@ -45,7 +45,7 @@ Ext.define('CpsiMapview.model.FeatureEventsMixin', {
         // update associated layers
         Ext.each(me.syncLayerKeys, function (k) {
             var layers = BasiGX.util.Layer.getLayersBy('layerKey', k);
-            if (layers) {
+            if (layers.length > 0) {
                 var layer = layers[0];
                 layerUtil.layerRefresh(layer);
             }
