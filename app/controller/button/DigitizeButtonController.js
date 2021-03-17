@@ -145,8 +145,12 @@ Ext.define('CpsiMapview.controller.button.DigitizeButtonController', {
                 drawInteractionConfig.type = type;
             }
             me.drawInteraction = new ol.interaction.Draw(drawInteractionConfig);
-            // register listeners
-            me.drawInteraction.on('drawend', type === 'Circle' ? me.handleCircleDrawEnd : me.handleDrawEnd, me);
+            // register listeners when connected to a backend service
+            if (view.getApiUrl()) {
+                me.drawInteraction.on('drawend', type === 'Circle' ? me.handleCircleDrawEnd : me.handleDrawEnd, me);
+            } else {
+                me.drawInteraction.on('drawend', me.handleLocalDrawEnd, me);
+            }
             me.map.addInteraction(me.drawInteraction);
         }
 
@@ -158,7 +162,10 @@ Ext.define('CpsiMapview.controller.button.DigitizeButtonController', {
                 deleteCondition: deleteCondition
             };
             me.modifyInteraction = new ol.interaction.Modify(modifyInteractionConfig);
-            me.modifyInteraction.on('modifyend', me.handleModifyEnd, me);
+            // add listeners when connected to a backend service
+            if (view.getApiUrl()) {
+                me.modifyInteraction.on('modifyend', me.handleModifyEnd, me);
+            }
             me.map.addInteraction(me.modifyInteraction);
         }
 
@@ -362,6 +369,19 @@ Ext.define('CpsiMapview.controller.button.DigitizeButtonController', {
             .sort(function (a, b) {
                 return a.get('index') - b.get('index');
             });
+    },
+
+    /**
+    * Handles the drawend event when using the feature to draw features that don't require
+    * sending or returning any data from a back-end service
+    * @param {ol.interaction.Draw.Event} evt The OpenLayers draw event containing the features
+    */
+    handleLocalDrawEnd: function () {
+        var me = this;
+
+        var drawSource = me.drawLayer.getSource();
+        // clear all previous features so only the last drawn feature remains
+        drawSource.clear();
     },
 
     /**
