@@ -25,11 +25,12 @@ Ext.define('CpsiMapview.plugin.FeatureInfoWindow', {
         var me = this;
 
         var mapComp = me.getCmp();
+        var mapPanel = mapComp.up('cmv_map');
         var map = mapComp.getMap();
 
-        map.on('singleclick', function (evt) {
+        mapPanel.on('cmv-mapclick', function (clickedFeatures, evt) {
             if (map.get('defaultClickEnabled')) {
-                me.requestFeatureInfos(evt);
+                me.requestFeatureInfos(clickedFeatures, evt);
             }
         });
     },
@@ -39,7 +40,7 @@ Ext.define('CpsiMapview.plugin.FeatureInfoWindow', {
      * open a window and display the information
      * @param {ol.MapBrowserEvent} evt
      */
-    requestFeatureInfos: function (evt) {
+    requestFeatureInfos: function (clickedFeatures, evt) {
         var me = this;
 
         var mapComp = me.getCmp();
