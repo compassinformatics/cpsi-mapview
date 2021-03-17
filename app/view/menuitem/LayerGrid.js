@@ -6,6 +6,7 @@
 Ext.define('CpsiMapview.view.menuitem.LayerGrid', {
     extend: 'Ext.menu.Item',
     xtype: 'cmv_menuitem_layergrid',
+    requires: 'CpsiMapview.view.window.MinimizableWindow',
 
     /**
      * The connected layer for this item.
