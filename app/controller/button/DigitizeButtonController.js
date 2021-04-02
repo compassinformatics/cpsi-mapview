@@ -86,6 +86,195 @@ Ext.define('CpsiMapview.controller.button.DigitizeButtonController', {
     blockedEventHandling: false,
 
     /**
+     * Set the layer to store features drawn by the editing
+     * tools
+     * @param {any} layer
+     */
+    setDrawLayer: function (layer) {
+        var me = this;
+
+        if (!me.map) {
+            return;
+        }
+
+        if (me.drawLayer) {
+            me.map.removeLayer(me.drawLayer);
+        }
+
+        me.drawLayer = layer;
+        me.setDrawInteraction(layer);
+        me.setModifyInteraction(layer);
+        me.setSnapInteraction(layer);
+    },
+
+    /**
+     * Set the layer used to store features returned
+     * by the digitising services
+     * @param {any} layer
+     */
+    setResultLayer: function (layer) {
+        var me = this;
+
+        if (!me.map) {
+            return;
+        }
+
+        if (me.resultLayer) {
+            me.map.removeLayer(me.resultLayer);
+        }
+
+        me.resultLayer = layer;
+    },
+
+    /**
+     * Set the map drawing interaction
+     * which will allow features to be added to the drawLayer
+     * @param {any} layer
+     */
+    setDrawInteraction: function (layer) {
+
+        var me = this;
+        var view = me.getView();
+        var type = view.getType();
+
+        if (me.drawInteraction) {
+            me.map.removeInteraction(me.drawInteraction);
+        }
+
+        var drawCondition = function (evt) {
+            // the draw interaction does not work with the singleClick condition.
+            return ol.events.condition.primaryAction(evt) && ol.events.condition.noModifierKeys(evt) && !me.blockedEventHandling;
+        };
+
+        var drawInteractionConfig = {
+            type: view.getMulti() ? 'Multi' + type : type,
+            source: layer.getSource(),
+            condition: drawCondition
+        };
+
+        if (type === 'Circle') {
+            // Circle type does not support "multi", so we make sure that it is set appropriately
+            drawInteractionConfig.type = type;
+        }
+
+        me.drawInteraction = new ol.interaction.Draw(drawInteractionConfig);
+
+        // register listeners when connected to a backend service
+        if (view.getApiUrl()) {
+            me.drawInteraction.on('drawend', type === 'Circle' ? me.handleCircleDrawEnd : me.handleDrawEnd, me);
+        } else {
+            me.drawInteraction.on('drawend', me.handleLocalDrawEnd, me);
+        }
+
+        me.map.addInteraction(me.drawInteraction);
+    },
+
+    /**
+     * Set the modify interaction, used to modify
+     * existing features created in the drawLayer
+     * @param {any} layer
+     */
+    setModifyInteraction: function (layer) {
+
+        var me = this;
+        var view = me.getView();
+        var type = view.getType();
+
+        if (me.modifyInteraction) {
+            me.map.removeInteraction(me.modifyInteraction);
+        }
+
+        var drawCondition = function (evt) {
+            // the modify interaction does not work with the singleClick condition.
+            return ol.events.condition.primaryAction(evt) && ol.events.condition.noModifierKeys(evt) && !me.blockedEventHandling;
+        };
+
+        var deleteCondition = function (evt) {
+            return ol.events.condition.singleClick(evt) && ol.events.condition.platformModifierKeyOnly(evt) && !me.blockedEventHandling;
+        };
+
+        // create the modify interaction
+        if (type !== 'Circle') {
+            var modifyInteractionConfig = {
+                source: layer.getSource(),
+                condition: drawCondition,
+                deleteCondition: deleteCondition
+            };
+            me.modifyInteraction = new ol.interaction.Modify(modifyInteractionConfig);
+            // add listeners when connected to a backend service
+            if (view.getApiUrl()) {
+                me.modifyInteraction.on('modifyend', me.handleModifyEnd, me);
+            }
+            me.map.addInteraction(me.modifyInteraction);
+        }
+    },
+
+    /**
+     * Create the pointer interaction used to delete
+     * and add solver points
+     * */
+    setPointerInteraction: function () {
+
+        var me = this;
+        var view = me.getView();
+        var type = view.getType();
+
+        if (me.pointerInteraction) {
+            me.map.removeInteraction(me.pointerInteraction);
+        }
+
+        var clickCondition = function (evt) {
+            return ol.events.condition.singleClick(evt) && ol.events.condition.noModifierKeys(evt) && !me.blockedEventHandling;
+        };
+
+        var deleteCondition = function (evt) {
+            return ol.events.condition.singleClick(evt) && ol.events.condition.platformModifierKeyOnly(evt) && !me.blockedEventHandling;
+        };
+
+        if (type === 'Point') {
+            me.pointerInteraction = new ol.interaction.Pointer({
+                handleEvent: function (evt) {
+                    if (deleteCondition(evt)) {
+                        return me.handlePointDelete(evt);
+                    }
+                    if (clickCondition(evt)) {
+                        // allow local drawing of features with no API calls
+                        if (!view.getApiUrl()) {
+                            return true;
+                        }
+                        return me.handlePointClick(evt);
+                    }
+                    return true;
+                }
+            });
+            me.map.addInteraction(me.pointerInteraction);
+        }
+    },
+
+    /**
+     * Set the snap interaction used to snap to features
+     * already in the drawLayer
+     * @param {any} layer
+     */
+    setSnapInteraction: function (layer) {
+
+        var me = this;
+        var view = me.getView();
+        var type = view.getType();
+
+        if (me.snapInteraction) {
+            me.map.removeInteraction(me.snapInteraction);
+        }
+
+        if (type !== 'Circle') {
+            me.snapInteraction = new ol.interaction.Snap({
+                source: layer.getSource()
+            });
+            me.map.addInteraction(me.snapInteraction);
+        }
+    },
+
+    /**
      * Main handler which activates or deactives the interactions and listeners
      * @param {Ext.button.Button} btn The button that has been pressed
      * @param {boolean} pressed The toggle state of the button
@@ -93,19 +282,7 @@ Ext.define('CpsiMapview.controller.button.DigitizeButtonController', {
     onToggle: function (btn, pressed) {
         var me = this;
         var view = me.getView();
-
-        var deleteCondition = function (evt) {
-            return ol.events.condition.singleClick(evt) && ol.events.condition.platformModifierKeyOnly(evt) && !me.blockedEventHandling;
-        };
-
-        var clickCondition = function (evt) {
-            return ol.events.condition.singleClick(evt) && ol.events.condition.noModifierKeys(evt) && !me.blockedEventHandling;
-        };
-
-        var drawCondition = function (evt) {
-            // the draw interaction does not work with the singleClick condition.
-            return ol.events.condition.primaryAction(evt) && ol.events.condition.noModifierKeys(evt) && !me.blockedEventHandling;
-        };
+        var type = view.getType();
 
         // guess the map if not given
         if (!me.map) {
@@ -132,68 +309,11 @@ Ext.define('CpsiMapview.controller.button.DigitizeButtonController', {
             }
         }
 
-        var type = view.getType();
-        // create the draw interaction
-        if (!me.drawInteraction) {
-            var drawInteractionConfig = {
-                type: view.getMulti() ? 'Multi' + type : type,
-                source: me.drawLayer.getSource(),
-                condition: drawCondition
-            };
-            if (type === 'Circle') {
-                // Circle type does not support "multi", so we make sure that it is set appropriately
-                drawInteractionConfig.type = type;
-            }
-            me.drawInteraction = new ol.interaction.Draw(drawInteractionConfig);
-            // register listeners when connected to a backend service
-            if (view.getApiUrl()) {
-                me.drawInteraction.on('drawend', type === 'Circle' ? me.handleCircleDrawEnd : me.handleDrawEnd, me);
-            } else {
-                me.drawInteraction.on('drawend', me.handleLocalDrawEnd, me);
-            }
-            me.map.addInteraction(me.drawInteraction);
-        }
+        me.setDrawInteraction(me.drawLayer);
+        me.setModifyInteraction(me.drawLayer);
+        me.setPointerInteraction();
+        me.setSnapInteraction(me.drawLayer);
 
-        // create the modify interaction
-        if (!me.modifyInteraction && type !== 'Circle') {
-            var modifyInteractionConfig = {
-                source: me.drawLayer.getSource(),
-                condition: drawCondition,
-                deleteCondition: deleteCondition
-            };
-            me.modifyInteraction = new ol.interaction.Modify(modifyInteractionConfig);
-            // add listeners when connected to a backend service
-            if (view.getApiUrl()) {
-                me.modifyInteraction.on('modifyend', me.handleModifyEnd, me);
-            }
-            me.map.addInteraction(me.modifyInteraction);
-        }
-
-        if (!me.pointerInteraction && type === 'Point') {
-            me.pointerInteraction = new ol.interaction.Pointer({
-                handleEvent: function (evt) {
-                    if (deleteCondition(evt)) {
-                        return me.handlePointDelete(evt);
-                    }
-                    if (clickCondition(evt)) {
-                        // allow local drawing of features with no API calls
-                        if (!view.getApiUrl()) {
-                            return true;
-                        }
-                        return me.handlePointClick(evt);
-                    }
-                    return true;
-                }
-            });
-            me.map.addInteraction(me.pointerInteraction);
-        }
-
-        if (!me.snapInteraction && type !== 'Circle') {
-            me.snapInteraction = new ol.interaction.Snap({
-                source: me.drawLayer.getSource()
-            });
-            me.map.addInteraction(me.snapInteraction);
-        }
 
         // create a result layer unless one has already been set
         if (!me.resultLayer) {
@@ -870,6 +990,14 @@ Ext.define('CpsiMapview.controller.button.DigitizeButtonController', {
 
         if (me.modifyInteraction) {
             me.map.removeInteraction(me.modifyInteraction);
+        }
+
+        if (me.pointerInteraction) {
+            me.map.removeInteraction(me.pointerInteraction);
+        }
+
+        if (me.snapInteraction) {
+            me.map.removeInteraction(me.snapInteraction);
         }
 
         if (me.drawLayer) {
