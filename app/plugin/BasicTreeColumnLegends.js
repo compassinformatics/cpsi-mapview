@@ -56,6 +56,13 @@ Ext.define('CpsiMapview.plugin.BasicTreeColumnLegends', {
                 if (styles) {
                     layerKey += styles.toUpperCase();
                 }
+            } else {
+                // for WFS we also use the WMS legend so make sure we create a cache
+                // key for these or it will always use just the layerKey
+                var activatedStyle = layer.get('activatedStyle');
+                if (activatedStyle) {
+                    layerKey += LegendUtil.getWmsStyleFromSldFile(activatedStyle);
+                }
             }
 
             var legendUrl = layer.get('legendUrl');
