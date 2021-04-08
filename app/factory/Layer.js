@@ -1018,9 +1018,9 @@ Ext.define('CpsiMapview.factory.Layer', {
                         Ext.Logger.info('Layer type not supported in StyleSwitcherRadioGroup');
                     }
 
-                    overlayCollection.setAt(index, newLayer);
                     newLayer.set('activatedStyle', activeStyle);
-
+                    // setting a layer will trigger legend creations etc. so make sure activeStyle is set prior to this
+                    overlayCollection.setAt(index, newLayer);
                     LayerFactory.updateLayerTreeForSwitchLayers();
 
                 }
