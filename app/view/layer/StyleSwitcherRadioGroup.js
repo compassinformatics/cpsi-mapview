@@ -90,7 +90,7 @@ Ext.define('CpsiMapview.view.layer.StyleSwitcherRadioGroup', {
 
     /**
      * Detects the checked state of the given style name based on the layer's
-     * current acive style (property 'activatedStyle').
+     * current active style (property 'activatedStyle').
      *
      * @param  {String} sldStyle The style name to get the checked state for
      * @return {Boolean}         Checked state

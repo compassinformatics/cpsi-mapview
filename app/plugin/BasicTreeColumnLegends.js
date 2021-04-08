@@ -54,14 +54,14 @@ Ext.define('CpsiMapview.plugin.BasicTreeColumnLegends', {
             if (layer.getSource && layer.getSource().getParams) {
                 var styles = layer.getSource().getParams().STYLES;
                 if (styles) {
-                    layerKey += styles.toUpperCase();
+                    layerKey += '_' +  styles.toUpperCase();
                 }
             } else {
                 // for WFS we also use the WMS legend so make sure we create a cache
                 // key for these or it will always use just the layerKey
                 var activatedStyle = layer.get('activatedStyle');
                 if (activatedStyle) {
-                    layerKey += LegendUtil.getWmsStyleFromSldFile(activatedStyle);
+                    layerKey += '_' + LegendUtil.getWmsStyleFromSldFile(activatedStyle).toUpperCase();
                 }
             }
 
@@ -90,7 +90,7 @@ Ext.define('CpsiMapview.plugin.BasicTreeColumnLegends', {
 
                 // check if there is an ongoing loading for the legend of this layer
                 // since getLegendHtml is executed several times for one refresh due to
-                // unkwon reasons
+                // unknown reasons
                 // Flag set / reset in LegendUtil.getLegendImgHtmlTpl
                 var isLoading = LegendUtil['legendLoading_' + layerKey];
                 if (isLoading) {
