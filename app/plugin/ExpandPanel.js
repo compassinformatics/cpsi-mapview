@@ -48,6 +48,9 @@ Ext.define('CpsiMapview.plugin.ExpandPanel', {
             throw new Error('the property parentPanel has to be of xtype `panel`');
         }
 
+        cmp.fireEvent('beforeexpand', cmp);
+        me.parentPanel.fireEvent('beforeexpand', cmp);
+
         var index = me.parentPanel.items.items.indexOf(cmp);
         me.positionInParentPanel = index > -1 ? index : me.positionInParentPanel;
 
