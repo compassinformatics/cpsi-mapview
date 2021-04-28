@@ -46,7 +46,8 @@ Ext.define('CpsiMapview.view.grid.Grid', {
     },
 
     viewConfig: {  //this config is passed to the view
-        loadingText: 'Loading records'
+        loadingText: 'Loading records',
+        enableTextSelection: true
         //loadMask: {
         //    msg: 'Loading records' // TODO not sure why this isn't applied to the loadMask
         //}
