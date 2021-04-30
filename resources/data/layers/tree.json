@@ -1,0 +1,147 @@
+{
+  "defaults": {
+    "general": {}
+  },
+  "treeConfig": {
+    "id": "root",
+    "children": [
+      {
+        "id": "overlay-folder",
+        "title": "Layers",
+        "expanded": true,
+        "checked": false,
+        "children": [
+          {
+            "id": "LIGHT_UNIT_MVT",
+            "leaf": true
+          },
+          {
+            "id": "RUINS_WFS",
+            "leaf": true,
+            "text": "Ruins",
+            "qtip": "Right-click for a layer grid"
+          },
+          {
+            "id": "LIGHT_UNIT_WFS",
+            "leaf": true
+          },
+          {
+            "title": "Borehole",
+            "expanded": false,
+            "children": [
+              {
+                "id": "BOREHOLE_WMS",
+                "leaf": true,
+                "text": "Borehole WMS"
+              },
+              {
+                "id": "BOREHOLE_WFS",
+                "leaf": true,
+                "text": "Borehole WFS (Time)",
+                "qtip": "Filter records with the timeslider control"
+              }
+            ]
+          },
+          {
+            "title": "Switch Group",
+            "expanded": false,
+            "children": [
+              {
+                "id": "WATERBODY_SWITCH_LAYER_FAR",
+                "leaf": true,
+                "text": "Waterbody Switch Layer (far)"
+              },
+              {
+                "id": "WATERBODY_SWITCH_LAYER_CLOSE",
+                "leaf": true,
+                "text": "Waterbody Switch Layer (close)"
+              },
+              {
+                "id": "BOREHOLE_WMS",
+                "leaf": true,
+                "text": "Borehole WMS"
+              },
+              {
+                "id": "BOREHOLE_WFS",
+                "leaf": true,
+                "text": "Borehole WFS (Time)",
+                "qtip": "Filter records with the timeslider control"
+              }
+            ]
+          },
+          {
+            "id": "TIME_WFS_PROXY",
+            "leaf": true
+          },
+          {
+            "id": "WORKS_EXPORT_WMS_PROXY",
+            "leaf": true
+          },
+          {
+            "id": "LIGHT_UNIT_SWITCH_LAYER_FAR",
+            "leaf": true
+          },
+          {
+            "id": "WATERWAYS_VTWMS",
+            "leaf": true,
+            "text": "Waterways VT WMS"
+          },
+          {
+            "id": "GAS_WFS",
+            "leaf": true,
+            "text": "GAS WFS"
+          },
+          {
+            "id": "COUNTRY_WFS",
+            "leaf": true,
+            "text": "Country WFS",
+            "qtip": "An OSM based WFS layer"
+          },
+          {
+            "id": "OSM_WMS",
+            "leaf": true,
+            "text": "OSM WMS",
+            "qtip": "An OSM based WMS layer",
+            "iconCls": "map"
+          },
+          {
+            "id": "OSM_WMS2",
+            "leaf": true,
+            "text": "A WMS 2"
+          },
+          {
+            "id": "OSM_WMS3",
+            "leaf": true,
+            "text": "A WMS 3"
+          },
+          {
+            "id": "OSM_WMS4",
+            "leaf": true,
+            "text": "A WMS 4"
+          }
+        ]
+      },
+      {
+        "id": "base-folder",
+        "title": "Base Layers",
+        "expanded": true,
+        "children": [
+          {
+            "id": "OSM_BACKGROUND",
+            "leaf": true,
+            "text": "OpenStreetMap",
+            "qtip": "An OpenStreetMap based background layer",
+            "cls": "cpsi-tree-node-baselayer"
+          },
+          {
+            "id": "GREY_BACKGROUND",
+            "leaf": true,
+            "text": "Grey Background",
+            "qtip": "This is the background layer",
+            "cls": "cpsi-tree-node-baselayer"
+          }
+        ]
+      }
+    ]
+  }
+}

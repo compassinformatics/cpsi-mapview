@@ -1,152 +1,346 @@
 {
-  "layers": [{
-    "layerType": "esrirest",
-    "iconCls": "map",
-    "isBaseLayer": true,
-    "isDefaultBaseLayer": false,
-    "text": "Grey Background",
-    "url": "https://services.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Light_Gray_Base/MapServer/tile/",
-    "openLayers": {
-      "maxResolution": 1222.99245234375,
-      "numZoomLevels": 13,
-      "projection": "EPSG:900913",
-      "visibility": true,
-      "zoomOffset": 7,
-      "transitionEffect": "resize"
-    }
-  }, {
-    "layerType": "osm",
-    "helpPage": "OSM",
-    "iconCls": "map",
-    "isBaseLayer": true,
-    "isDefaultBaseLayer": true,
-    "text": "OpenStreetMap",
-    "legendUrl": "https://a.tile.openstreetmap.org/9/244/166.png",
-    "legendHeight": 100,
-    "openLayers": {
-      "maxResolution": 1222.99245234375,
-      "numZoomLevels": 12,
-      "opacity": 0.7,
-      "projection": "EPSG:900913",
-      "visibility": false,
-      "zoomOffset": 7
-    }
-  }, {
-    "layerType": "wms",
-    "helpPage": "OSM",
-    "qtip": "An OSM based WMS layer",
-    "iconCls": "map",
-    "isBaseLayer": false,
-    "isDefaultBaseLayer": false,
-    "text": "A WMS",
-    "url": "https://ows.terrestris.de/osm-gray/service",
-    "serverOptions": {
-      "layers": "OSM-WMS"
+  "defaults": {
+    "general": {
+      "exampleGeneralProperty": 42
     },
-    "openLayers": {
-      "maxResolution": 1222.99245234375,
-      "numZoomLevels": 12,
-      "opacity": 0.7,
-      "projection": "EPSG:900913",
-      "visibility": false,
-      "zoomOffset": 7
-    }
-  }, {
-    "layerType": "wfs",
-    "text": "Country WFS",
-    "qtip": "An OSM based WFS layer",
-    "url": "https://ows.terrestris.de/geoserver/osm/wfs",
-    "featureType": "osm:osm-country-borders",
-    "serverOptions": {},
-    "noCluster": true,
-    "openLayers": {
-      "maxResolution": 1222.99245234375,
-      "numZoomLevels": 12,
-      "opacity": 0.7,
-      "projection": "EPSG:900913",
-      "visibility": false
-    }
-  }, {
-    "layerType": "wfs",
-    "text": "GAS WFS",
-    "url": "https://ows.terrestris.de/geoserver/osm/wfs",
-    "sldUrl": "resources/data/styling/Test_Gas.xml",
-    "featureType": "osm:osm-fuel",
-    "serverOptions": {},
-    "noCluster": true,
-    "tooltipsConfig": [
-        {
-            "property": "id"
-        },
-        {
-            "alias": "Name",
-            "property": "name"
-        },
-        {
-            "alias": "OSM ID",
-            "property": "osm_id"
-        },
-        {
-            "property": "type"
-        }
-    ],
-    "openLayers": {
-      "maxResolution": 1222.99245234375,
-      "numZoomLevels": 12,
-      "opacity": 0.7,
-      "projection": "EPSG:900913",
-      "visibility": false
-    }
-  }, {
-    "layerType": "wms",
-    "text": "Works_Export (needs proxy)",
-    "url": "mapserver/",
-    "isBaseLayer": false,
-    "isDefaultBaseLayer": false,
-    "timeitem": "TIME",
-    "dateFormat": "Y",
-    "serverOptions": {
-      "layers": "Works_Type",
-      "version": "1.1.1"
+    "xyz": {
+      "openLayers": {
+        "visibility": true,
+        "transitionEffect": "resize"
+      },
+      "isBaseLayer": true
     },
-    "openLayers": {
-      "singleTile": true,
-      "visibility": false
+    "osm": {
+      "isBaseLayer": true,
+      "openLayers": {
+        "opacity": 0.7,
+        "visibility": false
+      }
+    },
+    "wms": {
+      "isBaseLayer": false,
+      "isDefaultBaseLayer": false,
+      "featureInfoWindow": true,
+      "url": "https://w08-mapserver.compass.ie/mapserver/?map=/MapServer/apps/mapview-demo/example.map&",
+      "serverOptions": {
+        "version": "1.3.0"
+      },
+      "openLayers": {
+        "visibility": false
+      }
+    },
+    "wfs": {
+      "url": "https://w08-mapserver.compass.ie/mapserver/?map=/MapServer/apps/mapview-demo/example.map&",
+      "stylesBaseUrl": "resources/data/styling/",
+      "serverOptions": {
+        "version": "2.0.0"
+      },
+      "openLayers": {
+        "visibility": false
+      }
+    },
+    "switchlayer": {
+      "vectorFeaturesMinScale": 80000
+    },
+    "vtwms": {
+      "format": "MVT"
     }
-  }, {
-    "layerType": "wfs",
-    "text": "Test time WFS (needs proxy)",
-    "url": "wfs/",
-    "featureType": "test:osm-fuel",
-    "serverOptions": {},
-    "noCluster": true,
-    "timeitem": "time",
-    "dateFormat": "c",
-    "geometryProperty": "the_geom",
-    "openLayers": {
-      "maxResolution": 1222.99245234375,
-      "numZoomLevels": 12,
-      "opacity": 0.7,
-      "projection": "EPSG:900913",
-      "visibility": false
-    }
-  }, {
-      "layerType": "wfs",
-      "text": "Accidents",
-      "url": "https://pmstipperarydev.compass.ie/mapserver/?",
-      "geometryProperty": "msGeometry",
-      "featureType": "Accidents",
+  },
+  "layers": [
+    {
+      "layerType": "xyz",
+      "layerKey": "GREY_BACKGROUND",
+      "isDefaultBaseLayer": false,
+      "url": "https://services.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Light_Gray_Base/MapServer/tile/{z}/{y}/{x}"
+    },
+    {
+      "layerType": "osm",
+      "layerKey": "OSM_BACKGROUND",
+      "helpPage": "OSM",
+      "isDefaultBaseLayer": true,
+      "legendUrl": "https://a.tile.openstreetmap.org/9/244/166.png",
+      "legendHeight": 100
+    },
+    {
+      "layerType": "wms",
+      "layerKey": "OSM_WMS",
+      "helpPage": "OSM",
+      "url": "https://ows.terrestris.de/osm-gray/service",
+      "serverOptions": {
+        "layers": "OSM-WMS"
+      },
       "openLayers": {
         "maxResolution": 1222.99245234375,
-        "numZoomLevels": 12,
-        "opacity": 0.9,
-        "visibility": true
+        "opacity": 0.7,
+        "projection": "EPSG:900913",
+        "visibility": false
+      }
+    },
+    {
+      "layerType": "wms",
+      "layerKey": "OSM_WMS2",
+      "helpPage": "OSM",
+      "url": "https://ows.terrestris.de/osm-gray/service",
+      "serverOptions": {
+        "layers": "OSM-WMS"
+      },
+      "openLayers": {
+        "maxResolution": 1222.99245234375,
+        "opacity": 0.7,
+        "projection": "EPSG:900913",
+        "visibility": false
+      }
+    },
+    {
+      "layerType": "wms",
+      "layerKey": "OSM_WMS3",
+      "helpPage": "OSM",
+      "url": "https://ows.terrestris.de/osm-gray/service",
+      "serverOptions": {
+        "layers": "OSM-WMS"
+      },
+      "openLayers": {
+        "maxResolution": 1222.99245234375,
+        "opacity": 0.7,
+        "projection": "EPSG:900913",
+        "visibility": false
+      }
+    },
+    {
+      "layerType": "wms",
+      "layerKey": "OSM_WMS4",
+      "helpPage": "OSM",
+      "url": "https://ows.terrestris.de/osm-gray/service",
+      "serverOptions": {
+        "layers": "OSM-WMS"
+      },
+      "openLayers": {
+        "maxResolution": 1222.99245234375,
+        "opacity": 0.7,
+        "projection": "EPSG:900913",
+        "visibility": false
+      }
+    },
+    {
+      "layerType": "wfs",
+      "layerKey": "COUNTRY_WFS",
+      "url": "https://ows.terrestris.de/geoserver/osm/wfs",
+      "featureType": "osm:osm-country-borders",
+      "geomFieldName": "geometry",
+      "namespaceDefinitions": {
+        "osm": "http://terrestris"
+      },
+      "serverOptions": {},
+      "noCluster": true,
+      "openLayers": {
+        "maxResolution": 1222.99245234375,
+        "opacity": 0.7,
+        "projection": "EPSG:900913",
+        "visibility": false
+      }
+    },
+    {
+      "layerType": "wfs",
+      "layerKey": "GAS_WFS",
+      "url": "https://ows.terrestris.de/geoserver/osm/wfs",
+      "legendUrl": "https://ows.terrestris.de/geoserver/osm/wfs?SERVICE=WMS&VERSION=1.3.0&REQUEST=GetLegendGraphic&FORMAT=image%2Fpng&TRANSPARENT=TRUE&SLD_VERSION=1.1.0&LAYER=osm:osm-fuel&STYLE=",
+      "featureType": "osm:osm-fuel",
+      "styles": [
+        {
+          "name": "Test_Gas.xml",
+          "title": "Gas Style",
+          "label": "Test_Gas_label.xml"
+        },
+        {
+          "name": "Test_Alternative_Gas_Style.xml",
+          "title": "Another Style",
+          "label": "Test_Alternative_Gas_Style_label.xml"
+        }
+      ],
+      "geomFieldName": "geometry",
+      "namespaceDefinitions": {
+        "osm": "http://terrestris"
       },
       "serverOptions": {
-        "outputFormat": "application/json; subtype=geojson"
+        "version": "1.1.0"
+      },
+      "noCluster": true,
+      "tooltipsConfig": [
+        {
+          "property": "id"
+        },
+        {
+          "alias": "Name",
+          "property": "name"
+        },
+        {
+          "alias": "OSM ID",
+          "property": "osm_id"
+        },
+        {
+          "property": "type"
+        }
+      ],
+      "openLayers": {
+        "maxResolution": 1222.99245234375,
+        "opacity": 0.7,
+        "projection": "EPSG:900913",
+        "visibility": false
+      }
+    },
+    {
+      "layerType": "switchlayer",
+      "layerKey": "WATERBODY_SWITCH_LAYER",
+      "visibility": true,
+      "layers": [
+        {
+          "layerType": "wms",
+          "layerKey": "WATERBODY_SWITCH_LAYER_FAR",
+          "hasMetadata": true,
+          "serverOptions": {
+            "layers": "waterbodies"
+          },
+          "openLayers": {
+            "singleTile": false
+          },
+          "styles": [
+            "Waterbodies",
+            "Type"
+          ],
+          "labelClassName": "labels"
+        },
+        {
+          "layerType": "wfs",
+          "layerKey": "WATERBODY_SWITCH_LAYER_CLOSE",
+          "hasMetadata": true,
+          "geometryProperty": "msGeometry",
+          "featureType": "waterbodies",
+          "noCluster": true,
+          "styles": [
+            "Waterbodies_Default.xml",
+            "Waterbodies_Type.xml"
+          ],
+          "tooltipsConfig": [
+            {
+              "alias": "Id",
+              "property": "osm_id"
+            },
+            {
+              "alias": "Code",
+              "property": "code"
+            },
+            {
+              "alias": "Class",
+              "property": "fclass"
+            },
+            {
+              "alias": "Name",
+              "property": "name"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "layerType": "wfs",
+      "layerKey": "BOREHOLE_WFS",
+      "geometryProperty": "msGeometry",
+      "featureType": "Boreholes",
+      "hasMetadata": true,
+      "openLayers": {
+        "opacity": 0.9,
+        "visibility": false
       },
       "noCluster": false,
-      "timeitem": "DATE",
-      "dateFormat": "Y-m-d"
-    }]
+      "timeitem": "YEAR",
+      "dateFormat": "Y"
+    },
+    {
+      "layerType": "wms",
+      "layerKey": "BOREHOLE_WMS",
+      "featureType": "Boreholes",
+      "hasMetadata": true,
+      "serverOptions": {
+        "layers": "Boreholes",
+        "version": "1.3.0"
+      },
+      "openLayers": {
+        "singleTile": false,
+        "visibility": false
+      },
+      "styles": [
+        {
+          "name": "Type",
+          "title": "Borehole Type"
+        },
+        "Depth",
+        {
+          "name": "Unthemed",
+          "title": "Location"
+        }
+      ],
+      "labelClassName": "labels"
+    },
+    {
+      "layerType": "vtwms",
+      "layerKey": "WATERWAYS_VTWMS",
+      "url": "https://w08-mapserver.compass.ie/mapserver/?map=/MapServer/apps/mapview-demo/example.map&SERVICE=WMS&VERSION=1.3.0&REQUEST=GetMap&FORMAT=image%2Fpng&TRANSPARENT=true&LAYERS=waterways&TILED=false&CRS=EPSG%3A3857&WIDTH={width}&HEIGHT={height}&BBOX={bbox}&STYLES=Waterways&FORMAT=mvt",
+      "hasMetadata": true,
+      "baseurl": "https://w08-mapserver.compass.ie/mapserver/?map=/MapServer/apps/mapview-demo/example.map&",
+      "layerIdentificationName": "waterways",
+      "openLayers": {
+        "visibility": false
+      },
+      "sldUrl": "https://w08-mapserver.compass.ie/mapserver/?map=/MapServer/apps/mapview-demo/example.map&SERVICE=WMS&VERSION=1.3.0&REQUEST=GetStyles&LAYERS=waterways",
+      "tooltipsConfig": [
+        {
+          "alias": "Id",
+          "property": "osm_id"
+        },
+        {
+          "alias": "Code",
+          "property": "code"
+        },
+        {
+          "alias": "Class",
+          "property": "fclass"
+        },
+        {
+          "alias": "Name",
+          "property": "name"
+        }
+      ]
+    },
+    {
+      "layerType": "wfs",
+      "gridXType": "cmv_examplegrid",
+      "layerKey": "RUINS_WFS",
+      "geometryProperty": "msGeometry",
+      "featureType": "ruins",
+      "hasMetadata": true,
+      "sldUrl": "https://w08-mapserver.compass.ie/mapserver/?map=/MapServer/apps/mapview-demo/example.map&SERVICE=WMS&VERSION=1.3.0&REQUEST=GetStyles&LAYERS=ruins",
+      "idProperty": "osm_id",
+      "openLayers": {
+        "visibility": true
+      },
+      "tooltipsConfig": [
+        {
+          "alias": "Id",
+          "property": "osm_id"
+        },
+        {
+          "alias": "Code",
+          "property": "code"
+        },
+        {
+          "alias": "Class",
+          "property": "fclass"
+        },
+        {
+          "alias": "Name",
+          "property": "name"
+        }
+      ]
+    }
+  ]
 }
