@@ -27,37 +27,45 @@ Ext.define('CpsiMapview.view.toolbar.MapTools', {
 
     dock: 'top',
 
+    /**
+     * These would typically be overridden in a client application
+     **/
     items: [
         {
-            xtype: 'basigx-button-zoomtoextent',
-            extent: [-1210762, 6688545, -600489, 7490828]
-        }, {
-            xtype: 'basigx-button-zoomin',
-            toggleGroup: 'zoom'
-        }, {
-            xtype: 'basigx-button-zoomout',
-            toggleGroup: 'zoom',
-            enableZoomOutWithBox: true
-        }, {
-            xtype: 'basigx-button-measure',
-            measureType: 'line',
-            toggleGroup: 'measure-tools',
-            viewModel: 'cmv_btn_measure',
-            controller: 'cmv_btn_measure',
-            glyph: 'xf068@FontAwesome',
-            listeners: {
-                afterrender: 'initializeMeasureBtn'
-            }
-        }, {
-            xtype: 'basigx-button-measure',
-            measureType: 'polygon',
-            toggleGroup: 'measure-tools',
-            glyph: 'xf044@FontAwesome',
-            viewModel: 'cmv_btn_measure',
-            controller: 'cmv_btn_measure',
-            listeners: {
-                afterrender: 'initializeMeasureBtn'
-            }
+            xtype: 'buttongroup',
+            title: 'Map Tools',
+            items: [
+                {
+                    xtype: 'basigx-button-zoomtoextent',
+                    extent: [-1210762, 6688545, -600489, 7490828]
+                }, {
+                    xtype: 'basigx-button-zoomin',
+                    toggleGroup: 'zoom'
+                }, {
+                    xtype: 'basigx-button-zoomout',
+                    toggleGroup: 'zoom',
+                    enableZoomOutWithBox: true
+                }, {
+                    xtype: 'basigx-button-measure',
+                    measureType: 'line',
+                    toggleGroup: 'measure-tools',
+                    viewModel: 'cmv_btn_measure',
+                    controller: 'cmv_btn_measure',
+                    glyph: 'xf068@FontAwesome',
+                    listeners: {
+                        afterrender: 'initializeMeasureBtn'
+                    }
+                }, {
+                    xtype: 'basigx-button-measure',
+                    measureType: 'polygon',
+                    toggleGroup: 'measure-tools',
+                    glyph: 'xf044@FontAwesome',
+                    viewModel: 'cmv_btn_measure',
+                    controller: 'cmv_btn_measure',
+                    listeners: {
+                        afterrender: 'initializeMeasureBtn'
+                    }
+                }]
         }, {
             xtype: 'cmv_spatial_query_button',
             queryLayerName: 'GAS WFS',
@@ -110,6 +118,8 @@ Ext.define('CpsiMapview.view.toolbar.MapTools', {
             xtype: 'cmv_digitize_button',
             type: 'Polygon',
             tooltip: 'Polygon',
+            iconCls: 'icon-polygon2',
+            glyph: null,
             apiUrl: 'https://pmstipperarydev.compass.ie/WebServices/roadschedule/cutWithPolygon',
             listeners: {
                 responseFeatures: function () {

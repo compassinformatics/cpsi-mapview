@@ -14,7 +14,21 @@ cd cpsi-mapview
 git submodule update --init --recursive
 ```
 
-Add your ExtJS 6.2 library
+Ensure that Sencha Cmd is available on the command line. Examples for Windows:
+
+Powershell:
+
+```
+$env:Path = "D:\Tools\Sencha\Cmd\6.6.0.13;" + $env:Path
+```
+
+Command prompt:
+
+```
+SET PATH=D:\Tools\Sencha\Cmd\6.6.0.13;%PATH%
+```
+
+Now add your ExtJS library. The project is tested with both 6.2 (GPL), and 6.7 (commercial license).
 
 ```
 sencha app upgrade /path/to/local/extjs6.2
@@ -28,12 +42,15 @@ sencha app watch
 
 Open http://localhost:1841 in your browser.
 
+## Docker install
+
 If a simple local server is needed to omit CORS problems, you can use the one configured in `docker-compose.yml`.
 Fill placeholders in `nginx.conf` with appropriate values and start nginx server beside sencha dev server simply by:
 
 ```
 docker-compose up
 ```
+
 The application is available via http://localhost:81/ afterwards.
 
 For running tests various dependencies listed in package.json need to be installed. Run the following:
@@ -42,16 +59,19 @@ For running tests various dependencies listed in package.json need to be install
 npm install
 ```
 
-## Updating the deployed state
+## Updating the online demo
 
-```
-# 1. Build the standalone version
-sencha app build
-# 2. upstream remote should point to canonical repository
-# 3. publish using black magic
-npx gh-pages -d build/production/CpsiMapview/ -o upstream
+1. Build the standalone version
 
-```
+    ```
+    sencha app build
+    ```
+
+2. Publish using the [gh-pages](https://www.npmjs.com/package/gh-pages) Node module:
+
+    ```
+    npx gh-pages -d build/production/CpsiMapview/ --repo https://github.com/compassinformatics/cpsi-mapview.git -b gh-pages
+    ```
 
 ## Testing
 

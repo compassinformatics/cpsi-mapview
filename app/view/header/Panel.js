@@ -12,6 +12,6 @@ Ext.define('CpsiMapview.view.header.Panel', {
 
     height: 50,
 
-    html: '<img src="https://dummyimage.com/300x48/aaa/fff&text=Logo">'
+    html: '<img src="https://dummyimage.com/300x48/5fa2dd/fff&text=Logo">'
 
 });

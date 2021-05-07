@@ -12,17 +12,11 @@ Ext.define('CpsiMapview.view.main.Main', {
     requires: [
         'Ext.plugin.Viewport',
         'Ext.window.MessageBox',
-
-        'CpsiMapview.controller.MainController',
-        'CpsiMapview.model.MainModel',
         'CpsiMapview.view.main.Map',
         'CpsiMapview.view.header.Panel',
         'CpsiMapview.view.LayerTree',
         'CpsiMapview.view.grid.ExampleGrid'
     ],
-
-    controller: 'cmv_main',
-    viewModel: 'cmv_main',
 
     layout: 'border',
 
