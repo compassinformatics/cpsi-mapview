@@ -26,7 +26,7 @@
             "leaf": true
           },
           {
-            "title": "Borehole",
+            "title": "Boreholes (Switch Layer)",
             "expanded": false,
             "children": [
               {
@@ -43,7 +43,7 @@
             ]
           },
           {
-            "title": "Switch Group",
+            "title": "Waterbody (Switch Layer)",
             "expanded": false,
             "children": [
               {
@@ -55,17 +55,6 @@
                 "id": "WATERBODY_SWITCH_LAYER_CLOSE",
                 "leaf": true,
                 "text": "Waterbody Switch Layer (close)"
-              },
-              {
-                "id": "BOREHOLE_WMS",
-                "leaf": true,
-                "text": "Borehole WMS"
-              },
-              {
-                "id": "BOREHOLE_WFS",
-                "leaf": true,
-                "text": "Borehole WFS (Time)",
-                "qtip": "Filter records with the timeslider control"
               }
             ]
           },
