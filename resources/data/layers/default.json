@@ -242,44 +242,68 @@
       ]
     },
     {
-      "layerType": "wfs",
-      "layerKey": "BOREHOLE_WFS",
-      "geometryProperty": "msGeometry",
-      "featureType": "Boreholes",
-      "hasMetadata": true,
-      "openLayers": {
-        "opacity": 0.9,
-        "visibility": false
-      },
-      "noCluster": false,
-      "timeitem": "YEAR",
-      "dateFormat": "Y"
-    },
-    {
-      "layerType": "wms",
-      "layerKey": "BOREHOLE_WMS",
-      "featureType": "Boreholes",
-      "hasMetadata": true,
-      "serverOptions": {
-        "layers": "Boreholes",
-        "version": "1.3.0"
-      },
-      "openLayers": {
-        "singleTile": false,
-        "visibility": false
-      },
-      "styles": [
+      "layerType": "switchlayer",
+      "layerKey": "BOREHOLE_SWITCH_LAYER",
+      "visibility": true,
+      "layers": [
         {
-          "name": "Type",
-          "title": "Borehole Type"
+          "layerType": "wms",
+          "layerKey": "BOREHOLE_WMS",
+          "featureType": "Boreholes",
+          "hasMetadata": true,
+          "serverOptions": {
+            "layers": "Boreholes",
+            "version": "1.3.0"
+          },
+          "openLayers": {
+            "singleTile": false,
+            "visibility": false
+          },
+          "styles": [
+            {
+              "name": "Type",
+              "title": "Borehole Type"
+            },
+            "Depth",
+            {
+              "name": "Unthemed",
+              "title": "Location"
+            }
+          ],
+          "labelClassName": "labels"
         },
-        "Depth",
         {
-          "name": "Unthemed",
-          "title": "Location"
+          "layerType": "wfs",
+          "layerKey": "BOREHOLE_WFS",
+          "geometryProperty": "msGeometry",
+          "featureType": "Boreholes",
+          "hasMetadata": true,
+          "openLayers": {
+            "opacity": 0.9,
+            "visibility": false
+          },
+          "styles": [
+            {
+              "name": "Boreholes_Type.xml",
+              "label": "Boreholes_Type_Label.xml",
+              "title": "Type"
+            },
+            {
+              "name": "Boreholes_Depth.xml",
+              "label": "Boreholes_Depth_Label.xml",
+              "title": "Depth"
+            },
+            {
+              "name": "Boreholes_Unthemed.xml",
+              "label": "Boreholes_Unthemed_Label.xml",
+              "title": "Type"
+            }
+          ],
+          "noCluster": false,
+          "timeitem": "YEAR",
+          "dateFormat": "Y"
         }
-      ],
-      "labelClassName": "labels"
+      ]
     },
     {
       "layerType": "vtwms",

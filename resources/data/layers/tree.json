@@ -26,7 +26,7 @@
             "leaf": true
           },
           {
-            "title": "Borehole",
+            "title": "Boreholes (Switch Layer)",
             "expanded": false,
             "children": [
               {
@@ -43,7 +43,7 @@
             ]
           },
           {
-            "title": "Switch Group",
+            "title": "Waterbody (Switch Layer)",
             "expanded": false,
             "children": [
               {
