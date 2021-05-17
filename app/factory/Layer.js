@@ -271,14 +271,24 @@ Ext.define('CpsiMapview.factory.Layer', {
 
         if (singleTile) {
 
-            const blankSrc = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII=';
-            let img
-            olSourceConf.imageLoadFunction = function (image, src) {
-                if (img) {
-                    img.src = blankSrc;
-                }
-                img = image.getImage();
-                img.src = src;
+            if (layerConf.debounce !== undefined) {
+                var blankSrc = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII=';
+                var img;
+                var timeout;
+                olSourceConf.imageLoadFunction = function (image, src) {
+                    if (img) {
+                        img.src = blankSrc;
+                    }
+                    img = image.getImage();
+                    if (timeout) {
+                        clearTimeout(timeout);
+                    }
+                    timeout = setTimeout(function () {
+                        img.src = src;
+                        timeout = undefined;
+                        img = undefined;
+                    }, layerConf.debounce);
+                };
             }
 
             olLayerConf.source = new ol.source.ImageWMS(olSourceConf);
