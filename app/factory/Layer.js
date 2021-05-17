@@ -271,6 +271,16 @@ Ext.define('CpsiMapview.factory.Layer', {
 
         if (singleTile) {
 
+            const blankSrc = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII=';
+            let img
+            olSourceConf.imageLoadFunction = function (image, src) {
+                if (img) {
+                    img.src = blankSrc;
+                }
+                img = image.getImage();
+                img.src = src;
+            }
+
             olLayerConf.source = new ol.source.ImageWMS(olSourceConf);
             layer = new ol.layer.Image(olLayerConf);
 
