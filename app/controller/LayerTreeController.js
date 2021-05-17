@@ -125,7 +125,7 @@ Ext.define('CpsiMapview.controller.LayerTreeController', {
             // get the root layer group holding the grouped map layers
             var rootLayerGroup = me.getGroupedLayers(treeJson.treeConfig);
 
-            me.map.set('layerTreeRoot', rootLayerGroup)
+            me.map.set('layerTreeRoot', rootLayerGroup);
             me.map.getLayers().insertAt(0, rootLayerGroup);
 
             // create a new LayerStore from the grouped layers
@@ -157,7 +157,7 @@ Ext.define('CpsiMapview.controller.LayerTreeController', {
                 '- creating flat layer hierarchy as fallback');
 
             var layerTreeStore = Ext.create('GeoExt.data.store.LayersTree', {
-                layerGroup: me.map.get('layerTreeRoot')
+                layerGroup: me.map.get('layerTreeRoot') || me.map.getLayerGroup()
             });
 
             me.getView().setStore(layerTreeStore);
