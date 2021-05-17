@@ -117,17 +117,6 @@ Ext.define('CpsiMapview.controller.LayerTreeController', {
     makeLayerStore: function () {
         var me = this;
 
-        // filter function for LayerTreeStore to hide unwanted layers in tree
-        var layerFilter = function (layerRec) {
-            var layer = layerRec.getOlLayer();
-            if (layer) {
-                // neither displayInLayerSwitcher=false (our flag) nor
-                // bp_displayInLayerSwitcher=false (flag of BasiGX)
-                return layer.get('displayInLayerSwitcher') !== false &&
-                    layer.get('bp_displayInLayerSwitcher') !== false;
-            }
-        };
-
         var treeJsonPromise = me.loadTreeStructure();
         treeJsonPromise.then(function (treeJson) {
             // save defaults for tree nodes from config
@@ -136,12 +125,13 @@ Ext.define('CpsiMapview.controller.LayerTreeController', {
             // get the root layer group holding the grouped map layers
             var rootLayerGroup = me.getGroupedLayers(treeJson.treeConfig);
 
-            me.map.setLayerGroup(rootLayerGroup);
+            me.map.set('layerTreeRoot', rootLayerGroup)
+            me.map.getLayers().insertAt(0, rootLayerGroup);
+
             // create a new LayerStore from the grouped layers
             var groupedLayerTreeStore = Ext.create('GeoExt.data.store.LayersTree', {
                 model: 'CpsiMapview.data.model.LayerTreeNode',
-                layerGroup: me.map.getLayerGroup(),
-                filters: layerFilter
+                layerGroup: rootLayerGroup
             });
             me.getView().setStore(groupedLayerTreeStore);
 
@@ -167,8 +157,7 @@ Ext.define('CpsiMapview.controller.LayerTreeController', {
                 '- creating flat layer hierarchy as fallback');
 
             var layerTreeStore = Ext.create('GeoExt.data.store.LayersTree', {
-                layerGroup: me.map.getLayerGroup(),
-                filters: layerFilter
+                layerGroup: me.map.get('layerTreeRoot')
             });
 
             me.getView().setStore(layerTreeStore);

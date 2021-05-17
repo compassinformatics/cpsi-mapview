@@ -103,7 +103,6 @@ Ext.define('CpsiMapview.controller.button.SpatialQueryButtonController', {
             me.permanentLayer = new ol.layer.Vector({ source: new ol.source.Vector() });
             me.permanentLayer.set('associatedLayerKey', vectorLayerKey);
             me.permanentLayer.set('isSpatialQueryLayer', true);
-            me.permanentLayer.set('displayInLayerSwitcher', false);
             me.permanentLayer.set('name', vectorLayerKey + '_spatialfilter');
             // connect hide and show to query layer hide and show
             me.connectQueryLayer();

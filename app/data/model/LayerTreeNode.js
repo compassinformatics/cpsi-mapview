@@ -76,10 +76,8 @@ Ext.define('CpsiMapview.data.model.LayerTreeNode', {
     onLayerVisibleChange: function (evt) {
         var layer = evt.target;
 
-        if (layer.get('displayInLayerSwitcher') !== false) {
-            if (!this.__updating) {
-                this.set('checked', layer.get('visible'));
-            }
+        if (!this.__updating) {
+            this.set('checked', layer.get('visible'));
         }
     }
 });
