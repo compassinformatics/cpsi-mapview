@@ -258,6 +258,7 @@ Ext.define('CpsiMapview.controller.LayerTreeController', {
                     mapLyr.set('_origTreeConf', child);
 
                     // add OL layer to parent OL LayerGroup
+                    me.map.removeLayer(mapLyr);
                     parentGroup.getLayers().insertAt(0, mapLyr);
 
                 } else {
