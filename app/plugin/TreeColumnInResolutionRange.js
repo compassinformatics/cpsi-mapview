@@ -57,7 +57,7 @@ Ext.define('CpsiMapview.plugin.TreeColumnInResolutionRange', {
 
     /**
      * When resolution changes in map: update tree nodes if needed
-     * @param {ol.View } mapView The OL map view
+     * @param {ol.View} mapView The OL map view
      */
     updateTreeNode: function (mapView) {
         var me = this;
