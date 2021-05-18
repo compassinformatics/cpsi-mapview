@@ -273,20 +273,20 @@ Ext.define('CpsiMapview.factory.Layer', {
 
             if (layerConf.debounce !== undefined) {
                 var blankSrc = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII=';
-                var img;
+                var currentImgElement;
                 var timeout;
                 olSourceConf.imageLoadFunction = function (image, src) {
-                    if (img) {
-                        img.src = blankSrc;
+                    if (currentImgElement) {
+                        currentImgElement.src = blankSrc;
                     }
-                    img = image.getImage();
+                    currentImgElement = image.getImage();
                     if (timeout) {
                         clearTimeout(timeout);
                     }
                     timeout = setTimeout(function () {
-                        img.src = src;
+                        currentImgElement.src = src;
                         timeout = undefined;
-                        img = undefined;
+                        currentImgElement = undefined;
                     }, layerConf.debounce);
                 };
             }
