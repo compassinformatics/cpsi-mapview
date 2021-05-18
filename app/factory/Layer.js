@@ -152,7 +152,7 @@ Ext.define('CpsiMapview.factory.Layer', {
     },
 
     /**
-     * Creates an layer which renders shows a WMS for small scales and a WFS
+     * Creates a layer which renders a WMS for small scales and a WFS
      * for large scales as sub layer.
      *
      * @param  {Object} layerConf The configuration object for this layer
@@ -914,10 +914,10 @@ Ext.define('CpsiMapview.factory.Layer', {
      * Loops through all layers, identifies switch layers
      * and replaces them if required
      *
-     * @param {ol.Object.Event} evt The event which contains the view.
+     * @param {Number} resolution The new resolution
      */
-    handleSwitchLayerOnResolutionChange: function(evt) {
-        var resolution = evt.target.getResolution();
+    handleSwitchLayerOnResolutionChange: function(resolution) {
+
         var layerCollection = BasiGX.util.Map.getMapComponent().getMap().getLayers();
 
         LayerFactory.checkSwitchLayersRecursively(layerCollection, resolution);
