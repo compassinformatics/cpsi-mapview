@@ -10,11 +10,10 @@
     // the 'top' property set by Ext, so that our bottom property
     // actually applies.
     top: auto !important;
-    // add an outline around the button
-    .x-toolbar-item {
-        border-color: #778899;
-        border-width: medium;
-    }
+    // disable click events on the empty task bar
+    // this is necessary to controll the map
+    // and map interactions in this area
+    pointer-events: none;
 }
 
 .cmv_minimized_windows_toolbar .x-box-inner {
@@ -23,4 +22,9 @@
 
 .cmv_minimized_windows_toolbar .x-toolbar-item {
     top: auto !important;
+    // re-enable click events only for the buttons
+    pointer-events: auto;
+    // add an outline around the button
+    border-color: #778899;
+    border-width: medium;
 }
