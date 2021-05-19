@@ -28,7 +28,15 @@ Ext.define('CpsiMapview.plugin.TreeColumnInResolutionRange', {
         mapComponent.getStore().setChangeLayerFilterFn(me.changeLayerFilterFn);
 
         var map = mapComponent.getMap();
-        map.getView().on('change:resolution', me.onChangeResolution, me);
+        var mapView = map.getView();
+
+        mapView.on('change:resolution', function() {
+            me.updateTreeNode(mapView);
+        });
+
+        me.cmp.up('treepanel').on('cmv-init-layertree', function () {
+            me.updateTreeNode(mapView);
+        });
 
         me.cmp.up('treepanel').on('boxready', function (tp) {
             if (tp.getStore().count()) {
@@ -49,11 +57,10 @@ Ext.define('CpsiMapview.plugin.TreeColumnInResolutionRange', {
 
     /**
      * When resolution changes in map: update tree nodes if needed
-     * @param {ol.Object.Event} evt The openlayers event
+     * @param {ol.View} mapView The OL map view
      */
-    onChangeResolution: function (evt) {
+    updateTreeNode: function (mapView) {
         var me = this;
-        var mapView = evt.target;
         var unit = mapView.getProjection().getUnits();
         var resolution = mapView.getResolution();
         var treepanel = me.cmp.up('treepanel');
