@@ -84,6 +84,15 @@ Ext.define('CpsiMapview.view.main.Map', {
      */
     roundPermalinkCoords: true,
 
+
+    /**
+     * Remembers the last resolution before change.
+     * Necessary for detecting resolution change events.
+     * @property {Number}
+     * @private
+     */
+    lastResolution: null,
+
     /**
      * @event cmv-mapclick
      * Fires when the OL map is clicked.
@@ -282,9 +291,20 @@ Ext.define('CpsiMapview.view.main.Map', {
                 me.fireEvent('cmv-map-pointermove');
             });
 
-            // listener that checks the resolution and changes the switch layer if required
-            me.olMap.getView().on('change:resolution',
-                LayerFactory.handleSwitchLayerOnResolutionChange);
+            // event for resolution change
+            // we intentionally do not use the 'change:resolution',
+            // because it fires too often
+            // (see https://github.com/openlayers/openlayers/issues/7402)
+            me.olMap.on('moveend', function (evt) {
+                var targetResolution = evt.target.getView().getResolution();
+                if (targetResolution === me.lastResolution) {
+                    // resolution has not changed
+                    return;
+                }
+                me.lastResolution = targetResolution;
+                LayerFactory.handleSwitchLayerOnResolutionChange(targetResolution);
+            }
+            );
         }
 
         if (me.enablePermalink) {
