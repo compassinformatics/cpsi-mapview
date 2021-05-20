@@ -280,10 +280,17 @@ Ext.define('CpsiMapview.factory.Layer', {
                         currentImgElement.src = blankSrc;
                     }
                     currentImgElement = image.getImage();
-                    task.delay(layerConf.debounce, function () {
+                    if (task.id === null) {
+                        // no pending task
                         currentImgElement.src = src;
                         currentImgElement = undefined;
-                    });
+                        task.delay(layerConf.debounce, function () {});
+                    } else {
+                        task.delay(layerConf.debounce, function () {
+                            currentImgElement.src = src;
+                            currentImgElement = undefined;
+                        });
+                    }
                 };
             }
 
