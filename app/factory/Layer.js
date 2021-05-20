@@ -1021,20 +1021,23 @@ Ext.define('CpsiMapview.factory.Layer', {
                     newLayer.set('activatedStyle', activeStyle);
                     // setting a layer will trigger legend creations etc. so make sure activeStyle is set prior to this
 
-                    // `overlayCollection.setAt(0, newLayer)` causes
-                    // strange errors for some unknown reason.
-                    // `setAt` at other indexes as `0` seem to work fine.
-                    // In case of `setAt(0, ... )`, the change seems
-                    // to be forwarded to the treeStore but the change
-                    // does not apply to the overlayCollection itself.
-                    // Or maybe the change is temporarily applied,
-                    // but immediately reverted afterwards.
+                    // `overlayCollection.setAt(0, newLayer)` causes strange
+                    // errors for some unknown reason. `setAt` at other indexes
+                    // as `0` seem to work fine. In case of `setAt(0, ... )`,
+                    // the change seems to be forwarded to the treeStore but
+                    // the change does not apply to the overlayCollection
+                    // itself. Or maybe the change is temporarily applied, but
+                    // immediately reverted afterwards.
                     // this is a workaround
                     overlayCollection.insertAt(index + 1, newLayer);
                     overlayCollection.removeAt(index);
 
-                    LayerFactory.updateLayerTreeForSwitchLayers();
+                    // the configuration for the tree node got lost during the
+                    // switch. We add them again.
+                    var treePanel = Ext.ComponentQuery.query('treepanel')[0];
+                    treePanel.getController().applyTreeConfigsToOlLayer(newLayer, origTreeNodeConf);
 
+                    LayerFactory.updateLayerTreeForSwitchLayers();
                 }
             }
 
