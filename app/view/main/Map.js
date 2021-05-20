@@ -17,7 +17,8 @@ Ext.define('CpsiMapview.view.main.Map', {
         'CpsiMapview.plugin.FeatureInfoWindow',
 
         'BasiGX.util.Projection',
-        'CpsiMapview.plugin.FeatureAttributeGrouping'
+        'CpsiMapview.plugin.FeatureAttributeGrouping',
+        'CpsiMapview.util.SwitchLayer'
     ],
 
     layout: 'fit',
@@ -302,7 +303,9 @@ Ext.define('CpsiMapview.view.main.Map', {
                     return;
                 }
                 me.lastResolution = targetResolution;
-                LayerFactory.handleSwitchLayerOnResolutionChange(targetResolution);
+
+                var switchLayerUtil = CpsiMapview.util.SwitchLayer;
+                switchLayerUtil.handleSwitchLayerOnResolutionChange(targetResolution);
             }
             );
         }
