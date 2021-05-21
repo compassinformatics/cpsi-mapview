@@ -12,8 +12,8 @@ Ext.define('CpsiMapview.model.grid.Grid', {
     ],
 
     /**
-    * The following should all be overridden in child classes
-    */
+     * The following should all be overridden in child classes
+     */
     data: {
         vectorLayerKey: null,
         wmsLayerKey: null,

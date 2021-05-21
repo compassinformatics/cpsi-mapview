@@ -77,7 +77,7 @@ Ext.define('CpsiMapview.view.grid.ExampleGrid', {
                 dataIndex: 'code',
                 flex: 2,
                 filter: {
-                    type: 'string'
+                    type: 'number'
                 }
             },
             {

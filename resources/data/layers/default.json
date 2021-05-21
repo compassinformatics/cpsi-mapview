@@ -346,6 +346,18 @@
     {
       "layerType": "wfs",
       "gridXType": "cmv_examplegrid",
+      "gridFilters": [
+        {
+          "property": "code",
+          "value": "42",
+          "operator": ">"
+        },
+        {
+          "property": "name",
+          "value": "old",
+          "operator": "="
+        }
+      ],
       "layerKey": "RUINS_WFS",
       "geometryProperty": "msGeometry",
       "featureType": "ruins",
