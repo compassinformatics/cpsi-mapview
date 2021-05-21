@@ -145,6 +145,14 @@ Ext.define('CpsiMapview.controller.LayerTreeController', {
             });
             me.getView().setStore(groupedLayerTreeStore);
 
+            // update possible switchlayers when collapsing their parent folder
+            // otherwise the node text would be wrong/empty
+            me.getView().getRootNode().on(
+                'beforeexpand',
+                me.updateSwitchLayerNodes,
+                me
+            );
+
             me.getView().getRootNode().cascade(function (node) {
                 // apply properties for tree node from corresponding tree-conf
                 if (node.getOlLayer()) {
@@ -321,6 +329,30 @@ Ext.define('CpsiMapview.controller.LayerTreeController', {
         if (treeNodeConf.checked === false) {
             node.addCls('cpsi-tree-no-checkbox');
         }
+    },
+
+    /**
+     * Adds configuration to updated switch layer nodes.
+     *
+     * Ensures all layer information is transfered to the new
+     * switch layer after the switch event
+     *
+     * @param {Ext.data.TreeModel} groupNode The folder node that is expanded
+     */
+    updateSwitchLayerNodes: function(groupNode) {
+        var me = this;
+        groupNode.cascade(function(child){
+            var layer = child.getData();
+            if (!layer || !layer.get('isSwitchLayer')) {
+                // we only care about switch layers
+                return;
+            }
+            // the configuration for the tree node got lost during
+            // the switch. We read it again from the layer and apply
+            // it to the node.
+            var origTreeNodeConf = child.getOlLayer().get('_origTreeConf') || {};
+            me.applyTreeConfigsToNode(child, origTreeNodeConf);
+        });
     },
 
     /**
