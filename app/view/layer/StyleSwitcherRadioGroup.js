@@ -167,7 +167,7 @@ Ext.define('CpsiMapview.view.layer.StyleSwitcherRadioGroup', {
                 // load and parse SLD and apply it to layer
                 LayerFactory.loadSld(layer, sldUrl);
 
-                if ((layer.get('isWfs') || layer.get('isVt')) && layerTreePanel) {
+                if (layerTreePanel) {
                     // force update of corresponding layer node UI (e.g. legend)
                     layerTreePanel.updateLayerNodeUi(layer);
                 }
