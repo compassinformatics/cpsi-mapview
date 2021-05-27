@@ -55,8 +55,10 @@ Ext.define('CpsiMapview.plugin.FeatureInfoWindow', {
 
         map.forEachLayerAtPixel(evt.pixel, function (layer) {
             layers.push(layer);
-        }, undefined, function (layer) {
-            return layer.get('featureInfoWindow');
+        }, {
+            layerFilter: function (layer) {
+                return layer.get('featureInfoWindow');
+            }
         });
 
         var win = me.openFeatureInfoWindow();
@@ -77,7 +79,7 @@ Ext.define('CpsiMapview.plugin.FeatureInfoWindow', {
             }));
         } else {
             layers.forEach(function (layer) {
-                var url = layer.getSource().getGetFeatureInfoUrl(evt.coordinate, resolution, projection, {
+                var url = layer.getSource().getFeatureInfoUrl(evt.coordinate, resolution, projection, {
                     INFO_FORMAT: 'geojson'
                 });
 

@@ -32,7 +32,7 @@ Ext.define('CpsiMapview.plugin.LineSliceHighlight', {
         var coordinates = [];
         geometry.forEachSegment(function (a, b) {
             var segment = new ol.geom.LineString([a, b]);
-            var segmentLength = ol.Sphere.getLength(segment);
+            var segmentLength = ol.sphere.getLength(segment);
             if (length <= start && start < length + segmentLength) {
                 // start is in this segment
                 coordinates.push(segment.getCoordinateAt((start - length) / segmentLength));

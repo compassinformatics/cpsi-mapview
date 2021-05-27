@@ -62,6 +62,12 @@ Ext.define('CpsiMapview.controller.button.StreetViewTool', {
      */
     svPositionChangedListener: null,
 
+    constructor: function () {
+        var me = this;
+        me.onMapClick = me.onMapClick.bind(me);
+        me.callParent(arguments);
+    },
+
     /**
      * @private
      */
@@ -185,9 +191,9 @@ Ext.define('CpsiMapview.controller.button.StreetViewTool', {
         var me = this;
 
         if (activate) {
-            me.map.on('singleclick', me.onMapClick, me);
+            me.map.on('singleclick', me.onMapClick);
         } else {
-            me.map.un('singleclick', me.onMapClick, me);
+            me.map.un('singleclick', me.onMapClick);
         }
     },
 

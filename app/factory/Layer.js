@@ -774,7 +774,7 @@ Ext.define('CpsiMapview.factory.Layer', {
         // just setting 'opacity' to the layer does not work
         // seems related to https://github.com/openlayers/openlayers/issues/4758
         if (Ext.isNumber(layerConf.opacity)) {
-            vtLayer.on('precompose', function(evt) {
+            vtLayer.on('prerender', function(evt) {
                 evt.context.globalAlpha = layerConf.opacity;
             });
         }

@@ -35,6 +35,11 @@ Ext.define('CpsiMapview.controller.button.FeatureSelectionButtonController', {
      */
     fidsToFilter: [],
 
+    constructor: function () {
+        var me = this;
+        me.onMapClick = me.onMapClick.bind(me);
+        me.callParent(arguments);
+    },
 
     init: function () {
         var me = this;
@@ -74,10 +79,10 @@ Ext.define('CpsiMapview.controller.button.FeatureSelectionButtonController', {
         if (pressed) {
             // create and show selector UI
             me.addModeSelectorUi();
-            me.map.on('click', me.onMapClick, me);
+            me.map.on('click', me.onMapClick);
         } else {
             me.modeSelector.hide();
-            me.map.un('click', me.onMapClick, me);
+            me.map.un('click', me.onMapClick);
         }
 
     },
