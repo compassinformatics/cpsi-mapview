@@ -74,7 +74,7 @@ Ext.define('CpsiMapview.view.menuitem.LayerOpacity', {
             var setLayerOpacity = function(evt) {
                 evt.context.globalAlpha = opac;
             };
-            me.layer.on('precompose', setLayerOpacity);
+            me.layer.on('prerender', setLayerOpacity);
             CpsiMapview.view.main.Map.guess().olMap.render();
         }
 

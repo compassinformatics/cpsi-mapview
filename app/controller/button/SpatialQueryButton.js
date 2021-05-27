@@ -51,6 +51,15 @@ Ext.define('CpsiMapview.controller.button.SpatialQueryButtonController', {
      */
     mapComponent: null,
 
+
+    constructor: function () {
+        var me = this;
+        me.getFeaturesFromSourceAndTriggerWfs = me.getFeaturesFromSourceAndTriggerWfs.bind(me);
+        me.getGeometryFromPolygonAndTriggerWfs = me.getGeometryFromPolygonAndTriggerWfs.bind(me);
+        me.onQueryLayerVisibilityChange = me.onQueryLayerVisibilityChange.bind(me);
+        me.callParent(arguments);
+    },
+
     /**
      * Function to determine the query layer if not yet defined in class
      */
@@ -141,10 +150,10 @@ Ext.define('CpsiMapview.controller.button.SpatialQueryButtonController', {
             if (view.displayPermanently) {
                 me.modifiyQueryInteraction.setActive(true);
                 me.snapQueryInteraction.setActive(true);
-                me.drawQueryInteraction.on('drawend', me.getFeaturesFromSourceAndTriggerWfs, me);
-                me.modifiyQueryInteraction.on('modifyend', me.getFeaturesFromSourceAndTriggerWfs, me);
+                me.drawQueryInteraction.on('drawend', me.getFeaturesFromSourceAndTriggerWfs);
+                me.modifiyQueryInteraction.on('modifyend', me.getFeaturesFromSourceAndTriggerWfs);
             } else {
-                view.queryFeatures.on('add', me.getGeometryFromPolygonAndTriggerWfs, me);
+                view.queryFeatures.on('add', me.getGeometryFromPolygonAndTriggerWfs);
             }
         } else {
             me.drawQueryInteraction.setActive(false);
@@ -152,10 +161,10 @@ Ext.define('CpsiMapview.controller.button.SpatialQueryButtonController', {
             if (view.displayPermanently) {
                 me.modifiyQueryInteraction.setActive(false);
                 me.snapQueryInteraction.setActive(false);
-                me.drawQueryInteraction.un('drawend', me.getFeaturesFromSourceAndTriggerWfs, me);
-                me.modifiyQueryInteraction.un('modifyend', me.getFeaturesFromSourceAndTriggerWfs, me);
+                me.drawQueryInteraction.un('drawend', me.getFeaturesFromSourceAndTriggerWfs);
+                me.modifiyQueryInteraction.un('modifyend', me.getFeaturesFromSourceAndTriggerWfs);
             } else {
-                view.queryFeatures.un('add', me.getGeometryFromPolygonAndTriggerWfs, me);
+                view.queryFeatures.un('add', me.getGeometryFromPolygonAndTriggerWfs);
             }
         }
     },
@@ -202,7 +211,7 @@ Ext.define('CpsiMapview.controller.button.SpatialQueryButtonController', {
             return;
         }
         if (view.queryLayer) {
-            view.queryLayer.on('change:visible', me.onQueryLayerVisibilityChange.bind(me));
+            view.queryLayer.on('change:visible', me.onQueryLayerVisibilityChange);
         }
     },
 

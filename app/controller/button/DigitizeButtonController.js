@@ -85,6 +85,17 @@ Ext.define('CpsiMapview.controller.button.DigitizeButtonController', {
      */
     blockedEventHandling: false,
 
+    constructor: function () {
+        var me = this;
+
+        me.handleDrawEnd = me.handleDrawEnd.bind(me);
+        me.handleLocalDrawEnd = me.handleLocalDrawEnd.bind(me);
+        me.handleCircleDrawEnd = me.handleCircleDrawEnd.bind(me);
+        me.handleModifyEnd = me.handleModifyEnd.bind(me);
+
+        me.callParent(arguments);
+    },
+
     /**
      * Set the layer to store features drawn by the editing
      * tools
@@ -161,9 +172,9 @@ Ext.define('CpsiMapview.controller.button.DigitizeButtonController', {
 
         // register listeners when connected to a backend service
         if (view.getApiUrl()) {
-            me.drawInteraction.on('drawend', type === 'Circle' ? me.handleCircleDrawEnd : me.handleDrawEnd, me);
+            me.drawInteraction.on('drawend', type === 'Circle' ? me.handleCircleDrawEnd : me.handleDrawEnd);
         } else {
-            me.drawInteraction.on('drawend', me.handleLocalDrawEnd, me);
+            me.drawInteraction.on('drawend', me.handleLocalDrawEnd);
         }
 
         me.map.addInteraction(me.drawInteraction);
@@ -203,7 +214,7 @@ Ext.define('CpsiMapview.controller.button.DigitizeButtonController', {
             me.modifyInteraction = new ol.interaction.Modify(modifyInteractionConfig);
             // add listeners when connected to a backend service
             if (view.getApiUrl()) {
-                me.modifyInteraction.on('modifyend', me.handleModifyEnd, me);
+                me.modifyInteraction.on('modifyend', me.handleModifyEnd);
             }
             me.map.addInteraction(me.modifyInteraction);
         }
@@ -604,7 +615,7 @@ Ext.define('CpsiMapview.controller.button.DigitizeButtonController', {
                 return layer === me.drawLayer;
             }
         });
-        if (features && features.length) {
+        if (features.length > 0) {
             me.blockEventHandling();
 
             var drawFeature = features[0];
@@ -646,7 +657,7 @@ Ext.define('CpsiMapview.controller.button.DigitizeButtonController', {
 
         var points = me.getSolverPoints();
 
-        if (features && features.length && features[0] !== points[points.length - 1]) {
+        if (features.length > 0 && features[0] !== points[points.length - 1]) {
             me.blockEventHandling();
 
             me.getNetByPoints(points.concat([features[0]]))
