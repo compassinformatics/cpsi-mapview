@@ -208,7 +208,7 @@
      */
   "js": [
     {
-      "path": "./lib/openlayers/ol-debug.js"
+      "path": "./node_modules/@geoext/openlayers-legacy/dist/ol.js"
     },
     {
       "path": "./node_modules/geostyler-sld-parser/browser/sldStyleParser.js"
@@ -307,7 +307,7 @@
      */
     "css": [
         {
-            "path": "./lib/openlayers/ol.css"
+            "path": "./node_modules/@geoext/openlayers-legacy/dist/ol.css"
         },
         {
             "path": "./resources/font-gis/css/font-gis.css"
