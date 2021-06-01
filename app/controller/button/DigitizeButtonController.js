@@ -302,7 +302,6 @@ Ext.define('CpsiMapview.controller.button.DigitizeButtonController', {
             } else {
                 me.drawLayer = new ol.layer.Vector({
                     source: new ol.source.Vector(),
-                    displayInLayerSwitcher: false,
                     style: view.getDrawLayerStyle()
                 });
                 me.map.addLayer(me.drawLayer);
@@ -322,7 +321,6 @@ Ext.define('CpsiMapview.controller.button.DigitizeButtonController', {
             } else {
                 me.resultLayer = new ol.layer.Vector({
                     name: 'resultLayer',
-                    displayInLayerSwitcher: false,
                     source: new ol.source.Vector(),
                     style: view.getResultLayerStyle()
                 });

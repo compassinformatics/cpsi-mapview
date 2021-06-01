@@ -166,12 +166,7 @@ Ext.define('CpsiMapview.view.toolbar.MapTools', {
         // Nominatim based location search
         me.items.push({
             xtype: 'gx_geocoder_combo',
-            map: map,
-            listeners: {
-                afterrender: function (gcCombo) {
-                    gcCombo.locationLayer.set('displayInLayerSwitcher', false);
-                }
-            }
+            map: map
         });
 
         // custom CPSI gazetteer

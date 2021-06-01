@@ -37,7 +37,6 @@ Ext.define('CpsiMapview.store.GridExample', {
     model: 'CpsiMapview.model.GridExample',
     typeName: 'ruins',
     layerOptions: {
-        displayInLayerSwitcher: false,
         name: 'GridExampleLayer'
     },
     sorters: [{

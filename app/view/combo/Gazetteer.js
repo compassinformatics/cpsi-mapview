@@ -65,15 +65,6 @@ Ext.define('CpsiMapview.view.combo.Gazetteer', {
             beforequery: function () {
                 var val = this.getRawValue();
 
-                // set a key on the layer using the unique id of the combo
-                me.locationLayer.set('layerKey', me.id);
-                if (Ext.isEmpty(BasiGX.util.Layer.getLayersBy('layerKey', me.id))) {
-                    // if the layer is not yet in the map then add it
-                    if (me.map) {
-                        me.map.addLayer(me.locationLayer);
-                    }
-                }
-
                 // clear any previous query feature
                 me.removeLocationFeature();
 
@@ -87,8 +78,8 @@ Ext.define('CpsiMapview.view.combo.Gazetteer', {
                 }
             },
             afterrender: function () {
-                // don't display the layer in the layer tree
-                me.locationLayer.set('displayInLayerSwitcher', false);
+                // set a key on the layer using the unique id of the combo
+                me.locationLayer.set('layerKey', me.id);
             }
         });
 

@@ -4,9 +4,6 @@ Ext.define('CpsiMapview.store.WfsFeatures', {
     remoteSort: true,
     passThroughFilter: false,
     remoteFilter: true,
-    layerOptions: {
-        displayInLayerSwitcher: false
-    },
     url: '/mapserver/?',
     version: '2.0.0',
     outputFormat: 'geojson',

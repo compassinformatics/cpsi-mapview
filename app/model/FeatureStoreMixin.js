@@ -75,7 +75,6 @@ Ext.define('CpsiMapview.model.FeatureStoreMixin', {
         var selectStyle = field.createSelectStyle();
 
         var vectorLayer = new ol.layer.Vector({
-            displayInLayerSwitcher: false,
             source: new ol.source.Vector(),
             style: style,
             selectStyle: selectStyle // note selectStyle is a custom property and not a ol.layer.Vector option
