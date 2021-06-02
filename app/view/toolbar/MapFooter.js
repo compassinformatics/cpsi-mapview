@@ -22,7 +22,18 @@ Ext.define('CpsiMapview.view.toolbar.MapFooter', {
     {
         xtype: 'basigx-maploadingstatusbar',
         width: 200
-    }, '->',
+    },
+    {
+        xtype: 'cmv_numericattributeslider',
+        // TODO might be better suited at the layer level
+        numericField: 'Speed_Limit',
+        minValue: 30,
+        maxValue: 130,
+        increment: 10,
+        currLowerValue: 50,
+        currUpperValue: 100
+    },
+        '->',
     {
         xtype: 'button',
         text: 'Login',

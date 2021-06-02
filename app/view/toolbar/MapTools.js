@@ -12,7 +12,6 @@ Ext.define('CpsiMapview.view.toolbar.MapTools', {
         'BasiGX.view.button.ZoomToExtent',
         'BasiGX.view.button.History',
         'CpsiMapview.view.button.DigitizeButton',
-        'CpsiMapview.view.button.SpatialQueryButton',
         'CpsiMapview.model.button.MeasureButton',
         'CpsiMapview.controller.button.MeasureButtonController',
         'CpsiMapview.controller.MapController',
@@ -33,7 +32,7 @@ Ext.define('CpsiMapview.view.toolbar.MapTools', {
     items: [
         {
             xtype: 'buttongroup',
-            title: 'Map Tools',
+            title: 'Basic Tools',
             items: [
                 {
                     xtype: 'basigx-button-zoomtoextent',
@@ -51,7 +50,7 @@ Ext.define('CpsiMapview.view.toolbar.MapTools', {
                     toggleGroup: 'measure-tools',
                     viewModel: 'cmv_btn_measure',
                     controller: 'cmv_btn_measure',
-                    glyph: 'xf068@FontAwesome',
+                    glyph: 'ea13@font-gis',
                     listeners: {
                         afterrender: 'initializeMeasureBtn'
                     }
@@ -59,100 +58,81 @@ Ext.define('CpsiMapview.view.toolbar.MapTools', {
                     xtype: 'basigx-button-measure',
                     measureType: 'polygon',
                     toggleGroup: 'measure-tools',
-                    glyph: 'xf044@FontAwesome',
+                    glyph: 'ea14@font-gis',
                     viewModel: 'cmv_btn_measure',
                     controller: 'cmv_btn_measure',
                     listeners: {
                         afterrender: 'initializeMeasureBtn'
                     }
+                }, {
+                    xtype: 'basigx-button-history',
+                    direction: 'BACK',
+                    glyph: 'xf104@FontAwesome'
+                }, {
+                    xtype: 'basigx-button-history',
+                    direction: 'FORWARD',
+                    glyph: 'xf105@FontAwesome'
                 }]
-        }, {
-            xtype: 'cmv_spatial_query_button',
-            queryLayerName: 'GAS WFS',
-            drawGeometryType: 'Polygon',
-            spatialOperator: 'intersect',
-            glyph: 'xf096@FontAwesome',
-            listeners: {
-                'cmv-spatial-query-success': function (featureCollection) {
-                    var msg = 'WFS query returned ' + featureCollection.totalFeatures + ' feature(s)';
-                    Ext.Msg.show({
-                        title: 'Info',
-                        message: msg,
-                        buttons: Ext.MessageBox.OK,
-                        icon: Ext.MessageBox.INFO,
-                    });
-                },
-                'cmv-spatial-query-error': function () {
-                    Ext.Msg.show({
-                        title: 'Error',
-                        message: 'WFS query not successful',
-                        buttons: Ext.MessageBox.OK,
-                        icon: Ext.MessageBox.ERROR,
-                    });
+        },
+        {
+            xtype: 'buttongroup',
+            title: 'Advanced Tools',
+            items: [{
+                xtype: 'cmv_digitize_button',
+                tooltip: 'Point',
+                glyph: 'ea52@font-gis',
+                apiUrl: 'https://pmstipperarydev.compass.ie/pmspy/netsolver',
+                groups: true,
+                pointExtentBuffer: 50,
+                listeners: {
+                    responseFeatures: function () {
+                        this.getController().onResponseFeatures();
+                    }
                 }
-            }
-        }, {
-            xtype: 'basigx-button-history',
-            direction: 'BACK',
-            glyph: 'xf104@FontAwesome'
-        }, {
-            xtype: 'basigx-button-history',
-            direction: 'FORWARD',
-            glyph: 'xf105@FontAwesome'
-        }, {
-            xtype: 'cmv_digitize_button',
-            tooltip: 'Point',
-            apiUrl: 'https://pmstipperarydev.compass.ie/pmspy/netsolver',
-            groups: true,
-            pointExtentBuffer: 50,
-            listeners: {
-                responseFeatures: function () {
-                    this.getController().onResponseFeatures();
+            }, {
+                xtype: 'cmv_digitize_button',
+                type: 'LineString',
+                glyph: 'ea02@font-gis',
+                tooltip: 'Line'
+            }, {
+                xtype: 'cmv_digitize_button',
+                type: 'Polygon',
+                tooltip: 'Polygon',
+                glyph: 'ea03@font-gis',
+                apiUrl: 'https://pmstipperarydev.compass.ie/WebServices/roadschedule/cutWithPolygon',
+                listeners: {
+                    responseFeatures: function () {
+                        this.getController().onResponseFeatures();
+                    }
                 }
-            }
-        }, {
-            xtype: 'cmv_digitize_button',
-            type: 'LineString',
-            tooltip: 'Line'
-        }, {
-            xtype: 'cmv_digitize_button',
-            type: 'Polygon',
-            tooltip: 'Polygon',
-            iconCls: 'icon-polygon2',
-            glyph: null,
-            apiUrl: 'https://pmstipperarydev.compass.ie/WebServices/roadschedule/cutWithPolygon',
-            listeners: {
-                responseFeatures: function () {
-                    this.getController().onResponseFeatures();
+            }, {
+                xtype: 'cmv_digitize_button',
+                type: 'Circle',
+                tooltip: 'Circle',
+                apiUrl: 'https://pmstipperarydev.compass.ie/WebServices/roadschedule/cutWithPolygon',
+                listeners: {
+                    responseFeatures: function () {
+                        this.getController().onResponseFeatures();
+                    }
                 }
-            }
-        }, {
-            xtype: 'cmv_digitize_button',
-            type: 'Circle',
-            tooltip: 'Circle',
-            apiUrl: 'https://pmstipperarydev.compass.ie/WebServices/roadschedule/cutWithPolygon',
-            listeners: {
-                responseFeatures: function () {
-                    this.getController().onResponseFeatures();
-                }
-            }
-        }, {
-            xtype: 'cmv_streetview_tool'
-        }, {
-            xtype: 'cmv_timeslider',
-            startDate: new Date(1946, 0, 1),
-            endDate: new Date(2020, 11, 30)
-        }, {
-            xtype: 'cmv_numericattributeslider',
-            // TODO might be better suited at the layer level
-            numericField: 'Speed_Limit',
-            minValue: 30,
-            maxValue: 130,
-            increment: 10,
-            currLowerValue: 50,
-            currUpperValue: 100
-        }, {
-            xtype: 'cmv_line_slice_grid_button'
+            }, {
+                xtype: 'cmv_streetview_tool'
+            }, {
+                xtype: 'cmv_line_slice_grid_button',
+                text: '',
+                tooltip: 'Linear Reference demo',
+                glyph: 'ea78@font-gis',
+            }]
+        },
+        '->',
+        {
+            xtype: 'buttongroup',
+            title: 'Global Timeslider',
+            items: [{
+                xtype: 'cmv_timeslider',
+                startDate: new Date(1946, 0, 1),
+                endDate: new Date(2020, 11, 30)
+            }]
         }
     ],
 
@@ -165,20 +145,25 @@ Ext.define('CpsiMapview.view.toolbar.MapTools', {
 
         // Nominatim based location search
         me.items.push({
-            xtype: 'gx_geocoder_combo',
-            map: map
+            xtype: 'buttongroup',
+            title: 'Gazetteers',
+            items: [{
+                xtype: 'gx_geocoder_combo',
+                map: map,
+                listeners: {
+                    afterrender: function (gcCombo) {
+                        gcCombo.locationLayer.set('displayInLayerSwitcher', false);
+                    }
+                }
+            }, {
+                xtype: 'cmv_gazetteer_combo', // custom CPSI gazetteer
+                url: 'https://pmstipperarydev.compass.ie/WebServices/townland/gazetteer/',
+                proxyRootProperty: 'data',
+                displayValueMapping: 'name',
+                emptyText: 'Townland...',
+                map: map
+            }]
         });
-
-        // custom CPSI gazetteer
-        me.items.push({
-            xtype: 'cmv_gazetteer_combo',
-            url: 'https://pmstipperarydev.compass.ie/WebServices/townland/gazetteer/',
-            proxyRootProperty: 'data',
-            displayValueMapping: 'name',
-            emptyText: 'Townland...',
-            map: map
-        });
-
         me.callParent();
     }
 });
