@@ -12,7 +12,8 @@
         "checked": false,
         "children": [
           {
-            "id": "LIGHT_UNIT_MVT",
+            "id": "LA_SITES",
+            "text": "Local Authority Sites",
             "leaf": true
           },
           {
@@ -78,35 +79,40 @@
           {
             "id": "GAS_WFS",
             "leaf": true,
-            "text": "GAS WFS"
+            "text": "GAS WFS",
+            "glyph": "ea9e@font-gis"
           },
           {
             "id": "COUNTRY_WFS",
             "leaf": true,
             "text": "Country WFS",
-            "qtip": "An OSM based WFS layer"
+            "qtip": "An OSM based WFS layer",
+            "glyph": "ea9e@font-gis"
           },
           {
             "id": "OSM_WMS",
             "leaf": true,
             "text": "OSM WMS",
             "qtip": "An OSM based WMS layer",
-            "iconCls": "map"
+            "glyph": "ea68@font-gis"
           },
           {
             "id": "OSM_WMS2",
             "leaf": true,
-            "text": "A WMS 2"
+            "text": "A WMS 2",
+            "glyph": "ea9c@font-gis"
           },
           {
             "id": "OSM_WMS3",
             "leaf": true,
-            "text": "A WMS 3"
+            "text": "A WMS 3",
+            "glyph": "ea9c@font-gis"
           },
           {
             "id": "OSM_WMS4",
             "leaf": true,
-            "text": "A WMS 4"
+            "text": "A WMS 4",
+            "glyph": "ea9c@font-gis"
           }
         ]
       },
