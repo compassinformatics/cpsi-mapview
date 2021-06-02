@@ -374,6 +374,19 @@
           "property": "name"
         }
       ]
+    },
+    {
+      "layerType": "wms",
+      "gridXType": "cmv_filtersexamplegrid",
+      "layerKey": "LA_SITES",
+      "url": "http://localhost/mapserver2/?map=/MapServer/apps/mapview-demo/example.map&",
+      "serverOptions": {
+        "layers": "lasites"
+      },
+      "openLayers": {
+        "opacity": 0.7,
+        "visibility": true
+      }
     }
   ]
 }

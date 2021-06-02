@@ -12,7 +12,8 @@
         "checked": false,
         "children": [
           {
-            "id": "LIGHT_UNIT_MVT",
+            "id": "LA_SITES",
+            "text": "Local Authority Sites",
             "leaf": true
           },
           {
