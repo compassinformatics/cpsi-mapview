@@ -149,12 +149,7 @@ Ext.define('CpsiMapview.view.toolbar.MapTools', {
             title: 'Gazetteers',
             items: [{
                 xtype: 'gx_geocoder_combo',
-                map: map,
-                listeners: {
-                    afterrender: function (gcCombo) {
-                        gcCombo.locationLayer.set('displayInLayerSwitcher', false);
-                    }
-                }
+                map: map
             }, {
                 xtype: 'cmv_gazetteer_combo', // custom CPSI gazetteer
                 url: 'https://pmstipperarydev.compass.ie/WebServices/townland/gazetteer/',
