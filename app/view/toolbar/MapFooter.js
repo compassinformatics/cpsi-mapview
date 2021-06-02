@@ -32,8 +32,7 @@ Ext.define('CpsiMapview.view.toolbar.MapFooter', {
         increment: 10,
         currLowerValue: 50,
         currUpperValue: 100
-    },
-        '->',
+    }, '->',
     {
         xtype: 'button',
         text: 'Login',
