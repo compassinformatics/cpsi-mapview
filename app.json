@@ -310,6 +310,9 @@
             "path": "./lib/openlayers/ol.css"
         },
         {
+            "path": "./resources/font-gis/css/font-gis.css"
+        },
+        {
             // this entry uses an ant variable that is the calculated
             // value of the generated output css file for the app,
             // defined in .sencha/app/defaults.properties
