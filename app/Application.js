@@ -6,6 +6,12 @@
 Ext.define('CpsiMapview.Application', {
     extend: 'Ext.app.Application',
 
+    mixins: {
+        appmixin: 'CpsiMapview.util.ApplicationMixin'
+    },
+
+    requireLogin: false,
+
     name: 'CpsiMapview',
 
     quickTips: false,

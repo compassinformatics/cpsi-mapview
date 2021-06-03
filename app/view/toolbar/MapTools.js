@@ -39,15 +39,15 @@ Ext.define('CpsiMapview.view.toolbar.MapTools', {
                     extent: [-1210762, 6688545, -600489, 7490828]
                 }, {
                     xtype: 'basigx-button-zoomin',
-                    toggleGroup: 'zoom'
+                    toggleGroup: 'map'
                 }, {
                     xtype: 'basigx-button-zoomout',
-                    toggleGroup: 'zoom',
+                    toggleGroup: 'map',
                     enableZoomOutWithBox: true
                 }, {
                     xtype: 'basigx-button-measure',
+                    toggleGroup: 'map',
                     measureType: 'line',
-                    toggleGroup: 'measure-tools',
                     viewModel: 'cmv_btn_measure',
                     controller: 'cmv_btn_measure',
                     glyph: 'ea13@font-gis',
@@ -56,8 +56,8 @@ Ext.define('CpsiMapview.view.toolbar.MapTools', {
                     }
                 }, {
                     xtype: 'basigx-button-measure',
+                    toggleGroup: 'map',
                     measureType: 'polygon',
-                    toggleGroup: 'measure-tools',
                     glyph: 'ea14@font-gis',
                     viewModel: 'cmv_btn_measure',
                     controller: 'cmv_btn_measure',
@@ -79,6 +79,7 @@ Ext.define('CpsiMapview.view.toolbar.MapTools', {
             title: 'Advanced Tools',
             items: [{
                 xtype: 'cmv_digitize_button',
+                toggleGroup: 'map',
                 tooltip: 'Point',
                 glyph: 'ea52@font-gis',
                 apiUrl: 'https://pmstipperarydev.compass.ie/pmspy/netsolver',
@@ -89,13 +90,17 @@ Ext.define('CpsiMapview.view.toolbar.MapTools', {
                         this.getController().onResponseFeatures();
                     }
                 }
-            }, {
+            },
+            {
                 xtype: 'cmv_digitize_button',
+                toggleGroup: 'map',
                 type: 'LineString',
                 glyph: 'ea02@font-gis',
                 tooltip: 'Line'
-            }, {
+            },
+            {
                 xtype: 'cmv_digitize_button',
+                toggleGroup: 'map',
                 type: 'Polygon',
                 tooltip: 'Polygon',
                 glyph: 'ea03@font-gis',
@@ -105,8 +110,10 @@ Ext.define('CpsiMapview.view.toolbar.MapTools', {
                         this.getController().onResponseFeatures();
                     }
                 }
-            }, {
+            },
+            {
                 xtype: 'cmv_digitize_button',
+                toggleGroup: 'map',
                 type: 'Circle',
                 tooltip: 'Circle',
                 apiUrl: 'https://pmstipperarydev.compass.ie/WebServices/roadschedule/cutWithPolygon',
@@ -116,7 +123,8 @@ Ext.define('CpsiMapview.view.toolbar.MapTools', {
                     }
                 }
             }, {
-                xtype: 'cmv_streetview_tool'
+                xtype: 'cmv_streetview_tool',
+                toggleGroup: 'map',
             }, {
                 xtype: 'cmv_line_slice_grid_button',
                 text: '',
