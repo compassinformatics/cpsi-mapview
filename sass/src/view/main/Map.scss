@@ -4,3 +4,12 @@
   -moz-text-shadow: 0 0 5px white;
   -webkit-text-shadow: 0 0 5px white;
 }
+
+// display the scalebar in the top left corner
+// to avoid clashes with the minimised toolbar
+.ol-scale-line {
+    top: .5em;
+    left: 3.5em;
+    right: auto;
+    bottom: auto;
+}

@@ -15,7 +15,8 @@ Ext.define('CpsiMapview.view.main.Main', {
         'CpsiMapview.view.main.Map',
         'CpsiMapview.view.header.Panel',
         'CpsiMapview.view.LayerTree',
-        'CpsiMapview.view.grid.ExampleGrid'
+        'CpsiMapview.view.grid.ExampleGrid',
+        'CpsiMapview.view.grid.GridFiltersExample'
     ],
 
     layout: 'border',
