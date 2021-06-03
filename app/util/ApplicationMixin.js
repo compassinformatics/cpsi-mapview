@@ -9,7 +9,15 @@ Ext.define('CpsiMapview.util.ApplicationMixin', {
     // see https://docs.sencha.com/extjs/6.7.0/classic/Ext.app.Application.html#cfg-quickTips
     quickTips: false,
 
+    /**
+     * Property to store a reference to the login window
+     */
     loginWindow: null,
+
+    /**
+     * Does the application require a login window for access
+     */
+    requireLogin: true,
 
     // when the platform is matched any properties are placed on the class
     platformConfig: {
@@ -24,15 +32,24 @@ Ext.define('CpsiMapview.util.ApplicationMixin', {
         }
     },
 
-    // URLs to monitor for service errors
+    /**
+     * URLs to monitor for service errors
+     */
     serviceUrls: [],
 
-    // URLs to ignore for errors
+    /**
+     * URLs to ignore for errors
+     */
     excludedUrls: [],
 
-    // URL to use as the root for any window helpUrl
+    /**
+     * URL to use as the root for any window helpUrl
+     */
     rootHelpUrl: '',
 
+    /**
+     * The token name within a cookie that stores a login token
+     */
     tokenName: 'cookietoken',
 
     errorCode: {
@@ -68,7 +85,7 @@ Ext.define('CpsiMapview.util.ApplicationMixin', {
             if (Ext.Array.some(me.excludedUrls, urlTest) === false) {
 
                 // FORMS submission (i.e. attachments upoad) return bogus responses with no content-type
-                var responseType = response.responseType ? response.responseType: response.getResponseHeader ? response.getResponseHeader('content-type') : null;
+                var responseType = response.responseType ? response.responseType : response.getResponseHeader ? response.getResponseHeader('content-type') : null;
 
                 // check for geojson (coming from MapServer)
                 if (responseType && responseType.includes('subtype=geojson')) {
@@ -123,7 +140,9 @@ Ext.define('CpsiMapview.util.ApplicationMixin', {
 
         var me = this;
         me.setupRequestHooks();
-        me.doLogin();
+        if (me.requireLogin) {
+            me.doLogin();
+        }
         // add a listener for whenever any button in the map toggleGroup is toggled
         me.control({
             'button[toggleGroup=map]': {
