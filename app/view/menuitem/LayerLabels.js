@@ -62,17 +62,17 @@ Ext.define('CpsiMapview.view.menuitem.LayerLabels', {
      */
     initComponent: function () {
         var me = this;
-
-        me.clientSideStyle = (me.layer && (
-            me.layer.getSource() instanceof ol.source.VectorTile
-            || me.layer.getSource() instanceof ol.source.Vector
-        ));
-        // try to detect the 'labelClassName' property of a WMS layer
-        if (me.layer && (me.layer.getSource() instanceof ol.source.TileWMS ||
-            me.layer.getSource() instanceof ol.source.ImageWMS)) {
-            me.labelClassName = me.layer.get('labelClassName');
+        if (me.layer && !(me.layer instanceof ol.layer.Group)) {
+            me.clientSideStyle = (
+                me.layer.getSource() instanceof ol.source.VectorTile
+                || me.layer.getSource() instanceof ol.source.Vector
+            );
+            // try to detect the 'labelClassName' property of a WMS layer
+            if (me.layer.getSource() instanceof ol.source.TileWMS ||
+                me.layer.getSource() instanceof ol.source.ImageWMS) {
+                me.labelClassName = me.layer.get('labelClassName');
+            }
         }
-
         me.callParent();
 
         if (me.clientSideStyle) {
