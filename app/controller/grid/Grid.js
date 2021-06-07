@@ -735,8 +735,8 @@ Ext.define('CpsiMapview.controller.grid.Grid', {
             var operator = filterDef.operator;
 
             if (!columnName || !value || !operator) {
-                console.warn('Preset filter is not properly defined.');
-                console.warn(filterDef);
+                Ext.log.warn('Preset filter is not properly defined.');
+                Ext.log.warn(filterDef);
                 return;
             }
 
