@@ -25,8 +25,8 @@
     "@geoext/openlayers-legacy": "^6.5.2",
     "eslint": "^6.2.1",
     "font-gis": "^1.0.2",
-    "geostyler-openlayers-parser": "^0.21.0",
-    "geostyler-sld-parser": "^2.0.0",
+    "geostyler-openlayers-parser": "^2.3.0",
+    "geostyler-sld-parser": "^2.3.0",
     "jsonlint": "^1.6.3"
   },
   "devDependencies": {
