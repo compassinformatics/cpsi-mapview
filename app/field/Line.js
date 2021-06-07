@@ -99,7 +99,7 @@ Ext.define('CpsiMapview.field.Line', {
     createStyle: function () {
 
         var me = this;
-        var cfg = me.featureStoreConfig;
+        var cfg = me.featureStoreConfig || {};
 
         var lineColor = cfg.lineColor || me.styleDefaults.lineColor;
         var pointColor = cfg.pointColor || me.styleDefaults.pointColor;
@@ -115,7 +115,7 @@ Ext.define('CpsiMapview.field.Line', {
     createSelectStyle: function () {
 
         var me = this;
-        var cfg = me.featureStoreConfig;
+        var cfg = me.featureStoreConfig || {};
 
         var lineColor = cfg.selectLineColor || me.selectStyleDefaults.lineColor;
         var pointColor = cfg.selectPointColor || me.selectStyleDefaults.pointColor;

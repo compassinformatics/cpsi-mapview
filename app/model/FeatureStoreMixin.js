@@ -65,8 +65,6 @@ Ext.define('CpsiMapview.model.FeatureStoreMixin', {
      */
     createFeatureStore: function (field) {
 
-        var me = this;
-
         var cfg = field.featureStoreConfig || {};
         var featModel = cfg.model || 'GeoExt.data.model.Feature';
 
@@ -75,7 +73,9 @@ Ext.define('CpsiMapview.model.FeatureStoreMixin', {
         var selectStyle = field.createSelectStyle();
 
         var vectorLayer = new ol.layer.Vector({
-            source: new ol.source.Vector(),
+            source: new ol.source.Vector({
+                features: new ol.Collection()
+            }),
             style: style,
             selectStyle: selectStyle // note selectStyle is a custom property and not a ol.layer.Vector option
         });
@@ -93,47 +93,11 @@ Ext.define('CpsiMapview.model.FeatureStoreMixin', {
             filters.push(field.defaultFeatureFilter);
         }
 
-        var featStore = Ext.create('GeoExt.data.store.Features', {
+        return Ext.create('GeoExt.data.store.Features', {
             model: featModel,
             layer: vectorLayer,
-            filters: filters,
-            // ensure that any changes to layers are persisted back to the model
-            // to trigger validation
-            listeners: {
-                add: function (store, features) {
-                    // if in an edit session then this is in initial load from CpsiMapview.field.Feature
-                    // so avoid setting the model to dirty when updating the field
-                    var dirty = !me.editing;
-                    me.set(field.name, features, { convert: false, dirty: dirty });
-                },
-                clear: function () {
-                    me.set(field.name, null, { convert: false });
-                },
-                remove: function (store, records) {
-                    var features = store.getRange(); // get all remaining features
-                    me.set(field.name, features, { convert: false });
-                    // currently binding is from layer to store, not store to layer
-                    // manually remove features linked to records removed from the store
-                    // see https://github.com/geoext/geoext3/issues/636
-                    Ext.each(records, function (r) {
-                        var feature = r.getFeature();
-                        var source = store.layer.getSource();
-                        if (feature) {
-                            var featureKey = ol.getUid(feature).toString();
-                            // TODO fix this hack
-                            // currently a feature can be removed from a layer triggering the
-                            // remove event on the grid - which in turn tries to remove the feature
-                            // from the layer throwing an error. This check prevents this.
-                            if (source.featureChangeKeys_[featureKey]) {
-                                source.removeFeature(feature);
-                            }
-                        }
-                    });
-                }
-            }
+            filters: filters
         });
-
-        return featStore;
     },
 
     /**
