@@ -8,7 +8,7 @@ module.exports = function(config) {
         'https://cdnjs.cloudflare.com/ajax/libs/extjs/6.2.0/classic/theme-neptune/resources/theme-neptune-all.css',
         'node_modules/@geoext/openlayers-legacy/dist/ol.css',
         'node_modules/@geoext/openlayers-legacy/dist/ol.js',
-        'https://cdnjs.cloudflare.com/ajax/libs/extjs/6.2.0/ext-all.js',
+        'https://cdnjs.cloudflare.com/ajax/libs/extjs/6.2.0/ext-all-debug.js',
         'https://cdnjs.cloudflare.com/ajax/libs/extjs/6.2.0/packages/ux/classic/ux.js',
         'https://cdnjs.cloudflare.com/ajax/libs/opentype.js/0.6.9/opentype.min.js',
         'https://cdn.jsdelivr.net/npm/jsonix@3.0.0/jsonix.min.js',
