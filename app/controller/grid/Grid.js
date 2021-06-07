@@ -769,6 +769,19 @@ Ext.define('CpsiMapview.controller.grid.Grid', {
                         column.filter.setValue(filterValue);
                     }
                     break;
+                case 'list':
+                    // we need to apply the initial config again,
+                    // because otherwise the store with the list-choices
+                    // gets lost
+                    var newFilter = Ext.clone(column.initialConfig.filter);
+
+                    // now we apply the oparator and the value
+                    newFilter.operator = operator;
+                    newFilter.value = value;
+
+                    var plugin = grid.getPlugin('gridfilters');
+                    plugin.addFilter(newFilter);
+                    break;
                 default:
                     break;
             }
@@ -783,9 +796,8 @@ Ext.define('CpsiMapview.controller.grid.Grid', {
      * @returns {Object} The value object for the filter
      */
     createNumberFilterValue: function(operator, value){
-        // translate user defined operators
-        // into operators that are
-        // compatible with number filters
+        // translate user defined operators into operators
+        // that are compatible with number filters
         var operatorMapping = {
             '=': 'eq',
             '>': 'gt',

@@ -390,6 +390,23 @@
     {
       "layerType": "wms",
       "gridXType": "cmv_filtersexamplegrid",
+      "gridFilters": [
+        {
+          "property": "Calc_Area",
+          "value": "1.7",
+          "operator": ">"
+        },
+        {
+          "property": "Location",
+          "value": "Ba",
+          "operator": "="
+        },
+        {
+          "property": "AUTHORITY",
+          "value": ["Kerry", "Cavan"],
+          "operator": "in"
+        }
+      ],
       "layerKey": "LA_SITES",
       "serverOptions": {
         "layers": "lasites"
