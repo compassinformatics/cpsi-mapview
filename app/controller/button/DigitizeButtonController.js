@@ -286,7 +286,7 @@ Ext.define('CpsiMapview.controller.button.DigitizeButtonController', {
     },
 
     /**
-     * Main handler which activates or deactives the interactions and listeners
+     * Main handler which activates or deactivates the interactions and listeners
      * @param {Ext.button.Button} btn The button that has been pressed
      * @param {boolean} pressed The toggle state of the button
      */
@@ -544,9 +544,6 @@ Ext.define('CpsiMapview.controller.button.DigitizeButtonController', {
 
         resultPromise
             .then(me.handleFinalResult.bind(me))
-            .then(undefined, function (err) {
-                Ext.log.error(err);
-            })
             .then(me.updateDrawSource.bind(me));
     },
 
@@ -598,9 +595,6 @@ Ext.define('CpsiMapview.controller.button.DigitizeButtonController', {
 
         resultPromise
             .then(me.handleFinalResult.bind(me))
-            .then(undefined, function (err) {
-                Ext.log.error(err);
-            })
             .then(me.updateDrawSource.bind(me));
     },
 
@@ -631,9 +625,6 @@ Ext.define('CpsiMapview.controller.button.DigitizeButtonController', {
             } else {
                 me.getNetByPoints(points)
                     .then(me.handleFinalResult.bind(me))
-                    .then(undefined, function (err) {
-                        Ext.log.error(err);
-                    })
                     .then(me.updateDrawSource.bind(me));
             }
 
@@ -664,9 +655,6 @@ Ext.define('CpsiMapview.controller.button.DigitizeButtonController', {
 
             me.getNetByPoints(points.concat([features[0]]))
                 .then(me.handleFinalResult.bind(me))
-                .then(undefined, function (err) {
-                    Ext.log.error(err);
-                })
                 .then(me.updateDrawSource.bind(me));
 
             return false;
@@ -864,25 +852,27 @@ Ext.define('CpsiMapview.controller.button.DigitizeButtonController', {
 
         mapComponent.setLoading(true);
 
-        return Ext.Ajax.request({
-            url: url,
-            method: 'POST',
-            jsonData: jsonParams,
-            success: function (response) {
-                mapComponent.setLoading(false);
-                return response;
-            },
-            failure: function (response) {
-                mapComponent.setLoading(false);
+        return new Ext.Promise(function (resolve) {
+            Ext.Ajax.request({
+                url: url,
+                method: 'POST',
+                jsonData: jsonParams,
+                success: function (response) {
+                    mapComponent.setLoading(false);
+                    resolve(response);
+                },
+                failure: function (response) {
+                    mapComponent.setLoading(false);
 
-                var errorMessage = 'Error while requesting the API endpoint';
+                    var errorMessage = 'Error while requesting the API endpoint';
 
-                if (response.responseText && response.responseText.message) {
-                    errorMessage += ': ' + response.responseText.message;
+                    if (response.responseText && response.responseText.message) {
+                        errorMessage += ': ' + response.responseText.message;
+                    }
+
+                    BasiGX.error(errorMessage);
                 }
-
-                BasiGX.error(errorMessage);
-            }
+            });
         });
     },
 
