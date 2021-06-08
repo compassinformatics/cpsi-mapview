@@ -1,9 +1,9 @@
 /**
-* A model mixin to create feature stores for feature related fields
-* (custom fields such as CpsiMapview.field.Line and CpsiMapview.field.Polygon
-* Any fields which contain features will automatically have a featureStore
-* created and added to featureStores property e.g. featureStores.edges
-*/
+ * A model mixin to create feature stores for feature related fields
+ * (custom fields such as CpsiMapview.field.Line and CpsiMapview.field.Polygon)
+ * Any fields which contain features will automatically have a featureStore
+ * created and added to featureStores property e.g. featureStores.edges
+ */
 Ext.define('CpsiMapview.model.FeatureStoreMixin', {
     extend: 'Ext.Mixin',
     requires: [
@@ -24,7 +24,7 @@ Ext.define('CpsiMapview.model.FeatureStoreMixin', {
     extentBuffer: 100,
 
     /**
-    Return the extent of all features associated with the model
+     * Return the extent of all features associated with the model
     */
     getRecordBounds: function () {
 
