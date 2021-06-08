@@ -645,21 +645,30 @@ Ext.define('CpsiMapview.controller.grid.Grid', {
     },
 
     /**
+     * @private
+     */
+    initViewModel: function (viewModel) {
+        var me = this;
+
+        me.applyStoreToGrid(viewModel);
+        me.activatePresetFilterButton(viewModel);
+    },
+
+    /**
      * Dynamically apply a store to the grid based on the gridStoreType
      * config option. Also set the hidden grid vector layer to be associated
      * with the cmv_spatial_query_button
      *
-     * @private
+     * @param {Ext.app.ViewModel } viewModel The ViewModel
      */
-    initViewModel: function (viewModel) {
-
+    applyStoreToGrid: function (viewModel) {
         var me = this;
 
         me.addChildModelListener();
 
         var gridStoreType = viewModel.get('gridStoreType');
         var layerName = viewModel.get('gridLayerName');
-        var layerKey = viewModel.get('vectorLayerKey');
+        var vectorLayerKey = viewModel.get('vectorLayerKey');
 
         // TODO check why we can't simply add a {'queryLayerName'} binding in
         // the grid view - already created ?
@@ -668,7 +677,7 @@ Ext.define('CpsiMapview.controller.grid.Grid', {
         spatialQueryButton.setVectorLayerKey(layerName); // this name will have _spatialfilter appended to it
 
         var featureSelectionButton = viewModel.getView().down('cmv_feature_selection_button');
-        featureSelectionButton.setVectorLayerKey(layerKey);
+        featureSelectionButton.setVectorLayerKey(vectorLayerKey);
 
         // dynamically create the store based on the config setting
 
@@ -686,6 +695,29 @@ Ext.define('CpsiMapview.controller.grid.Grid', {
         };
 
         viewModel.setStores(stores);
+    },
+
+    /**
+     * Activated the "preset filter" button if the layer
+     * has the repspective properties.
+     *
+     * @param {Ext.app.ViewModel } viewModel The ViewModel
+     */
+    activatePresetFilterButton: function (viewModel) {
+        var me = this;
+        // check if layer has preset grid Filters
+        // if yes, we activate the respective button
+        var wmsLayerKey = viewModel.get('wmsLayerKey');
+        var vectorLayerKey = viewModel.get('vectorLayerKey');
+        var layer;
+        if (wmsLayerKey) {
+            layer = me.getLayerByKey(wmsLayerKey);
+        } else if (vectorLayerKey) {
+            layer = me.getLayerByKey(vectorLayerKey);
+        }
+        if (layer && layer.get('gridFilters')) {
+            viewModel.set('usePresetFilters', true);
+        }
     },
 
     /**
@@ -725,6 +757,7 @@ Ext.define('CpsiMapview.controller.grid.Grid', {
         }
 
         // loop through all provided preset filter definitions
+        // TODO: ? extract function ?
         Ext.each(gridFilters, function (filterDef) {
             if (!filterDef || !Ext.isObject(filterDef)) {
                 return;

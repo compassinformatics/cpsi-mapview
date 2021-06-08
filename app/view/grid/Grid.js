@@ -115,7 +115,10 @@ Ext.define('CpsiMapview.view.grid.Grid', {
             xtype: 'button',
             text: 'Apply Preset Filters',
             glyph: 'f005@FontAwesome',
-            handler: 'onApplyPresetFilters'
+            handler: 'onApplyPresetFilters',
+            bind: {
+                hidden: '{!usePresetFilters}'
+            }
         },
         '->',
         {
