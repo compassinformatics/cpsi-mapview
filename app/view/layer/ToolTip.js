@@ -62,24 +62,17 @@ Ext.define('CpsiMapview.view.layer.ToolTip', {
         }
     },
 
-    /**
-     * @private
-     */
-    initComponent: function () {
+    constructor: function (config) {
         var me = this;
 
-        me.callParent();
+        config.style = {
+            backgroundColor: config.bgColor,
+            color: config.textColor,
+            fontWeight: config.bold ? 'bold' : undefined,
+            opacity: config.opacity
+        };
 
-        // adjust style with custom values
-        me.on('afterrender', function () {
-            var domEl = me.getEl();
-            domEl.applyStyles({
-                backgroundColor: me.bgColor,
-                color: me.textColor,
-                fontWeight: me.bold ? 'bold' : null
-            });
-            domEl.setOpacity(me.opacity);
-        });
+        me.callParent([config]);
     },
 
     /**
@@ -120,6 +113,15 @@ Ext.define('CpsiMapview.view.layer.ToolTip', {
         var screenX = evt.originalEvent.x + me.offsetX;
         var screenY = evt.originalEvent.y + me.offsetY;
         me.showAt([screenX, screenY]);
+
+        // extjs has somehow problems with the very first render of the tooltip
+        if (me.__initialized === undefined) {
+            me.__initialized = true;
+            me.hide();
+            setTimeout(function () {
+                me.show();
+            }, 200);
+        }
     },
 
     /**
