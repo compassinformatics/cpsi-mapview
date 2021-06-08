@@ -790,6 +790,7 @@ Ext.define('CpsiMapview.controller.grid.Grid', {
                 case 'string':
                     // only equal is supported for string
                     if (operator !== '=') {
+                        Ext.log.warn('No valid operator provided.');
                         return;
                     }
                     column.filter.setValue(value);
@@ -810,6 +811,11 @@ Ext.define('CpsiMapview.controller.grid.Grid', {
                     // because otherwise the store with the list-choices
                     // gets lost
                     var newFilter = Ext.clone(column.initialConfig.filter);
+
+                    if (operator != 'in'){
+                        Ext.log.warn('No valid operator provided.');
+                        return;
+                    }
 
                     // now we apply the oparator and the value
                     newFilter.operator = operator;
@@ -841,6 +847,7 @@ Ext.define('CpsiMapview.controller.grid.Grid', {
         };
         var filterOperator = operatorMapping[operator];
         if (!filterOperator) {
+            Ext.log.warn('No valid operator provided.');
             return;
         }
 
