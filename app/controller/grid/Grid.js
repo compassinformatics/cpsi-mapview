@@ -792,9 +792,7 @@ Ext.define('CpsiMapview.controller.grid.Grid', {
                     if (operator !== '=') {
                         return;
                     }
-                    if (!column.filter.value) {
-                        column.filter.setValue(value);
-                    }
+                    column.filter.setValue(value);
                     break;
                 case 'number':
                     var filterValue = me.createNumberFilterValue(
@@ -805,9 +803,7 @@ Ext.define('CpsiMapview.controller.grid.Grid', {
                         return;
                     }
 
-                    if (!column.filter.value) {
-                        column.filter.setValue(filterValue);
-                    }
+                    column.filter.setValue(filterValue);
                     break;
                 case 'list':
                     // we need to apply the initial config again,
