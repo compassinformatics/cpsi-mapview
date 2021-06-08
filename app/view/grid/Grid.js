@@ -36,9 +36,9 @@ Ext.define('CpsiMapview.view.grid.Grid', {
     exportTitle: 'Records Export',
 
     /**
-    * The filename of the Excel export
-    * @cfg {String}
-    */
+     * The filename of the Excel export
+     * @cfg {String}
+     */
     exportFileName: 'RecordsExport.xlsx',
 
     bind: {
@@ -79,8 +79,8 @@ Ext.define('CpsiMapview.view.grid.Grid', {
     },
 
     /**
-    * Functions attached to various listeners on the grid
-    */
+     * Functions attached to various listeners on the grid
+     */
     listeners: {
         filterchange: 'updateAssociatedLayers',
         itemcontextmenu: 'onItemContextMenu',
@@ -90,12 +90,13 @@ Ext.define('CpsiMapview.view.grid.Grid', {
         // ensure columns are set when the store is bound to the grid
         reconfigure: 'onColumnsReconfigure',
         hide: 'onHide',
-        show: 'onShow'
+        show: 'onShow',
+        boxready: 'onBoxReady'
     },
 
     /**
-    * Collection of tools and buttons at the top of the grid
-    */
+     * Collection of tools and buttons at the top of the grid
+     */
     dockedItems: [{
         xtype: 'toolbar',
         dock: 'top',
@@ -110,7 +111,17 @@ Ext.define('CpsiMapview.view.grid.Grid', {
             text: 'Clear Sorting',
             glyph: 'f039@FontAwesome',
             handler: 'onClearSort'
-        }, '->',
+        },
+        {
+            xtype: 'button',
+            text: 'Apply Preset Filters',
+            glyph: 'f005@FontAwesome',
+            handler: 'onApplyPresetFilters',
+            bind: {
+                hidden: '{!usePresetFilters}'
+            }
+        },
+        '->',
         {
             xtype: 'cmv_spatial_query_button',
             drawGeometryType: 'Polygon',

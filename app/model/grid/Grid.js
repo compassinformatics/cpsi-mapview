@@ -12,15 +12,16 @@ Ext.define('CpsiMapview.model.grid.Grid', {
     ],
 
     /**
-    * The following should all be overridden in child classes
-    */
+     * The following should all be overridden in child classes
+     */
     data: {
         vectorLayerKey: null,
         wmsLayerKey: null,
         gridStoreType: null,
         allowFeatureSelection: false,
         // when isSpatialGrid is set to false the 'Select by Shape' button will be hidden
-        isSpatialGrid: true
+        isSpatialGrid: true,
+        usePresetFilters: false
     },
 
     formulas: {

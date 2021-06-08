@@ -16,10 +16,10 @@ Ext.define('CpsiMapview.controller.grid.Grid', {
     ],
 
     /**
-    * The currently active spatial filter for the layer.
-    *
-    * @cfg {Ext.util.Filter} spatialFilter
-    */
+     * The currently active spatial filter for the layer.
+     *
+     * @cfg {Ext.util.Filter} spatialFilter
+     */
     spatialFilter: null,
 
     /**
@@ -276,10 +276,10 @@ Ext.define('CpsiMapview.controller.grid.Grid', {
     },
 
     /**
-    * Hide the loading mask when the store has loaded
-    *
-    * @private
-    */
+     * Hide the loading mask when the store has loaded
+     *
+     * @private
+     */
     onWfsStoreAfterLoad: function (store, features, success) {
 
         var grid = this.getView();
@@ -409,13 +409,13 @@ Ext.define('CpsiMapview.controller.grid.Grid', {
         }
     },
     /**
-    * Enable and disable paging for the grid.
-    * Disabling paging allows all records to be loaded into the
-    * grid for an Excel export. Enabling paging improves load
-    * performance.
-    *
-    * @private
-    */
+     * Enable and disable paging for the grid.
+     * Disabling paging allows all records to be loaded into the
+     * grid for an Excel export. Enabling paging improves load
+     * performance.
+     *
+     * @private
+     */
     togglePaging: function (checkBox, checked) {
 
         var me = this;
@@ -449,10 +449,10 @@ Ext.define('CpsiMapview.controller.grid.Grid', {
     },
 
     /**
-    * Export the current records in the grid to Excel
-    *
-    * @private
-    */
+     * Export the current records in the grid to Excel
+     *
+     * @private
+     */
     exportToExcel: function () {
 
         var me = this;
@@ -479,12 +479,11 @@ Ext.define('CpsiMapview.controller.grid.Grid', {
     },
 
     /**
-    * Whenever columns are shown or hidden update
-    * the WFS propertyName so only data to
-    * be displayed is returned. The idProperty will
-    * always be returned even if the column is hidden.
-    *
-    */
+     * Whenever columns are shown or hidden update
+     * the WFS propertyName so only data to
+     * be displayed is returned. The idProperty will
+     * always be returned even if the column is hidden.
+     */
     getVisibleColumns: function () {
 
         var me = this;
@@ -534,7 +533,6 @@ Ext.define('CpsiMapview.controller.grid.Grid', {
         }
     },
 
-
     /**
      * Hide and show the map layer with the grid
      * Although the layer has no styling we need to hide
@@ -561,16 +559,24 @@ Ext.define('CpsiMapview.controller.grid.Grid', {
     },
 
     /**
-    * Template method for Ext.Component that
-    * can be overridden
-    */
+     * Template method for Ext.Component that
+     * can be overridden
+     */
     onShow: function () {
         this.toggleLayerVisibility(true);
     },
 
     /**
-    * Clear any sorters on the store
-    */
+     * Apply preset filters once grid is created
+     */
+    onBoxReady: function () {
+        var me = this;
+        me.onApplyPresetFilters();
+    },
+
+    /**
+     * Clear any sorters on the store
+     */
     onClearSort: function () {
         var me = this;
         var grid = me.getView();
@@ -580,11 +586,11 @@ Ext.define('CpsiMapview.controller.grid.Grid', {
     },
 
     /**
-    * Clear both the grid filters and any spatial filter.
-    * This will cause the store to reload.
-    *
-    * @private
-    */
+     * Clear both the grid filters and any spatial filter.
+     * This will cause the store to reload.
+     *
+     * @private
+     */
     clearFilters: function () {
         var me = this;
         var view = me.getView();
@@ -621,12 +627,12 @@ Ext.define('CpsiMapview.controller.grid.Grid', {
     },
 
     /**
-    * If any models associated with the grid are edited
-    * (for example in a child form) then automatically update
-    * the grid and associated layers
-    *
-    * @private
-    */
+     * If any models associated with the grid are edited
+     * (for example in a child form) then automatically update
+     * the grid and associated layers
+     *
+     * @private
+     */
     addChildModelListener: function () {
 
         var me = this;
@@ -647,21 +653,30 @@ Ext.define('CpsiMapview.controller.grid.Grid', {
     },
 
     /**
-    * Dynamically apply a store to the grid based on the gridStoreType
-    * config option. Also set the hidden grid vector layer to be associated
-    * with the cmv_spatial_query_button
-    *
-    * @private
-    */
+     * @private
+     */
     initViewModel: function (viewModel) {
+        var me = this;
 
+        me.applyStoreToGrid(viewModel);
+        me.activatePresetFilterButton(viewModel);
+    },
+
+    /**
+     * Dynamically apply a store to the grid based on the gridStoreType
+     * config option. Also set the hidden grid vector layer to be associated
+     * with the cmv_spatial_query_button
+     *
+     * @param {Ext.app.ViewModel } viewModel The ViewModel
+     */
+    applyStoreToGrid: function (viewModel) {
         var me = this;
 
         me.addChildModelListener();
 
         var gridStoreType = viewModel.get('gridStoreType');
         var layerName = viewModel.get('gridLayerName');
-        var layerKey = viewModel.get('vectorLayerKey');
+        var vectorLayerKey = viewModel.get('vectorLayerKey');
 
         // TODO check why we can't simply add a {'queryLayerName'} binding in
         // the grid view - already created ?
@@ -670,7 +685,7 @@ Ext.define('CpsiMapview.controller.grid.Grid', {
         spatialQueryButton.setVectorLayerKey(layerName); // this name will have _spatialfilter appended to it
 
         var featureSelectionButton = viewModel.getView().down('cmv_feature_selection_button');
-        featureSelectionButton.setVectorLayerKey(layerKey);
+        featureSelectionButton.setVectorLayerKey(vectorLayerKey);
 
         // dynamically create the store based on the config setting
 
@@ -688,5 +703,158 @@ Ext.define('CpsiMapview.controller.grid.Grid', {
         };
 
         viewModel.setStores(stores);
+    },
+
+    /**
+     * Activated the "preset filter" button if the layer
+     * has the repspective properties.
+     *
+     * @param {Ext.app.ViewModel } viewModel The ViewModel
+     */
+    activatePresetFilterButton: function (viewModel) {
+        var me = this;
+        // check if layer has preset grid Filters
+        // if yes, we activate the respective button
+        var wmsLayerKey = viewModel.get('wmsLayerKey');
+        var vectorLayerKey = viewModel.get('vectorLayerKey');
+        var layer;
+        if (wmsLayerKey) {
+            layer = me.getLayerByKey(wmsLayerKey);
+        } else if (vectorLayerKey) {
+            layer = me.getLayerByKey(vectorLayerKey);
+        }
+        if (layer && layer.get('gridFilters')) {
+            viewModel.set('usePresetFilters', true);
+        }
+    },
+
+    /**
+     * Applies preset filters from the configuration
+     * to the grid.
+     */
+    onApplyPresetFilters: function () {
+        var me = this;
+
+        var viewModel = me.getViewModel();
+
+        var wmsLayerKey = viewModel.get('wmsLayerKey');
+        var vectorLayerKey = viewModel.get('vectorLayerKey');
+
+        var layer;
+        if (wmsLayerKey) {
+            layer = me.getLayerByKey(wmsLayerKey);
+        } else if (vectorLayerKey) {
+            layer = me.getLayerByKey(vectorLayerKey);
+        } else {
+            // no layer found
+            return;
+        }
+        var gridFilters = layer.get('gridFilters');
+
+        if (!gridFilters || !Ext.isArray(gridFilters)) {
+            return;
+        }
+
+        var grid = me.getView();
+        if (!grid) {
+            return;
+        }
+        var columnManager = grid.getColumnManager();
+        if (!columnManager) {
+            return;
+        }
+
+        // loop through all provided preset filter definitions
+        Ext.each(gridFilters, function (filterDef) {
+            if (!filterDef || !Ext.isObject(filterDef)) {
+                return;
+            }
+
+            var columnName = filterDef.property;
+            var value = filterDef.value;
+            var operator = filterDef.operator;
+
+            if (!columnName || !value || !operator) {
+                Ext.log.warn('Preset filter is not properly defined.');
+                Ext.log.warn(filterDef);
+                return;
+            }
+
+            var column = columnManager.getHeaderByDataIndex(columnName);
+            if (!column || !column.filter || !column.filter.type) {
+                return;
+            }
+            var columnType = column.filter.type;
+
+            switch (columnType) {
+                case 'string':
+                    // only equal is supported for string
+                    if (operator !== '=') {
+                        Ext.log.warn('No valid operator provided.');
+                        return;
+                    }
+                    column.filter.setValue(value);
+                    break;
+                case 'number':
+                    var filterValue = me.createNumberFilterValue(
+                        operator,
+                        value
+                    );
+                    if (!filterValue) {
+                        return;
+                    }
+
+                    column.filter.setValue(filterValue);
+                    break;
+                case 'list':
+                    // we need to apply the initial config again,
+                    // because otherwise the store with the list-choices
+                    // gets lost
+                    var newFilter = Ext.clone(column.initialConfig.filter);
+
+                    if (operator != 'in'){
+                        Ext.log.warn('No valid operator provided.');
+                        return;
+                    }
+
+                    // now we apply the oparator and the value
+                    newFilter.operator = operator;
+                    newFilter.value = value;
+
+                    var plugin = grid.getPlugin('gridfilters');
+                    plugin.addFilter(newFilter);
+                    break;
+                default:
+                    break;
+            }
+        });
+    },
+
+    /**
+     * Create a value object needed for number filters.
+     *
+     * @param {string} operator The userdefined operator. Allowed values: '=', '<' and '>'
+     * @param {number} value The numerical value to compare
+     * @returns {Object} The value object for the filter
+     */
+    createNumberFilterValue: function(operator, value){
+        // translate user defined operators into operators
+        // that are compatible with number filters
+        var operatorMapping = {
+            '=': 'eq',
+            '>': 'gt',
+            '<': 'lt'
+        };
+        var filterOperator = operatorMapping[operator];
+        if (!filterOperator) {
+            Ext.log.warn('No valid operator provided.');
+            return;
+        }
+
+        // the value for number filters are objects like '{eq: 42}'
+        // we need to create them from the original value and the operator
+        var filterValue = {};
+        filterValue[filterOperator] = value;
+        return filterValue;
     }
 });
