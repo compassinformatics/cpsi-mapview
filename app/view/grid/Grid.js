@@ -90,7 +90,8 @@ Ext.define('CpsiMapview.view.grid.Grid', {
         // ensure columns are set when the store is bound to the grid
         reconfigure: 'onColumnsReconfigure',
         hide: 'onHide',
-        show: 'onShow'
+        show: 'onShow',
+        boxready: 'onBoxReady'
     },
 
     /**

@@ -567,6 +567,14 @@ Ext.define('CpsiMapview.controller.grid.Grid', {
     },
 
     /**
+     * Apply preset filters once grid is created
+     */
+    onBoxReady: function () {
+        var me = this;
+        me.onApplyPresetFilters();
+    },
+
+    /**
      * Clear any sorters on the store
      */
     onClearSort: function () {
@@ -757,7 +765,6 @@ Ext.define('CpsiMapview.controller.grid.Grid', {
         }
 
         // loop through all provided preset filter definitions
-        // TODO: ? extract function ?
         Ext.each(gridFilters, function (filterDef) {
             if (!filterDef || !Ext.isObject(filterDef)) {
                 return;
