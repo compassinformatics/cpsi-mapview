@@ -937,7 +937,7 @@ Ext.define('CpsiMapview.controller.button.DigitizeButtonController', {
             // get the original solver points before they are removed
             var resultSource = me.resultLayer.getSource();
             // remove all features from the current active group
-            var allFeatures = me.resultLayer.getSource().getFeatures();
+            var allFeatures = me.resultLayer.getSource().getFeatures().slice(0);
             Ext.each(allFeatures, function (f) {
                 if (f.get('group') === me.activeGroupIdx) {
                     resultSource.removeFeature(f);
