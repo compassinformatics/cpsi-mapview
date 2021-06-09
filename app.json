@@ -271,7 +271,7 @@
         "path": "https://cdn.jsdelivr.net/gh/highsource/ogc-schemas@2.6.1/scripts/lib/GML_3_2_0.js"
     },
     {
-      "path": "https://maps.googleapis.com/maps/api/js?v=3.36&key=INSERT_YOUR_API_KEY_HERE",
+      "path": "https://maps.googleapis.com/maps/api/js?v=3.42&key=AIzaSyAj6xrC0L3G0YquO1q6Qsma1ZEfYgGQotU",
       "remote": true
     },
     {
