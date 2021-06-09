@@ -404,7 +404,7 @@
         },
         {
           "property": "AUTHORITY",
-          "value": ["Kerry", "Cavan"],
+          "value": ["Kerry", "Cavan", "Laois", "Galway City", "Carlow", "Kilkenny CC", "Kildare", "Louth", "Offaly", "Roscommon CC", "Tipperary", "Waterford"],
           "operator": "in"
         }
       ],

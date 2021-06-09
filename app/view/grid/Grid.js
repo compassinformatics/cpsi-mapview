@@ -91,7 +91,8 @@ Ext.define('CpsiMapview.view.grid.Grid', {
         reconfigure: 'onColumnsReconfigure',
         hide: 'onHide',
         show: 'onShow',
-        boxready: 'onBoxReady'
+        clearfilters: 'clearFilters',
+        applypresetfilters: 'applyPresetFilters'
     },
 
     /**
@@ -116,7 +117,7 @@ Ext.define('CpsiMapview.view.grid.Grid', {
             xtype: 'button',
             text: 'Apply Preset Filters',
             glyph: 'f005@FontAwesome',
-            handler: 'onApplyPresetFilters',
+            handler: 'applyPresetFilters',
             bind: {
                 hidden: '{!usePresetFilters}'
             }
