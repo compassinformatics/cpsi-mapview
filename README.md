@@ -70,8 +70,10 @@ npm install
 2. Publish using the [gh-pages](https://www.npmjs.com/package/gh-pages) Node module:
 
     ```
-    npx gh-pages -d build/production/CpsiMapview/ --repo https://github.com/compassinformatics/cpsi-mapview.git -b gh-pages
+    npx gh-pages -d build/production/CpsiMapview/--dotfiles --repo https://github.com/compassinformatics/cpsi-mapview.git -b gh-pages
     ```
+
+Note the `--dotfiles`` flag as `.nojekyll` is required on GitHub Pages to allow access to any JS files in the `node_modules` folder.
 
 ## Testing
 
