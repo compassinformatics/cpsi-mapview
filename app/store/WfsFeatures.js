@@ -2,7 +2,7 @@ Ext.define('CpsiMapview.store.WfsFeatures', {
     extend: 'GeoExt.data.store.WfsFeatures',
     cacheFeatureCount: false,
     remoteSort: true,
-    passThroughFilter: false,
+    passThroughFilter: true,
     remoteFilter: true,
     url: '/mapserver/?',
     version: '2.0.0',
