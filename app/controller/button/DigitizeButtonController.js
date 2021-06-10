@@ -1160,6 +1160,7 @@ Ext.define('CpsiMapview.controller.button.DigitizeButtonController', {
             resultSource.clear();
         } else {
             resultSource.getFeatures()
+                .slice(0)
                 .filter(function (feature) {
                     return feature.get('group') === activeGroupIdx;
                 })
