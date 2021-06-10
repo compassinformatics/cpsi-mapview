@@ -208,7 +208,7 @@
      */
   "js": [
     {
-      "path": "./node_modules/@geoext/openlayers-legacy/dist/ol-debug.js"
+      "path": "./node_modules/@geoext/openlayers-legacy/dist/ol.js"
     },
     {
       "path": "./node_modules/geostyler-sld-parser/browser/sldStyleParser.js"
