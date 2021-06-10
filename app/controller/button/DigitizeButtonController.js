@@ -54,7 +54,12 @@ Ext.define('CpsiMapview.controller.button.DigitizeButtonController', {
     /**
      * OpenLayers snap interaction for better vertex selection
      */
-    snapInteraction: null,
+    snapVertexInteraction: null,
+
+    /**
+     * OpenLayers snap interaction for better edge selection
+     */
+    snapEdgeInteraction: null,
 
     /**
      * CircleToolbar that will be set
@@ -201,7 +206,7 @@ Ext.define('CpsiMapview.controller.button.DigitizeButtonController', {
         };
 
         var deleteCondition = function (evt) {
-            return ol.events.condition.singleClick(evt) && ol.events.condition.platformModifierKeyOnly(evt) && !me.blockedEventHandling;
+            return ol.events.condition.primaryAction(evt) && ol.events.condition.platformModifierKeyOnly(evt) && !me.blockedEventHandling;
         };
 
         // create the modify interaction
@@ -234,15 +239,15 @@ Ext.define('CpsiMapview.controller.button.DigitizeButtonController', {
             me.map.removeInteraction(me.pointerInteraction);
         }
 
-        var clickCondition = function (evt) {
-            return ol.events.condition.singleClick(evt) && ol.events.condition.noModifierKeys(evt) && !me.blockedEventHandling;
-        };
-
-        var deleteCondition = function (evt) {
-            return ol.events.condition.singleClick(evt) && ol.events.condition.platformModifierKeyOnly(evt) && !me.blockedEventHandling;
-        };
-
         if (type === 'Point') {
+            var clickCondition = function (evt) {
+                return ol.events.condition.primaryAction(evt) && ol.events.condition.noModifierKeys(evt) && !me.blockedEventHandling;
+            };
+
+            var deleteCondition = function (evt) {
+                return ol.events.condition.primaryAction(evt) && ol.events.condition.platformModifierKeyOnly(evt) && !me.blockedEventHandling;
+            };
+
             me.pointerInteraction = new ol.interaction.Pointer({
                 handleEvent: function (evt) {
                     if (deleteCondition(evt)) {
@@ -273,15 +278,24 @@ Ext.define('CpsiMapview.controller.button.DigitizeButtonController', {
         var view = me.getView();
         var type = view.getType();
 
-        if (me.snapInteraction) {
-            me.map.removeInteraction(me.snapInteraction);
+        if (me.snapVertexInteraction) {
+            me.map.removeInteraction(me.snapVertexInteraction);
+        }
+
+        if (me.snapEdgeInteraction) {
+            me.map.removeInteraction(me.snapEdgeInteraction);
         }
 
         if (type !== 'Circle') {
-            me.snapInteraction = new ol.interaction.Snap({
+            me.snapVertexInteraction = new ol.interaction.Snap({
                 source: layer.getSource()
             });
-            me.map.addInteraction(me.snapInteraction);
+            me.map.addInteraction(me.snapVertexInteraction);
+            me.snapEdgeInteraction = new ol.interaction.Snap({
+                source: me.resultLayer.getSource(),
+                vertex: false
+            });
+            me.map.addInteraction(me.snapEdgeInteraction);
         }
     },
 
@@ -319,12 +333,6 @@ Ext.define('CpsiMapview.controller.button.DigitizeButtonController', {
             }
         }
 
-        me.setDrawInteraction(me.drawLayer);
-        me.setModifyInteraction(me.drawLayer);
-        me.setPointerInteraction();
-        me.setSnapInteraction(me.drawLayer);
-
-
         // create a result layer unless one has already been set
         if (!me.resultLayer) {
             if (view.resultLayer) {
@@ -341,11 +349,17 @@ Ext.define('CpsiMapview.controller.button.DigitizeButtonController', {
             }
         }
 
+        me.setDrawInteraction(me.drawLayer);
+        me.setModifyInteraction(me.drawLayer);
+        me.setPointerInteraction();
+        me.setSnapInteraction(me.drawLayer);
+
         if (pressed) {
             me.drawInteraction.setActive(true);
             if (type !== 'Circle') {
                 me.modifyInteraction.setActive(true);
-                me.snapInteraction.setActive(true);
+                me.snapVertexInteraction.setActive(true);
+                me.snapEdgeInteraction.setActive(true);
             }
             if (type === 'Point') {
                 me.pointerInteraction.setActive(true);
@@ -356,7 +370,8 @@ Ext.define('CpsiMapview.controller.button.DigitizeButtonController', {
             me.drawInteraction.setActive(false);
             if (type !== 'Circle') {
                 me.modifyInteraction.setActive(false);
-                me.snapInteraction.setActive(false);
+                me.snapVertexInteraction.setActive(false);
+                me.snapEdgeInteraction.setActive(false);
             }
             if (type === 'Point') {
                 me.pointerInteraction.setActive(false);
@@ -658,9 +673,17 @@ Ext.define('CpsiMapview.controller.button.DigitizeButtonController', {
                 .then(me.updateDrawSource.bind(me));
 
             return false;
+        } else {
+            var hasEdge = me.map.hasFeatureAtPixel(evt.pixel, {
+                layerFilter: function (layer) {
+                    return layer === me.resultLayer;
+                }
+            });
+            if (hasEdge) {
+                me.blockEventHandling();
+            }
+            return !hasEdge;
         }
-
-        return true;
     },
 
     /**
@@ -997,8 +1020,12 @@ Ext.define('CpsiMapview.controller.button.DigitizeButtonController', {
             me.map.removeInteraction(me.pointerInteraction);
         }
 
-        if (me.snapInteraction) {
-            me.map.removeInteraction(me.snapInteraction);
+        if (me.snapVertexInteraction) {
+            me.map.removeInteraction(me.snapVertexInteraction);
+        }
+
+        if (me.snapEdgeInteraction) {
+            me.map.removeInteraction(me.snapEdgeInteraction);
         }
 
         if (me.drawLayer) {
@@ -1062,6 +1089,14 @@ Ext.define('CpsiMapview.controller.button.DigitizeButtonController', {
             items: [{
                 xtype: 'grid',
                 store: featStore,
+                selModel: {
+                    type: 'featurerowmodel',
+                    mode: 'MULTI',
+                    allowDeselect: true,
+                    mapSelection: true,
+                    selectStyle: selectStyle,
+                    map: me.map
+                },
                 columns: [{
                     xtype: 'widgetcolumn',
                     width: 40,
@@ -1095,21 +1130,7 @@ Ext.define('CpsiMapview.controller.button.DigitizeButtonController', {
                             val.toFixed(0).toString()
                         );
                     }
-                }],
-                listeners: {
-                    'selectionchange': function (grid, selected) {
-                        // reset all selections
-                        featStore.each(function (rec) {
-                            rec.getFeature().setStyle(me.resultLayer.getStyle());
-                        });
-                        // highlight grid selection in map
-                        Ext.each(selected, function (rec) {
-                            rec.getFeature().setStyle(selectStyle);
-                        });
-                    },
-                    'cellclick': me.zoomToFeatures,
-                    scope: me
-                }
+                }]
             }]
         });
         me.win.showAt(100, 100);
