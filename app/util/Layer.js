@@ -26,12 +26,12 @@ Ext.define('CpsiMapview.util.Layer', {
             source.updateParams(params);
             source.refresh();
         } else if (layer.get('isWfs') === true) {
-            // for WFS trigger reload of source
-            if (source.getSource) {
+            if (source instanceof ol.source.Cluster) {
                 // for clustered layers we need to get the original source - see #203
                 source = source.getSource();
             }
-            source.clear();
+            // for WFS trigger reload of source
+            source.refresh();
         } else {
             // only refresh for other layers and sources (to not loose data)
             source.refresh();
