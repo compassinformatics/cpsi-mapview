@@ -131,27 +131,12 @@ Ext.define('CpsiMapview.controller.button.StreetViewTool', {
      */
     onToggle: function (btn, pressed) {
         var me = this;
-        var view = me.getView();
-        var lyrGroupName = view.layerGroupName;
-
-        // detect the layer group to add position layer
-        var overlayGroup = BasiGX.util.Layer.getLayerByName(lyrGroupName);
-        var overlayLayers;
-        if (overlayGroup) {
-            overlayLayers = overlayGroup.getLayers();
-        } else{
-            overlayLayers = me.map.getLayers();
-        }
 
         if (pressed) {
-            if (overlayLayers) {
-                // add layer and raise layer to top of stack
-                overlayLayers.insertAt(overlayLayers.getLength(), me.vectorLayer);
-            }
+            // add layer and raise layer to top of stack
+            me.map.addLayer(me.vectorLayer);
         } else {
-            if (overlayLayers) {
-                overlayLayers.remove(me.vectorLayer);
-            }
+            me.map.removeLayer(me.vectorLayer);
             // cleanup
             me.vectorLayer.getSource().clear();
             if (me.streetViewWin) {

@@ -62,13 +62,6 @@ Ext.define('CpsiMapview.view.button.StreetViewTool', {
     vectorLayerStyle: null,
 
     /**
-     * Name of the layer group to which the position layer will be added.
-     *
-     * @cfg {String}
-     */
-    layerGroupName: 'Layers',
-
-    /**
      * The position icon image to be shown on the map.
      *
      * @cfg {String}
