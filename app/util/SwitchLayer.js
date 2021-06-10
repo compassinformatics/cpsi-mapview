@@ -76,6 +76,20 @@ Ext.define('CpsiMapview.util.SwitchLayer', {
      */
     changeInternalLayer: function(layerCollection, switchLayer, index) {
         var staticMe = CpsiMapview.util.SwitchLayer;
+
+        // complete any load events for the layer so the BasiGX.view.MapLoadingStatusBar
+        // decrements correctly
+
+        var source = switchLayer.getSource();
+
+        if (source instanceof ol.source.Image) {
+            source.dispatchEvent('imageloadend');
+        } else if (source instanceof ol.source.Tile) {
+            source.dispatchEvent('tileloadend');
+        } else if (source instanceof ol.source.Vector) {
+            source.dispatchEvent('vectorloadend');
+        }
+
         var switchConfiguration = switchLayer.get('switchConfiguration');
         // restore current layer visibility
         switchConfiguration.visibility = switchLayer.getVisible();
