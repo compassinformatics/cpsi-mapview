@@ -573,14 +573,6 @@ Ext.define('CpsiMapview.controller.grid.Grid', {
      * Template method for Ext.Component that
      * can be overridden
      */
-    onHide: function () {
-        this.toggleLayerVisibility(false);
-    },
-
-    /**
-     * Template method for Ext.Component that
-     * can be overridden
-     */
     onShow: function () {
         this.toggleLayerVisibility(true);
     },
