@@ -544,18 +544,29 @@ Ext.define('CpsiMapview.controller.grid.Grid', {
         var grid = me.getView();
         var store = grid.getStore();
 
-        if (store.isEmptyStore !== true) {
-            var layer = store.getLayer();
+        var layer = me.getOlLayer();
+        if (store.isEmptyStore !== true && layer) {
             layer.setVisible(show);
         }
     },
 
     /**
-     * Template method for Ext.Component that
-     * can be overridden
+     * Returns the layer of the grid.
+     *
+     * @returns {ol.layer.Base} The grid's layer
      */
-    onHide: function () {
-        this.toggleLayerVisibility(false);
+    getOlLayer: function() {
+        var me = this;
+        var viewModel = me.getViewModel();
+        var wmsLayerKey = viewModel.get('wmsLayerKey');
+        var vectorLayerKey = viewModel.get('vectorLayerKey');
+        var layer;
+        if (wmsLayerKey) {
+            layer = me.getLayerByKey(wmsLayerKey);
+        } else if (vectorLayerKey) {
+            layer = me.getLayerByKey(vectorLayerKey);
+        }
+        return layer;
     },
 
     /**
@@ -564,14 +575,6 @@ Ext.define('CpsiMapview.controller.grid.Grid', {
      */
     onShow: function () {
         this.toggleLayerVisibility(true);
-    },
-
-    /**
-     * Apply preset filters once grid is created
-     */
-    onBoxReady: function () {
-        var me = this;
-        me.onApplyPresetFilters();
     },
 
     /**
@@ -707,22 +710,16 @@ Ext.define('CpsiMapview.controller.grid.Grid', {
 
     /**
      * Activated the "preset filter" button if the layer
-     * has the repspective properties.
+     * has the respective properties.
      *
      * @param {Ext.app.ViewModel } viewModel The ViewModel
      */
     activatePresetFilterButton: function (viewModel) {
         var me = this;
+
         // check if layer has preset grid Filters
         // if yes, we activate the respective button
-        var wmsLayerKey = viewModel.get('wmsLayerKey');
-        var vectorLayerKey = viewModel.get('vectorLayerKey');
-        var layer;
-        if (wmsLayerKey) {
-            layer = me.getLayerByKey(wmsLayerKey);
-        } else if (vectorLayerKey) {
-            layer = me.getLayerByKey(vectorLayerKey);
-        }
+        var layer = me.getOlLayer();
         if (layer && layer.get('gridFilters')) {
             viewModel.set('usePresetFilters', true);
         }
@@ -732,23 +729,10 @@ Ext.define('CpsiMapview.controller.grid.Grid', {
      * Applies preset filters from the configuration
      * to the grid.
      */
-    onApplyPresetFilters: function () {
+    applyPresetFilters: function () {
         var me = this;
 
-        var viewModel = me.getViewModel();
-
-        var wmsLayerKey = viewModel.get('wmsLayerKey');
-        var vectorLayerKey = viewModel.get('vectorLayerKey');
-
-        var layer;
-        if (wmsLayerKey) {
-            layer = me.getLayerByKey(wmsLayerKey);
-        } else if (vectorLayerKey) {
-            layer = me.getLayerByKey(vectorLayerKey);
-        } else {
-            // no layer found
-            return;
-        }
+        var layer = me.getOlLayer();
         var gridFilters = layer.get('gridFilters');
 
         if (!gridFilters || !Ext.isArray(gridFilters)) {
@@ -759,6 +743,7 @@ Ext.define('CpsiMapview.controller.grid.Grid', {
         if (!grid) {
             return;
         }
+
         var columnManager = grid.getColumnManager();
         if (!columnManager) {
             return;
