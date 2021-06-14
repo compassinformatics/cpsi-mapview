@@ -812,9 +812,7 @@ Ext.define('CpsiMapview.controller.grid.Grid', {
                 default:
                     break;
             }
-        }
-
-        );
+        });
     },
 
     /**
