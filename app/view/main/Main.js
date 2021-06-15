@@ -29,6 +29,7 @@ Ext.define('CpsiMapview.view.main.Main', {
         region: 'west',
         width: 300,
         collapsible: true,
+        resizable: true,
         layout: {
             type: 'vbox',
             align: 'stretch'
