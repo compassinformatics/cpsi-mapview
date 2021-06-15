@@ -211,8 +211,12 @@ Ext.define('CpsiMapview.controller.grid.Grid', {
 
         if (vectorLayer) {
             var vectorSource = vectorLayer.getSource();
+
+            if (vectorSource instanceof ol.source.Cluster) {
+                vectorSource = vectorSource.getSource(); // we use the raw source
+            }
+
             vectorSource.set('additionalFilters', filters);
-            vectorSource.clear();
             vectorSource.refresh();
             me.updateLayerNodeUI(vectorLayer, filters);
         }
