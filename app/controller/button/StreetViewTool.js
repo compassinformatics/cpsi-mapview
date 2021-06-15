@@ -316,7 +316,6 @@ Ext.define('CpsiMapview.controller.button.StreetViewTool', {
 
             // rotate position feature to current heading
             me.vectorLayer.getStyle().getImage().setRotation(newHeading);
-            vectorSource.refresh();
         }
     },
 
