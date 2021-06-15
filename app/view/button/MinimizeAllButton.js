@@ -14,7 +14,7 @@ Ext.define('CpsiMapview.view.button.MinimizeAllButton', {
     tooltip: 'Minimize all windows',
 
     /**
-     * The icon the button should use.
+     * The icon the button should use
      */
     glyph: 'f2d1@FontAwesome',
 

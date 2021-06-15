@@ -1,5 +1,5 @@
 /**
- * This class is the controller for the button 'MinimizeAllButton'
+ * This class is the controller for the button 'MinimizeAllButton'.
  */
 Ext.define('CpsiMapview.controller.button.MinimizeAllButtonController', {
     extend: 'Ext.app.ViewController',
