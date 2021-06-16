@@ -65,6 +65,8 @@ Ext.define('CpsiMapview.model.FeatureStoreMixin', {
      */
     createFeatureStore: function (field) {
 
+        var me = this;
+
         var cfg = field.featureStoreConfig || {};
         var featModel = cfg.model || 'GeoExt.data.model.Feature';
 
@@ -96,8 +98,28 @@ Ext.define('CpsiMapview.model.FeatureStoreMixin', {
         return Ext.create('GeoExt.data.store.Features', {
             model: featModel,
             layer: vectorLayer,
-            filters: filters
+            filters: filters,
+            passThroughFilter: true,
+            listeners: {
+                add: function (store) {
+                    me.updateAssociatedField(store, field);
+                },
+                clear: function () {
+                    me.set(field.name, null, { convert: false });
+                },
+                remove: function (store) {
+                    me.updateAssociatedField(store, field);
+                }
+            }
         });
+    },
+
+    updateAssociatedField: function (store, field) {
+        var me = this;
+        var features = store.getRange(); // get all features in the store
+        // check if we are in an edit session set in the convert function of CpsiMapview.field.Feature
+        var dirty = !me.editing;
+        me.set(field.name, features, { convert: false, dirty: dirty });
     },
 
     /**

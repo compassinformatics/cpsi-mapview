@@ -31,18 +31,10 @@ Ext.define('CpsiMapview.field.Feature', {
             features = (new ol.format.GeoJSON().readFeatures(data));
             // wrap an edit session around updating the field when first loaded
             // to ensure the model is not marked as dirty
-            var originalDirtyState = rec.dirty;
             rec.beginEdit();
             var layerSource = featureStore.layer.getSource();
-            // remove any previous features when loading or reloading the model
-            layerSource.clear();
             layerSource.addFeatures(features);
             rec.endEdit();
-
-            //<debug>
-            // ensure the dirty state is not affected by the adding of converted features
-            Ext.Assert.truthy(originalDirtyState === rec.dirty);
-            //</debug>
         }
 
         return features;
