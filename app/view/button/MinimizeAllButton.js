@@ -16,7 +16,7 @@ Ext.define('CpsiMapview.view.button.MinimizeAllButton', {
     /**
      * The icon the button should use
      */
-    glyph: 'f2d1@FontAwesome',
+    glyph: 'f068@FontAwesome',
 
     /**
      * The controller for this class
