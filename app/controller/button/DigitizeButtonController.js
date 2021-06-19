@@ -212,7 +212,7 @@ Ext.define('CpsiMapview.controller.button.DigitizeButtonController', {
         // create the modify interaction
         if (type !== 'Circle') {
             var modifyInteractionConfig = {
-                source: layer.getSource(),
+                features: layer.getSource().getFeaturesCollection(),
                 condition: drawCondition,
                 deleteCondition: deleteCondition
             };
@@ -292,7 +292,7 @@ Ext.define('CpsiMapview.controller.button.DigitizeButtonController', {
             });
             me.map.addInteraction(me.snapVertexInteraction);
             me.snapEdgeInteraction = new ol.interaction.Snap({
-                source: me.resultLayer.getSource(),
+                features: me.resultLayer.getSource().getFeaturesCollection(),
                 vertex: false
             });
             me.map.addInteraction(me.snapEdgeInteraction);
@@ -326,8 +326,9 @@ Ext.define('CpsiMapview.controller.button.DigitizeButtonController', {
                 me.drawLayer = view.drawLayer;
             } else {
                 me.drawLayer = new ol.layer.Vector({
-                    source: new ol.source.Vector(),
-                    style: view.getDrawLayerStyle()
+                    source: new ol.source.Vector({
+                        features: new ol.Collection()
+                    })
                 });
 
                 // apply any draw style set from the view
