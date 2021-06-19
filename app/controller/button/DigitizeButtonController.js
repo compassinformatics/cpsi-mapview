@@ -329,6 +329,12 @@ Ext.define('CpsiMapview.controller.button.DigitizeButtonController', {
                     source: new ol.source.Vector(),
                     style: view.getDrawLayerStyle()
                 });
+
+                // apply any draw style set from the view
+                var drawStyle = view.getDrawLayerStyle();
+                if (drawStyle) {
+                    me.drawLayer.setStyle(drawStyle);
+                }
                 me.map.addLayer(me.drawLayer);
             }
         }
