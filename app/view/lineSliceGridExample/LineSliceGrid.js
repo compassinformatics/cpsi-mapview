@@ -1,17 +1,3 @@
-var store = Ext.create('Ext.data.Store', {
-    data: [
-        {startMeasure: 0, endMeasure: 200, text: 'slice 1'},
-        {startMeasure: 200, endMeasure: 1000, text: 'slice 2'},
-        {startMeasure: 1100, endMeasure: 1800, text: 'slice 3'},
-        {startMeasure: 1400, endMeasure: 4000, text: 'slice 4'},
-        {startMeasure: 5000, endMeasure: 12000, text: 'slice 5'}
-    ]
-});
-
-function meterRenderer(val) {
-    return val.toFixed(1) + ' m';
-}
-
 Ext.define('CpsiMapview.view.lineSliceGridExample.LineSliceGrid', {
     extend: 'Ext.grid.Panel',
     xtype: 'cmv_line_slice_grid',
@@ -24,18 +10,20 @@ Ext.define('CpsiMapview.view.lineSliceGridExample.LineSliceGrid', {
         ptype: 'cmv_line_slice_highlight'
     }],
 
-    store: store,
-
     columns: [
         {
             text: 'From',
             dataIndex: 'startMeasure',
-            renderer: meterRenderer
+            renderer: function(val) {
+                return val.toFixed(1) + ' m';
+            }
         },
         {
             text: 'To',
             dataIndex: 'endMeasure',
-            renderer: meterRenderer
+            renderer: function(val) {
+                return val.toFixed(1) + ' m';
+            }
         },
         {
             text: 'Text',
@@ -51,6 +39,18 @@ Ext.define('CpsiMapview.view.lineSliceGridExample.LineSliceGrid', {
 
     initComponent: function () {
         var map = BasiGX.util.Map.getMapComponent().map;
+
+        var store = Ext.create('Ext.data.Store', {
+            data: [
+                {startMeasure: 0, endMeasure: 200, text: 'slice 1'},
+                {startMeasure: 200, endMeasure: 1000, text: 'slice 2'},
+                {startMeasure: 1100, endMeasure: 1800, text: 'slice 3'},
+                {startMeasure: 1400, endMeasure: 4000, text: 'slice 4'},
+                {startMeasure: 5000, endMeasure: 12000, text: 'slice 5'}
+            ]
+        });
+
+        this.store = store;
 
         var geoJson = JSON.stringify({
             'type': 'Feature',
