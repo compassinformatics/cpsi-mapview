@@ -75,20 +75,10 @@ Ext.define('CpsiMapview.view.button.DigitizeButton', {
         }),
 
         /**
-        * The default style to use when features are selected
-        * in the result layer
+        * The default style to use for features drawn with the digitizing tools
+        * e.g. the polygons and circles used for selecting features
         */
-        drawLayerStyle: new ol.style.Style({
-            image: new ol.style.Circle({
-                radius: 5,
-                fill: new ol.style.Fill({
-                    color: 'red'
-                }),
-                stroke: new ol.style.Stroke({
-                    color: 'red'
-                })
-            })
-        }),
+        drawLayerStyle: null,
 
         /**
          * The default style to use when features are selected
@@ -98,18 +88,18 @@ Ext.define('CpsiMapview.view.button.DigitizeButton', {
             image: new ol.style.Circle({
                 radius: 5,
                 fill: new ol.style.Fill({
-                    color: 'red'
+                    color: 'cyan'
                 }),
                 stroke: new ol.style.Stroke({
-                    color: 'red'
+                    color: 'cyan'
                 })
             }),
             width: 2,
             fill: new ol.style.Fill({
-                color: 'red'
+                color: 'cyan'
             }),
             stroke: new ol.style.Stroke({
-                color: 'red'
+                color: 'cyan'
             })
         }),
 
