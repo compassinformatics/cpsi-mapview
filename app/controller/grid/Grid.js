@@ -565,11 +565,17 @@ Ext.define('CpsiMapview.controller.grid.Grid', {
         var wmsLayerKey = viewModel.get('wmsLayerKey');
         var vectorLayerKey = viewModel.get('vectorLayerKey');
         var layer;
+
         if (wmsLayerKey) {
             layer = me.getLayerByKey(wmsLayerKey);
-        } else if (vectorLayerKey) {
+        }
+
+        // in the case of a switch layer we may have 2 layer keys defined
+        // but only one loaded into the map
+        if (!layer && vectorLayerKey) {
             layer = me.getLayerByKey(vectorLayerKey);
         }
+
         return layer;
     },
 
