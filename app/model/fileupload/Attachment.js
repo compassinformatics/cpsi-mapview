@@ -18,11 +18,7 @@ Ext.define('CpsiMapview.model.fileupload.Attachment', {
         { name: 'fileSize', type: 'int' },
         { name: 'isDefaultImage', type: 'boolean' },
         { name: 'isThumbnailAvailable', type: 'boolean' },
-        {
-            name: 'lastUpdatedDateUtc',
-            type: 'date',
-            dateFormat: 'Y-m-d\\TH:i:s'
-        },
+        { name: 'lastUpdatedDateUtc', type: 'date' },
         { name: 'name', type: 'string' },
         { name: 'attachmentUrl', type: 'string' }, // calculated client-side
         { name: 'thumbnailUrl', type: 'string' } // calculated client-side
