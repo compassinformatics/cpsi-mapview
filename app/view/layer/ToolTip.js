@@ -138,13 +138,13 @@ Ext.define('CpsiMapview.view.layer.ToolTip', {
         var htmlPart;
 
         Ext.each(me.toolTipConfig, function (tipConf) {
-            if(tipConf.thumbnail && tipConf.property){
+            if (tipConf.thumbnail && tipConf.property) {
                 var antiCache = new Date().getTime();
                 var onError = 'this.style.display =\'none\'';
                 var style = 'width:120px; height:90px;';
                 var url = Ext.String.format(tipConf.thumbnail, feature.get(tipConf.property));
                 htmlPart = Ext.String.format('<img src="{0}?_ac={1}" onerror="{2}" style="{3}"/>',
-                                             url, antiCache, onError, style);
+                    url, antiCache, onError, style);
             } else {
                 var key = tipConf.alias || tipConf.property;
                 var value = feature.get(tipConf.property);
