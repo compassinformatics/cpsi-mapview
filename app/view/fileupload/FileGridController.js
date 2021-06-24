@@ -1,6 +1,6 @@
 ﻿/**
  * Controller for the grid used to display a collection of attachments
- * 
+ *
  * @class CpsiMapview.view.fileupload.FileGridController
  */
 
@@ -113,7 +113,7 @@ Ext.define('CpsiMapview.view.fileupload.FileGridController', {
     },
 
     /**
-     * When double clicking a file attachment open in a 
+     * When double clicking a file attachment open in a
      * window for images, or download directly for other file types
      * @param {any} grid
      * @param {any} record

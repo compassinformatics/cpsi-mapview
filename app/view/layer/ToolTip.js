@@ -140,7 +140,7 @@ Ext.define('CpsiMapview.view.layer.ToolTip', {
         Ext.each(me.toolTipConfig, function (tipConf) {
             if(tipConf.thumbnail && tipConf.property){
                 var antiCache = new Date().getTime();
-                var noThumbnail = "this.style.display='none'";
+                var noThumbnail = 'this.style.display="none"';
                 var url = Ext.String.format(tipConf.thumbnail, feature.get(tipConf.property));
                 htmlPart = Ext.String.format('<br /><img src="{0}?_ac={1}" onerror="{2}" />', url, antiCache, noThumbnail);
             } else {

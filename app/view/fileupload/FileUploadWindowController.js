@@ -40,10 +40,8 @@ Ext.define('CpsiMapview.view.fileupload.FileUploadWindowController', {
 
     /**
      * Save the attachment to the server
-     * 
-     * @param {any} btn
      */
-    onAttachmentSave: function (btn) {
+    onAttachmentSave: function () {
 
         var me = this;
         var form = me.getView().down('form');
