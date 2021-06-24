@@ -1,22 +1,8 @@
-﻿/*
-    File uploads are not performed using normal 'Ajax' techniques, that is they are
-    not performed using XMLHttpRequests.
-    Instead the form is submitted in the standard manner with the DOM <form> element temporarily modified to have
-    its target set to refer to a dynamically generated, hidden <iframe> which is inserted into the document but
-    removed after the return data has been gathered.
-    The server response is parsed by the browser to create the document for the IFRAME.
-    If the server is using JSON to send the return object, then the Content-Type header must
-    be set to 'text/html' in order to tell the browser to insert the text unchanged into the document body.
-
-    Characters which are significant to an HTML parser must be sent as HTML entities,
-    so encode '<' as '&lt;', '&' as '&amp;' etc.
-
-    The response text is retrieved from the document, and a fake XMLHttpRequest object is created containing a
-    responseText property in order to conform to the requirements of event handlers and callbacks.
-    Be aware that file upload packets are sent with the content type multipart/form and some server
-    technologies (notably JEE) may require some custom processing in order to retrieve parameter names
-    and parameter values from the packet content.
-*/
+﻿/**
+ * Controller for the grid used to display a collection of attachments
+ *
+ * @class CpsiMapview.view.fileupload.FileGridController
+ */
 
 Ext.define('CpsiMapview.view.fileupload.FileGridController', {
     extend: 'Ext.app.ViewController',
@@ -24,75 +10,131 @@ Ext.define('CpsiMapview.view.fileupload.FileGridController', {
     requires: [
         'CpsiMapview.view.fileupload.Report',
         'CpsiMapview.view.fileupload.FileUploadWindow',
-        'CpsiMapview.model.fileupload.FileGridStoreModel'
+        'CpsiMapview.model.fileupload.Attachment'
     ],
     mixins: [
         'CpsiMapview.controller.grid.ItemDeleterGridControllerMixin'
     ],
-    getServiceUrl: function() {
-        var vm = this.getViewModel();
-        var url = vm.getData().serviceUrl;
-        return url;
-    },
-    getAttachmentDeleteUrl: function(id) {
-        var url = this.getServiceUrl();
-        url += (url.endsWith('/') ? '' : '/') + 'attachment/{0}';
-        url = url.replace('{0}', id);
-        return url;
-    },
 
+    /**
+     * Open the modal form for adding a new file attachment
+     */
     onAddFileClick: function () {
-        var vm = this.getViewModel();
+
+        var me = this;
+        var vm = me.getViewModel();
         var data = vm.getData();
+
         var fileUploadWin = Ext.create('CpsiMapview.view.fileupload.FileUploadWindow', {
             viewModel: {
                 data: {
-                    serviceUrl: data.serviceUrl,
                     currentRecord: data.currentRecord,
                     parentType: data.parentType
                 }
             },
             listeners: {
                 fileadded: 'onFileAdded',
-                scope: this
+                scope: me
             }
         });
+
         fileUploadWin.show();
     },
 
-    onRowDelete: function(tableView, rowIndex, colIndex, item, e, record/*, tableRow*/)
-    {
-        var id = CpsiMapview.model.fileupload.FileGridStoreModel.loadData(record.data).getId();
+    /**
+     * Delete an attachment from the server and removed from the grid
+     * @param {any} tableView
+     * @param {any} rowIndex
+     * @param {any} colIndex
+     * @param {any} item
+     * @param {any} e
+     * @param {any} record
+     */
+    onRowDelete: function (tableView, rowIndex, colIndex, item, e, record) {
+
+        var me = this;
+        var url = record.get('attachmentUrl');
+
         Ext.Ajax.request({
-            url: this.getAttachmentDeleteUrl(id),
+            url: url,
             method: 'DELETE',
-            success: function() {
-                var store = tableView.getStore();
-                store.remove(record);
+            success: function (response) {
+                var resp = Ext.decode(response.responseText);
+                if (resp.success === true) {
+                    var store = me.getView().getStore();
+                    store.remove(record);
+                } else {
+                    Ext.log.warn('Error deleting attachement', resp.message);
+                }
             },
-            failure: function(){
+            failure: function (response) {
+                if (!response.aborted) {
+                    Ext.log.error('Error deleting attachement', response);
+                }
             }
         });
     },
 
+    /**
+     * Add a new attachment to the grid
+     * @param {any} file
+     */
     onFileAdded: function (file) {
         var store = this.getViewModel().getStore('files');
         store.add(file);
     },
 
-    getAttachmentUrl: function (attachmentId) {
-        var vm = this.getViewModel();
-        return Ext.String.format('{0}/attachment/{1}', vm.getData().serviceUrl, attachmentId);
+    /**
+     * Open an image attachment in a floating window
+     * @param {any} record
+     */
+    openImageInWindow: function (record) {
+
+        var imageUrl = record.get('attachmentUrl');
+        var css = 'style="width: 100%; height: 100%; object-fit: contain"';
+
+        var win = Ext.create('CpsiMapview.view.window.MinimizableWindow', {
+            width: 300,
+            height: 400,
+            title: 'Image Attachment',
+            layout: 'fit',
+            minimizable: true,
+            maximizable: true,
+            resizable: true,
+            closeAction: 'destroy',
+            glyph: 'f030@FontAwesome',
+            items: {
+                xtype: 'component',
+                html: Ext.String.format('<a href="{0}" target="_blank"><img src={1} {2}</a>', imageUrl, imageUrl, css)
+            }
+        });
+        win.show();
+
     },
 
-    onDownloadFileClick: function (grid, record/*, element, rowIndex, e, eOpts*/) {
-        var report = Ext.create('CpsiMapview.view.fileupload.Report', {
-            renderTo: Ext.getBody()
-        });
-        var url = this.getAttachmentUrl(record.get('attachmentId'));
-        report.load({
-            url: url
-        });
+    /**
+     * When double clicking a file attachment open in a
+     * window for images, or download directly for other file types
+     * @param {any} grid
+     * @param {any} record
+     */
+    onDownloadFileClick: function (grid, record) {
+
+        var me = this;
+
+        if (record.get('isThumbnailAvailable') === true) {
+            me.openImageInWindow(record);
+        } else {
+            // for non-image attachments download the file
+            var report = Ext.create('CpsiMapview.view.fileupload.Report', {
+                renderTo: Ext.getBody()
+            });
+
+            var url = record.get('attachmentUrl');
+            report.load({
+                url: url
+            });
+        }
     }
 
 });
