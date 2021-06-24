@@ -1,3 +1,8 @@
+/**
+ * Grid used to display a collection of attachments
+ *
+ * @class CpsiMapview.view.fileupload.FileGrid
+ */
 Ext.define('CpsiMapview.view.fileupload.FileGrid',
     {
         extend: 'Ext.grid.Panel',
@@ -36,6 +41,17 @@ Ext.define('CpsiMapview.view.fileupload.FileGrid',
                 dataIndex: 'description',
                 flex: 3
             }, {
+                text: 'Thumbnail',
+                flex: 1,
+                dataIndex: 'thumbnailUrl',
+                renderer: function(url) {
+                    if(url){
+                        return Ext.String.format('<img src="{0}" alt="thumbnail" height="32" width="32">', url);
+                    } else {
+                        return '';
+                    }
+                }
+            }, {
                 text: 'File',
                 dataIndex: 'fileName',
                 flex: 2,
@@ -56,6 +72,31 @@ Ext.define('CpsiMapview.view.fileupload.FileGrid',
                 dataIndex: 'lastUpdatedDateUtc',
                 format: 'd-m-Y',
                 width: 100
+            },
+            {
+                text: 'Attachment Id',
+                dataIndex: 'attachmentId',
+                hidden: true
+            },
+            {
+                text: 'Content Type',
+                dataIndex: 'contentType',
+                hidden: true
+            },
+            {
+                text: 'File Extension',
+                dataIndex: 'extension',
+                hidden: true
+            },
+            {
+                text: 'Default Image',
+                dataIndex: 'isDefaultImage',
+                hidden: true
+            },
+            {
+                text: 'Thumnail Available',
+                dataIndex: 'isThumbnailAvailable',
+                hidden: true
             },
             {
                 xtype: 'cmv_itemdeleter',

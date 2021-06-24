@@ -135,10 +135,20 @@ Ext.define('CpsiMapview.view.layer.ToolTip', {
     formatFunction: function (feature) {
         var me = this;
         var htmlParts = [];
+        var htmlPart;
 
         Ext.each(me.toolTipConfig, function (tipConf) {
-            var key = tipConf.alias || tipConf.property;
-            var value = feature.get(tipConf.property);
+            if(tipConf.thumbnail && tipConf.property){
+                var antiCache = new Date().getTime();
+                var noThumbnail = "this.style.display='none'";
+                var url = Ext.String.format(tipConf.thumbnail, feature.get(tipConf.property));
+                htmlPart = Ext.String.format('<br /><img src="{0}?_ac={1}" onerror="{2}" />', url, antiCache, noThumbnail);
+            } else {
+                var key = tipConf.alias || tipConf.property;
+                var value = feature.get(tipConf.property);
+                htmlPart = Ext.String.format('<b>{0}: </b>{1}', key, value);
+            }
+
             if (String(value) === '-999') {
                 // HACK
                 // -999 is the default value used for NULLs so WFS layers can
@@ -146,7 +156,6 @@ Ext.define('CpsiMapview.view.layer.ToolTip', {
                 value = null;
             }
 
-            var htmlPart = Ext.String.format('<b>{0}: </b>{1}', key, value);
             htmlParts.push(htmlPart);
         });
 

@@ -1,4 +1,9 @@
-// define a simple Window class to hold the grid
+/**
+ * A simple form in a modal window to allow a user to select a local file
+ * to upload
+ *
+ * @class CpsiMapview.view.fileupload.FileUploadWindow
+ */
 Ext.define('CpsiMapview.view.fileupload.FileUploadWindow', {
     extend: 'Ext.window.Window',
     xtype: 'cmv_fileuploadwindow',
@@ -8,7 +13,7 @@ Ext.define('CpsiMapview.view.fileupload.FileUploadWindow', {
     modal: true,
     layout: 'anchor',
     width: 500,
-    closeAction: 'destroy', // by default destroy the window when it is closed,
+    closeAction: 'destroy',
     controller: 'cmv_fileuploadwindowcontroller',
     bind: {
         title: 'Associate a File with the {parentType}'
@@ -31,14 +36,12 @@ Ext.define('CpsiMapview.view.fileupload.FileUploadWindow', {
                 {
                     xtype: 'textfield',
                     name: 'documentName',
-                    itemId: 'documentName',
                     fieldLabel: 'Name*',
                     emptyText: 'Enter a name for the document...'
                 },
                 {
                     xtype: 'textfield',
                     name: 'documentDescription',
-                    itemId: 'documentDescription',
                     fieldLabel: 'Description*',
                     emptyText: 'Enter a description for the document...'
                 },
@@ -47,7 +50,6 @@ Ext.define('CpsiMapview.view.fileupload.FileUploadWindow', {
                     emptyText: 'Select a file',
                     fieldLabel: 'Document*',
                     name: 'filePath',
-                    itemId: 'filePath',
                     buttonConfig: {
                         iconCls: 'add icon-add',
                         cls: 'bordered-button',
@@ -69,5 +71,4 @@ Ext.define('CpsiMapview.view.fileupload.FileUploadWindow', {
             handler: 'onAttachmentCancelUpload'
         }
     ]
-
 });
