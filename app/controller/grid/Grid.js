@@ -154,11 +154,13 @@ Ext.define('CpsiMapview.controller.grid.Grid', {
 
     /**
      * Applies both attribute and spatial filters to
-     * any associated WMS and vector layer and forces a reload of both
+     * any associated WMS and vector layer and reloads both
+     * If filters have not been modified the WMS layer is not updated unless forced
      *
      * @private
+     * @param {Boolean} force True to force a WMS refresh (required if underlying data has changed)
      */
-    updateAssociatedLayers: function () {
+    updateAssociatedLayers: function (force) {
 
         var me = this;
         var grid = me.getView();
@@ -194,8 +196,9 @@ Ext.define('CpsiMapview.controller.grid.Grid', {
             var wmsFilterUtil = CpsiMapview.util.WmsFilter;
             var wmsFilterString = wmsFilterUtil.getWmsFilterString(wmsLayer);
 
-
-            if (originalFilterString !== wmsFilterString) {
+            // if the filters have not changed then we do not need to refresh
+            // unless the underlying data has changed and force is used
+            if (force === true || originalFilterString !== wmsFilterString) {
                 wmsSource.updateParams({
                     FILTER: wmsFilterString,
                     cacheBuster: Math.random()
@@ -310,22 +313,32 @@ Ext.define('CpsiMapview.controller.grid.Grid', {
      * @private
      */
     onSpatialFilter: function (spatialFilter) {
-
         var me = this;
         me.spatialFilter = spatialFilter;
+        var clearPaging = true;
+        me.refreshStore(clearPaging);
+        var force = false;
+        me.updateAssociatedLayers(force);
+    },
 
-        // force a reload of the grid store
+
+    /**
+    * Force a reload of the grid store
+    * @param {Boolean} clearPaging True to clear paging parameters
+    */
+    refreshStore: function(clearPaging){
+
+        var me = this;
         var grid = me.getView();
         var store = grid.getStore();
 
         // clear any paging parameters as these will no longer apply
-        // once the spatial filter has been applied
-        store.currentPage = 1;
+        // once filters have been applied
+        if(clearPaging === true){
+            store.currentPage = 1;
+        }
 
         store.loadWfs();
-
-
-        this.updateAssociatedLayers();
     },
 
     /**
@@ -338,18 +351,11 @@ Ext.define('CpsiMapview.controller.grid.Grid', {
         var me = this;
         me.idFilter = idFilter;
 
-        // force a reload of the grid store
-        var grid = me.getView();
-        var store = grid.getStore();
+        var clearPaging = true;
+        me.refreshStore(clearPaging);
 
-        // clear any paging parameters as these will no longer apply
-        // once the spatial filter has been applied
-        store.currentPage = 1;
-
-        store.loadWfs();
-
-
-        this.updateAssociatedLayers();
+        var force = false;
+        me.updateAssociatedLayers(force);
     },
 
 
@@ -538,7 +544,8 @@ Ext.define('CpsiMapview.controller.grid.Grid', {
     },
 
     /**
-     * Hide and show the map layer with the grid
+     * Hide and show the map layer used to highlight selected features
+     * with the grid.
      * Although the layer has no styling we need to hide
      * any selections which are visible
      */
@@ -548,9 +555,11 @@ Ext.define('CpsiMapview.controller.grid.Grid', {
         var grid = me.getView();
         var store = grid.getStore();
 
-        var layer = me.getOlLayer();
-        if (store.isEmptyStore !== true && layer) {
-            layer.setVisible(show);
+        if (store.isEmptyStore !== true && store.getLayer) {
+            var selectedFeaturesLayer = store.getLayer();
+            if(selectedFeaturesLayer){
+                selectedFeaturesLayer.setVisible(show);
+            }
         }
     },
 
@@ -655,12 +664,13 @@ Ext.define('CpsiMapview.controller.grid.Grid', {
         if (associatedEditModel) {
             var modelPrototype = Ext.ClassManager.get(associatedEditModel);
             Ext.util.Observable.observe(modelPrototype, {
-                modelsaved: function () {
-                    var grid = me.getView();
-                    var store = grid.getStore();
-                    store.loadWfs();
-                    me.updateAssociatedLayers();
-                }
+                modelsaved: function(){
+                    var clearPaging = false;
+                    me.refreshStore(clearPaging);
+                    var force = true;
+                    me.updateAssociatedLayers(force);
+                },
+                scope: me
             });
         }
     },
