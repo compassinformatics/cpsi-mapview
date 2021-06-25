@@ -535,10 +535,11 @@ Ext.define('CpsiMapview.controller.grid.Grid', {
         me.getVisibleColumns();
         var idProperty = store.model.prototype.idField.name;
 
-        if (column.dataIndex !== idProperty) {
+        if ((Ext.isEmpty(column.dataIndex) === false) && (column.dataIndex !== idProperty)) {
             // when a new column is displayed
             // query the server again to retrieve the data
             // idProperty will always be loaded so no need to reload in this case
+            // if a column does not have a dataIndex (e.g. checkbox columns) then there is no need to requery the server
             store.reload();
         }
     },
