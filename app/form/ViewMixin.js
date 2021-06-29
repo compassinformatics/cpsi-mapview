@@ -1,9 +1,9 @@
 ﻿/**
- * To be mixed into any edit form window. 
+ * To be mixed into any edit form window.
  * Provides default buttons which can be hidden by assigning values to the viewModel
- * @class CpsiMapview.form.LayersMixin
+ * @class CpsiMapview.form.ViewMixin
  */
-Ext.define('CpsiMapview.util.EditFormWindowMixin', {
+Ext.define('CpsiMapview.form.ViewMixin', {
     extend: 'Ext.Mixin',
     requires: [
         'CpsiMapview.view.button.DigitizeButton'

@@ -2,10 +2,14 @@
  * A mixin for an editing windows providing formulas that can be bound
  * to the window model
  *
- * @class CpsiMapview.util.EditWindowViewModelMixin
+ * @class CpsiMapview.form.ViewModelMixin
  */
-Ext.define('CpsiMapview.util.EditWindowViewModelMixin', {
+Ext.define('CpsiMapview.form.ViewModelMixin', {
     extend: 'Ext.Mixin',
+
+    requires: [
+        'BasiGX.util.Map'
+    ],
 
     mixinConfig: {
         before: {
@@ -45,6 +49,10 @@ Ext.define('CpsiMapview.util.EditWindowViewModelMixin', {
     config: {
 
         formulas: {
+
+            map: function () {
+                return BasiGX.util.Map.getMapComponent().getMap();
+            },
 
             resultLayer: {
                 bind: {
