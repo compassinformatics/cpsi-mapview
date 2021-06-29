@@ -217,7 +217,7 @@
       "path": "./node_modules/geostyler-openlayers-parser/browser/olStyleParser.js"
     },
     {
-      "path": "https://cdnjs.cloudflare.com/ajax/libs/proj4js/2.5.0/proj4.js"
+      "path": "https://cdnjs.cloudflare.com/ajax/libs/proj4js/2.7.4/proj4.js"
     },
     {
       "path": "https://cdn.jsdelivr.net/npm/jsonix@3.0.0/jsonix.min.js"
