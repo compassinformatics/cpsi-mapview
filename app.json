@@ -46,7 +46,8 @@
      * in the "override" property is also included.
      */
     "overrides": [
-        "overrides"
+      "app/overrides",
+      "app/overrides/Ext.Base.js" // not picked up automatically (as not a standard component?)
     ],
 
     /**
