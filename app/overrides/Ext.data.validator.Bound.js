@@ -1,5 +1,4 @@
-﻿
-Ext.override(Ext.data.validator.Bound, {
+﻿Ext.override(Ext.data.validator.Bound, {
     /**
     * When using a range or bound validator allow null values to return true
     * See https://forum.sencha.com/forum/showthread.php?298213-Range-validator-validates-nullable-fields

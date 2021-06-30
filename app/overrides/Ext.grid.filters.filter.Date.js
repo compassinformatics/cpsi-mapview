@@ -1,5 +1,4 @@
 ﻿Ext.override(Ext.grid.filters.filter.Date, {
-
     /**
      * The grid Date filter currently ignores the dateFormat and passes raw dates back to
      * the server. This function converts them prior to sending them back using the dateFormat
@@ -19,8 +18,6 @@
         }
 
         filter[key] = val;
-
         me.callParent([filter]);
-
     }
 });

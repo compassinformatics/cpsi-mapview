@@ -1,6 +1,4 @@
-﻿
-Ext.override(Ext.form.field.Base, {
-/*
+﻿/*
  * Based on:  https://forum.sencha.com/forum/showthread.php?304374-Binding-doesn-t-work-with-validation
  *
  * by design the bound model isn't updated if the form field is invalid, therefore validation-related bindings aren't triggered
@@ -13,6 +11,7 @@ Ext.override(Ext.form.field.Base, {
  *  "valid"/<not set>: (default) the model is updated only if the field value is valid (default behaviour)
  */
 
+Ext.override(Ext.form.field.Base, {
     bindOn: 'both',
     publishValue: function () {
         var me = this;
