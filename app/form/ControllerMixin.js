@@ -38,7 +38,7 @@ Ext.define('CpsiMapview.form.ControllerMixin', {
     onSaveFailed: function (record, operation) {
 
         var me = this;
-        var response = operation.getResponse()? operation.getResponse(): operation._response;
+        var response = operation.getResponse() ? operation.getResponse() : operation._response;
 
         var result = !response ? { errorCode: me.errorCodes.GeneralServerError } :
             (response.responseType == 'json'
@@ -253,6 +253,47 @@ Ext.define('CpsiMapview.form.ControllerMixin', {
         // are removed and recreated
         var existingRec = vm.get('currentRecord');
         vm.set('currentRecord', serverRec);
+        vm.notify(); // flush all bindings, otherwise the grid may still be bound to the old layer
+
+        // we also need to update the featureStores for any associated tools
+        // as when a model is reloaded then the featureStore and layer
+        // are recreated, and the tool is pointing to the old layer
+
+        // see bindings in CpsiMapview.form.ViewMixin
+
+        var resultLayer = vm.get('resultLayer');
+        var polygonLayer = vm.get('polygonLayer');
+        var vw = me.getView();
+
+        var tool, toolCtrl;
+
+        if (vm.get('hideDigitisePointButton') === false) {
+            tool = vw.down('#pointDigitiserButton');
+            toolCtrl = tool.getController();
+            toolCtrl.setResultLayer(resultLayer);
+            toolCtrl.setDrawLayer(resultLayer);
+        }
+
+        if (vm.get('hideDigitiseAreaButton') === false) {
+            tool = vw.down('#areaDigitiserButton');
+            toolCtrl = tool.getController();
+            toolCtrl.setResultLayer(resultLayer);
+            toolCtrl.setDrawLayer(polygonLayer);
+        }
+
+        if (vm.get('circleDigitiserButton') === false) {
+            tool = vw.down('#circleDigitiserButton');
+            toolCtrl = tool.getController();
+            toolCtrl.setResultLayer(resultLayer);
+            toolCtrl.setDrawLayer(polygonLayer);
+        }
+
+        if (vm.get('hideDigitiseSegmentButton') === false) {
+            tool = vw.down('#segmentDigitiserButton');
+            toolCtrl = tool.getController();
+            toolCtrl.setResultLayer(resultLayer);
+        }
+
         // only destroy this after the new record has been set as getting errors in checkHadValue > getChildValue
         // it seems to be an issue with checkBoxes only
         existingRec.destroy();
