@@ -7,8 +7,10 @@
 Ext.define('CpsiMapview.form.ControllerMixin', {
     extend: 'Ext.Mixin',
     mixins: {
-        zoomer: 'CpsiMapview.util.ZoomerMixin'
+        zoomer: 'CpsiMapview.util.ZoomerMixin',
+        validation: 'CpsiMapview.form.ValidationMessages'
     },
+
     /** The possible return codes from the services */
     errorCodes: {
         None: 0,
@@ -234,9 +236,11 @@ Ext.define('CpsiMapview.form.ControllerMixin', {
      * Action when the zoom button is clicked
      */
     onZoomClick: function () {
-        var goAhead = !this.beforeZoom || this.beforeZoom();
+        var me = this;
+        var goAhead = !me.beforeZoom || me.beforeZoom();
         if (goAhead) {
-            this.zoomToRecordExtent();
+            // call the mixin function with the controller as the scope
+            me.mixins.zoomer.zoomToRecordExtent.call(me);
         }
     },
 
@@ -348,5 +352,19 @@ Ext.define('CpsiMapview.form.ControllerMixin', {
         });
 
         return ret;
+    },
+
+    onFieldChanged: function () {
+        var me = this;
+        var vm = me.getViewModel();
+        var rec = vm.get('currentRecord');
+        if (rec) {
+            // call the mixin function with the controller as the scope
+            var isValid = me.mixins.validation.checkValid.call(me, rec);
+
+            // we can't just set the canSave to valid as there may be other logic for the canSave function
+            // so set valid property which is one of the bindings to the canSave function
+            vm.set('valid', isValid);
+        }
     }
 });
