@@ -63,18 +63,6 @@ Ext.define('CpsiMapview.form.ViewModelMixin', {
                     var storeName = me.get('featureStoreName');
                     var currentRecord = me.get('currentRecord');
                     var fs = me.getFeatureStore(currentRecord, storeName);
-
-                    // when a model is reloaded then the featureStore and layer
-                    // is recreated, and the tool is pointing to the old layer
-                    // TODO fix this for all tool types
-                    // see bindings in CpsiMapview.util.EditFormWindowMixin
-                    var pointTool = me.getView().down('#pointDigitiserButton');
-                    if (pointTool) {
-                        var toolCtrl = pointTool.getController();
-                        toolCtrl.setResultLayer(fs.layer);
-                        toolCtrl.setDrawLayer(fs.layer);
-                    }
-
                     if (fs) {
                         return fs.layer;
                     }

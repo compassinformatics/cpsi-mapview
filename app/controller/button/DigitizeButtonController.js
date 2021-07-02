@@ -1151,6 +1151,7 @@ Ext.define('CpsiMapview.controller.button.DigitizeButtonController', {
      */
     clearActiveGroup: function (activeGroupIdx) {
         var me = this;
+        var view = me.getView();
 
         if (!me.resultLayer) {
             // no results have been returned so nothing to clear
@@ -1162,10 +1163,7 @@ Ext.define('CpsiMapview.controller.button.DigitizeButtonController', {
 
         var resultSource = me.resultLayer.getSource();
 
-        if (Ext.isEmpty(activeGroupIdx)) {
-            // remove all features
-            resultSource.clear();
-        } else {
+        if (view.getGroups() === true) {
             resultSource.getFeatures()
                 .slice(0)
                 .filter(function (feature) {
@@ -1174,6 +1172,9 @@ Ext.define('CpsiMapview.controller.button.DigitizeButtonController', {
                 .forEach(function (feature) {
                     resultSource.removeFeature(feature);
                 });
+        } else {
+            // remove all features
+            resultSource.clear();
         }
 
         var modifications = {
