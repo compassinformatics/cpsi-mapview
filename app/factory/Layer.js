@@ -864,7 +864,8 @@ Ext.define('CpsiMapview.factory.Layer', {
             attributions: ol2Conf.attribution,
             projection: ol2Conf.projection,
             transition: ol2Conf.transitionEffect === null ? 0 : undefined,
-            gutter: ol2Conf.gutter
+            gutter: ol2Conf.gutter,
+            tileSize: ol2Conf.tileSize
         };
 
         return olSourceProps;
