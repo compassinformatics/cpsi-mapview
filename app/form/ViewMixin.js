@@ -80,6 +80,7 @@ Ext.define('CpsiMapview.form.ViewMixin', {
                         itemId: 'deleteButton',
                         text: 'Delete',
                         handler: 'onDeleteClick',
+                        tooltip: 'Permanently delete the record',
                         bind: {
                             hidden: '{hideDeleteButton}',
                             disabled: '{!canDelete}',
@@ -101,6 +102,7 @@ Ext.define('CpsiMapview.form.ViewMixin', {
                         itemId: 'exportButton',
                         text: 'Export',
                         handler: 'onExportClick',
+                        tooltip: 'Export the record to Excel',
                         bind: {
                             hidden: '{hideExportButton}'
                         }
@@ -110,6 +112,7 @@ Ext.define('CpsiMapview.form.ViewMixin', {
                         itemId: 'zoomButton',
                         text: 'Zoom',
                         handler: 'onZoomClick',
+                        tooltip: 'Zoom the map to the location of the record',
                         bind: {
                             hidden: '{hideZoomButton}'
                         }
@@ -119,6 +122,10 @@ Ext.define('CpsiMapview.form.ViewMixin', {
                         itemId: 'refreshButton',
                         text: 'Refresh',
                         handler: 'onRefreshClick',
+                        tooltip: 'Reload the record with the latest data from the server (only for existing records)',
+                        style: {
+                            pointerEvents: 'all' // display tooltip even when the button is disabled
+                        },
                         bind: {
                             hidden: '{hideRefreshButton}',
                             disabled: '{!canRefresh}'
@@ -208,6 +215,8 @@ Ext.define('CpsiMapview.form.ViewMixin', {
                         itemId: 'saveButton',
                         text: 'Save',
                         handler: 'onSaveClick',
+                        // Save button tooltips are updated using CpsiMapview.form.ValidationMessages
+                        tooltip: 'Save the record',
                         bind: {
                             disabled: '{!canSave}',
                             hidden: '{hideSaveButton}',
@@ -229,6 +238,7 @@ Ext.define('CpsiMapview.form.ViewMixin', {
                         itemId: 'cancelButton',
                         text: 'Cancel',
                         handler: 'onCancelClick',
+                        tooltip: 'Discard any changes without saving and close the window',
                         bind: {
                             hidden: '{hideCancelButton}'
                         }
