@@ -105,11 +105,11 @@ Ext.define('CpsiMapview.view.fileupload.FileGridController', {
             glyph: 'f030@FontAwesome',
             items: {
                 xtype: 'component',
-                html: Ext.String.format('<a href="{0}" target="_blank"><img src={1} {2}</a>', imageUrl, imageUrl, css)
+                html: Ext.String.format('<a href="{0}" target="_blank"><img src={1} {2} ></a>',
+                    imageUrl, imageUrl, css)
             }
         });
         win.show();
-
     },
 
     /**
