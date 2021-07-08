@@ -74,7 +74,7 @@ Ext.define('CpsiMapview.controller.grid.Grid', {
      * Open a row-level context-menu with a Zoom to Feature option
      * @private
      */
-    onItemContextMenu: function (grid, record, item, index, e) {
+    onItemContextMenu: function (grid, record, item, index, evt) {
         var me = this;
         var vm = me.getViewModel();
         var map = vm.get('map');
@@ -107,8 +107,8 @@ Ext.define('CpsiMapview.controller.grid.Grid', {
             }
         });
 
-        e.stopEvent();
-        contextMenu.showAt(e.getXY());
+        evt.stopEvent();
+        contextMenu.showAt(evt.pageX, evt.pageY);
     },
 
     /**

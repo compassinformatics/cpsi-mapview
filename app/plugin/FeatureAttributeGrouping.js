@@ -95,11 +95,11 @@ Ext.define('CpsiMapview.plugin.FeatureAttributeGrouping', {
         });
     },
 
-    showContext: function (e) {
+    showContext: function (evt) {
         var me = this;
 
         if (this.groupingActive) {
-            e.preventDefault();
+            evt.preventDefault();
 
             var menu = Ext.create('Ext.menu.Menu', {
                 width: 160,
@@ -112,7 +112,7 @@ Ext.define('CpsiMapview.plugin.FeatureAttributeGrouping', {
                     }
                 }]
             });
-            menu.showAt(e.x, e.y);
+            menu.showAt(evt.pageX, evt.pageY);
         }
     }
 });
