@@ -443,6 +443,15 @@ Ext.define('CpsiMapview.factory.Layer', {
                 url, 'FILTER=' + encodeURIComponent(filter)
             );
 
+            // add a timestamp parameter to the URL is set on the source
+            // so that we can bypass the browser cache if required
+            var ts = vectorSource.get('timestamp');
+            if (ts) {
+                reqUrl = Ext.String.urlAppend(
+                    reqUrl, 'TIMESTAMP=' + ts
+                );
+            }
+
             var xhr = new XMLHttpRequest();
             xhr.open('GET', reqUrl);
             var onError = function() {

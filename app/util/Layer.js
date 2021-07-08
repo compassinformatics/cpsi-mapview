@@ -22,7 +22,7 @@ Ext.define('CpsiMapview.util.Layer', {
         // mostly WMS layers
         if (source.updateParams) {
             var params = source.getParams();
-            params.noCache = new Date().getMilliseconds();
+            params.TIMESTAMP = Ext.Date.now();
             source.updateParams(params);
             source.refresh();
         } else if (layer.get('isWfs') === true) {
@@ -31,6 +31,7 @@ Ext.define('CpsiMapview.util.Layer', {
                 source = source.getSource();
             }
             // for WFS trigger reload of source
+            source.set('timestamp', Ext.Date.now())
             source.refresh();
         } else {
             // only refresh for other layers and sources (to not loose data)

@@ -201,7 +201,7 @@ Ext.define('CpsiMapview.controller.grid.Grid', {
             if (force === true || originalFilterString !== wmsFilterString) {
                 wmsSource.updateParams({
                     FILTER: wmsFilterString,
-                    cacheBuster: Math.random()
+                    TIMESTAMP: Ext.Date.now()
                 });
             }
             // keep a reference to the raw filters so they can be applied to the vector layer
@@ -217,6 +217,10 @@ Ext.define('CpsiMapview.controller.grid.Grid', {
 
             if (vectorSource instanceof ol.source.Cluster) {
                 vectorSource = vectorSource.getSource(); // we use the raw source
+            }
+
+            if (force === true) {
+                vectorSource.set('timestamp', Ext.Date.now())
             }
 
             vectorSource.set('additionalFilters', filters);
