@@ -110,8 +110,8 @@ Ext.define('CpsiMapview.view.layer.ToolTip', {
         me.setHtml(html);
 
         // show tooltip near mouse pointer
-        var screenX = evt.originalEvent.x + me.offsetX;
-        var screenY = evt.originalEvent.y + me.offsetY;
+        var screenX = evt.originalEvent.pageX + me.offsetX;
+        var screenY = evt.originalEvent.pageY + me.offsetY;
         me.showAt([screenX, screenY]);
 
         // extjs has somehow problems with the very first render of the tooltip
