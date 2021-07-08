@@ -53,25 +53,5 @@ Ext.define('CpsiMapview.form.LayersMixin', {
         if (this.syncLayerWindowVisibility) {
             this.toggleLayerVisibility(true);
         }
-    },
-
-    onEdgeSelectionChange: function (grid, selected) {
-
-        var vm = this.getView().getViewModel();
-
-        // reset all selections
-        // setting the style to null defaults to using the layer style
-        grid.store.each(function (rec) {
-            rec.getFeature().setStyle(null);
-        });
-
-        var selectStyle = vm.get('selectStyle');
-
-        if (selectStyle) {
-            // highlight grid selection in map
-            Ext.each(selected, function (rec) {
-                rec.getFeature().setStyle(selectStyle);
-            });
-        }
     }
 });

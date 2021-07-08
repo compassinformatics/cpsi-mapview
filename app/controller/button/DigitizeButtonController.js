@@ -673,7 +673,17 @@ Ext.define('CpsiMapview.controller.button.DigitizeButtonController', {
         var points = me.getSolverPoints();
 
         if (features.length > 0 && features[0] !== points[points.length - 1]) {
+
+            // for pointerdown and pointerup events we simply want to return
+            // we only want to create a new point on a user click
+            if (evt.type !== 'singleclick') {
+                return true;
+            }
+
             me.blockEventHandling();
+
+            // to allow loops to be created we need to allow users to click on the
+            // start point to add a duplicate end point
 
             me.getNetByPoints(points.concat([features[0]]))
                 .then(me.handleFinalResult.bind(me))
@@ -681,6 +691,8 @@ Ext.define('CpsiMapview.controller.button.DigitizeButtonController', {
 
             return false;
         } else {
+            // allow edges to be selected by clicking on them
+            // by temporarily setting a blockedEventHandling flag
             var hasEdge = me.map.hasFeatureAtPixel(evt.pixel, {
                 layerFilter: function (layer) {
                     return layer === me.resultLayer;
@@ -894,13 +906,15 @@ Ext.define('CpsiMapview.controller.button.DigitizeButtonController', {
                 failure: function (response) {
                     mapComponent.setLoading(false);
 
-                    var errorMessage = 'Error while requesting the API endpoint';
+                    if (response.aborted !== true) {
+                        var errorMessage = 'Error while requesting the API endpoint';
 
-                    if (response.responseText && response.responseText.message) {
-                        errorMessage += ': ' + response.responseText.message;
+                        if (response.responseText && response.responseText.message) {
+                            errorMessage += ': ' + response.responseText.message;
+                        }
+
+                        BasiGX.error(errorMessage);
                     }
-
-                    BasiGX.error(errorMessage);
                 }
             });
         });
