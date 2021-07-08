@@ -495,7 +495,7 @@ Ext.define('CpsiMapview.controller.button.DigitizeButtonController', {
             renderTo: Ext.getBody(),
             items: menuItems
         });
-        menu.showAt(evt.x, evt.y);
+        menu.showAt(evt.pageX, evt.pageY);
     },
 
     /**

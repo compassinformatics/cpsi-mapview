@@ -195,7 +195,7 @@ Ext.define('CpsiMapview.controller.button.SpatialQueryButtonController', {
                 scope: me
             }]
         });
-        menu.showAt(evt.x, evt.y);
+        menu.showAt(evt.pageX, evt.pageY);
     },
     /**
      * Connects the change:visible event of the query layer
