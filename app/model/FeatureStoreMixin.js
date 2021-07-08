@@ -58,7 +58,7 @@ Ext.define('CpsiMapview.model.FeatureStoreMixin', {
     },
 
     /**
-     * Create a new feature store
+     * Create a new feature store for a model field
      *
      * @param {Ext.data.Model} model A model to use when loading features
      * @return {GeoExt.data.store.Features} The new feature store

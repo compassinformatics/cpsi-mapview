@@ -89,7 +89,7 @@ Ext.define('CpsiMapview.view.layer.ToolTip', {
         // care about clustered features
         if (featureCluster) {
             // in this case take the first feature in the cluster to define the
-            // tooltop text
+            // tooltip text
             if (featureCluster.length > 0) {
                 feature = featureCluster[0];
             } else {
