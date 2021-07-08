@@ -139,7 +139,7 @@ Ext.define('CpsiMapview.util.SwitchLayer', {
             var newParams = {
                 STYLES: activeStyle,
                 FILTER: wmsFilterString,
-                cacheBuster: Math.random()
+                TIMESTAMP: Ext.Date.now()
             };
             newLayerSource.updateParams(newParams);
         } else if (newLayer.get('isWfs') || newLayer.get('isVt')) {
@@ -151,7 +151,7 @@ Ext.define('CpsiMapview.util.SwitchLayer', {
 
             // load and parse SLD and apply it to layer
             LayerFactory.loadSld(newLayer, sldUrl);
-            newLayerSource.clear();
+            newLayerSource.set('timestamp', Ext.Date.now());
             newLayerSource.refresh();
         } else {
             Ext.Logger.info('Layer type not supported in StyleSwitcherRadioGroup');
