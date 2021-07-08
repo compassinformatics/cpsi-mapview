@@ -151,7 +151,7 @@ Ext.define('CpsiMapview.util.SwitchLayer', {
 
             // load and parse SLD and apply it to layer
             LayerFactory.loadSld(newLayer, sldUrl);
-            newLayerSource.set('timestamp', Ext.Date.now())
+            newLayerSource.set('timestamp', Ext.Date.now());
             newLayerSource.refresh();
         } else {
             Ext.Logger.info('Layer type not supported in StyleSwitcherRadioGroup');

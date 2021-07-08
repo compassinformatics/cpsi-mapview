@@ -220,7 +220,7 @@ Ext.define('CpsiMapview.controller.grid.Grid', {
             }
 
             if (force === true) {
-                vectorSource.set('timestamp', Ext.Date.now())
+                vectorSource.set('timestamp', Ext.Date.now());
             }
 
             vectorSource.set('additionalFilters', filters);

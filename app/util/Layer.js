@@ -31,7 +31,7 @@ Ext.define('CpsiMapview.util.Layer', {
                 source = source.getSource();
             }
             // for WFS trigger reload of source
-            source.set('timestamp', Ext.Date.now())
+            source.set('timestamp', Ext.Date.now());
             source.refresh();
         } else {
             // only refresh for other layers and sources (to not loose data)
