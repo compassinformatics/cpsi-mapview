@@ -84,12 +84,19 @@ Ext.define('CpsiMapview.util.ApplicationMixin', {
         if (Ext.Array.some(me.serviceUrls, urlTest) === true) {
             if (Ext.Array.some(me.excludedUrls, urlTest) === false) {
 
-                // FORMS submission (i.e. attachments upoad) return bogus responses with no content-type
                 var responseType = response.responseType ? response.responseType : response.getResponseHeader ? response.getResponseHeader('content-type') : null;
 
                 // check for geojson (coming from MapServer)
                 if (responseType && responseType.includes('subtype=geojson')) {
                     responseType = 'geojson';
+                }
+
+                // form submissions (i.e. attachments upload) return bogus responses with no content-type
+                // we can try and parse the response to see if it is valid JSON
+                if (responseType === null) {
+                    if (Ext.JSON.decode(response.responseText, true)) { // pass true to avoid errors
+                        responseType = 'json';
+                    }
                 }
 
                 switch (responseType) {

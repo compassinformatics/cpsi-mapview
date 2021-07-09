@@ -64,12 +64,12 @@ Ext.define('CpsiMapview.view.fileupload.FileGridController', {
                     var store = me.getView().getStore();
                     store.remove(record);
                 } else {
-                    Ext.log.warn('Error deleting attachement', resp.message);
+                    Ext.log.warn('Error deleting attachment', resp.message);
                 }
             },
             failure: function (response) {
                 if (!response.aborted) {
-                    Ext.log.error('Error deleting attachement', response);
+                    Ext.log.error('Error deleting attachment', response);
                 }
             }
         });
