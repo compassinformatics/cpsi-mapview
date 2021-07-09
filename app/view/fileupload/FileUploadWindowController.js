@@ -130,7 +130,11 @@ Ext.define('CpsiMapview.view.fileupload.FileUploadWindowController', {
                 // the header for errors should be html/text
                 // however 404 errors or non-JSON errors will produce a huge error box
                 var txt = action.response.responseText;
-                Ext.Msg.alert('Server Error', txt);
+                if (Ext.JSON.decode(txt, true) === null) {
+                    // display any non-JSON errors
+                    // JSON errors will be handled in CpsiMapview.util.ApplicationMixin
+                    Ext.Msg.alert('Server Error', txt);
+                }
                 break;
             default:
                 break;
