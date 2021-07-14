@@ -108,12 +108,6 @@ Ext.define('CpsiMapview.form.ControllerMixin', {
             throw 'Editing windows must have a top level "xtype: \'form\'" container';
         }
 
-        var currentRecord = vm.get('currentRecord');
-
-        // currentRecord.getData({associated: true})
-        // to check JSON that will be sent to the server
-        //currentRecord.getProxy().getWriter().getRecordData(currentRecord)
-
         var goAhead = f.isValid() && (!this.beforeSave || this.beforeSave());
 
         if (goAhead) {
@@ -130,6 +124,10 @@ Ext.define('CpsiMapview.form.ControllerMixin', {
         var win = me.getView();
         var vm = me.getViewModel();
         var currentRecord = vm.get('currentRecord');
+
+        // use currentRecord.getData({associated: true})
+        // to check JSON that will be sent to the server
+        // or currentRecord.getProxy().getWriter().getRecordData(currentRecord)
 
         win.mask('Saving...');
         currentRecord.save({
