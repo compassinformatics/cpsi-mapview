@@ -102,7 +102,6 @@ Ext.define('CpsiMapview.form.ControllerMixin', {
     onSaveClick: function () {
         var me = this;
         var win = me.getView();
-        var vm = me.getViewModel();
         var f = win.down('form');
         if (!f) {
             throw 'Editing windows must have a top level "xtype: \'form\'" container';
