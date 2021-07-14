@@ -371,7 +371,7 @@ Ext.define('CpsiMapview.form.ControllerMixin', {
         var rec = vm.get('currentRecord');
         if (rec) {
             // call the mixin function with the controller as the scope
-            var isValid = me.mixins.validation.checkValid.call(me, rec);
+            me.mixins.validation.checkValid.call(me, rec);
 
             // update a custom timestamp property on the viewmodel
             // so any validation logic can be retriggered if required
