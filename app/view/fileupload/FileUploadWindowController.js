@@ -67,6 +67,7 @@ Ext.define('CpsiMapview.view.fileupload.FileUploadWindowController', {
     /**
      * Inform the user that the attachment was successfully uploaded and
      * trigger an event to the new record can be added to the attachments grid
+     * TODO - return full object in response when saving
      * @param {any} form
      * @param {any} action
      */
@@ -74,7 +75,6 @@ Ext.define('CpsiMapview.view.fileupload.FileUploadWindowController', {
 
         var me = this;
         var formValues = form.getFieldValues();
-
         // create a new object containing the attributes of the attachment
         // after it was successfully associated
         // with the parent object. This record can then be added to a store
@@ -86,8 +86,14 @@ Ext.define('CpsiMapview.view.fileupload.FileUploadWindowController', {
             extension: 'Extension',
             fileName: formValues.filePath,
             fileSize: '',
-            lastUpdatedDateUtc: Date()
+            lastUpdatedDateUtc: Date(),
+            isThumbnailAvailable: false
         });
+
+        // now update the attachment URLs so it can be deleted
+        var parentRecord = me.getViewModel().getData().currentRecord;
+        var serviceUrl = parentRecord.proxy.url;
+        newAttachment.updateAttachmentUrls(serviceUrl);
 
         // now show a message box to show the file was successfully uploaded
 
