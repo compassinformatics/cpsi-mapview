@@ -101,8 +101,8 @@ Ext.define('CpsiMapview.form.ControllerMixin', {
      * */
     onSaveClick: function () {
         var me = this;
-        var win = this.getView();
-        var vm = win.getViewModel();
+        var win = me.getView();
+        var vm = me.getViewModel();
         var f = win.down('form');
         if (!f) {
             throw 'Editing windows must have a top level "xtype: \'form\'" container';
@@ -117,17 +117,31 @@ Ext.define('CpsiMapview.form.ControllerMixin', {
         var goAhead = f.isValid() && (!this.beforeSave || this.beforeSave());
 
         if (goAhead) {
-            win.mask('Saving...');
-            currentRecord.save({
-                failure: me.onSaveFailed,
-                success: me.onSaveSucceded,
-                callback: function () {
-                    // do something whether the save succeeded or failed
-                    win.unmask();
-                },
-                scope: me
-            });
+            me.saveRecord();
         }
+    },
+
+    /**
+     * Save the current record to the server
+     */
+    saveRecord: function () {
+
+        var me = this;
+        var win = me.getView();
+        var vm = me.getViewModel();
+        var currentRecord = vm.get('currentRecord');
+
+        win.mask('Saving...');
+        currentRecord.save({
+            failure: me.onSaveFailed,
+            success: me.onSaveSucceded,
+            callback: function () {
+                // do something whether the save succeeded or failed
+                win.unmask();
+            },
+            scope: me
+        });
+
     },
 
     /**
