@@ -101,33 +101,44 @@ Ext.define('CpsiMapview.form.ControllerMixin', {
      * */
     onSaveClick: function () {
         var me = this;
-        var win = this.getView();
-        var vm = win.getViewModel();
+        var win = me.getView();
         var f = win.down('form');
         if (!f) {
             throw 'Editing windows must have a top level "xtype: \'form\'" container';
         }
 
-        var currentRecord = vm.get('currentRecord');
-
-        // currentRecord.getData({associated: true})
-        // to check JSON that will be sent to the server
-        //currentRecord.getProxy().getWriter().getRecordData(currentRecord)
-
         var goAhead = f.isValid() && (!this.beforeSave || this.beforeSave());
 
         if (goAhead) {
-            win.mask('Saving...');
-            currentRecord.save({
-                failure: me.onSaveFailed,
-                success: me.onSaveSucceded,
-                callback: function () {
-                    // do something whether the save succeeded or failed
-                    win.unmask();
-                },
-                scope: me
-            });
+            me.saveRecord();
         }
+    },
+
+    /**
+     * Save the current record to the server
+     */
+    saveRecord: function () {
+
+        var me = this;
+        var win = me.getView();
+        var vm = me.getViewModel();
+        var currentRecord = vm.get('currentRecord');
+
+        // use currentRecord.getData({associated: true})
+        // to check JSON that will be sent to the server
+        // or currentRecord.getProxy().getWriter().getRecordData(currentRecord)
+
+        win.mask('Saving...');
+        currentRecord.save({
+            failure: me.onSaveFailed,
+            success: me.onSaveSucceded,
+            callback: function () {
+                // do something whether the save succeeded or failed
+                win.unmask();
+            },
+            scope: me
+        });
+
     },
 
     /**
