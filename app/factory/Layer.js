@@ -496,7 +496,7 @@ Ext.define('CpsiMapview.factory.Layer', {
         var clusterSource;
         if (!noCluster) {
             var clusterSourceConf = {
-                threshold: 5,
+                distance: 5,
                 source: vectorSource
             };
             clusterSourceConf = Ext.apply(clusterSourceConf, olSourceProps);
@@ -881,6 +881,30 @@ Ext.define('CpsiMapview.factory.Layer', {
     },
 
     /**
+     * Create a point style for clustered features
+     * @param {any} featCount the number of features in the clustered feature
+     */
+    createClusterStyle: function (featCount) {
+        return new ol.style.Style({
+            image: new ol.style.Circle({
+                radius: 10,
+                stroke: new ol.style.Stroke({
+                    color: '#fff'
+                }),
+                fill: new ol.style.Fill({
+                    color: '#3399CC'
+                })
+            }),
+            text: new ol.style.Text({
+                text: featCount.toString(),
+                fill: new ol.style.Fill({
+                    color: '#fff'
+                })
+            })
+        });
+    },
+
+    /**
      * Loads and parses the given SLD (by URL) and applies it to the given
      * vector layer.
      *
@@ -888,6 +912,9 @@ Ext.define('CpsiMapview.factory.Layer', {
      * @param  {String} sldUrl   The URL to the SLD
      */
     loadSld: function (mapLayer, sldUrl) {
+
+        var me = this;
+
         Ext.Ajax.request({
             url: sldUrl,
             method: 'GET',
@@ -899,8 +926,37 @@ Ext.define('CpsiMapview.factory.Layer', {
                 sldParser.readStyle(sldXml)
                     .then(function (gs) {
 
-                        olParser.writeStyle(gs).then(function (olStyle) {
-                            mapLayer.setStyle(olStyle);
+                        olParser.writeStyle(gs).then(function (olStyleFunc){
+                            var source = mapLayer.getSource();
+                            if (source instanceof ol.source.Cluster) {
+
+                                // for clustered features add an additional style
+                                // for any grouped features
+
+                                var styleCache = {}; // cache styles per featCount
+
+                                var styleFuncWrapper = function (feature, resolution) {
+                                    var featCount = feature.get('features').length;
+                                    var style;
+
+                                    if (featCount === 1) {
+                                        // call the standard style function
+                                        var feat = feature.get('features')[0];
+                                        style = olStyleFunc(feat, resolution);
+                                    } else {
+                                        // use a clustered style
+                                        style = styleCache[featCount];
+                                        if (!style) {
+                                            style = me.createClusterStyle(featCount);
+                                            styleCache[featCount] = style;
+                                        }
+                                    }
+                                    return style;
+                                };
+                                mapLayer.setStyle(styleFuncWrapper);
+                            } else {
+                                mapLayer.setStyle(olStyleFunc);
+                            }
                         });
                     }, function() {
                         // rejection
