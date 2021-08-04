@@ -15,7 +15,8 @@ Ext.define('CpsiMapview.factory.Layer', {
         'BasiGX.util.Map',
         'BasiGX.util.WFS',
         'BasiGX.util.Namespace',
-        'CpsiMapview.util.SwitchLayer'
+        'CpsiMapview.util.SwitchLayer',
+        'CpsiMapview.util.Style'
     ],
 
     singleton: true,
@@ -881,30 +882,6 @@ Ext.define('CpsiMapview.factory.Layer', {
     },
 
     /**
-     * Create a point style for clustered features
-     * @param {any} featCount the number of features in the clustered feature
-     */
-    createClusterStyle: function (featCount) {
-        return new ol.style.Style({
-            image: new ol.style.Circle({
-                radius: 10,
-                stroke: new ol.style.Stroke({
-                    color: '#fff'
-                }),
-                fill: new ol.style.Fill({
-                    color: '#3399CC'
-                })
-            }),
-            text: new ol.style.Text({
-                text: featCount.toString(),
-                fill: new ol.style.Fill({
-                    color: '#fff'
-                })
-            })
-        });
-    },
-
-    /**
      * Loads and parses the given SLD (by URL) and applies it to the given
      * vector layer.
      *
@@ -947,7 +924,7 @@ Ext.define('CpsiMapview.factory.Layer', {
                                         // use a clustered style
                                         style = styleCache[featCount];
                                         if (!style) {
-                                            style = me.createClusterStyle(featCount);
+                                            style = CpsiMapview.util.Style.createClusterStyle(featCount);
                                             styleCache[featCount] = style;
                                         }
                                     }
