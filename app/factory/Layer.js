@@ -15,7 +15,8 @@ Ext.define('CpsiMapview.factory.Layer', {
         'BasiGX.util.Map',
         'BasiGX.util.WFS',
         'BasiGX.util.Namespace',
-        'CpsiMapview.util.SwitchLayer'
+        'CpsiMapview.util.SwitchLayer',
+        'CpsiMapview.util.Style'
     ],
 
     singleton: true,
@@ -496,7 +497,7 @@ Ext.define('CpsiMapview.factory.Layer', {
         var clusterSource;
         if (!noCluster) {
             var clusterSourceConf = {
-                threshold: 5,
+                distance: 5,
                 source: vectorSource
             };
             clusterSourceConf = Ext.apply(clusterSourceConf, olSourceProps);
@@ -888,6 +889,7 @@ Ext.define('CpsiMapview.factory.Layer', {
      * @param  {String} sldUrl   The URL to the SLD
      */
     loadSld: function (mapLayer, sldUrl) {
+
         Ext.Ajax.request({
             url: sldUrl,
             method: 'GET',
@@ -899,8 +901,37 @@ Ext.define('CpsiMapview.factory.Layer', {
                 sldParser.readStyle(sldXml)
                     .then(function (gs) {
 
-                        olParser.writeStyle(gs).then(function (olStyle) {
-                            mapLayer.setStyle(olStyle);
+                        olParser.writeStyle(gs).then(function (olStyleFunc){
+                            var source = mapLayer.getSource();
+                            if (source instanceof ol.source.Cluster) {
+
+                                // for clustered features add an additional style
+                                // for any grouped features
+
+                                var styleCache = {}; // cache styles per featCount
+
+                                var styleFuncWrapper = function (feature, resolution) {
+                                    var featCount = feature.get('features').length;
+                                    var style;
+
+                                    if (featCount === 1) {
+                                        // call the standard style function
+                                        var feat = feature.get('features')[0];
+                                        style = olStyleFunc(feat, resolution);
+                                    } else {
+                                        // use a clustered style
+                                        style = styleCache[featCount];
+                                        if (!style) {
+                                            style = CpsiMapview.util.Style.createClusterStyle(featCount);
+                                            styleCache[featCount] = style;
+                                        }
+                                    }
+                                    return style;
+                                };
+                                mapLayer.setStyle(styleFuncWrapper);
+                            } else {
+                                mapLayer.setStyle(olStyleFunc);
+                            }
                         });
                     }, function() {
                         // rejection
