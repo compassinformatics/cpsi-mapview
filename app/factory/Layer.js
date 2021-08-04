@@ -890,8 +890,6 @@ Ext.define('CpsiMapview.factory.Layer', {
      */
     loadSld: function (mapLayer, sldUrl) {
 
-        var me = this;
-
         Ext.Ajax.request({
             url: sldUrl,
             method: 'GET',
