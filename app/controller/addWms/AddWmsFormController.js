@@ -7,12 +7,18 @@ Ext.define('CpsiMapview.controller.addWms.AddWmsFormController', {
         var me = this;
         var map = BasiGX.util.Map.getMapComponent().getMap();
 
-        if (this.layerGroup === undefined) {
-            this.layerGroup = new ol.layer.Group({
-                name: this.getView().layerGroupName,
+        if (me.layerGroup === undefined) {
+
+            // create a new layer group to hold the external layers
+            me.layerGroup = new ol.layer.Group({
+                name: me.getView().layerGroupName,
                 collapsed: false
             });
-            map.addLayer(this.layerGroup);
+
+            // add the external group layer to the layerTreeRoot
+            // so it appears in the layer tree
+            var layerTreeRoot = map.get('layerTreeRoot');
+            layerTreeRoot.getLayers().push(me.layerGroup);
 
             setTimeout(function () {
                 var layerTrees = Ext.ComponentQuery.query('cmv_layertree');
@@ -26,7 +32,8 @@ Ext.define('CpsiMapview.controller.addWms.AddWmsFormController', {
         olLayer.set('refreshLayerOption', true);
         olLayer.set('opacitySlider', true);
 
+        // now add the external layer to the external layers group
         map.removeLayer(olLayer);
-        this.layerGroup.getLayers().push(olLayer);
+        me.layerGroup.getLayers().push(olLayer);
     }
 });
