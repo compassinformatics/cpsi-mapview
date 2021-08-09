@@ -21,7 +21,9 @@ Ext.define('CpsiMapview.model.grid.Grid', {
         allowFeatureSelection: false,
         // when isSpatialGrid is set to false the 'Select by Shape' button will be hidden
         isSpatialGrid: true,
-        usePresetFilters: false
+        usePresetFilters: false,
+        exportExcelVisible: true,
+        exportShapefileVisible: true
     },
 
     formulas: {
