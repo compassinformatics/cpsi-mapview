@@ -121,7 +121,7 @@ Ext.define('CpsiMapview.view.grid.Grid', {
                 hidden: '{!usePresetFilters}'
             }
         },
-            '->',
+        '->',
         {
             xtype: 'cmv_spatial_query_button',
             drawGeometryType: 'Polygon',
