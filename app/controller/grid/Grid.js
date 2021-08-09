@@ -493,6 +493,35 @@ Ext.define('CpsiMapview.controller.grid.Grid', {
     },
 
     /**
+     * Export the current records in the grid to a zipped shapefile
+     *
+     * @private
+     */
+    exportToShapefile: function () {
+
+        var me = this;
+        var grid = me.getView();
+
+        var store = grid.getStore();
+        var url = store.url;
+
+        var params = store.createParameters();
+        params.outputFormat = 'shapezip';
+
+        // files can't be downloaded using Ext.Ajax.request (due to browser security)
+        // so a hidden form is used with standardSubmit set to true
+        // this approach does not allow callbacks to be run on success / failure
+
+        Ext.create('Ext.form.Panel', {
+            standardSubmit: true
+        }).submit({
+            params: params,
+            url: url
+        });
+
+    },
+
+    /**
      * Whenever columns are shown or hidden update
      * the WFS propertyName so only data to
      * be displayed is returned. The idProperty will

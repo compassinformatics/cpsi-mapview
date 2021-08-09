@@ -184,7 +184,19 @@ Ext.define('CpsiMapview.view.grid.Grid', {
             xtype: 'button',
             text: 'Export to Excel',
             glyph: 'xf1c3@FontAwesome',
-            handler: 'exportToExcel'
+            handler: 'exportToExcel',
+            bind: {
+                hidden: '{!exportExcelVisible}'
+            }
+        },
+        {
+            xtype: 'button',
+            text: 'Export to Shapefile',
+            glyph: 'eaa2@font-gis',
+            handler: 'exportToShapefile',
+            bind: {
+                hidden: '{!exportShapefileVisible}'
+            }
         }]
     },
     {
