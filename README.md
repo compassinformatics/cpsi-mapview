@@ -1,4 +1,7 @@
-# cpsi-mapview [![Build Status](https://travis-ci.org/compassinformatics/cpsi-mapview.svg?branch=master)](https://travis-ci.org/compassinformatics/cpsi-mapview)
+# cpsi-mapview 
+
+[![Build Status](https://travis-ci.org/compassinformatics/cpsi-mapview.svg?branch=master)](https://travis-ci.org/compassinformatics/cpsi-mapview)
+[![Coverage Status](https://coveralls.io/repos/compassinformatics/cpsi-mapview/badge.svg?branch=master&service=github)](https://coveralls.io/github/compassinformatics/cpsi-mapview?branch=master)
 
 Check out the latest deployed version at https://compassinformatics.github.io/cpsi-mapview/
 
