@@ -9,11 +9,41 @@ describe('CpsiMapview.form.ControllerMixin', function () {
         expect(inst).to.be.a(CpsiMapview.form.ControllerMixin);
     });
 
-    //describe('Functions', function () {
+    describe('Functions', function () {
 
-    //    it('#onFieldChanged', function () {
-    //        var fn = mixin.onFieldChanged;
-    //        expect(fn).not.to.be(undefined);
-    //    });
-    //});
+        var editForm;
+
+        Ext.define('TestModel', {
+            extend: 'Ext.data.Model',
+            fields: ['id']
+        });
+
+        Ext.define('TestController', {
+            extend: 'Ext.app.ViewController',
+            alias: 'controller.TestController',
+            mixins: ['CpsiMapview.form.ControllerMixin']
+        });
+
+        beforeEach(function () {
+
+            var model = Ext.create('TestModel');
+
+            // create a new view with the controller and mixin
+            editForm = Ext.create('Ext.window.Window', {
+                viewModel: {
+                    currentRecord: model
+                },
+                controller: {
+                    type: 'TestController'
+                }
+            });
+
+        });
+
+        it('#onFieldChanged is defined', function () {
+            var ctrl = editForm.getController();
+            var fn = ctrl.onFieldChanged;
+            expect(fn).not.to.be(undefined);
+        });
+    });
 });
