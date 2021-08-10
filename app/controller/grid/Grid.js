@@ -474,7 +474,7 @@ Ext.define('CpsiMapview.controller.grid.Grid', {
 
         if (!grid.saveDocumentAs) {
             Ext.Msg.alert('Not Supported',
-                'The Excel export is not supported in this version of the system', Ext.emptyFn);
+                'The Excel export is not supported for this grid', Ext.emptyFn);
             return;
         }
 
