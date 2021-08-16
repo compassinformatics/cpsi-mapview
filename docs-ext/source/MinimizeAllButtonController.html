@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+  <title>The source code</title>
+  <link href="../resources/prettify/prettify.css" type="text/css" rel="stylesheet" />
+  <script type="text/javascript" src="../resources/prettify/prettify.js"></script>
+  <style type="text/css">
+    .highlight { display: block; background-color: #ddd; }
+  </style>
+  <script type="text/javascript">
+    function highlight() {
+      document.getElementById(location.hash.replace(/#/, "")).className = "highlight";
+    }
+  </script>
+</head>
+<body onload="prettyPrint(); highlight();">
+  <pre class="prettyprint lang-js"><span id='CpsiMapview-controller-button-MinimizeAllButtonController'>/**
+</span> * This class is the controller for the button &#39;MinimizeAllButton&#39;.
+ */
+Ext.define(&#39;CpsiMapview.controller.button.MinimizeAllButtonController&#39;, {
+    extend: &#39;Ext.app.ViewController&#39;,
+
+    alias: &#39;controller.cmv_minimize_all_button&#39;,
+
+<span id='CpsiMapview-controller-button-MinimizeAllButtonController-method-onClick'>    onClick: function () {
+</span>        var windows = Ext.ComponentQuery.query(&#39;cmv_minimizable_window&#39;);
+        Ext.Array.forEach(windows, function (win) {
+            if (win.isVisible()) {
+                win.minimize();
+            }
+        });
+    }
+});
+</pre>
+</body>
+</html>

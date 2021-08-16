@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+  <title>The source code</title>
+  <link href="../resources/prettify/prettify.css" type="text/css" rel="stylesheet" />
+  <script type="text/javascript" src="../resources/prettify/prettify.js"></script>
+  <style type="text/css">
+    .highlight { display: block; background-color: #ddd; }
+  </style>
+  <script type="text/javascript">
+    function highlight() {
+      document.getElementById(location.hash.replace(/#/, "")).className = "highlight";
+    }
+  </script>
+</head>
+<body onload="prettyPrint(); highlight();">
+  <pre class="prettyprint lang-js"><span id='CpsiMapview-view-panel-TimeSlider'>/**
+</span> * This class is the time slider component of cpsi mapview application
+ */
+Ext.define(&#39;CpsiMapview.view.panel.TimeSlider&#39;, {
+    extend: &#39;Ext.panel.Panel&#39;,
+    xtype: &#39;cmv_timeslider&#39;,
+
+    requires: [
+        &#39;Ext.slider.Multi&#39;,
+
+        &#39;CpsiMapview.controller.panel.TimeSlider&#39;
+    ],
+
+<span id='CpsiMapview-view-panel-TimeSlider-property-controller'>    controller: &#39;cmv_timeslider&#39;,
+</span>
+<span id='CpsiMapview-view-panel-TimeSlider-property-layout'>    layout: &#39;hbox&#39;,
+</span>
+<span id='CpsiMapview-view-panel-TimeSlider-property-viewModel'>    /**
+</span>     *
+     */
+    viewModel: {
+        data: {
+            isRange: false
+        }
+    },
+
+<span id='CpsiMapview-view-panel-TimeSlider-property-selectedDate'>    /**
+</span>     * The selected date (after initialization) as Date object
+     */
+    selectedDate: null,
+<span id='CpsiMapview-view-panel-TimeSlider-property-startDate'>    /**
+</span>     * The start date of slider
+     */
+    startDate: null,
+<span id='CpsiMapview-view-panel-TimeSlider-property-endDate'>    /**
+</span>     * The end date of slider
+     */
+    endDate: null,
+<span id='CpsiMapview-view-panel-TimeSlider-property-timeIncrementUnit'>    /**
+</span>     * The unit of time increment (currently only year and month supported)
+     */
+    timeIncrementUnit: &#39;year&#39;,
+<span id='CpsiMapview-view-panel-TimeSlider-property-cls'>    /**
+</span>     * The CSS class of the slider
+     */
+    cls: &#39;cpsi-time-slider&#39;,
+<span id='CpsiMapview-view-panel-TimeSlider-property-listeners'>    /**
+</span>     * Listener to be called when all layers are added to set configured time
+     * to time dependent layers
+     */
+    listeners: {
+        allLayersAdded: &#39;setTimeOnLayers&#39;
+    },
+
+<span id='CpsiMapview-view-panel-TimeSlider-method-initComponent'>    /**
+</span>     *
+     */
+    initComponent: function () {
+        var me = this;
+        me.items = [{
+            xtype: &#39;multislider&#39;,
+            labelAlign: &#39;right&#39;,
+            listeners: {
+                beforerender: &#39;initTimeSlider&#39;,
+                changecomplete: &#39;onChangeComplete&#39;
+            },
+            constrainThumbs: false,
+            tipText: &#39;getTipText&#39;,
+            fieldLabel: &#39;Time&#39;,
+            width: 400,
+            values: [25, 75],
+            increment: 1,
+            minValue: 0,
+            maxValue: 100
+        },
+        {
+            xtype: &#39;checkbox&#39;,
+            name: &#39;range&#39;,
+            fieldLabel: &#39;Time range&#39;,
+            labelAlign: &#39;right&#39;,
+            bind: {
+                value: &#39;{isRange}&#39;
+            },
+            listeners: {
+                change: &#39;onRangeClick&#39;
+            }
+        }];
+
+        me.callParent();
+    }
+
+});
+</pre>
+</body>
+</html>

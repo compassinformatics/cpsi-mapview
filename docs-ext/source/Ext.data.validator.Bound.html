@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+  <title>The source code</title>
+  <link href="../resources/prettify/prettify.css" type="text/css" rel="stylesheet" />
+  <script type="text/javascript" src="../resources/prettify/prettify.js"></script>
+  <style type="text/css">
+    .highlight { display: block; background-color: #ddd; }
+  </style>
+  <script type="text/javascript">
+    function highlight() {
+      document.getElementById(location.hash.replace(/#/, "")).className = "highlight";
+    }
+  </script>
+</head>
+<body onload="prettyPrint(); highlight();">
+  <pre class="prettyprint lang-js">Ext.override(Ext.data.validator.Bound, {
+<span id='global-method-validate'>    /**
+</span>    * When using a range or bound validator allow null values to return true
+    * See https://forum.sencha.com/forum/showthread.php?298213-Range-validator-validates-nullable-fields
+    * And Compass ticket https://support.sencha.com/#ticket-53539
+    * @param {any} value
+    */
+    validate: function (value) {
+        var me = this;
+        if (value === null) {
+            return true;
+        }
+        return me.callParent([value]);
+    }
+});</pre>
+</body>
+</html>

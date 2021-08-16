@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+  <title>The source code</title>
+  <link href="../resources/prettify/prettify.css" type="text/css" rel="stylesheet" />
+  <script type="text/javascript" src="../resources/prettify/prettify.js"></script>
+  <style type="text/css">
+    .highlight { display: block; background-color: #ddd; }
+  </style>
+  <script type="text/javascript">
+    function highlight() {
+      document.getElementById(location.hash.replace(/#/, "")).className = "highlight";
+    }
+  </script>
+</head>
+<body onload="prettyPrint(); highlight();">
+  <pre class="prettyprint lang-js">Ext.define(&#39;CpsiMapview.view.lineSliceGridExample.LineSliceGrid&#39;, {
+    extend: &#39;Ext.grid.Panel&#39;,
+    xtype: &#39;cmv_line_slice_grid&#39;,
+
+    requires: [
+        &#39;CpsiMapview.plugin.LineSliceHighlight&#39;
+    ],
+
+    plugins: [{
+        ptype: &#39;cmv_line_slice_highlight&#39;
+    }],
+
+    columns: [
+        {
+            text: &#39;From&#39;,
+            dataIndex: &#39;startMeasure&#39;,
+            renderer: function(val) {
+                return val.toFixed(1) + &#39; m&#39;;
+            }
+        },
+        {
+            text: &#39;To&#39;,
+            dataIndex: &#39;endMeasure&#39;,
+            renderer: function(val) {
+                return val.toFixed(1) + &#39; m&#39;;
+            }
+        },
+        {
+            text: &#39;Text&#39;,
+            dataIndex: &#39;text&#39;
+        }
+    ],
+    listeners: {
+        itemclick: function (_, record) {
+            var highlighter = this.getPlugin(&#39;cmv_line_slice_highlight&#39;);
+            highlighter.highlightSlice(this.feature.getGeometry(), record.data.startMeasure, record.data.endMeasure);
+        }
+    },
+
+    initComponent: function () {
+        var map = BasiGX.util.Map.getMapComponent().map;
+
+        var store = Ext.create(&#39;Ext.data.Store&#39;, {
+            data: [
+                {startMeasure: 0, endMeasure: 200, text: &#39;slice 1&#39;},
+                {startMeasure: 200, endMeasure: 1000, text: &#39;slice 2&#39;},
+                {startMeasure: 1100, endMeasure: 1800, text: &#39;slice 3&#39;},
+                {startMeasure: 1400, endMeasure: 4000, text: &#39;slice 4&#39;},
+                {startMeasure: 5000, endMeasure: 12000, text: &#39;slice 5&#39;}
+            ]
+        });
+
+        this.store = store;
+
+        var geoJson = JSON.stringify({
+            &#39;type&#39;: &#39;Feature&#39;,
+            &#39;geometry&#39;: {
+                &#39;type&#39;: &#39;LineString&#39;,
+                &#39;coordinates&#39;: [
+                    [-965068.9613156476, 6917903.9768694835], [-963761.0112796988, 6918876.101896202],
+                    [-962187.936236463, 6919883.576923893], [-960915.3362014858, 6920608.25194381],
+                    [-959695.7611679661, 6920024.976927779], [-958264.0861286167, 6919176.576904461],
+                    [-957645.4611116138, 6918893.776896688], [-961533.9612184886, 6918116.076875313],
+                    [-964344.28629573, 6914528.051776697], [-965387.1113243919, 6915853.676813131]
+                ]
+            },
+            &#39;properties&#39;: null
+        });
+
+        this.feature = (new ol.format.GeoJSON()).readFeature(geoJson, {
+            featureProjection: &#39;EPSG:3857&#39;,
+            dataProjection: &#39;EPSG:3857&#39;
+        });
+
+        var layer = new ol.layer.Vector({
+            source: new ol.source.Vector({
+                features: [this.feature]
+            }),
+            map: map,
+            style: new ol.style.Style({
+                stroke: new ol.style.Stroke({
+                    color: &#39;yellow&#39;,
+                    width: 2
+                })
+            }),
+            visible: false
+        });
+
+        this.callParent(arguments);
+
+        var highlighter = this.getPlugin(&#39;cmv_line_slice_highlight&#39;);
+
+        highlighter.setStyle(new ol.style.Style({
+            stroke: new ol.style.Stroke({
+                color: &#39;blue&#39;,
+                width: 2
+            })
+        }));
+
+        this.up(&#39;cmv_minimizable_window&#39;).on(&#39;show&#39;, function () {
+            layer.setVisible(true);
+            map.render();
+        });
+
+        this.up(&#39;cmv_minimizable_window&#39;).on(&#39;close&#39;, function () {
+            layer.setVisible(false);
+            highlighter.removeHighlight();
+            map.render();
+        });
+    }
+});
+
+
+</pre>
+</body>
+</html>

@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+  <title>The source code</title>
+  <link href="../resources/prettify/prettify.css" type="text/css" rel="stylesheet" />
+  <script type="text/javascript" src="../resources/prettify/prettify.js"></script>
+  <style type="text/css">
+    .highlight { display: block; background-color: #ddd; }
+  </style>
+  <script type="text/javascript">
+    function highlight() {
+      document.getElementById(location.hash.replace(/#/, "")).className = "highlight";
+    }
+  </script>
+</head>
+<body onload="prettyPrint(); highlight();">
+  <pre class="prettyprint lang-js">Ext.define(&#39;CpsiMapview.store.WfsFeatures&#39;, {
+    extend: &#39;GeoExt.data.store.WfsFeatures&#39;,
+    cacheFeatureCount: false,
+    remoteSort: true,
+<span id='global-cfg-autoLoad'>    /**
+</span>     * remoteFilters causes the grids to load automatically - setting autoLoad to true
+     * causes the grid to load twice
+     *
+     * @cfg {Boolean}
+     */
+    autoLoad: false,
+<span id='global-cfg-passThroughFilter'>    /**
+</span>     * if passThroughFilter is used with remote filters then the store gets
+     * reloaded twice
+     *
+     * @cfg {Boolean}
+     */
+    passThroughFilter: false,
+    remoteFilter: true,
+    url: &#39;/mapserver/?&#39;,
+    version: &#39;2.0.0&#39;,
+    outputFormat: &#39;geojson&#39;,
+    startIndex: 0,
+    count: 20,
+    format: new ol.format.GeoJSON()
+});
+</pre>
+</body>
+</html>

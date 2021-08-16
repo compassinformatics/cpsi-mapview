@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+  <title>The source code</title>
+  <link href="../resources/prettify/prettify.css" type="text/css" rel="stylesheet" />
+  <script type="text/javascript" src="../resources/prettify/prettify.js"></script>
+  <style type="text/css">
+    .highlight { display: block; background-color: #ddd; }
+  </style>
+  <script type="text/javascript">
+    function highlight() {
+      document.getElementById(location.hash.replace(/#/, "")).className = "highlight";
+    }
+  </script>
+</head>
+<body onload="prettyPrint(); highlight();">
+  <pre class="prettyprint lang-js">Ext.override(Ext.picker.Date, {
+
+    setValue: function (value) {
+        if (Ext.isString(value)) {
+            // as the date needs to be formatted as a string to send to the server
+            // we need to convert it back again or the DatePicker fails when sending
+            // a string to Ext.Date.clearTime
+            value = Ext.Date.parse(value, this.format);
+        }
+        this.value = Ext.Date.clearTime(value || this.defaultValue, true);
+        return this.update(this.value);
+    }
+});</pre>
+</body>
+</html>

@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+  <title>The source code</title>
+  <link href="../resources/prettify/prettify.css" type="text/css" rel="stylesheet" />
+  <script type="text/javascript" src="../resources/prettify/prettify.js"></script>
+  <style type="text/css">
+    .highlight { display: block; background-color: #ddd; }
+  </style>
+  <script type="text/javascript">
+    function highlight() {
+      document.getElementById(location.hash.replace(/#/, "")).className = "highlight";
+    }
+  </script>
+</head>
+<body onload="prettyPrint(); highlight();">
+  <pre class="prettyprint lang-js">Ext.define(&#39;CpsiMapview.controller.form.Login&#39;, {
+    extend: &#39;Ext.app.ViewController&#39;,
+    requires: [
+        &#39;Ext.util.Cookies&#39;
+    ],
+    alias: &#39;controller.cmv_login_form&#39;,
+
+<span id='global-method-onSpecialKey'>    /**
+</span>    * Attempt to login if the user presses the Enter key on
+    * the form
+    */
+    onSpecialKey: function (field, e) {
+        if (e.getKey() === e.ENTER) {
+            this.attemptLogin();
+        }
+    },
+
+    onLoginClick: function (btn) {
+        var form = btn.up(&#39;form&#39;);
+        var valid = true;
+        Ext.each(form.down(&#39;textfield&#39;), function(field) {
+            valid = valid &amp;&amp; !Ext.isEmpty(field.value);
+        });
+        if (valid) {
+            this.attemptLogin();
+        }
+    },
+
+<span id='global-method-tryAutomaticLogin'>    /**
+</span>    * If a user still has a valid token, don&#39;t force them to log
+    * in again
+    * @param {string} token The toggle state of the button
+    */
+    tryAutomaticLogin: function () {
+
+        var me = this;
+        var tokenName = me.getTokenName();
+
+        var token = Ext.util.Cookies.get(tokenName);
+        var jsonData = {};
+        var serviceUrl = me.getViewModel().validateUrl;
+
+        if (token) {
+            jsonData[tokenName] = token;
+            jsonData = Ext.JSON.encode(jsonData);
+            me.callLoginService(jsonData, serviceUrl, false);
+        } else {
+            me.getView().show();
+        }
+    },
+
+    getTokenName: function () {
+
+        var me = this;
+        return me.getViewModel().tokenName;
+    },
+
+    login: function (response) {
+
+        var me = this;
+        var roles = response.userRoles; // this is an array e.g. [&quot;UPL&quot;]
+        var tokenName = me.getTokenName();
+
+        var loginData = {
+            roles: roles,
+            username: Ext.util.Cookies.get(&#39;username&#39;)
+        };
+
+        loginData[tokenName] = response.data;
+        me.updateCookie(loginData);
+        me.fireEvent(&#39;login&#39;, loginData);
+    },
+
+    logout: function () {
+
+        // issues with Cookies clear - http://www.sencha.com/forum/showthread.php?98070-CLOSED-Ext.util.Cookies.clear%28%29-not-working
+        // only work when browser is restarted
+        // so instead set them to null
+
+        var me = this;
+        var tokenName = me.getTokenName();
+
+        var loginData = {
+            roles: &#39;&#39;,
+            username: &#39;&#39;
+        };
+
+        loginData[tokenName] = &#39;&#39;;
+
+        me.updateCookie(loginData);
+        me.fireEvent(&#39;logout&#39;);
+    },
+
+    updateCookie: function (loginData) {
+
+        var me = this;
+        var tokenName = me.getTokenName();
+
+        Ext.util.Cookies.set(tokenName, loginData[tokenName]);
+        Ext.util.Cookies.set(&#39;roles&#39;, loginData.roles);
+        Ext.util.Cookies.set(&#39;username&#39;, loginData.username);
+
+    },
+
+    callLoginService: function (jsonData, serviceUrl, showMask) {
+
+        var me = this;
+        var view = me.getView();
+
+        showMask = showMask &amp;&amp; view.rendered;
+
+        if (showMask) {
+            view.mask(&#39;Logging in&#39;);
+        }
+
+        Ext.Ajax.request({
+            method: &#39;POST&#39;,
+            url: serviceUrl,
+            headers: {
+                &#39;Content-Type&#39;: &#39;application/json; charset=utf-8&#39; //this must be set or get server 500 errors
+            },
+            params: jsonData,
+            success: function (result) {
+                // successful HTTP connection, not necessarily the log in
+                // call was successful, we should now have a token in the response.data property
+                var response = Ext.decode(result.responseText);
+
+                if (showMask) {
+                    view.unmask();
+                }
+
+                if (response.success === true) {
+                    me.login(response);
+                    view.close();
+                }
+                else {
+                    //username / password login failure
+                    me.fireEvent(&#39;loginfail&#39;, result.statusText);
+                    view.show();
+                }
+            },
+            failure: function (result) {
+                // indicates HTTP failure
+                me.fireEvent(&#39;loginfail&#39;, result.statusText);
+                if (showMask) {
+                    view.unmask();
+                }
+                view.show();
+            }
+
+        });
+    },
+
+    attemptLogin: function () {
+
+        var me = this;
+        var view = me.getView();
+
+        var formValues = view.down(&#39;form&#39;).getForm().getValues();
+        Ext.util.Cookies.set(&#39;username&#39;, formValues.username);
+
+        var jsonData = Ext.JSON.encode(formValues);
+
+        var serviceUrl = me.getViewModel().serviceUrl;
+        me.callLoginService(jsonData, serviceUrl, true);
+
+    },
+
+    initViewModel: function () {
+        this.tryAutomaticLogin();
+    }
+
+});
+</pre>
+</body>
+</html>

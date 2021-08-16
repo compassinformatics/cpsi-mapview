@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+  <title>The source code</title>
+  <link href="../resources/prettify/prettify.css" type="text/css" rel="stylesheet" />
+  <script type="text/javascript" src="../resources/prettify/prettify.js"></script>
+  <style type="text/css">
+    .highlight { display: block; background-color: #ddd; }
+  </style>
+  <script type="text/javascript">
+    function highlight() {
+      document.getElementById(location.hash.replace(/#/, "")).className = "highlight";
+    }
+  </script>
+</head>
+<body onload="prettyPrint(); highlight();">
+  <pre class="prettyprint lang-js"><span id='CpsiMapview-model-grid-Grid'>/**
+</span> * This class is the model for the cpsi mapview WFS
+ * generic grid class
+ *
+ */
+Ext.define(&#39;CpsiMapview.model.grid.Grid&#39;, {
+    extend: &#39;Ext.app.ViewModel&#39;,
+    alias: &#39;viewmodel.cmv_grid&#39;,
+
+    requires: [
+        &#39;BasiGX.util.Map&#39;
+    ],
+
+<span id='CpsiMapview-model-grid-Grid-property-data'>    /**
+</span>     * The following should all be overridden in child classes
+     */
+    data: {
+        vectorLayerKey: null,
+        wmsLayerKey: null,
+        gridStoreType: null,
+        allowFeatureSelection: false,
+        // when isSpatialGrid is set to false the &#39;Select by Shape&#39; button will be hidden
+        isSpatialGrid: true,
+        usePresetFilters: false,
+        exportExcelVisible: true,
+        exportShapefileVisible: true
+    },
+
+<span id='CpsiMapview-model-grid-Grid-property-formulas'>    formulas: {
+</span>        map: function () {
+            return BasiGX.util.Map.getMapComponent().map;
+        },
+        isGroupEditingVisible: function () {
+            // can be overridden in subclasses
+            return false;
+        },
+        useSimpleSelection: function () {
+            return !this.get(&#39;allowFeatureSelection&#39;) &amp;&amp; this.get(&#39;isSpatialGrid&#39;);
+        },
+        useAdvancedSelection: function () {
+            return this.get(&#39;allowFeatureSelection&#39;) &amp;&amp; this.get(&#39;isSpatialGrid&#39;);
+        }
+    }
+});
+</pre>
+</body>
+</html>

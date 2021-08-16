@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+  <title>The source code</title>
+  <link href="../resources/prettify/prettify.css" type="text/css" rel="stylesheet" />
+  <script type="text/javascript" src="../resources/prettify/prettify.js"></script>
+  <style type="text/css">
+    .highlight { display: block; background-color: #ddd; }
+  </style>
+  <script type="text/javascript">
+    function highlight() {
+      document.getElementById(location.hash.replace(/#/, "")).className = "highlight";
+    }
+  </script>
+</head>
+<body onload="prettyPrint(); highlight();">
+  <pre class="prettyprint lang-js"><span id='CpsiMapview-util-Html'>/**
+</span> * Static util class for HTML related operations.
+ */
+Ext.define(&#39;CpsiMapview.util.Html&#39;, {
+
+    statics: {
+<span id='CpsiMapview-util-Html-static-method-addEvent'>        /**
+</span>         * Add events to HTML elements in a cross browser compatible manor.
+         *
+         * Credits: http://stackoverflow.com/a/21140463
+         *
+         * @param {DOMElement} htmlElement The element to attach the event to.
+         * @param {String} eventName The name of the event to attach.
+         * @param {Function} eventFunction The handler for the `eventName` on
+         *     the passed `htmlElement`.
+         */
+        addEvent: function (htmlElement, eventName, eventFunction) {
+            if (htmlElement.addEventListener) { // Modern
+                htmlElement.addEventListener(eventName, eventFunction, false);
+            } else if (htmlElement.attachEvent) { // Internet Explorer
+                htmlElement.attachEvent(&#39;on&#39; + eventName, eventFunction);
+            } else { // others
+                htmlElement[&#39;on&#39; + eventName] = eventFunction;
+            }
+        }
+    }
+
+});
+</pre>
+</body>
+</html>

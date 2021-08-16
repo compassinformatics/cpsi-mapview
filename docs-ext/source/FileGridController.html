@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+  <title>The source code</title>
+  <link href="../resources/prettify/prettify.css" type="text/css" rel="stylesheet" />
+  <script type="text/javascript" src="../resources/prettify/prettify.js"></script>
+  <style type="text/css">
+    .highlight { display: block; background-color: #ddd; }
+  </style>
+  <script type="text/javascript">
+    function highlight() {
+      document.getElementById(location.hash.replace(/#/, "")).className = "highlight";
+    }
+  </script>
+</head>
+<body onload="prettyPrint(); highlight();">
+  <pre class="prettyprint lang-js"><span id='CpsiMapview-view-fileupload-FileGridController'>/**
+</span> * Controller for the grid used to display a collection of attachments
+ *
+ * @class CpsiMapview.view.fileupload.FileGridController
+ */
+
+Ext.define(&#39;CpsiMapview.view.fileupload.FileGridController&#39;, {
+    extend: &#39;Ext.app.ViewController&#39;,
+    alias: &#39;controller.cmv_filegridcontroller&#39;,
+    requires: [
+        &#39;CpsiMapview.view.fileupload.Report&#39;,
+        &#39;CpsiMapview.view.fileupload.FileUploadWindow&#39;,
+        &#39;CpsiMapview.model.fileupload.Attachment&#39;
+    ],
+    mixins: [
+        &#39;CpsiMapview.controller.grid.ItemDeleterGridControllerMixin&#39;
+    ],
+
+<span id='CpsiMapview-view-fileupload-FileGridController-method-onAddFileClick'>    /**
+</span>     * Open the modal form for adding a new file attachment
+     */
+    onAddFileClick: function () {
+
+        var me = this;
+        var vm = me.getViewModel();
+        var data = vm.getData();
+
+        var fileUploadWin = Ext.create(&#39;CpsiMapview.view.fileupload.FileUploadWindow&#39;, {
+            viewModel: {
+                data: {
+                    currentRecord: data.currentRecord,
+                    parentType: data.parentType
+                }
+            },
+            listeners: {
+                fileadded: &#39;onFileAdded&#39;,
+                scope: me
+            }
+        });
+
+        fileUploadWin.show();
+    },
+
+<span id='CpsiMapview-view-fileupload-FileGridController-method-onRowDelete'>    /**
+</span>     * Delete an attachment from the server and removed from the grid
+     * @param {any} tableView
+     * @param {any} rowIndex
+     * @param {any} colIndex
+     * @param {any} item
+     * @param {any} e
+     * @param {any} record
+     */
+    onRowDelete: function (tableView, rowIndex, colIndex, item, e, record) {
+
+        var me = this;
+        var url = record.get(&#39;attachmentUrl&#39;);
+
+        Ext.Ajax.request({
+            url: url,
+            method: &#39;DELETE&#39;,
+            success: function (response) {
+                var resp = Ext.decode(response.responseText);
+                if (resp.success === true) {
+                    var store = me.getView().getStore();
+                    store.remove(record);
+                } else {
+                    Ext.log.warn(&#39;Error deleting attachment&#39;, resp.message);
+                }
+            },
+            failure: function (response) {
+                if (!response.aborted) {
+                    Ext.log.error(&#39;Error deleting attachment&#39;, response);
+                }
+            }
+        });
+    },
+
+<span id='CpsiMapview-view-fileupload-FileGridController-method-onFileAdded'>    /**
+</span>     * Add a new attachment to the grid
+     * @param {any} file
+     */
+    onFileAdded: function (file) {
+        var store = this.getViewModel().getStore(&#39;files&#39;);
+        store.add(file);
+    },
+
+<span id='CpsiMapview-view-fileupload-FileGridController-method-openImageInWindow'>    /**
+</span>     * Open an image attachment in a floating window
+     * @param {any} record
+     */
+    openImageInWindow: function (record) {
+
+        var imageUrl = record.get(&#39;attachmentUrl&#39;);
+        var css = &#39;style=&quot;width: 100%; height: 100%; object-fit: contain&quot;&#39;;
+
+        var win = Ext.create(&#39;CpsiMapview.view.window.MinimizableWindow&#39;, {
+            width: 300,
+            height: 400,
+            title: &#39;Image Attachment&#39;,
+            layout: &#39;fit&#39;,
+            minimizable: true,
+            maximizable: true,
+            resizable: true,
+            closeAction: &#39;destroy&#39;,
+            glyph: &#39;f030@FontAwesome&#39;,
+            items: {
+                xtype: &#39;component&#39;,
+                html: Ext.String.format(&#39;&lt;a href=&quot;{0}&quot; target=&quot;_blank&quot;&gt;&lt;img src={1} {2} &gt;&lt;/a&gt;&#39;,
+                    imageUrl, imageUrl, css)
+            }
+        });
+        win.show();
+    },
+
+<span id='CpsiMapview-view-fileupload-FileGridController-method-onDownloadFileClick'>    /**
+</span>     * When double clicking a file attachment open in a
+     * window for images, or download directly for other file types
+     * @param {any} grid
+     * @param {any} record
+     */
+    onDownloadFileClick: function (grid, record) {
+
+        var me = this;
+
+        if (record.get(&#39;isThumbnailAvailable&#39;) === true) {
+            me.openImageInWindow(record);
+        } else {
+            // for non-image attachments download the file
+            var report = Ext.create(&#39;CpsiMapview.view.fileupload.Report&#39;, {
+                renderTo: Ext.getBody()
+            });
+
+            var url = record.get(&#39;attachmentUrl&#39;);
+            report.load({
+                url: url
+            });
+        }
+    }
+
+});</pre>
+</body>
+</html>

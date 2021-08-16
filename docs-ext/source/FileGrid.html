@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+  <title>The source code</title>
+  <link href="../resources/prettify/prettify.css" type="text/css" rel="stylesheet" />
+  <script type="text/javascript" src="../resources/prettify/prettify.js"></script>
+  <style type="text/css">
+    .highlight { display: block; background-color: #ddd; }
+  </style>
+  <script type="text/javascript">
+    function highlight() {
+      document.getElementById(location.hash.replace(/#/, "")).className = "highlight";
+    }
+  </script>
+</head>
+<body onload="prettyPrint(); highlight();">
+  <pre class="prettyprint lang-js"><span id='CpsiMapview-view-fileupload-FileGrid'>/**
+</span> * Grid used to display a collection of attachments
+ *
+ * @class CpsiMapview.view.fileupload.FileGrid
+ */
+Ext.define(&#39;CpsiMapview.view.fileupload.FileGrid&#39;,
+    {
+        extend: &#39;Ext.grid.Panel&#39;,
+        xtype: &#39;cmv_filegrid&#39;,
+        requires: [
+            &#39;CpsiMapview.view.grid.ItemDeleter&#39;,
+            &#39;Ext.util.Format&#39;,
+            &#39;CpsiMapview.view.fileupload.FileGridController&#39;
+        ],
+<span id='CpsiMapview-view-fileupload-FileGrid-property-loadMask'>        loadMask: true,
+</span><span id='CpsiMapview-view-fileupload-FileGrid-property-border'>        border: true,
+</span><span id='CpsiMapview-view-fileupload-FileGrid-property-anchor'>        anchor: &#39;100% 100%&#39;,
+</span><span id='CpsiMapview-view-fileupload-FileGrid-property-multiSelect'>        multiSelect: true,
+</span><span id='CpsiMapview-view-fileupload-FileGrid-property-emptyText'>        emptyText: &#39;No files to display&#39;,
+</span><span id='CpsiMapview-view-fileupload-FileGrid-property-reserveScrollOffset'>        reserveScrollOffset: true,
+</span><span id='CpsiMapview-view-fileupload-FileGrid-property-sortableColumns'>        sortableColumns: false,
+</span><span id='CpsiMapview-view-fileupload-FileGrid-property-allowAddingAttachments'>        allowAddingAttachments: true,
+</span><span id='CpsiMapview-view-fileupload-FileGrid-property-controller'>        controller: &#39;cmv_filegridcontroller&#39;,
+</span><span id='CpsiMapview-view-fileupload-FileGrid-property-listeners'>        listeners: {
+</span>            itemdblclick: &#39;onDownloadFileClick&#39;
+        },
+<span id='CpsiMapview-view-fileupload-FileGrid-property-bind'>        bind: {
+</span>            store: &#39;{files}&#39;,
+            serviceUrl: &#39;{serviceUrl}&#39;
+        },
+        config: {
+<span id='CpsiMapview-view-fileupload-FileGrid-cfg-serviceUrl'>            serviceUrl: &#39;&#39;
+</span>        },
+<span id='CpsiMapview-view-fileupload-FileGrid-property-columns'>        columns: [
+</span>            {
+                text: &#39;Name&#39;,
+                dataIndex: &#39;name&#39;,
+                flex: 2
+            }, {
+                text: &#39;Description&#39;,
+                dataIndex: &#39;description&#39;,
+                flex: 3
+            }, {
+                text: &#39;Thumbnail&#39;,
+                flex: 1,
+                dataIndex: &#39;thumbnailUrl&#39;,
+                renderer: function(url) {
+                    if(url){
+                        return Ext.String.format(&#39;&lt;img src=&quot;{0}&quot; alt=&quot;thumbnail&quot; height=&quot;32&quot; width=&quot;32&quot;&gt;&#39;, url);
+                    } else {
+                        return &#39;&#39;;
+                    }
+                }
+            }, {
+                text: &#39;File&#39;,
+                dataIndex: &#39;fileName&#39;,
+                flex: 2,
+                hidden: true
+            }, {
+                text: &#39;Size&#39;,
+                dataIndex: &#39;fileSize&#39;,
+                align: &#39;right&#39;,
+                renderer: function (value) {
+                    return Ext.util.Format.number(value / 1024, &#39;0,000 KB&#39;);
+                },
+                flex: 1,
+                hidden: true
+            },
+            {
+                xtype: &#39;datecolumn&#39;,
+                text: &#39;Last Updated&#39;,
+                dataIndex: &#39;lastUpdatedDateUtc&#39;,
+                format: &#39;d-m-Y&#39;,
+                width: 100
+            },
+            {
+                text: &#39;Attachment Id&#39;,
+                dataIndex: &#39;attachmentId&#39;,
+                hidden: true
+            },
+            {
+                text: &#39;Content Type&#39;,
+                dataIndex: &#39;contentType&#39;,
+                hidden: true
+            },
+            {
+                text: &#39;File Extension&#39;,
+                dataIndex: &#39;extension&#39;,
+                hidden: true
+            },
+            {
+                text: &#39;Default Image&#39;,
+                dataIndex: &#39;isDefaultImage&#39;,
+                hidden: true
+            },
+            {
+                text: &#39;Thumnail Available&#39;,
+                dataIndex: &#39;isThumbnailAvailable&#39;,
+                hidden: true
+            },
+            {
+                xtype: &#39;cmv_itemdeleter&#39;,
+                itemId: &#39;itemDeleter&#39;,
+                avoidConfirmationRequest: false,
+                bind: {
+                    hidden: &#39;{hideDeleteFileButton}&#39;,
+                    disabled: &#39;{!canDeleteFiles}&#39;,
+                }
+            }
+        ],
+<span id='CpsiMapview-view-fileupload-FileGrid-property-tbar'>        tbar: [
+</span>            {
+                xtype: &#39;button&#39;,
+                text: &#39;Add File&#39;,
+                itemId: &#39;addFileButton&#39;,
+                iconCls: &#39;add icon-add&#39;,
+                cls: &#39;bordered-button&#39;,
+                infoIconTooltip: this.addFileInfoIconTooltip,
+                listeners: {
+                    click: &#39;onAddFileClick&#39;
+                },
+                style: {
+                    pointerEvents: &#39;all&#39;
+                },
+                bind: {
+                    disabled: &#39;{!canAddFiles}&#39;,
+                    tooltip:&#39;Associate a File with the {parentType} - files can only be added after the {parentType} has been saved&#39;,
+                    hidden: &#39;{hideAddFileButton}&#39;
+                }
+            }
+        ]
+    });
+</pre>
+</body>
+</html>

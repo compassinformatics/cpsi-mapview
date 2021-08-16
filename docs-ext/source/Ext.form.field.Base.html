@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+  <title>The source code</title>
+  <link href="../resources/prettify/prettify.css" type="text/css" rel="stylesheet" />
+  <script type="text/javascript" src="../resources/prettify/prettify.js"></script>
+  <style type="text/css">
+    .highlight { display: block; background-color: #ddd; }
+  </style>
+  <script type="text/javascript">
+    function highlight() {
+      document.getElementById(location.hash.replace(/#/, "")).className = "highlight";
+    }
+  </script>
+</head>
+<body onload="prettyPrint(); highlight();">
+  <pre class="prettyprint lang-js">/*
+ * Based on:  https://forum.sencha.com/forum/showthread.php?304374-Binding-doesn-t-work-with-validation
+ *
+ * by design the bound model isn&#39;t updated if the form field is invalid, therefore validation-related bindings aren&#39;t triggered
+ * (like the &quot;canSave&quot; formula in the EditFormViewModelMixin&quot; class)
+ * This override lets the model to be updated even if the value in the field is invalid, allowing for further logic to be processed
+ *
+ * It relies on a &quot;bindOn&quot; configuration to be set on the fields to one of the following values:
+ *  &quot;both&quot;: updates the model when the field value is either valid or invalid
+ *  &quot;invalid&quot;: updates the model only when the value is invalid
+ *  &quot;valid&quot;/&lt;not set&gt;: (default) the model is updated only if the field value is valid (default behaviour)
+ */
+
+Ext.override(Ext.form.field.Base, {
+    bindOn: &#39;both&#39;,
+    publishValue: function () {
+        var me = this;
+
+        if (me.rendered) {
+            switch (me.bindOn) {
+                case &#39;both&#39;:
+                    me.publishState(&#39;value&#39;, me.getValue());
+                    break;
+                case &#39;invalid&#39;:
+                    if (me.getErrors().length) {
+                        me.publishState(&#39;value&#39;, me.getValue());
+                    }
+                    break;
+                case &#39;valid&#39;:
+                default:
+                    if (!me.getErrors().length) {
+                        me.publishState(&#39;value&#39;, me.getValue());
+                    }
+            }
+        }
+    }
+});</pre>
+</body>
+</html>

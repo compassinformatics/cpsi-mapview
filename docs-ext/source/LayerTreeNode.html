@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+  <title>The source code</title>
+  <link href="../resources/prettify/prettify.css" type="text/css" rel="stylesheet" />
+  <script type="text/javascript" src="../resources/prettify/prettify.js"></script>
+  <style type="text/css">
+    .highlight { display: block; background-color: #ddd; }
+  </style>
+  <script type="text/javascript">
+    function highlight() {
+      document.getElementById(location.hash.replace(/#/, "")).className = "highlight";
+    }
+  </script>
+</head>
+<body onload="prettyPrint(); highlight();">
+  <pre class="prettyprint lang-js"><span id='CpsiMapview-data-model-LayerTreeNode'>/**
+</span> * The CPSI MapView layer tree node class used by the stores used in trees.
+ *
+ * @class CpsiMapview.data.model.LayerTreeNode
+ */
+Ext.define(&#39;CpsiMapview.data.model.LayerTreeNode&#39;, {
+    extend: &#39;GeoExt.data.model.LayerTreeNode&#39;,
+
+    requires: [
+        &#39;CpsiMapview.util.Style&#39;
+    ],
+
+<span id='CpsiMapview-data-model-LayerTreeNode-cfg-descriptionTitleProperty'>    /**
+</span>     * The layer property that will be used to hold a title for the description of the model in views.
+     *
+     * @cfg {String}
+     */
+    descriptionTitleProperty: &#39;descTitle&#39;,
+
+<span id='CpsiMapview-data-model-LayerTreeNode-property-fields'>    fields: [
+</span>        {
+            name: &#39;qtitle&#39;,
+            type: &#39;string&#39;,
+            persist: false,
+            convert: function(v, record) {
+                return record.getOlLayerProp(record.descriptionTitleProperty, &#39;&#39;) || record.get(&#39;text&#39;);
+            }
+        },
+        {
+            name: &#39;__toggleMode&#39;,
+            type: &#39;string&#39;,
+            defaultValue: &#39;ol3&#39;
+        },
+        {
+            // overwrite the text property to add custom behavior
+            name: &#39;text&#39;,
+            type: &#39;string&#39;,
+            persist: false,
+            convert: function(v, record) {
+                if (!v) {
+                    // folders / LayerGroups
+                    var layerGroup = record.getOlLayer();
+                    if (layerGroup) {
+                        return record.getOlLayer().get(&#39;name&#39;);
+                    }
+                }
+
+                // add layer style to node text if we have the style chooser
+                // in the context menu and not as direct item under the node
+                var layerTree = Ext.ComponentQuery.query(&#39;cmv_layertree&#39;)[0];
+                if (layerTree &amp;&amp; layerTree.styleSwitcherBelowNode === false) {
+
+                    var olLayer = record.getOlLayer();
+                    if (olLayer &amp;&amp; olLayer.get(&#39;activatedStyle&#39;)) {
+                        // get activated layer style
+                        var activeStyle = olLayer.get(&#39;activatedStyle&#39;);
+                        var styleTitle = CpsiMapview.util.Style.getLayerStyleTitle(activeStyle, olLayer);
+                        // apply node name + style name
+                        var treeNodeConf = olLayer.get(&#39;_origTreeConf&#39;);
+                        if (treeNodeConf &amp;&amp; treeNodeConf.text &amp;&amp; styleTitle) {
+                            return treeNodeConf.text + &#39; (&#39; + styleTitle + &#39;)&#39;;
+                        }
+                    }
+                }
+
+                return v;
+            }
+        }
+    ],
+
+<span id='CpsiMapview-data-model-LayerTreeNode-method-onLayerVisibleChange'>    /**
+</span>     * Only toggle checkboxes if the layer is in the layer tree
+     * This avoids a costly refresh of the entire tree
+     * @param {any} evt
+     */
+    onLayerVisibleChange: function (evt) {
+        var layer = evt.target;
+
+        if (!this.__updating) {
+            this.set(&#39;checked&#39;, layer.get(&#39;visible&#39;));
+        }
+    }
+});
+</pre>
+</body>
+</html>

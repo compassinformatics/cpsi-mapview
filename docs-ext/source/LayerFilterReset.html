@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+  <title>The source code</title>
+  <link href="../resources/prettify/prettify.css" type="text/css" rel="stylesheet" />
+  <script type="text/javascript" src="../resources/prettify/prettify.js"></script>
+  <style type="text/css">
+    .highlight { display: block; background-color: #ddd; }
+  </style>
+  <script type="text/javascript">
+    function highlight() {
+      document.getElementById(location.hash.replace(/#/, "")).className = "highlight";
+    }
+  </script>
+</head>
+<body onload="prettyPrint(); highlight();">
+  <pre class="prettyprint lang-js"><span id='CpsiMapview-view-menuitem-LayerFilterReset'>/**
+</span> * Resets the all applied filters.
+ * Aftwards applies predefined filters in case they exist.
+ *
+ * @class CpsiMapview.view.menuitem.LayerFilterReset
+ */
+Ext.define(&#39;CpsiMapview.view.menuitem.LayerFilterReset&#39;, {
+    extend: &#39;Ext.menu.Item&#39;,
+    xtype: &#39;cmv_menuitem_layerfilterreset&#39;,
+
+    requires: [
+        &#39;CpsiMapview.util.Grid&#39;
+    ],
+
+<span id='CpsiMapview-view-menuitem-LayerFilterReset-cfg-layer'>    /**
+</span>     * The connected layer for this item
+     *
+     * @cfg {ol.layer.Base}
+     */
+    layer: null,
+
+<span id='CpsiMapview-view-menuitem-LayerFilterReset-cfg-text'>    /**
+</span>     * Text shown in this MenuItem
+     * @cfg {String}
+     */
+    text: &#39;Reset Filters&#39;,
+
+<span id='CpsiMapview-view-menuitem-LayerFilterReset-method-initComponent'>    /**
+</span>     * @private
+     */
+    initComponent: function () {
+        var me = this;
+
+        me.handler = me.handlerFunc;
+
+        me.callParent();
+
+        me.setHidden(!me.shallMenuItemBeShown());
+    },
+
+<span id='CpsiMapview-view-menuitem-LayerFilterReset-method-handlerFunc'>    /**
+</span>     * Executed when this menu item is clicked.
+     */
+    handlerFunc: function () {
+        var me = this;
+        var gridWindow = CpsiMapview.util.Grid.getGridWindow(me.layer);
+
+        var grid = gridWindow.down(&#39;grid&#39;);
+        grid.fireEvent(&#39;clearfilters&#39;);
+        grid.fireEvent(&#39;applypresetfilters&#39;);
+    },
+
+<span id='CpsiMapview-view-menuitem-LayerFilterReset-method-shallMenuItemBeShown'>    /**
+</span>     * Checks if menu item should be shown.
+     *
+     * @returns {Boolean} If menu item should be shown
+     */
+    shallMenuItemBeShown: function(){
+        var me = this;
+
+        // the menu can only be shown for layers that have a grid
+        if (!me.layer.get(&#39;gridXType&#39;)) {
+            return false;
+        }
+
+        // check preset filters
+        var hasPresetFilters = false;
+        if (me.layer.get(&#39;gridFilters&#39;)) {
+            hasPresetFilters = true;
+        }
+
+        // if the layer has preset filters, we always show the menu item
+        // otherwise we only show it there are currently any preset filters
+        return hasPresetFilters || me.isLayerCurrentlyFiltered();
+    },
+
+<span id='CpsiMapview-view-menuitem-LayerFilterReset-method-isLayerCurrentlyFiltered'>    /**
+</span>     * Checks if the grid is currently filtered.
+     *
+     * @returns {Boolean} If grid is currently filtered
+     */
+    isLayerCurrentlyFiltered: function() {
+        var me = this;
+
+        // retrieve store to check if it is filtered
+        var gridWindow = CpsiMapview.util.Grid.getGridWindow(me.layer);
+        var grid = gridWindow.down(&#39;grid&#39;);
+        var store = grid.getStore();
+        if (!store) {
+            return false;
+        }
+
+        // check if common Ext filters (string, number, list, ...) are set
+        var filters = store.getFilters();
+        var hasGridFilters = false;
+        if (filters) {
+            hasGridFilters = (filters.length &gt; 0);
+        }
+
+        // spatial filters can only be detected by a property in the controller
+        var spatialFilter = grid.getController().spatialFilter;
+        var hasSpatialFilter = false;
+        if (spatialFilter) {
+            hasSpatialFilter = true;
+        }
+
+        return hasGridFilters || hasSpatialFilter;
+    }
+});
+</pre>
+</body>
+</html>

@@ -1,0 +1,1236 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+  <title>The source code</title>
+  <link href="../resources/prettify/prettify.css" type="text/css" rel="stylesheet" />
+  <script type="text/javascript" src="../resources/prettify/prettify.js"></script>
+  <style type="text/css">
+    .highlight { display: block; background-color: #ddd; }
+  </style>
+  <script type="text/javascript">
+    function highlight() {
+      document.getElementById(location.hash.replace(/#/, "")).className = "highlight";
+    }
+  </script>
+</head>
+<body onload="prettyPrint(); highlight();">
+  <pre class="prettyprint lang-js"><span id='CpsiMapview-controller-button-DigitizeButtonController'>/**
+</span> * This class is the controller for the DigitizeButton.
+ */
+Ext.define(&#39;CpsiMapview.controller.button.DigitizeButtonController&#39;, {
+    extend: &#39;Ext.app.ViewController&#39;,
+    requires: [
+        &#39;BasiGX.util.Map&#39;,
+        &#39;BasiGX.util.MsgBox&#39;,
+        &#39;Ext.menu.Menu&#39;,
+        &#39;CpsiMapview.view.window.MinimizableWindow&#39;,
+        &#39;GeoExt.component.FeatureRenderer&#39;,
+        &#39;GeoExt.data.store.Features&#39;,
+        &#39;CpsiMapview.view.toolbar.CircleSelectionToolbar&#39;
+    ],
+
+    alias: &#39;controller.cmv_digitize_button&#39;,
+
+<span id='CpsiMapview-controller-button-DigitizeButtonController-property-map'>    /**
+</span>     * The OpenLayers map. If not given, will be auto-detected
+     */
+    map: null,
+
+<span id='CpsiMapview-controller-button-DigitizeButtonController-property-mapComponent'>    /**
+</span>     * The BasiGX mapComponent. If not given, will be auto-detected
+     */
+    mapComponent: null,
+
+<span id='CpsiMapview-controller-button-DigitizeButtonController-property-drawLayer'>    /**
+</span>     * Temporary vector layer used while drawing points, lines or polygons
+     */
+    drawLayer: null,
+
+<span id='CpsiMapview-controller-button-DigitizeButtonController-property-resultLayer'>    /**
+</span>     * Temporary vector layer used to display the response features
+     */
+    resultLayer: null,
+
+<span id='CpsiMapview-controller-button-DigitizeButtonController-property-drawInteraction'>    /**
+</span>     * OpenLayers draw interaction for drawing of lines and polygons
+     */
+    drawInteraction: null,
+
+<span id='CpsiMapview-controller-button-DigitizeButtonController-property-modifyInteraction'>    /**
+</span>     * OpenLayers modify interaction
+     * Used in polygon and point draw mode
+     */
+    modifyInteraction: null,
+
+<span id='CpsiMapview-controller-button-DigitizeButtonController-property-pointerInteraction'>    /**
+</span>     * OpenLayers pointer interaction for deleting points
+     */
+    pointerInteraction: null,
+
+<span id='CpsiMapview-controller-button-DigitizeButtonController-property-snapVertexInteraction'>    /**
+</span>     * OpenLayers snap interaction for better vertex selection
+     */
+    snapVertexInteraction: null,
+
+<span id='CpsiMapview-controller-button-DigitizeButtonController-property-snapEdgeInteraction'>    /**
+</span>     * OpenLayers snap interaction for better edge selection
+     */
+    snapEdgeInteraction: null,
+
+<span id='CpsiMapview-controller-button-DigitizeButtonController-property-circleToolbar'>    /**
+</span>     * CircleToolbar that will be set
+     * when pressing a button of type `Circle`
+     */
+    circleToolbar: null,
+
+<span id='CpsiMapview-controller-button-DigitizeButtonController-property-circleToolbarParent'>    /**
+</span>     * Parent to add the circleToolbar to. MUST
+     * implement the method `addDocked()`.
+     */
+    circleToolbarParent: null,
+
+<span id='CpsiMapview-controller-button-DigitizeButtonController-property-activeGroupIdx'>    /**
+</span>     * The index of the currently active group
+     * Only used when `useContextMenu` is true
+     */
+    activeGroupIdx: 0,
+
+<span id='CpsiMapview-controller-button-DigitizeButtonController-property-contextMenuGroupsCounter'>    /**
+</span>     * The counter reflecting the number of groups
+     * the user has created through the context menu
+     */
+    contextMenuGroupsCounter: 0,
+
+<span id='CpsiMapview-controller-button-DigitizeButtonController-property-blockedEventHandling'>    /**
+</span>     * Determines if event handling is blocked.
+     */
+    blockedEventHandling: false,
+
+<span id='CpsiMapview-controller-button-DigitizeButtonController-method-constructor'>    constructor: function () {
+</span>        var me = this;
+
+        me.handleDrawEnd = me.handleDrawEnd.bind(me);
+        me.handleLocalDrawEnd = me.handleLocalDrawEnd.bind(me);
+        me.handleCircleDrawEnd = me.handleCircleDrawEnd.bind(me);
+        me.handleModifyEnd = me.handleModifyEnd.bind(me);
+
+        me.callParent(arguments);
+    },
+
+<span id='CpsiMapview-controller-button-DigitizeButtonController-method-setDrawLayer'>    /**
+</span>     * Set the layer to store features drawn by the editing
+     * tools
+     * @param {any} layer
+     */
+    setDrawLayer: function (layer) {
+        var me = this;
+
+        if (!me.map) {
+            return;
+        }
+
+        if (me.drawLayer) {
+            me.map.removeLayer(me.drawLayer);
+        }
+
+        me.drawLayer = layer;
+        me.setDrawInteraction(layer);
+        me.setModifyInteraction(layer);
+        me.setSnapInteraction(layer);
+    },
+
+<span id='CpsiMapview-controller-button-DigitizeButtonController-method-setResultLayer'>    /**
+</span>     * Set the layer used to store features returned
+     * by the digitising services
+     * @param {any} layer
+     */
+    setResultLayer: function (layer) {
+        var me = this;
+
+        if (!me.map) {
+            return;
+        }
+
+        if (me.resultLayer) {
+            me.map.removeLayer(me.resultLayer);
+        }
+
+        me.resultLayer = layer;
+    },
+
+<span id='CpsiMapview-controller-button-DigitizeButtonController-method-setDrawInteraction'>    /**
+</span>     * Set the map drawing interaction
+     * which will allow features to be added to the drawLayer
+     * @param {any} layer
+     */
+    setDrawInteraction: function (layer) {
+
+        var me = this;
+        var view = me.getView();
+        var type = view.getType();
+
+        if (me.drawInteraction) {
+            me.map.removeInteraction(me.drawInteraction);
+        }
+
+        var drawCondition = function (evt) {
+            // the draw interaction does not work with the singleClick condition.
+            return ol.events.condition.primaryAction(evt) &amp;&amp; ol.events.condition.noModifierKeys(evt) &amp;&amp; !me.blockedEventHandling;
+        };
+
+        var drawInteractionConfig = {
+            type: view.getMulti() ? &#39;Multi&#39; + type : type,
+            source: layer.getSource(),
+            condition: drawCondition
+        };
+
+        if (type === &#39;Circle&#39;) {
+            // Circle type does not support &quot;multi&quot;, so we make sure that it is set appropriately
+            drawInteractionConfig.type = type;
+        }
+
+        me.drawInteraction = new ol.interaction.Draw(drawInteractionConfig);
+
+        // register listeners when connected to a backend service
+        if (view.getApiUrl()) {
+            me.drawInteraction.on(&#39;drawend&#39;, type === &#39;Circle&#39; ? me.handleCircleDrawEnd : me.handleDrawEnd);
+        } else {
+            me.drawInteraction.on(&#39;drawend&#39;, me.handleLocalDrawEnd);
+        }
+
+        me.map.addInteraction(me.drawInteraction);
+    },
+
+<span id='CpsiMapview-controller-button-DigitizeButtonController-method-setModifyInteraction'>    /**
+</span>     * Set the modify interaction, used to modify
+     * existing features created in the drawLayer
+     * @param {any} layer
+     */
+    setModifyInteraction: function (layer) {
+
+        var me = this;
+        var view = me.getView();
+        var type = view.getType();
+
+        if (me.modifyInteraction) {
+            me.map.removeInteraction(me.modifyInteraction);
+        }
+
+        var drawCondition = function (evt) {
+            // the modify interaction does not work with the singleClick condition.
+            return ol.events.condition.primaryAction(evt) &amp;&amp; ol.events.condition.noModifierKeys(evt) &amp;&amp; !me.blockedEventHandling;
+        };
+
+        var deleteCondition = function (evt) {
+            return ol.events.condition.primaryAction(evt) &amp;&amp; ol.events.condition.platformModifierKeyOnly(evt) &amp;&amp; !me.blockedEventHandling;
+        };
+
+        // create the modify interaction
+        if (type !== &#39;Circle&#39;) {
+            var modifyInteractionConfig = {
+                features: layer.getSource().getFeaturesCollection(),
+                condition: drawCondition,
+                deleteCondition: deleteCondition
+            };
+            me.modifyInteraction = new ol.interaction.Modify(modifyInteractionConfig);
+            // add listeners when connected to a backend service
+            if (view.getApiUrl()) {
+                me.modifyInteraction.on(&#39;modifyend&#39;, me.handleModifyEnd);
+            }
+            me.map.addInteraction(me.modifyInteraction);
+        }
+    },
+
+<span id='CpsiMapview-controller-button-DigitizeButtonController-method-setPointerInteraction'>    /**
+</span>     * Create the pointer interaction used to delete
+     * and add solver points
+     * */
+    setPointerInteraction: function () {
+
+        var me = this;
+        var view = me.getView();
+        var type = view.getType();
+
+        if (me.pointerInteraction) {
+            me.map.removeInteraction(me.pointerInteraction);
+        }
+
+        if (type === &#39;Point&#39;) {
+            var clickCondition = function (evt) {
+                return ol.events.condition.primaryAction(evt) &amp;&amp; ol.events.condition.noModifierKeys(evt) &amp;&amp; !me.blockedEventHandling;
+            };
+
+            var deleteCondition = function (evt) {
+                return ol.events.condition.primaryAction(evt) &amp;&amp; ol.events.condition.platformModifierKeyOnly(evt) &amp;&amp; !me.blockedEventHandling;
+            };
+
+            me.pointerInteraction = new ol.interaction.Pointer({
+                handleEvent: function (evt) {
+                    if (deleteCondition(evt)) {
+                        return me.handlePointDelete(evt);
+                    }
+                    if (clickCondition(evt)) {
+                        // allow local drawing of features with no API calls
+                        if (!view.getApiUrl()) {
+                            return true;
+                        }
+                        return me.handlePointClick(evt);
+                    }
+                    return true;
+                }
+            });
+            me.map.addInteraction(me.pointerInteraction);
+        }
+    },
+
+<span id='CpsiMapview-controller-button-DigitizeButtonController-method-setSnapInteraction'>    /**
+</span>     * Set the snap interaction used to snap to features
+     * already in the drawLayer
+     * @param {any} layer
+     */
+    setSnapInteraction: function (layer) {
+
+        var me = this;
+        var view = me.getView();
+        var type = view.getType();
+
+        if (me.snapVertexInteraction) {
+            me.map.removeInteraction(me.snapVertexInteraction);
+        }
+
+        if (me.snapEdgeInteraction) {
+            me.map.removeInteraction(me.snapEdgeInteraction);
+        }
+
+        if (type !== &#39;Circle&#39;) {
+            me.snapVertexInteraction = new ol.interaction.Snap({
+                source: layer.getSource()
+            });
+            me.map.addInteraction(me.snapVertexInteraction);
+            me.snapEdgeInteraction = new ol.interaction.Snap({
+                features: me.resultLayer.getSource().getFeaturesCollection(),
+                vertex: false
+            });
+            me.map.addInteraction(me.snapEdgeInteraction);
+        }
+    },
+
+<span id='CpsiMapview-controller-button-DigitizeButtonController-method-onToggle'>    /**
+</span>     * Main handler which activates or deactivates the interactions and listeners
+     * @param {Ext.button.Button} btn The button that has been pressed
+     * @param {boolean} pressed The toggle state of the button
+     */
+    onToggle: function (btn, pressed) {
+        var me = this;
+        var view = me.getView();
+        var type = view.getType();
+
+        // guess the map if not given
+        if (!me.map) {
+            me.map = BasiGX.util.Map.getMapComponent().map;
+        }
+
+        // use default cmv_map Ext.panel.Panel for circle toolbar if not defined
+        if (!me.circleToolbarParent) {
+            me.circleToolbarParent = Ext.ComponentQuery.query(&#39;cmv_map&#39;)[0];
+        }
+
+        // create a temporary draw layer unless one has already been set
+
+        if (!me.drawLayer) {
+            if (view.drawLayer) {
+                me.drawLayer = view.drawLayer;
+            } else {
+                me.drawLayer = new ol.layer.Vector({
+                    source: new ol.source.Vector({
+                        features: new ol.Collection()
+                    })
+                });
+
+                // apply any draw style set from the view
+                var drawStyle = view.getDrawLayerStyle();
+                if (drawStyle) {
+                    me.drawLayer.setStyle(drawStyle);
+                }
+                me.map.addLayer(me.drawLayer);
+            }
+        }
+
+        // create a result layer unless one has already been set
+        if (!me.resultLayer) {
+            if (view.resultLayer) {
+                me.resultLayer = view.resultLayer;
+            } else {
+                me.resultLayer = new ol.layer.Vector({
+                    name: &#39;resultLayer&#39;,
+                    source: new ol.source.Vector({
+                        features: new ol.Collection()
+                    }),
+                    style: view.getResultLayerStyle()
+                });
+                me.map.addLayer(me.resultLayer);
+            }
+        }
+
+        me.setDrawInteraction(me.drawLayer);
+        me.setModifyInteraction(me.drawLayer);
+        me.setPointerInteraction();
+        me.setSnapInteraction(me.drawLayer);
+
+        if (pressed) {
+            me.drawInteraction.setActive(true);
+            if (type !== &#39;Circle&#39;) {
+                me.modifyInteraction.setActive(true);
+                me.snapVertexInteraction.setActive(true);
+                me.snapEdgeInteraction.setActive(true);
+            }
+            if (type === &#39;Point&#39;) {
+                me.pointerInteraction.setActive(true);
+                me.drawLayer.setVisible(true);
+            }
+            me.map.getViewport().addEventListener(&#39;contextmenu&#39;, me.contextHandler);
+        } else {
+            me.drawInteraction.setActive(false);
+            if (type !== &#39;Circle&#39;) {
+                me.modifyInteraction.setActive(false);
+                me.snapVertexInteraction.setActive(false);
+                me.snapEdgeInteraction.setActive(false);
+            }
+            if (type === &#39;Point&#39;) {
+                me.pointerInteraction.setActive(false);
+                // hide/show the draw layer based on if the tool is active
+                // but leave circle/polygon features visible
+                me.drawLayer.setVisible(false);
+            }
+            if (type === &#39;Circle&#39; &amp;&amp; me.circleToolbar != null) {
+                me.removeCircleSelectToolbar();
+            }
+            me.map.getViewport().removeEventListener(&#39;contextmenu&#39;, me.contextHandler);
+
+            if (me.getView().getResetOnToggle()) {
+                me.drawLayer.getSource().clear();
+                me.clearActiveGroup();
+                // reset context menu entries
+                me.activeGroupIdx = 0;
+                me.contextMenuGroupsCounter = 0;
+            }
+        }
+    },
+
+<span id='CpsiMapview-controller-button-DigitizeButtonController-method-blockEventHandling'>    blockEventHandling: function () {
+</span>        var me = this;
+
+        me.blockedEventHandling = true;
+
+        setTimeout(function () {
+            me.blockedEventHandling = false;
+        }, 300);
+    },
+
+<span id='CpsiMapview-controller-button-DigitizeButtonController-method-getRadioGroupItem'>    /**
+</span>     * Returns an Ext.form.field.Radio for the context menu
+     * @param {number} idx The index that is used as value and label of the radio
+     * @param {boolean} checked Boolean indicating if the radio shall be checked
+     * @returns {object} An config object to create an Ext.form.field.Radio
+     */
+    getRadioGroupItem: function (idx, checked) {
+        return {
+            boxLabel: &#39;Group &#39; + (idx + 1).toString(),
+            name: &#39;radiobutton&#39;,
+            inputValue: idx,
+            checked: checked
+        };
+    },
+
+<span id='CpsiMapview-controller-button-DigitizeButtonController-method-showContextMenu'>    /**
+</span>     * Method shows the context menu on mouse right click
+     * @param {Event} evt The browser event
+     */
+    showContextMenu: function (evt) {
+        // suppress default browser behaviour
+        evt.preventDefault();
+
+        var me = this.scope;
+        var view = me.getView();
+
+        var radioGroupItems = [];
+        if (me.contextMenuGroupsCounter === 0) {
+            radioGroupItems.push(me.getRadioGroupItem(0, true));
+        } else {
+            for (var i = 0; i &lt;= me.contextMenuGroupsCounter; i++) {
+                radioGroupItems.push(me.getRadioGroupItem(i, me.activeGroupIdx === i));
+            }
+        }
+
+        var menuItems;
+        if (view.getGroups()) {
+            menuItems = [
+                {
+                    text: &#39;Start new Group&#39;,
+                    handler: function () {
+                        me.contextMenuGroupsCounter++;
+                        me.activeGroupIdx = me.contextMenuGroupsCounter;
+                    }
+                }, {
+                    text: &#39;Active Group&#39;,
+                    menu: {
+                        name: &#39;active-group-submenu&#39;,
+                        items: [{
+                            xtype: &#39;radiogroup&#39;,
+                            columns: 1,
+                            vertical: true,
+                            items: radioGroupItems,
+                            listeners: {
+                                &#39;change&#39;: function (radioGroup, newVal) {
+                                    me.activeGroupIdx = newVal.radiobutton;
+                                    me.updateDrawSource();
+                                }
+                            }
+                        }]
+                    }
+                }, {
+                    text: &#39;Clear Active Group&#39;,
+                    handler: function () {
+                        me.clearActiveGroup(me.activeGroupIdx);
+                    }
+                }
+            ];
+        } else {
+            menuItems = [{
+                text: &#39;Clear All&#39;,
+                handler: function () {
+                    me.drawLayer.getSource().clear();
+                    me.clearActiveGroup(me.activeGroupIdx);
+                }
+            }];
+        }
+
+        var menu = Ext.create(&#39;Ext.menu.Menu&#39;, {
+            width: 100,
+            plain: true,
+            renderTo: Ext.getBody(),
+            items: menuItems
+        });
+        menu.showAt(evt.pageX, evt.pageY);
+    },
+
+<span id='CpsiMapview-controller-button-DigitizeButtonController-method-getActiveGroupFeatures'>    /**
+</span>     * Returns all features in the active group from the result layer
+     * @returns {ol.Feature[]}
+     */
+    getActiveGroupFeatures: function () {
+        var me = this;
+        return this.resultLayer.getSource().getFeatures()
+            .filter(function (feature) {
+                return feature.get(&#39;group&#39;) === me.activeGroupIdx;
+            });
+    },
+
+<span id='CpsiMapview-controller-button-DigitizeButtonController-method-getSolverPoints'>    /**
+</span>     * Returns only the solver points from the result layer in correct order
+     * @returns {ol.Feature[]}
+     */
+    getSolverPoints: function () {
+        return this.getActiveGroupFeatures()
+            .filter(function (feature) {
+                return feature.getGeometry() instanceof ol.geom.Point;
+            })
+            .sort(function (a, b) {
+                return a.get(&#39;index&#39;) - b.get(&#39;index&#39;);
+            });
+    },
+
+<span id='CpsiMapview-controller-button-DigitizeButtonController-method-handleLocalDrawEnd'>    /**
+</span>    * Handles the drawend event when using the feature to draw features that don&#39;t require
+    * sending or returning any data from a back-end service
+    * @param {ol.interaction.Draw.Event} evt The OpenLayers draw event containing the features
+    */
+    handleLocalDrawEnd: function () {
+        var me = this;
+
+        var drawSource = me.drawLayer.getSource();
+        // clear all previous features so only the last drawn feature remains
+        drawSource.clear();
+    },
+
+<span id='CpsiMapview-controller-button-DigitizeButtonController-method-handleDrawEnd'>    /**
+</span>     * Handles the drawend event and gets the netsolver result which is passed to `handleFinalResult`
+     * @param {ol.interaction.Draw.Event} evt The OpenLayers draw event containing the features
+     */
+    handleDrawEnd: function (evt) {
+        var me = this;
+        var view = me.getView();
+        var resultPromise;
+
+        me.blockEventHandling();
+
+        switch (view.getType()) {
+            case &#39;Point&#39;:
+                var points = me.getSolverPoints();
+                resultPromise = me.getNetByPoints(points.concat([evt.feature]));
+                break;
+            case &#39;Polygon&#39;:
+                resultPromise = me.getNetByPolygon(evt.feature);
+                break;
+            case &#39;Circle&#39;:
+                resultPromise = me.getNetByCircle(evt.feature);
+                break;
+            default:
+                BasiGX.warn(&#39;Please implement your custom handler here for &#39; + view.getType());
+                return;
+        }
+
+        resultPromise
+            .then(me.handleFinalResult.bind(me))
+            .then(me.updateDrawSource.bind(me));
+    },
+
+
+<span id='CpsiMapview-controller-button-DigitizeButtonController-method-handleModifyEnd'>    /**
+</span>     * Handles the modifyend event and gets the netsolver result which is passed to `handleFinalResult`
+     * @param {ol.interaction.Modify.Event} evt The OpenLayers modify event containing the features
+     */
+    handleModifyEnd: function (evt) {
+        var me = this;
+        var view = me.getView();
+        var resultPromise;
+
+        me.blockEventHandling();
+
+        switch (view.getType()) {
+            case &#39;Point&#39;:
+                // find modified feature
+                var drawFeature = me.map.getFeaturesAtPixel(evt.mapBrowserEvent.pixel, {
+                    layerFilter: function (layer) {
+                        return layer === me.drawLayer;
+                    }
+                })[0];
+
+                var index = drawFeature.get(&#39;index&#39;);
+                var points = me.getSolverPoints();
+
+                if (index === points.length - 1) {
+                    points.splice(index, 1, drawFeature);
+                    resultPromise = me.getNetByPoints(points);
+                } else {
+                    // we first get the corrected point from the netsolver and then recalculate the whole path
+                    resultPromise = me.getNetByPoints([drawFeature])
+                        .then(function (features) {
+                            if (features) {
+                                var newFeature = features[0];
+                                newFeature.set(&#39;index&#39;, index);
+                                points.splice(index, 1, newFeature);
+                                return me.getNetByPoints(points);
+                            }
+                        });
+                }
+
+                break;
+            case &#39;Polygon&#39;:
+                resultPromise = me.getNetByPolygon(evt.features.getArray()[0]);
+                break;
+        }
+
+        resultPromise
+            .then(me.handleFinalResult.bind(me))
+            .then(me.updateDrawSource.bind(me));
+    },
+
+<span id='CpsiMapview-controller-button-DigitizeButtonController-method-handlePointDelete'>    /**
+</span>     * Handles a click registered by the pointer interaction if the deleteCondition is met.
+     * If it returns false all other interaction at this point are ignored
+     * @param {ol.MapBrowserEvent} evt
+     */
+    handlePointDelete: function (evt) {
+        var me = this;
+
+        var features = me.map.getFeaturesAtPixel(evt.pixel, {
+            layerFilter: function (layer) {
+                return layer === me.drawLayer;
+            }
+        });
+        if (features.length &gt; 0) {
+            me.blockEventHandling();
+
+            var drawFeature = features[0];
+
+            var points = me.getSolverPoints();
+            points.splice(drawFeature.get(&#39;index&#39;), 1);
+
+            if (Ext.isEmpty(points)) {
+                me.handleFinalResult([]);
+                me.updateDrawSource();
+            } else {
+                me.getNetByPoints(points)
+                    .then(me.handleFinalResult.bind(me))
+                    .then(me.updateDrawSource.bind(me));
+            }
+
+            return false;
+        } else {
+            return true;
+        }
+    },
+
+<span id='CpsiMapview-controller-button-DigitizeButtonController-method-handlePointClick'>    /**
+</span>     * Handles the click registered by the pointer interaction.
+     * If it returns false all other interaction at this point are ignored
+     * @param {ol.MapBrowserEvent} evt
+     */
+    handlePointClick: function (evt) {
+        var me = this;
+
+        var features = me.map.getFeaturesAtPixel(evt.pixel, {
+            layerFilter: function (layer) {
+                return layer === me.drawLayer;
+            }
+        });
+
+        var points = me.getSolverPoints();
+
+        if (features.length &gt; 0 &amp;&amp; features[0] !== points[points.length - 1]) {
+
+            // for pointerdown and pointerup events we simply want to return
+            // we only want to create a new point on a user click
+            if (evt.type !== &#39;singleclick&#39;) {
+                return true;
+            }
+
+            me.blockEventHandling();
+
+            // to allow loops to be created we need to allow users to click on the
+            // start point to add a duplicate end point
+
+            me.getNetByPoints(points.concat([features[0]]))
+                .then(me.handleFinalResult.bind(me))
+                .then(me.updateDrawSource.bind(me));
+
+            return false;
+        } else {
+            // allow edges to be selected by clicking on them
+            // by temporarily setting a blockedEventHandling flag
+            var hasEdge = me.map.hasFeatureAtPixel(evt.pixel, {
+                layerFilter: function (layer) {
+                    return layer === me.resultLayer;
+                }
+            });
+            if (hasEdge) {
+                me.blockEventHandling();
+            }
+            return !hasEdge;
+        }
+    },
+
+<span id='CpsiMapview-controller-button-DigitizeButtonController-method-handleCircleDrawEnd'>    /**
+</span>     * Handles the draw end event of the circle type by getting the feature and passing it
+     * to the CircleSelection component
+     * @param {DrawEvent} evt The OpenLayers draw event containing the features
+     */
+    handleCircleDrawEnd: function (evt) {
+        var me = this;
+        me.blockEventHandling();
+        // deactivate the creation of another circle
+        me.drawInteraction.setActive(false);
+        me.circleToolbar = Ext.create(&#39;CpsiMapview.view.toolbar.CircleSelectionToolbar&#39;, {
+            feature: evt.feature,
+        });
+        me.circleToolbar.getController().on({
+            circleSelectApply: me.onCircleSelectApply,
+            circleSelectCancel: me.onCircleSelectCancel,
+            scope: me
+        });
+        me.circleToolbarParent.addDocked(me.circleToolbar);
+    },
+
+<span id='CpsiMapview-controller-button-DigitizeButtonController-method-onCircleSelectApply'>    /**
+</span>     * Handles the `apply` event of the CircleSelection by passing the created circle
+     * to the `handleDrawEnd` function. Also handles the cleanup of the CircleSelection toolbar
+     * and enables the drawing interaction
+     * @param {ol.Feature} feat
+     */
+    onCircleSelectApply: function (feat) {
+        var me = this;
+        var evt = { feature: feat };
+        me.handleDrawEnd(evt);
+        me.removeCircleSelectToolbar();
+        me.drawInteraction.setActive(true);
+    },
+
+<span id='CpsiMapview-controller-button-DigitizeButtonController-method-onCircleSelectCancel'>    /**
+</span>     * Handles the `cancel` event of the CircleSelection by cleaning up the CircleSelection toolbar
+     * and enabling the drawing interaction
+     */
+    onCircleSelectCancel: function () {
+        var me = this;
+        me.drawLayer.getSource().clear();
+        me.removeCircleSelectToolbar();
+        me.drawInteraction.setActive(true);
+    },
+
+<span id='CpsiMapview-controller-button-DigitizeButtonController-method-removeCircleSelectToolbar'>    /**
+</span>     * Handles the removal of the CircleSelect toolbar
+     */
+    removeCircleSelectToolbar: function () {
+        var me = this;
+        me.circleToolbarParent.removeDocked(me.circleToolbar);
+        me.circleToolbar = null;
+    },
+
+<span id='CpsiMapview-controller-button-DigitizeButtonController-method-getNetByPoints'>    /**
+</span>     * Asynchronously gets a path between the given points from the netsolver.
+     * @param {ol.Feature[]} features Expects the features in the correct order for solving. The coordinates of the last
+     *      feature will get corrected by the netsolver. The other coordinates need to be valid coordinates for the
+     *      netsolver (i.e. already corrected points)
+     * @returns {Ext.Promise&lt;ol.Feature[]|undefined&gt;}
+     */
+    getNetByPoints: function (features) {
+        var me = this;
+        var view = me.getView();
+        var format = new ol.format.GeoJSON({
+            dataProjection: me.map.getView().getProjection().getCode()
+        });
+        var jsonParams, searchParams;
+
+        features.forEach(function (feature, index) {
+            feature.set(&#39;index&#39;, index);
+        });
+
+        // The Netsolver endpoint expects bbox to be sent within a request.
+        // The lower left and upper right coordinates cannot be the same so
+        // we have to apply a small buffer on the point geometry to get a
+        // small bbox around the clicked point.
+        if (view.getPointExtentBuffer()) {
+            jsonParams = format.writeFeatures(features.slice(0, -1));
+            var extent = features[features.length - 1].getGeometry().getExtent();
+            var buffered = ol.extent.buffer(extent, view.getPointExtentBuffer());
+            searchParams = &#39;bbox=&#39; + encodeURIComponent(buffered.join(&#39;,&#39;));
+        } else {
+            jsonParams = format.writeFeatures(features);
+        }
+
+        return me.doAjaxRequest(jsonParams, searchParams)
+            .then(me.parseNetsolverResponse.bind(me));
+    },
+
+<span id='CpsiMapview-controller-button-DigitizeButtonController-method-getNetByPolygon'>    /**
+</span>     * Asynchronously gets all lines inside the given polygon from the netsolver
+     * @param {ol.Feature} feat
+     * @returns {Ext.Promise&lt;ol.Feature[]|undefined&gt;}
+     */
+    getNetByPolygon: function (feat) {
+        var me = this;
+        var format = new ol.format.GeoJSON({
+            dataProjection: me.map.getView().getProjection().getCode()
+        });
+        var geoJson = format.writeFeature(feat);
+        var jsonParams = {
+            geometry3857: Ext.JSON.decode(geoJson).geometry
+        };
+        return me.doAjaxRequest(jsonParams)
+            .then(me.parseNetsolverResponse.bind(me));
+    },
+
+<span id='CpsiMapview-controller-button-DigitizeButtonController-method-getNetByCircle'>    /**
+</span>     * Asynchronously gets all lines inside the given circle from the netsolver
+     * @param {ol.Feature} feat
+     * @returns {Ext.Promise&lt;ol.Feature[]|undefined&gt;}
+     */
+    getNetByCircle: function (feat) {
+        // ol circle objects consist of a center coordinate and a radius in the
+        // unit of the projection. In order to convert it into a geoJSON, we have
+        // to convert the circle to a polygon first.
+        var circleAsPolygon = new ol.geom.Polygon.fromCircle(feat.getGeometry());
+        var polygonAsFeature = new ol.Feature({ geometry: circleAsPolygon });
+
+        return this.getNetByPolygon(polygonAsFeature);
+    },
+
+<span id='CpsiMapview-controller-button-DigitizeButtonController-method-parseNetsolverResponse'>    /**
+</span>     * Parses the netsolver result to openlayers features
+     * @param {XMLHttpRequest} response
+     * @returns {ol.Feature[]}
+     */
+    parseNetsolverResponse: function (response) {
+        if (response) {
+            var me = this;
+            var format = new ol.format.GeoJSON();
+            var json;
+
+            if (!Ext.isEmpty(response.responseText)) {
+                try {
+                    json = Ext.decode(response.responseText);
+                } catch (e) {
+                    BasiGX.error(&#39;Could not parse the response: &#39; +
+                        response.responseText);
+                    return;
+                }
+                if (json.success &amp;&amp; json.data &amp;&amp; json.data.features) {
+                    var features = json.data.features;
+
+                    return features.map(function (feat) {
+                        // api will respond with non unique ids, which
+                        // will collide with OpenLayers feature ids not
+                        // being unique. That&#39;s why we delete it here.
+                        delete feat.id;
+                        // set the current active group as property
+                        feat.properties.group = me.activeGroupIdx;
+                        return format.readFeature(feat);
+                    });
+                } else {
+                    BasiGX.error(&#39;Could not find features in the response: &#39; +
+                        (json.message ? json.message : JSON.stringify(json)));
+                }
+            } else {
+                BasiGX.error(&#39;Response was empty&#39;);
+            }
+        }
+    },
+
+<span id='CpsiMapview-controller-button-DigitizeButtonController-method-doAjaxRequest'>    /**
+</span>     * Issues an Ext.Ajax.request against the configured endpoint with
+     * the given params.
+     * @param {object} jsonParams Object containing the params to send
+     * @param {string} searchParams The serarchParams which will be
+     *   appended to the request url
+     * @returns {Ext.request.Base}
+     */
+    doAjaxRequest: function (jsonParams, searchParams) {
+        var me = this;
+        var mapComponent = me.mapComponent || BasiGX.util.Map.getMapComponent();
+        var view = me.getView();
+        var url = view.getApiUrl();
+
+        if (!url) {
+            return;
+        }
+
+        if (searchParams) {
+            url = Ext.urlAppend(url, searchParams);
+        }
+
+        mapComponent.setLoading(true);
+
+        return new Ext.Promise(function (resolve) {
+            Ext.Ajax.request({
+                url: url,
+                method: &#39;POST&#39;,
+                jsonData: jsonParams,
+                success: function (response) {
+                    mapComponent.setLoading(false);
+                    resolve(response);
+                },
+                failure: function (response) {
+                    mapComponent.setLoading(false);
+
+                    if (response.aborted !== true) {
+                        var errorMessage = &#39;Error while requesting the API endpoint&#39;;
+
+                        if (response.responseText &amp;&amp; response.responseText.message) {
+                            errorMessage += &#39;: &#39; + response.responseText.message;
+                        }
+
+                        BasiGX.error(errorMessage);
+                    }
+                }
+            });
+        });
+    },
+
+<span id='CpsiMapview-controller-button-DigitizeButtonController-method-updateDrawSource'>    updateDrawSource: function () {
+</span>        var me = this;
+        var view = me.getView();
+
+        var drawSource = me.drawLayer.getSource();
+        var type = view.getType();
+
+        if (type === &#39;Point&#39;) {
+            drawSource.clear();
+
+            var drawFeatures = this.getSolverPoints()
+                .map(function (feature) {
+                    return feature.clone();
+                });
+            drawSource.addFeatures(drawFeatures);
+        } else if (type === &#39;Polygon&#39; || type === &#39;Circle&#39;) {
+            if (drawSource.getFeatures().length &gt; 1) {
+                // keep the last drawn feature and remove the oldest one
+                // it seems that the a half-completed draw polygon can consist of multiple features
+                drawSource.removeFeature(drawSource.getFeatures()[0]);
+            }
+        }
+    },
+
+<span id='CpsiMapview-controller-button-DigitizeButtonController-method-getResultGeometryLength'>    /***
+</span>     * Get the total length of all features in the results layer
+     * If a feature does not have a length property it will be assumed to
+     * have a length of 0 (for example points)
+     * */
+    getResultGeometryLength: function () {
+
+        var me = this;
+        var allFeatures = me.resultLayer.getSource().getFeatures();
+        var resultLength = 0;
+
+        Ext.each(allFeatures, function (f) {
+            if (f.get(&#39;group&#39;) === me.activeGroupIdx) {
+                resultLength += f.get(&#39;length&#39;) ? f.get(&#39;length&#39;) : 0;
+            }
+        });
+
+        return resultLength;
+    },
+
+<span id='CpsiMapview-controller-button-DigitizeButtonController-method-handleFinalResult'>    /**
+</span>     * Handles the final result from netsolver.
+     * Features will get set a new property `group` in order
+     * to maintain their membership to the current selected group.
+     * A responseFeatures event is fired.
+     * @param {undefined|ol.Feature[]} features The features returned from the API.
+     */
+    handleFinalResult: function (features) {
+        if (features) {
+            var me = this;
+
+            var originalSolverPoints = me.getSolverPoints();
+            var originalLength = me.getResultGeometryLength();
+
+            // get the original solver points before they are removed
+            var resultSource = me.resultLayer.getSource();
+            // remove all features from the current active group
+            var allFeatures = me.resultLayer.getSource().getFeatures().slice(0);
+            Ext.each(allFeatures, function (f) {
+                if (f.get(&#39;group&#39;) === me.activeGroupIdx) {
+                    resultSource.removeFeature(f);
+                }
+            });
+            // add the new features for the current active group
+            resultSource.addFeatures(features);
+
+            // now get the new solver points once they have been added
+            var newSolverPoints = me.getSolverPoints();
+            var newLength = 0;
+
+            Ext.each(features, function (f) {
+                newLength += f.get(&#39;length&#39;) ? f.get(&#39;length&#39;) : 0;
+            });
+
+            var modifications = {
+                originalLength: originalLength,
+                newLength: newLength,
+                originalSolverPoints: originalSolverPoints,
+                newSolverPoints: newSolverPoints
+            };
+
+            // fire a custom event from the source so a listener can be added once
+            // all features have been added/removed
+            // the event object includes a custom modifications object containing
+            // details of before and after the solve
+            resultSource.dispatchEvent({ type: &#39;featuresupdated&#39;, modifications: modifications });
+
+            // The response from the API, parsed as OpenLayers features, will be
+            // fired here and the event can be used application-wide to access
+            // and handle the feature response.
+            me.getView().fireEvent(&#39;responseFeatures&#39;, features);
+        }
+    },
+
+<span id='CpsiMapview-controller-button-DigitizeButtonController-method-onBeforeDestroy'>    /**
+</span>     * Remove the interaction when this component gets destroyed
+     */
+    onBeforeDestroy: function () {
+
+        var me = this;
+        var btn = me.getView();
+
+        // detoggle button
+        me.onToggle(btn, false);
+
+        if (me.drawInteraction) {
+            me.map.removeInteraction(me.drawInteraction);
+        }
+
+        if (me.modifyInteraction) {
+            me.map.removeInteraction(me.modifyInteraction);
+        }
+
+        if (me.pointerInteraction) {
+            me.map.removeInteraction(me.pointerInteraction);
+        }
+
+        if (me.snapVertexInteraction) {
+            me.map.removeInteraction(me.snapVertexInteraction);
+        }
+
+        if (me.snapEdgeInteraction) {
+            me.map.removeInteraction(me.snapEdgeInteraction);
+        }
+
+        if (me.drawLayer) {
+            me.map.removeLayer(me.drawLayer);
+        }
+
+        if (me.resultLayer) {
+            me.map.removeLayer(me.resultLayer);
+        }
+
+        if (me.circleToolbar) {
+            me.circleToolbar.destroy();
+        }
+
+    },
+
+<span id='CpsiMapview-controller-button-DigitizeButtonController-method-zoomToFeatures'>    /**
+</span>     * Zooms the map to the extent of the clicked feature
+     * Method may be removed as its actually a showcase, like `onResponseFeatures`
+     */
+    zoomToFeatures: function (grid, td, index, rec) {
+        var me = this;
+        var extent = rec.olObject.getGeometry().getExtent();
+        me.map.getView().fit(extent, {
+            size: me.map.getSize(),
+            padding: [5, 5, 5, 5]
+        });
+    },
+
+<span id='CpsiMapview-controller-button-DigitizeButtonController-method-onResponseFeatures'>    /**
+</span>     * Showcasing the handling of the response features by adding them
+     * to an `GeoExt.data.store.Features` and showing them in a grid.
+     * Method may be removed as its actually a showcase, like `zoomToFeatures`
+     */
+    onResponseFeatures: function () {
+        // the code below is just a show case representing how the response
+        // features can be used within a feature grid.
+        var me = this;
+
+        var featStore = Ext.create(&#39;GeoExt.data.store.Features&#39;, {
+            layer: this.resultLayer,
+            map: me.map
+        });
+
+        featStore.filterBy(function (rec) {
+            return rec.get(&#39;geometry&#39;).getType() !== &#39;Point&#39;;
+        });
+
+        var view = me.getView();
+        var selectStyle = view.getResultLayerSelectStyle();
+
+        if (me.win) {
+            me.win.destroy();
+        }
+        me.win = Ext.create(&#39;CpsiMapview.view.window.MinimizableWindow&#39;, {
+            height: 500,
+            width: 300,
+            layout: &#39;fit&#39;,
+            title: &#39;Your data&#39;,
+            name: &#39;gridwin&#39;,
+            items: [{
+                xtype: &#39;grid&#39;,
+                store: featStore,
+                selModel: {
+                    type: &#39;featurerowmodel&#39;,
+                    mode: &#39;MULTI&#39;,
+                    allowDeselect: true,
+                    mapSelection: true,
+                    selectStyle: selectStyle,
+                    map: me.map
+                },
+                columns: [{
+                    xtype: &#39;widgetcolumn&#39;,
+                    width: 40,
+                    widget: {
+                        xtype: &#39;gx_renderer&#39;
+                    },
+                    onWidgetAttach: function (column, gxRenderer, record) {
+                        // update the symbolizer with the related feature
+                        var featureRenderer = GeoExt.component.FeatureRenderer;
+                        var feature = record.getFeature();
+                        gxRenderer.update({
+                            feature: feature,
+                            symbolizers: featureRenderer.determineStyle(record)
+                        });
+                    }
+                }, {
+                    text: &#39;ID&#39;,
+                    dataIndex: &#39;segmentId&#39;,
+                    flex: 1
+                }, {
+                    text: &#39;Code&#39;,
+                    dataIndex: &#39;segmentCode&#39;,
+                    flex: 1
+                }, {
+                    text: &#39;Length&#39;,
+                    dataIndex: &#39;segmentLength&#39;,
+                    flex: 1,
+                    renderer: function (val) {
+                        return Ext.String.format(
+                            &#39;{0} m&#39;,
+                            val.toFixed(0).toString()
+                        );
+                    }
+                }]
+            }]
+        });
+        me.win.showAt(100, 100);
+    },
+
+<span id='CpsiMapview-controller-button-DigitizeButtonController-method-clearActiveGroup'>    /**
+</span>     * Clears all features of the active group from the result source
+     * and fire a custom featuresupdated event
+     * If no activeGroupIdx is supplied then all features are removed from the
+     * resultLayer
+     */
+    clearActiveGroup: function (activeGroupIdx) {
+        var me = this;
+        var view = me.getView();
+
+        if (!me.resultLayer) {
+            // no results have been returned so nothing to clear
+            return;
+        }
+
+        var originalSolverPoints = me.getSolverPoints();
+        var originalLength = me.getResultGeometryLength();
+
+        var resultSource = me.resultLayer.getSource();
+
+        if (view.getGroups() === true) {
+            resultSource.getFeatures()
+                .slice(0)
+                .filter(function (feature) {
+                    return feature.get(&#39;group&#39;) === activeGroupIdx;
+                })
+                .forEach(function (feature) {
+                    resultSource.removeFeature(feature);
+                });
+        } else {
+            // remove all features
+            resultSource.clear();
+        }
+
+        var modifications = {
+            originalLength: originalLength,
+            newLength: 0,
+            originalSolverPoints: originalSolverPoints,
+            newSolverPoints: []
+        };
+
+        resultSource.dispatchEvent({ type: &#39;featuresupdated&#39;, modifications: modifications });
+        this.updateDrawSource();
+    },
+
+<span id='CpsiMapview-controller-button-DigitizeButtonController-method-init'>    init: function () {
+</span>
+        var me = this;
+
+        // create an object for the contextmenu eventhandler
+        // so it can be removed correctly
+        me.contextHandler = {
+            handleEvent: me.showContextMenu,
+            scope: me
+        };
+    }
+});
+</pre>
+</body>
+</html>

@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+  <title>The source code</title>
+  <link href="../resources/prettify/prettify.css" type="text/css" rel="stylesheet" />
+  <script type="text/javascript" src="../resources/prettify/prettify.js"></script>
+  <style type="text/css">
+    .highlight { display: block; background-color: #ddd; }
+  </style>
+  <script type="text/javascript">
+    function highlight() {
+      document.getElementById(location.hash.replace(/#/, "")).className = "highlight";
+    }
+  </script>
+</head>
+<body onload="prettyPrint(); highlight();">
+  <pre class="prettyprint lang-js"><span id='CpsiMapview-util-Style'>/**
+</span> * Util class for style related functions.
+ *
+ * @class CpsiMapview.util.Style
+ */
+Ext.define(&#39;CpsiMapview.util.Style&#39;, {
+    alternateClassName: &#39;StyleUtil&#39;,
+    requires: [],
+
+    singleton: true,
+
+<span id='CpsiMapview-util-Style-method-getLayerStyleLabel'>    /**
+</span>     * Returns the human readable label for the given layer style.
+     * If WFS or VT we remove the &#39;_&#39; and the .xml file ending. For other layer
+     * types we return the input value.
+     *
+     * @param  {String} layerStyle The style name to get the label for
+     * @param  {ol.layer.Base} layer The layer to get style label for
+     * @return {String} Human readable label
+     */
+    getLayerStyleLabel: function (layerStyle, layer) {
+        if (layer.get(&#39;isWfs&#39;) || layer.get(&#39;isVt&#39;)) {
+            // remove _ and the .xml file ending
+            var legendUtil = CpsiMapview.util.Legend;
+            return legendUtil.getWmsStyleFromSldFile(layerStyle);
+        } else {
+            return layerStyle;
+        }
+    },
+
+<span id='CpsiMapview-util-Style-method-getLayerStyleTitle'>    /**
+</span>     * Returns the human readable title for the given layer style.
+     * Either the explicit title property of the style config or the derived
+     * style label (by #getLayerStyleLabel) is returned.
+     *
+     * @param  {String} layerStyle The style name to get the title for
+     * @param  {ol.layer.Base} layer The layer to get style title for
+     * @return {String}            Human readable title
+     */
+    getLayerStyleTitle: function (layerStyleName, layer) {
+        var me = CpsiMapview.util.Style;
+        var layerStyles = layer.get(&#39;styles&#39;);
+        var layerTitle = null;
+
+        Ext.each(layerStyles, function (layerStyle) {
+            // get the relevant style definition
+            if (layerStyle === layerStyleName ||
+                layerStyle.name === layerStyleName) {
+                if (layerStyle[&#39;title&#39;] &amp;&amp; layerStyle[&#39;name&#39;]) {
+                    // has title property
+                    layerTitle = layerStyle[&#39;title&#39;];
+                } else {
+                    // does not have title property
+                    // title generated from style name
+                    layerTitle = me.getLayerStyleLabel(layerStyle, layer);
+                }
+            }
+        });
+
+        return layerTitle;
+    },
+
+<span id='CpsiMapview-util-Style-method-createClusterStyle'>    /**
+</span>     * Create a point style for clustered features
+     * @param {any} featCount the number of features in the clustered feature
+     */
+    createClusterStyle: function (featCount) {
+        return new ol.style.Style({
+            image: new ol.style.Circle({
+                radius: 10,
+                stroke: new ol.style.Stroke({
+                    color: &#39;#fff&#39;
+                }),
+                fill: new ol.style.Fill({
+                    color: &#39;#3399CC&#39;
+                })
+            }),
+            text: new ol.style.Text({
+                text: featCount.toString(),
+                fill: new ol.style.Fill({
+                    color: &#39;#fff&#39;
+                })
+            })
+        });
+    }
+});
+</pre>
+</body>
+</html>

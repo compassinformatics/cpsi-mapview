@@ -1,0 +1,254 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+  <title>The source code</title>
+  <link href="../resources/prettify/prettify.css" type="text/css" rel="stylesheet" />
+  <script type="text/javascript" src="../resources/prettify/prettify.js"></script>
+  <style type="text/css">
+    .highlight { display: block; background-color: #ddd; }
+  </style>
+  <script type="text/javascript">
+    function highlight() {
+      document.getElementById(location.hash.replace(/#/, "")).className = "highlight";
+    }
+  </script>
+</head>
+<body onload="prettyPrint(); highlight();">
+  <pre class="prettyprint lang-js"><span id='CpsiMapview-controller-button-FeatureSelectionButtonController'>/**
+</span>* This class is the controller for the button &#39;FeatureSelectionButton&#39;
+ */
+Ext.define(&#39;CpsiMapview.controller.button.FeatureSelectionButtonController&#39;, {
+    extend: &#39;Ext.app.ViewController&#39;,
+
+    alias: &#39;controller.cmv_feature_selection_btn&#39;,
+
+    requires: [&#39;Ext.window.Toast&#39;],
+
+<span id='CpsiMapview-controller-button-FeatureSelectionButtonController-cfg-map'>    /**
+</span>    * The OpenLayers map. If not given, will be auto-detected.
+    * @cfg
+    */
+    map: null,
+
+<span id='CpsiMapview-controller-button-FeatureSelectionButtonController-property-modeSelector'>    /**
+</span>     * The selector UI for the #filterMode. Created in #onBtnToggle.
+     * @property
+     * @readonly
+     */
+    modeSelector: null,
+
+<span id='CpsiMapview-controller-button-FeatureSelectionButtonController-property-filterMode'>    /**
+</span>     * The filter mode (set by the user via #modeSelector UI).
+     * @property
+     * @readonly
+     */
+    filterMode: &#39;ADD_TO_SELECTION&#39;, // ADD_TO_SELECTION or NEW_SELECTION
+
+<span id='CpsiMapview-controller-button-FeatureSelectionButtonController-property-fidsToFilter'>    /**
+</span>     * The feature IDs (FIDs) used for filtering.
+     * @property
+     * @readonly
+     */
+    fidsToFilter: [],
+
+<span id='CpsiMapview-controller-button-FeatureSelectionButtonController-method-constructor'>    constructor: function () {
+</span>        var me = this;
+        me.onMapClick = me.onMapClick.bind(me);
+        me.callParent(arguments);
+    },
+
+<span id='CpsiMapview-controller-button-FeatureSelectionButtonController-method-init'>    init: function () {
+</span>        var me = this;
+        var ownerGrid = this.getView().up(&#39;grid&#39;);
+        if (ownerGrid) {
+            // reset FIDs if grid clears its filters
+            ownerGrid.on(&#39;cmv-clear-filters&#39;, function() {
+                me.fidsToFilter = [];
+            });
+        }
+    },
+
+<span id='CpsiMapview-controller-button-FeatureSelectionButtonController-method-onBtnToggle'>    /**
+</span>     * Activates this tool.
+     * Adds a click handler to the map and tries to detect the IDs of the
+     * clicked features. Builds a filter object for the (&quot;where ID IN(1,2,3))
+     * and forwards it to the grid so it gets applied to the underlying WFS.
+     *
+     * @param {Ext.button.Button} btn The toggled button.
+     * @param {Boolean} pressed The toggle state.
+     */
+    onBtnToggle: function (btn, pressed) {
+        var me = this;
+        var view = me.getView();
+
+        if (view.map &amp;&amp; view.map instanceof ol.Map) {
+            me.map = view.map;
+        } else {
+            // guess map as fallback
+            me.map = BasiGX.util.Map.getMapComponent().map;
+        }
+
+        if (!view.queryLayer) {
+            me.findWfsLayer();
+        }
+
+        if (pressed) {
+            // create and show selector UI
+            me.addModeSelectorUi();
+            me.map.on(&#39;click&#39;, me.onMapClick);
+        } else {
+            me.modeSelector.hide();
+            me.map.un(&#39;click&#39;, me.onMapClick);
+        }
+
+    },
+
+<span id='CpsiMapview-controller-button-FeatureSelectionButtonController-method-addModeSelectorUi'>    /**
+</span>     * Adds the mode selector UI to the toolbar (if not existing) and shows it.
+     */
+    addModeSelectorUi: function () {
+        var me = this;
+
+        if (!me.modeSelector) {
+            me.modeSelector = Ext.create(&#39;Ext.button.Split&#39;, {
+                viewModel: me.getViewModel(),
+                bind: {
+                    text: &#39;{addToSelectionLabel}&#39;
+                },
+                hidden: true,
+                menu: new Ext.menu.Menu({
+                    items: [
+                        {
+                            bind: {
+                                text: &#39;{addToSelectionLabel}&#39;
+                            },
+                            handler: function (menu) {
+                                me.filterMode = &#39;ADD_TO_SELECTION&#39;;
+                                me.modeSelector.setText(menu.text);
+                            }
+                        },
+                        {
+                            bind: {
+                                text: &#39;{newSelectionLabel}&#39;
+                            },
+                            handler: function (menu) {
+                                me.filterMode = &#39;NEW_SELECTION&#39;;
+                                me.modeSelector.setText(menu.text);
+                            }
+                        },
+                    ]
+                })
+            });
+
+            var tb = me.getView().up(&#39;toolbar&#39;);
+            var segBtn = me.getView().up(&#39;segmentedbutton&#39;);
+            if (tb &amp;&amp; segBtn) {
+                var segBtnPos = tb.items.indexOf(segBtn);
+                var afterSegBtnPos = segBtnPos + 1;
+                tb.insert(afterSegBtnPos, me.modeSelector);
+            }
+        }
+
+        me.modeSelector.show();
+    },
+
+<span id='CpsiMapview-controller-button-FeatureSelectionButtonController-method-findWfsLayer'>    /**
+</span>     * Function to determine the WFS layer to connect the click handler if not
+     * yet defined.
+     */
+    findWfsLayer: function () {
+        var me = this;
+        var view = me.getView();
+
+        if (!view.queryLayer &amp;&amp; view.vectorLayerKey) {
+            view.queryLayer = BasiGX.util.Layer.getLayerBy(
+                &#39;layerKey&#39;, view.vectorLayerKey
+            );
+        }
+
+        if (!view.queryLayer) {
+            Ext.Logger.warn(&#39;No queryLayer found in the map for the FeaureSelectionButton with the name: &#39; + view.queryLayerName);
+        } else {
+            // save the ID property name for future use
+            me.idProperty = view.queryLayer.get(&#39;idProperty&#39;);
+        }
+
+    },
+
+<span id='CpsiMapview-controller-button-FeatureSelectionButtonController-method-onMapClick'>    /**
+</span>     * Handles map click for selection of features.
+     *
+     * @param {ol.MapBrowserEvent} evt The OL event
+     */
+    onMapClick: function (evt) {
+        var me = this;
+        var view = me.getView();
+
+        // clear FIDs to filter when we have a new selection
+        if (me.filterMode === &#39;NEW_SELECTION&#39;) {
+            me.fidsToFilter = [];
+        }
+
+        // collect all IDs of clicked features
+        var clickedFeatureIds = [];
+        me.map.forEachFeatureAtPixel(evt.pixel, function(feature, layer) {
+            // add check for correct layer
+            if (layer &amp;&amp; view.queryLayer &amp;&amp; (layer.id === view.queryLayer.id)) {
+
+                var source = view.queryLayer.getSource();
+                if (source instanceof ol.source.Cluster) {
+                    var origFeats = feature.get(&#39;features&#39;);
+                    if (Ext.isArray(origFeats)) {
+                        // add all sub-feature due to clustering
+                        Ext.each(origFeats, function (origFeat) {
+                            me.fidsToFilter.push(origFeat.get(me.idProperty));
+                            clickedFeatureIds.push(origFeat.get(me.idProperty));
+                        });
+                    }
+                } else {
+                    // &quot;normal&quot; layers without clustering
+                    me.fidsToFilter.push(feature.get(me.idProperty));
+                    clickedFeatureIds.push(feature.get(me.idProperty));
+                }
+            }
+        });
+
+        // inform that no feature was hit on the map
+        if (clickedFeatureIds.length === 0) {
+            if (view.showNoSelectionMessage) {
+                Ext.toast(&#39;No feature(s) at clicked position.&#39;, null, &#39;br&#39;);
+            }
+
+            view.fireEvent(&#39;cmv-no-feature-selected&#39;, view);
+            return;
+        }
+
+        // create ExtJS &quot;IN&quot; filter with unique values
+        var uniqueFids = Ext.Array.unique(me.fidsToFilter);
+        var extInFilter = new Ext.util.Filter({
+            property: me.idProperty,
+            value   : uniqueFids,
+            operator: &#39;in&#39;
+        });
+
+        if (me.filterMode === &#39;NEW_SELECTION&#39;) {
+            // removes all filters from grid without reloading WFS store
+            view.fireEvent(&#39;cmv-reset-grid-filters&#39;);
+        }
+        // sets the ID filter in the grid
+        view.fireEvent(&#39;cmv-id-filter-set&#39;, extInFilter);
+    },
+
+<span id='CpsiMapview-controller-button-FeatureSelectionButtonController-method-onBeforeDestroy'>    onBeforeDestroy: function () {
+</span>        var me = this;
+        var btn = me.getView();
+
+        // detoggle button
+        me.onBtnToggle(btn, false);
+    }
+
+});
+</pre>
+</body>
+</html>

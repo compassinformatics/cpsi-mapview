@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+  <title>The source code</title>
+  <link href="../resources/prettify/prettify.css" type="text/css" rel="stylesheet" />
+  <script type="text/javascript" src="../resources/prettify/prettify.js"></script>
+  <style type="text/css">
+    .highlight { display: block; background-color: #ddd; }
+  </style>
+  <script type="text/javascript">
+    function highlight() {
+      document.getElementById(location.hash.replace(/#/, "")).className = "highlight";
+    }
+  </script>
+</head>
+<body onload="prettyPrint(); highlight();">
+  <pre class="prettyprint lang-js">Ext.define(&#39;CpsiMapview.view.lineSliceGridExample.LineSliceGridButton&#39;, {
+    extend: &#39;Ext.button.Button&#39;,
+    xtype: &#39;cmv_line_slice_grid_button&#39;,
+    text: &#39;Linear reference&#39;,
+    enableToggle: true,
+    listeners: {
+        toggle: function (_, pressed) {
+            if (pressed) {
+                this.window = Ext.create(&#39;CpsiMapview.view.window.MinimizableWindow&#39;, {
+                    layout: &#39;fit&#39;,
+                    width: 400,
+                    height: 200,
+
+                    items: [{
+                        xtype: &#39;cmv_line_slice_grid&#39;
+                    }]
+                });
+                this.window.show();
+            } else if (this.window) {
+                this.window.destroy();
+                this.window = null;
+            }
+        }
+    }
+});
+</pre>
+</body>
+</html>

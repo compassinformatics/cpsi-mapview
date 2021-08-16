@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+  <title>The source code</title>
+  <link href="../resources/prettify/prettify.css" type="text/css" rel="stylesheet" />
+  <script type="text/javascript" src="../resources/prettify/prettify.js"></script>
+  <style type="text/css">
+    .highlight { display: block; background-color: #ddd; }
+  </style>
+  <script type="text/javascript">
+    function highlight() {
+      document.getElementById(location.hash.replace(/#/, "")).className = "highlight";
+    }
+  </script>
+</head>
+<body onload="prettyPrint(); highlight();">
+  <pre class="prettyprint lang-js"><span id='CpsiMapview-view-fileupload-Report'>/**
+</span> * Component used to upload local files
+ * You can&#39;t download a file using a direct AJAX call so use this hidden iframe.
+ * See comments at https://stackoverflow.com/questions/20499959/extjs-4-downloading-a-file-through-ajax-call
+ * and https://stackoverflow.com/questions/18434962/extjs-handling-success-or-failure-when-doing-a-standard-submit-in-a-form
+ *
+ * @class CpsiMapview.view.fileupload.Report
+ */
+
+Ext.define(&#39;CpsiMapview.view.fileupload.Report&#39;, {
+    extend: &#39;Ext.Component&#39;,
+<span id='CpsiMapview-view-fileupload-Report-property-autoEl'>    autoEl: {
+</span>        tag: &#39;iframe&#39;,
+        cls: &#39;x-hidden&#39;,
+        src: Ext.SSL_SECURE_URL
+    },
+<span id='CpsiMapview-view-fileupload-Report-method-load'>    load: function (config) {
+</span>        this.getEl().dom.src = config.url + (config.params ? &#39;?&#39; + Ext.urlEncode(config.params) : &#39;&#39;);
+    }
+});
+</pre>
+</body>
+</html>

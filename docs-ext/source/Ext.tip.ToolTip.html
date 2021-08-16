@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+  <title>The source code</title>
+  <link href="../resources/prettify/prettify.css" type="text/css" rel="stylesheet" />
+  <script type="text/javascript" src="../resources/prettify/prettify.js"></script>
+  <style type="text/css">
+    .highlight { display: block; background-color: #ddd; }
+  </style>
+  <script type="text/javascript">
+    function highlight() {
+      document.getElementById(location.hash.replace(/#/, "")).className = "highlight";
+    }
+  </script>
+</head>
+<body onload="prettyPrint(); highlight();">
+  <pre class="prettyprint lang-js"><span id=''>/**
+</span> * Show tooltips for as long as a user hovers over the relevant item
+ * See https://stackoverflow.com/questions/5817074/ext-js-tooltip-to-stay-when-hover-over
+ * Overriding here fixes tooltips throughout the application - including grid column titles
+ */
+Ext.override(Ext.tip.ToolTip, {
+<span id='-property-dismissDelay'>    dismissDelay: 0
+</span>});</pre>
+</body>
+</html>

@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+  <title>The source code</title>
+  <link href="../resources/prettify/prettify.css" type="text/css" rel="stylesheet" />
+  <script type="text/javascript" src="../resources/prettify/prettify.js"></script>
+  <style type="text/css">
+    .highlight { display: block; background-color: #ddd; }
+  </style>
+  <script type="text/javascript">
+    function highlight() {
+      document.getElementById(location.hash.replace(/#/, "")).className = "highlight";
+    }
+  </script>
+</head>
+<body onload="prettyPrint(); highlight();">
+  <pre class="prettyprint lang-js"><span id='CpsiMapview-util-FileUploadViewModelMixin'>/**
+</span> * A mixin to handle enabling and disabling of file uploader features
+ *
+ * To be mixed in to any viewmodel where the file upload functionality is required.
+ *
+ * Allows for file upload and deletion if:
+ * - the parent record is not &quot;phantom&quot;
+ * - the parent record is not &quot;locked&quot;
+ * - the user belongs to the &quot;browser read and write&quot; role
+ */
+Ext.define(&#39;CpsiMapview.util.FileUploadViewModelMixin&#39;, {
+    extend: &#39;Ext.Mixin&#39;,
+
+    config: {
+<span id='CpsiMapview-util-FileUploadViewModelMixin-cfg-formulas'>        formulas: {
+</span>            canAddFiles: {
+                bind: {
+                    currentRecord: &#39;{currentRecord}&#39;,
+                    isLocked: &#39;{currentRecord.isLocked}&#39;,
+                    phantom: &#39;{currentRecord.phantom}&#39;
+                },
+                get: function (data) {
+                    var ret = (data.isLocked !== true);
+                    ret = ret &amp;&amp; (data.phantom !== true);
+                    if (!this.getFormulas().belongsToRoleReadWrite) {
+                        Ext.log({
+                            msg: &#39;CpsiMapview.util.FileUploadViewModelMixin should be mixed into a viewmodel that implements role checks formulas&#39;
+                        });
+                    } else {
+                        ret = ret &amp;&amp; this.getFormulas().belongsToRoleReadWrite.call(this, this.formulaFn);
+                    }
+                    return ret;
+                }
+            },
+
+            canDeleteFiles: {
+                bind: {
+                    currentRecord: &#39;{currentRecord}&#39;,
+                    isLocked: &#39;{currentRecord.isLocked}&#39;,
+                    phantom: &#39;{currentRecord.phantom}&#39;
+                },
+                get: function (data) {
+                    var ret = (data.isLocked !== true) &amp;&amp; !data.phantom;
+                    ret = ret &amp;&amp; (data.phantom !== true);
+                    if (!this.getFormulas().belongsToRoleReadWrite) {
+                        Ext.log({
+                            msg: &#39;CpsiMapview.util.FileUploadViewModelMixin should be mixed into a viewmodel that implements role checks formulas&#39;
+                        });
+                    } else {
+                        ret = ret &amp;&amp; this.getFormulas().belongsToRoleReadWrite.call(this, this.formulaFn);
+                    }
+                    return ret;
+                }
+            }
+        }
+    }
+});</pre>
+</body>
+</html>

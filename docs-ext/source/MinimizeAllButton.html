@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+  <title>The source code</title>
+  <link href="../resources/prettify/prettify.css" type="text/css" rel="stylesheet" />
+  <script type="text/javascript" src="../resources/prettify/prettify.js"></script>
+  <style type="text/css">
+    .highlight { display: block; background-color: #ddd; }
+  </style>
+  <script type="text/javascript">
+    function highlight() {
+      document.getElementById(location.hash.replace(/#/, "")).className = "highlight";
+    }
+  </script>
+</head>
+<body onload="prettyPrint(); highlight();">
+  <pre class="prettyprint lang-js"><span id='CpsiMapview-view-button-MinimizeAllButton'>/**
+</span> * This class is a button to minimize all minimizable windows.
+ *
+ * @class CpsiMapview.view.button.MinimizeAllButton
+ */
+Ext.define(&#39;CpsiMapview.view.button.MinimizeAllButton&#39;, {
+    extend: &#39;Ext.button.Button&#39;,
+    xtype: &#39;cmv_minimize_all_button&#39;,
+
+    requires: [
+        &#39;CpsiMapview.controller.button.MinimizeAllButtonController&#39;
+    ],
+
+<span id='CpsiMapview-view-button-MinimizeAllButton-property-tooltip'>    tooltip: &#39;Minimize all windows&#39;,
+</span>
+<span id='CpsiMapview-view-button-MinimizeAllButton-property-glyph'>    /**
+</span>     * The icon the button should use
+     */
+    glyph: &#39;f068@FontAwesome&#39;,
+
+<span id='CpsiMapview-view-button-MinimizeAllButton-property-controller'>    /**
+</span>     * The controller for this class
+     */
+    controller: &#39;cmv_minimize_all_button&#39;,
+
+<span id='CpsiMapview-view-button-MinimizeAllButton-property-name'>    /**
+</span>     * The name to be used e.g. in ComponentQueries
+     */
+    name: &#39;minimizeAllButton&#39;,
+
+<span id='CpsiMapview-view-button-MinimizeAllButton-property-listeners'>    /**
+</span>     * Register the listeners and redirect them
+     * to their corresponding controller methods
+     */
+    listeners: {
+        click: &#39;onClick&#39;
+    }
+});
+</pre>
+</body>
+</html>

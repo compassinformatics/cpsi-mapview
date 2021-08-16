@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+  <title>The source code</title>
+  <link href="../resources/prettify/prettify.css" type="text/css" rel="stylesheet" />
+  <script type="text/javascript" src="../resources/prettify/prettify.js"></script>
+  <style type="text/css">
+    .highlight { display: block; background-color: #ddd; }
+  </style>
+  <script type="text/javascript">
+    function highlight() {
+      document.getElementById(location.hash.replace(/#/, "")).className = "highlight";
+    }
+  </script>
+</head>
+<body onload="prettyPrint(); highlight();">
+  <pre class="prettyprint lang-js"><span id='global-property-'>/**
+</span> * This class is the digitize button of cpsi mapview application
+ * It can be used e.g. for the zone tool
+ */
+<span id='CpsiMapview-view-button-DigitizeButton'>/**
+</span> * Digitize Button
+ *
+ * @class CpsiMapview.view.button.DigitizeButton
+ */
+Ext.define(&#39;CpsiMapview.view.button.DigitizeButton&#39;, {
+    extend: &#39;Ext.button.Button&#39;,
+    xtype: &#39;cmv_digitize_button&#39;,
+
+    requires: [
+        &#39;CpsiMapview.model.button.DigitizeButtonModel&#39;,
+        &#39;CpsiMapview.controller.button.DigitizeButtonController&#39;
+    ],
+
+<span id='CpsiMapview-view-button-DigitizeButton-property-viewModel'>    /**
+</span>     * The viewModel for this class
+     */
+    viewModel: &#39;cmv_digitize_button&#39;,
+
+<span id='CpsiMapview-view-button-DigitizeButton-property-controller'>    /**
+</span>     * The controller for this class
+     */
+    controller: &#39;cmv_digitize_button&#39;,
+
+<span id='CpsiMapview-view-button-DigitizeButton-property-glyph'>    /**
+</span>     * The icon used for the button
+     */
+    glyph: &#39;xf040@FontAwesome&#39;,
+
+    config: {
+<span id='CpsiMapview-view-button-DigitizeButton-cfg-type'>        /**
+</span>         * The type to draw. Can be Point, Polygon, LineString or Circle
+         */
+        type: &#39;Point&#39;,
+
+<span id='CpsiMapview-view-button-DigitizeButton-cfg-multi'>        /**
+</span>         * Allow drawing of multi-geometries?
+         */
+        multi: false,
+
+<span id='CpsiMapview-view-button-DigitizeButton-cfg-apiUrl'>        /**
+</span>         * URL needs to be set on instantiation of button
+         */
+        apiUrl: null,
+
+<span id='CpsiMapview-view-button-DigitizeButton-cfg-groups'>        /**
+</span>         * Should the tool use groups?
+         */
+        groups: false,
+
+<span id='CpsiMapview-view-button-DigitizeButton-cfg-resultLayerStyle'>        /**
+</span>         * The default style to use for the result layer
+         */
+        resultLayerStyle: new ol.style.Style({
+            image: new ol.style.Circle({
+                radius: 5,
+                fill: new ol.style.Fill({
+                    color: &#39;yellow&#39;
+                }),
+                stroke: new ol.style.Stroke({
+                    color: &#39;orange&#39;
+                })
+            }),
+            width: 4,
+            fill: new ol.style.Fill({
+                color: &#39;yellow&#39;
+            }),
+            stroke: new ol.style.Stroke({
+                color: &#39;orange&#39;
+            })
+        }),
+
+<span id='CpsiMapview-view-button-DigitizeButton-cfg-drawLayerStyle'>        /**
+</span>        * The default style to use for features drawn with the digitizing tools
+        * e.g. the polygons and circles used for selecting features
+        */
+        drawLayerStyle: null,
+
+<span id='CpsiMapview-view-button-DigitizeButton-cfg-resultLayerSelectStyle'>        /**
+</span>         * The default style to use when features are selected
+         * in the result layer
+         */
+        resultLayerSelectStyle: new ol.style.Style({
+            image: new ol.style.Circle({
+                radius: 5,
+                fill: new ol.style.Fill({
+                    color: &#39;cyan&#39;
+                }),
+                stroke: new ol.style.Stroke({
+                    color: &#39;cyan&#39;
+                })
+            }),
+            width: 2,
+            fill: new ol.style.Fill({
+                color: &#39;cyan&#39;
+            }),
+            stroke: new ol.style.Stroke({
+                color: &#39;cyan&#39;
+            })
+        }),
+
+<span id='CpsiMapview-view-button-DigitizeButton-cfg-pointExtentBuffer'>        /**
+</span>         * If set higher than 0 and type is set to `Point`,
+         * the request URL gets appended with a `bbox`
+         * parameter, which is calculated by the point and
+         * this buffer in units of the maps projection.
+         * Internally, this uses the `buffer` method of ol.extent
+         */
+        pointExtentBuffer: 0,
+
+<span id='CpsiMapview-view-button-DigitizeButton-cfg-resultLayer'>        /**
+</span>         * Set a layer to store the solver results
+         * If not set a layer will be created and added to the map automatically
+         */
+        resultLayer: null,
+
+<span id='CpsiMapview-view-button-DigitizeButton-cfg-drawLayer'>        /**
+</span>         * Set a layer to store the features drawn by a user (points, polygons_
+         * If not set a layer will be created and added to the map automatically
+         */
+        drawLayer: null,
+
+<span id='CpsiMapview-view-button-DigitizeButton-cfg-resetOnToggle'>        /**
+</span>        * Should the results and draw layers be reset if the
+        * tool is deactivated?
+        */
+        resetOnToggle: true
+    },
+
+<span id='CpsiMapview-view-button-DigitizeButton-property-name'>    /**
+</span>     * The name to be used e.g. in ComponentQueries
+     */
+    name: &#39;digitizeButton&#39;,
+
+<span id='CpsiMapview-view-button-DigitizeButton-property-toggleGroup'>    /**
+</span>     * The name of the toggleGroup
+     * Activates the toggle behaviour of the button
+     */
+    toggleGroup: &#39;digitize&#39;,
+
+<span id='CpsiMapview-view-button-DigitizeButton-property-listeners'>    /**
+</span>     * Register the listeners and redirect them
+     * to their corresponding controller methods
+     */
+    listeners: {
+        toggle: &#39;onToggle&#39;,
+        beforedestroy: &#39;onBeforeDestroy&#39;
+    }
+});
+</pre>
+</body>
+</html>

@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+  <title>The source code</title>
+  <link href="../resources/prettify/prettify.css" type="text/css" rel="stylesheet" />
+  <script type="text/javascript" src="../resources/prettify/prettify.js"></script>
+  <style type="text/css">
+    .highlight { display: block; background-color: #ddd; }
+  </style>
+  <script type="text/javascript">
+    function highlight() {
+      document.getElementById(location.hash.replace(/#/, "")).className = "highlight";
+    }
+  </script>
+</head>
+<body onload="prettyPrint(); highlight();">
+  <pre class="prettyprint lang-js"><span id='CpsiMapview-controller-MapController'>/**
+</span> * This class is the controller for the map view of cpsi mapview
+ *
+ */
+Ext.define(&#39;CpsiMapview.controller.MapController&#39;, {
+    extend: &#39;Ext.app.ViewController&#39;,
+
+    alias: &#39;controller.cmv_map&#39;,
+
+<span id='CpsiMapview-controller-MapController-method-afterMapRender'>    /**
+</span>     * Function called after render of map component
+     */
+    afterMapRender: function () {
+        var me = this;
+        var mapPanel = me.getView();
+
+        if (mapPanel.addScaleBarToMap) {
+            var removeCtrls = [];
+            // Cleanup existing controls first
+            mapPanel.olMap.getControls().forEach(function(ctrl) {
+                if (ctrl instanceof ol.control.ScaleLine) {
+                    removeCtrls.push(ctrl);
+                }
+            });
+            Ext.each(removeCtrls, function(removeCtrl) {
+                mapPanel.olMap.removeControl(removeCtrl);
+            });
+
+            var sbTarget = (mapPanel.body &amp;&amp; mapPanel.body.dom) ?
+                mapPanel.body.dom :
+                mapPanel.getEl().dom;
+            var scaleLineCtrl = new ol.control.ScaleLine({
+                target: sbTarget
+            });
+            mapPanel.olMap.addControl(scaleLineCtrl);
+        }
+    },
+
+<span id='CpsiMapview-controller-MapController-method-initializeMeasureBtn'>    /**
+</span>     * Initialize measure buttons
+     * @param {Ext.button.Button} btn The measure button
+     */
+    initializeMeasureBtn: function (btn) {
+
+        // avoid showing &quot;null&quot; in IE11 by setting to an empty string
+        btn.getViewModel().set(&#39;clickToDrawText&#39;, &#39;&#39;);
+
+        btn.setBind({
+            text: &#39;{measureTooltext}&#39;,
+            tooltip: btn.measureType === &#39;line&#39; ? &#39;{lineMeasureTooltip}&#39; :
+                &#39;{polygonMeasureAreaTooltip}&#39;
+        });
+        var tTipStr = btn.measureType === &#39;line&#39; ?
+            btn.getViewModel().get(&#39;lineMeasureTooltip&#39;) :
+            btn.getViewModel().get(&#39;polygonMeasureAreaTooltip&#39;);
+        btn.tooltipStr = tTipStr;
+    },
+});
+</pre>
+</body>
+</html>

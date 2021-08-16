@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+  <title>The source code</title>
+  <link href="../resources/prettify/prettify.css" type="text/css" rel="stylesheet" />
+  <script type="text/javascript" src="../resources/prettify/prettify.js"></script>
+  <style type="text/css">
+    .highlight { display: block; background-color: #ddd; }
+  </style>
+  <script type="text/javascript">
+    function highlight() {
+      document.getElementById(location.hash.replace(/#/, "")).className = "highlight";
+    }
+  </script>
+</head>
+<body onload="prettyPrint(); highlight();">
+  <pre class="prettyprint lang-js"><span id='global-property-'>/**
+</span> * Example classes for a CpsiMapview.view.grid.Grid grid
+ */
+
+// define the model
+Ext.define(&#39;CpsiMapview.model.GridExample&#39;, {
+    requires: &#39;GeoExt.data.model.Feature&#39;,
+    extend: &#39;GeoExt.data.model.Feature&#39;,
+    idProperty: &#39;osm_id&#39;,
+    fields: [
+        {
+            name: &#39;code&#39;,
+            type: &#39;string&#39;
+        },
+        {
+            name: &#39;name&#39;,
+            type: &#39;string&#39;
+        },
+        {
+            name: &#39;fclass&#39;,
+            type: &#39;string&#39;
+        },
+        {
+            name: &#39;osm_id&#39;,
+            type: &#39;integer&#39;
+        }
+    ]
+});
+
+// create the store
+Ext.define(&#39;CpsiMapview.store.GridExample&#39;, {
+    extend: &#39;CpsiMapview.store.WfsFeatures&#39;,
+    alias: &#39;store.GridExample&#39;,
+    url: &#39;https://w08-mapserver.compass.ie/mapserver/?map=/MapServer/apps/mapview-demo/example.map&amp;&#39;,
+    storeId: &#39;GridExample&#39;,
+    requestMethod: &#39;POST&#39;,
+    model: &#39;CpsiMapview.model.GridExample&#39;,
+    typeName: &#39;ruins&#39;,
+    layerOptions: {
+        name: &#39;GridExampleLayer&#39;
+    },
+    sorters: [{
+        property: &#39;osm_id&#39;,
+        direction: &#39;ASC&#39;
+    }]
+});
+
+// create the view model
+Ext.define(&#39;CpsiMapview.view.grid.ExampleGridModel&#39;, {
+    extend: &#39;CpsiMapview.model.grid.Grid&#39;,
+    alias: &#39;viewmodel.example_grid&#39;,
+    data: {
+        vectorLayerKey: &#39;RUINS_WFS&#39;,
+        gridStoreType: &#39;GridExample&#39;,
+        gridLayerName: &#39;GridExampleLayer&#39;, // TODO this is duplicated in layerOptions above
+        helpUrl: &#39;https://github.com/compassinformatics/cpsi-mapview/blob/master/app/view/grid/ExampleGrid.js&#39;
+    }
+});
+
+// create the grid view
+Ext.define(&#39;CpsiMapview.view.grid.ExampleGrid&#39;, {
+    extend: &#39;CpsiMapview.view.grid.Grid&#39;,
+    xtype: &#39;cmv_examplegrid&#39;,
+    controller: &#39;cmv_grid&#39;,
+    viewModel: &#39;example_grid&#39;,
+    columns: {
+        items: [
+            {
+                text: &#39;Id&#39;,
+                dataIndex: &#39;osm_id&#39;, // case-sensitive
+                filter: {
+                    type: &#39;number&#39;
+                }
+            },
+            {
+                text: &#39;Code&#39;,
+                dataIndex: &#39;code&#39;,
+                flex: 2,
+                filter: {
+                    type: &#39;number&#39;
+                }
+            },
+            {
+                text: &#39;Class&#39;,
+                dataIndex: &#39;fclass&#39;,
+                flex: 2,
+                filter: {
+                    type: &#39;string&#39;
+                }
+            },
+            {
+                text: &#39;Name&#39;,
+                dataIndex: &#39;name&#39;,
+                flex: 1,
+                filter: {
+                    type: &#39;string&#39;
+                }
+            }
+        ]
+    }
+});
+</pre>
+</body>
+</html>

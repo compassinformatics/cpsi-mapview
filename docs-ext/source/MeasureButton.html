@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+  <title>The source code</title>
+  <link href="../resources/prettify/prettify.css" type="text/css" rel="stylesheet" />
+  <script type="text/javascript" src="../resources/prettify/prettify.js"></script>
+  <style type="text/css">
+    .highlight { display: block; background-color: #ddd; }
+  </style>
+  <script type="text/javascript">
+    function highlight() {
+      document.getElementById(location.hash.replace(/#/, "")).className = "highlight";
+    }
+  </script>
+</head>
+<body onload="prettyPrint(); highlight();">
+  <pre class="prettyprint lang-js"><span id='CpsiMapview-model-button-MeasureButton'>/**
+</span> * This class is the view model for the Main view of the application.
+ */
+Ext.define(&#39;CpsiMapview.model.button.MeasureButton&#39;, {
+    extend: &#39;Ext.app.ViewModel&#39;,
+
+    alias: &#39;viewmodel.cmv_btn_measure&#39;,
+
+<span id='CpsiMapview-model-button-MeasureButton-property-data'>    data: {
+</span>        measureTooltext: null, // don&#39;t show text
+        lineMeasureTooltip: &#39;Measure a distance&#39;,
+        textline: &#39;Measure distance&#39;,
+        tooltipLine: &#39;Measure distance&#39;,
+        continueLineMsg: &#39;Click to measure a distance&#39;,
+        textpoly: &#39;Measure area&#39;,
+        tooltipPoly: &#39;Measure area&#39;,
+        polygonMeasureAreaTooltip: &#39;Measure an area&#39;,
+        continuePolygonMsg: &#39;Click to measure an area&#39;
+    }
+});
+</pre>
+</body>
+</html>

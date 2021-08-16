@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+  <title>The source code</title>
+  <link href="../resources/prettify/prettify.css" type="text/css" rel="stylesheet" />
+  <script type="text/javascript" src="../resources/prettify/prettify.js"></script>
+  <style type="text/css">
+    .highlight { display: block; background-color: #ddd; }
+  </style>
+  <script type="text/javascript">
+    function highlight() {
+      document.getElementById(location.hash.replace(/#/, "")).className = "highlight";
+    }
+  </script>
+</head>
+<body onload="prettyPrint(); highlight();">
+  <pre class="prettyprint lang-js"><span id='CpsiMapview-view-layer-ToolTip'>/**
+</span> * Mouse tooltip for a vector layer to show layer/feature information on the
+ * map. For example show attributes when feature gets hovered with the mouse.
+ */
+Ext.define(&#39;CpsiMapview.view.layer.ToolTip&#39;, {
+    extend: &#39;Ext.tip.Tip&#39;,
+    xtype: &#39;cmv_layer_tooltip&#39;,
+    requires: [
+    ],
+
+<span id='CpsiMapview-view-layer-ToolTip-cfg-The'>    /** @cfg The offset from the event&#39;s mouse x-position */
+</span>    offsetX: 10,
+
+<span id='CpsiMapview-view-layer-ToolTip-cfg-The'>    /** @cfg The offset from the event&#39;s mouse y-position */
+</span>    offsetY: 10,
+
+<span id='CpsiMapview-view-layer-ToolTip-cfg-toolTipConfig'>    /**
+</span>     * The tooltip configuration from the layer JSON-configuration
+     * @cfg {Object}
+     */
+    toolTipConfig: null,
+
+<span id='CpsiMapview-view-layer-ToolTip-cfg-layer'>    /**
+</span>     * Layer refrence for which this tooltip shows the content
+     * @cfg {ol.layer.Base}
+     */
+    layer: null,
+
+<span id='CpsiMapview-view-layer-ToolTip-property-bgColor'>    /**
+</span>     * Custom background color of this tooltip
+     * @type {String} Color
+     */
+    bgColor: null,
+
+<span id='CpsiMapview-view-layer-ToolTip-property-textColor'>    /**
+</span>     * Custom text color of this tooltip
+     * @type {String} Color
+     */
+    textColor: null,
+
+<span id='CpsiMapview-view-layer-ToolTip-property-bold'>    /**
+</span>     * Custom bold font weight of this tooltip
+     * @type {Boolean} true=bold
+     */
+    bold: false,
+
+<span id='CpsiMapview-view-layer-ToolTip-property-opacity'>    /**
+</span>     * Custom background opacity of this tooltip
+     * @type {Number} Opacity between 0 and 1
+     */
+    opacity: null,
+
+    statics: {
+<span id='CpsiMapview-view-layer-ToolTip-static-method-clear'>        /**
+</span>         * Hides all layer tooltips.
+         */
+        clear: function () {
+            var ttips = Ext.ComponentQuery.query(&#39;cmv_layer_tooltip&#39;);
+            Ext.each(ttips, function (tip) {
+                tip.hide();
+            });
+        }
+    },
+
+<span id='CpsiMapview-view-layer-ToolTip-method-constructor'>    constructor: function (config) {
+</span>        var me = this;
+
+        config.style = {
+            backgroundColor: config.bgColor,
+            color: config.textColor,
+            fontWeight: config.bold ? &#39;bold&#39; : undefined,
+            opacity: config.opacity
+        };
+
+        me.callParent([config]);
+    },
+
+<span id='CpsiMapview-view-layer-ToolTip-method-draw'>    /**
+</span>     * Draws a tooltip at the given event position.
+     * The content is derived from the #formatFunction.
+     *
+     * @param {ol.Feature} feature The feature to draw the tooltip for
+     * @param {ol.MapBrowserEvent} evt The MapBrowserEvent event of OpenLayers
+     */
+    draw: function (feature, evt) {
+        var me = this;
+        var featureCluster = feature.getProperties().features;
+
+        // care about clustered features
+        if (featureCluster) {
+            // in this case take the first feature in the cluster to define the
+            // tooltip text
+            if (featureCluster.length &gt; 0) {
+                feature = featureCluster[0];
+            } else {
+                Ext.log.error(&#39;No cluster features found&#39;);
+            }
+        }
+
+        // check for layer&#39;s formatFunction
+        var html;
+        if (me.layer &amp;&amp; Ext.isFunction(me.layer.formatFunction)) {
+            // the layer has its own formatFunction, do not use the default one
+            html = me.layer.formatFunction(feature);
+        } else {
+            html = me.formatFunction(feature);
+        }
+
+        // set HTML content
+        me.setHtml(html);
+
+        // show tooltip near mouse pointer
+        var screenX = evt.originalEvent.pageX + me.offsetX;
+        var screenY = evt.originalEvent.pageY + me.offsetY;
+        me.showAt([screenX, screenY]);
+
+        // extjs has somehow problems with the very first render of the tooltip
+        if (me.__initialized === undefined) {
+            me.__initialized = true;
+            me.hide();
+            setTimeout(function () {
+                me.show();
+            }, 200);
+        }
+    },
+
+<span id='CpsiMapview-view-layer-ToolTip-method-formatFunction'>    /**
+</span>     * Tranforms the feature&#39;s attributes to the wanted HTML structure shown in
+     * this tooltip.
+     * This function can be overridden if different HTML is needed for a custom
+     * layer.
+     * @param  {ol.Feature} feature The feature to get the HTML for
+     * @return {String}             HTML code as text
+     */
+    formatFunction: function (feature) {
+        var me = this;
+        var htmlParts = [];
+        var htmlPart;
+
+        Ext.each(me.toolTipConfig, function (tipConf) {
+            if (tipConf.thumbnail &amp;&amp; tipConf.property) {
+                var antiCache = new Date().getTime();
+                var onError = &#39;this.style.display =\&#39;none\&#39;&#39;;
+                var style = &#39;width:120px; height:90px;&#39;;
+                var url = Ext.String.format(tipConf.thumbnail, feature.get(tipConf.property));
+                htmlPart = Ext.String.format(&#39;&lt;img src=&quot;{0}?_ac={1}&quot; onerror=&quot;{2}&quot; style=&quot;{3}&quot;/&gt;&#39;,
+                    url, antiCache, onError, style);
+            } else {
+                var key = tipConf.alias || tipConf.property;
+                var value = feature.get(tipConf.property);
+                htmlPart = Ext.String.format(&#39;&lt;b&gt;{0}: &lt;/b&gt;{1}&#39;, key, value);
+            }
+
+            if (String(value) === &#39;-999&#39;) {
+                // HACK
+                // -999 is the default value used for NULLs so WFS layers can
+                // work with MapInfo as TAB files don&#39;t allow NULL values
+                value = null;
+            }
+
+            htmlParts.push(htmlPart);
+        });
+
+        return htmlParts.join(&#39;&lt;br/&gt;&#39;);
+    }
+});
+</pre>
+</body>
+</html>

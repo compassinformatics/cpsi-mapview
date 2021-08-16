@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+  <title>The source code</title>
+  <link href="../resources/prettify/prettify.css" type="text/css" rel="stylesheet" />
+  <script type="text/javascript" src="../resources/prettify/prettify.js"></script>
+  <style type="text/css">
+    .highlight { display: block; background-color: #ddd; }
+  </style>
+  <script type="text/javascript">
+    function highlight() {
+      document.getElementById(location.hash.replace(/#/, "")).className = "highlight";
+    }
+  </script>
+</head>
+<body onload="prettyPrint(); highlight();">
+  <pre class="prettyprint lang-js"><span id='CpsiMapview-view-button-StreetViewTool'>/**
+</span> * Button to open the Street View tool.
+ *
+ * @class CpsiMapview.view.button.StreetViewTool
+ */
+Ext.define(&#39;CpsiMapview.view.button.StreetViewTool&#39;, {
+    extend: &#39;Ext.button.Button&#39;,
+    xtype: &#39;cmv_streetview_tool&#39;,
+
+    requires: [
+        &#39;CpsiMapview.controller.button.StreetViewTool&#39;
+    ],
+
+<span id='CpsiMapview-view-button-StreetViewTool-property-controller'>    /**
+</span>     * The controller for this class.
+     *
+     * @private
+     */
+    controller: &#39;cmv_streetview_tool&#39;,
+
+<span id='CpsiMapview-view-button-StreetViewTool-cfg-glyph'>    /**
+</span>     * The icon used for the button.
+     *
+     * @cfg {String}
+     */
+    glyph: &#39;xf21d@FontAwesome&#39;,
+
+<span id='CpsiMapview-view-button-StreetViewTool-property-name'>    /**
+</span>     * The name to be used e.g. in ComponentQueries.
+     *
+     * @private
+     */
+    name: &#39;streetViewToolButton&#39;,
+
+<span id='CpsiMapview-view-button-StreetViewTool-property-tooltip'>    /**
+</span>     * The tooltip to display when hovering over the button
+     *
+     * @private
+     */
+    tooltip: &#39;Activate the StreetView tool&#39;,
+
+<span id='CpsiMapview-view-button-StreetViewTool-cfg-enableToggle'>    /**
+</span>     * Enable toggle mode for the button.
+     *
+     * @cfg {Boolean}
+     * @private
+     */
+    enableToggle: true,
+
+<span id='CpsiMapview-view-button-StreetViewTool-cfg-map'>    /**
+</span>     * The OL map work / sync with this tool.
+     *
+     * @cfg {ol.Map}
+     */
+    map: null,
+
+<span id='CpsiMapview-view-button-StreetViewTool-cfg-vectorLayerStyle'>    /**
+</span>     * Optional style for the position layer.
+     *
+     * @cfg {ol.style.Style}
+     */
+    vectorLayerStyle: null,
+
+<span id='CpsiMapview-view-button-StreetViewTool-cfg-vectorIcon'>    /**
+</span>     * The position icon image to be shown on the map.
+     *
+     * @cfg {String}
+     */
+    vectorIcon: &#39;resources/img/streetViewFOV.png&#39;,
+
+<span id='CpsiMapview-view-button-StreetViewTool-cfg-svWinWidth'>    /**
+</span>     * Initial width of the Street View window.
+     *
+     * @cfg {Number}
+     */
+    svWinWidth: 800,
+
+<span id='CpsiMapview-view-button-StreetViewTool-cfg-svWinHeight'>    /**
+</span>     * Initial height of the Street View window.
+     *
+     * @cfg {Number}
+     */
+    svWinHeight: 600,
+
+<span id='CpsiMapview-view-button-StreetViewTool-cfg-svWinTitlePrefix'>    /**
+</span>     * The prefix for the title of the Street View window.
+     *
+     * @cfg {String}
+     */
+    svWinTitlePrefix: &#39;Google Street View&#39;,
+
+<span id='CpsiMapview-view-button-StreetViewTool-cfg-svWinTitleDateLabel'>    /**
+</span>     * The label to be set in front of the image date of the SV panorama.
+     *
+     * @cfg {String}
+     */
+    svWinTitleDateLabel: &#39; Image Date: &#39;,
+
+<span id='CpsiMapview-view-button-StreetViewTool-cfg-svDefaultPov'>    /**
+</span>     * The default / initial POV settings for the Street View panorama.
+     *
+     * @cfg {Object}
+     */
+    svDefaultPov: {
+        heading: 34,
+        pitch: 10,
+        zoom: 1
+    },
+
+<span id='CpsiMapview-view-button-StreetViewTool-cfg-showNoPanoramaWarning'>    /**
+</span>     * Flag to steer if a warning UI is shown in case no panorama is available
+     * for the clicked position.
+     *
+     * @cfg {Boolean}
+     */
+    showNoPanoramaWarning: true,
+
+<span id='CpsiMapview-view-button-StreetViewTool-cfg-noPanoramaWarningTitle'>    /**
+</span>     * Title of the alert UI shown in case no panorama is available.
+     *
+     * @cfg {String}
+     */
+    noPanoramaWarningTitle: &#39;INFO&#39;,
+
+<span id='CpsiMapview-view-button-StreetViewTool-cfg-noPanoramaWarningText'>    /**
+</span>     * Text of the alert UI shown in case no panorama is available.
+     *
+     * @cfg {String}
+     */
+    noPanoramaWarningText: &#39;No panorama available for the clicked position.&#39;,
+
+<span id='CpsiMapview-view-button-StreetViewTool-property-listeners'>    /**
+</span>     * Register the listeners and redirect them
+     * to their corresponding controller methods
+     */
+    listeners: {
+        toggle: &#39;onToggle&#39;,
+        beforedestroy: &#39;onBeforeDestroy&#39;
+    }
+});
+</pre>
+</body>
+</html>

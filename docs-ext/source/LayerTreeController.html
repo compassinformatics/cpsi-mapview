@@ -1,0 +1,399 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+  <title>The source code</title>
+  <link href="../resources/prettify/prettify.css" type="text/css" rel="stylesheet" />
+  <script type="text/javascript" src="../resources/prettify/prettify.js"></script>
+  <style type="text/css">
+    .highlight { display: block; background-color: #ddd; }
+  </style>
+  <script type="text/javascript">
+    function highlight() {
+      document.getElementById(location.hash.replace(/#/, "")).className = "highlight";
+    }
+  </script>
+</head>
+<body onload="prettyPrint(); highlight();">
+  <pre class="prettyprint lang-js">Ext.define(&#39;CpsiMapview.controller.LayerTreeController&#39;, {
+    extend: &#39;Ext.app.ViewController&#39;,
+
+    alias: &#39;controller.cmv_layertree&#39;,
+
+    requires: [
+        &#39;BasiGX.util.Map&#39;,
+        &#39;BasiGX.util.Layer&#39;,
+        &#39;CpsiMapview.data.model.LayerTreeNode&#39;
+    ],
+
+    statics: {
+<span id='global-method-getTreeNodeConf'>        /**
+</span>         * Detects the original tree node config from tree.json file for a
+         * layer identified by the given layerKey.
+         *
+         * @param {String} layerKey Identifier of the layer to get node conf for
+         * @param {Object} childNodeConf Conf to start with (root if not given)
+         */
+        getTreeNodeConf: function (layerKey, childNodeConf) {
+            var nodeConf = null;
+            var staticMe = CpsiMapview.controller.LayerTreeController;
+            if (!childNodeConf) {
+                childNodeConf = CpsiMapview.treeConfig;
+            }
+
+            if (childNodeConf.id === layerKey) {
+                return childNodeConf;
+            } else {
+                // exit for leafs
+                if (childNodeConf.leaf === true) {
+                    return null;
+                }
+                // iterate recursively over all child nodes
+                for (var i = 0; i &lt; childNodeConf.children.length; i += 1) {
+                    var currentChild = childNodeConf.children[i];
+                    // Search in the current child
+                    nodeConf = staticMe.getTreeNodeConf(layerKey, currentChild);
+
+                    // Return result immediately if the node conf has been found
+                    if (nodeConf !== null) {
+                        return nodeConf;
+                    }
+                }
+            }
+
+            return nodeConf;
+        }
+    },
+
+
+<span id='global-cfg-structureMode'>    /**
+</span>     * Mode in order to steer how the layers in tree will be structured.
+     * At the moment &#39;BASELAYER_OVERLAY&#39; will divide the layers in 2 folders
+     * &#39;Base Layers&#39; and &#39;Overlays&#39; (depending on their property &#39;isBaseLayer&#39;).
+     * All other settings will result in a flat layer list.
+     *
+     * @cfg {String}
+     */
+    structureMode: null,
+
+<span id='global-property-initLayersAdded'>    /**
+</span>     * Shows if the event &#39;cmv-init-layersadded&#39; has been fired or not.
+     *
+     * @property {Boolean}
+     * @private
+     */
+    initLayersAdded: false,
+
+<span id='global-property-treeConfDefaults'>    /**
+</span>     * Holds the default values for tree nodes of the config file tree.json.
+     * Will be set in #makeLayerStore function.
+     *
+     * @private
+     * @readonly
+     */
+    treeConfDefaults: {},
+
+    constructor: function () {
+        var me = this;
+
+        var mapPanel = CpsiMapview.view.main.Map.guess();
+
+        mapPanel.on(&#39;cmv-init-layersadded&#39;, function () {
+            me.initLayersAdded = true;
+            me.autoConnectToMap(); // connect after all the layers have been loaded to the map
+        });
+    },
+
+<span id='global-method-autoConnectToMap'>    /**
+</span>     * Guesses the mapcomponent and assigns the appropriate layers store, if one
+     * could be guessed.
+     */
+    autoConnectToMap: function () {
+
+        var me = this;
+
+        var mapComp = BasiGX.util.Map.getMapComponent();
+        me.map = mapComp &amp;&amp; mapComp.getMap();
+
+        if (me.map) {
+            var store = me.makeLayerStore();
+            me.getView().setStore(store);
+        }
+    },
+
+<span id='global-method-makeLayerStore'>    /**
+</span>     * This method will return an instance of the GeoExt class
+     * `GeoExt.data.store.LayersTree` based on the connected OL #map. The layers
+     * of the `ol.Map` are restructured and divided into groups based on the
+     * JSON tree structure loaded in #loadTreeStructure. This assures that
+     * the layers will appear in different folders in this TreePanel
+     * (as defined in the tree structure JSON).
+     *
+     * @return {GeoExt.data.store.LayersTree} The created store.
+     */
+    makeLayerStore: function () {
+        var me = this;
+
+        var treeJsonPromise = me.loadTreeStructure();
+        treeJsonPromise.then(function (treeJson) {
+            // save defaults for tree nodes from config
+            me.treeConfDefaults = treeJson.defaults || {};
+
+            // get the root layer group holding the grouped map layers
+            var rootLayerGroup = me.getGroupedLayers(treeJson.treeConfig);
+
+            me.map.set(&#39;layerTreeRoot&#39;, rootLayerGroup);
+            me.map.getLayers().insertAt(0, rootLayerGroup);
+
+            // create a new LayerStore from the grouped layers
+            var groupedLayerTreeStore = Ext.create(&#39;GeoExt.data.store.LayersTree&#39;, {
+                model: &#39;CpsiMapview.data.model.LayerTreeNode&#39;,
+                layerGroup: rootLayerGroup
+            });
+            me.getView().setStore(groupedLayerTreeStore);
+
+            // update possible switchlayers when collapsing their parent folder
+            // otherwise the node text would be wrong/empty
+            me.getView().getRootNode().on(
+                &#39;beforeexpand&#39;,
+                me.updateSwitchLayerNodes,
+                me
+            );
+
+            me.getView().getRootNode().cascade(function (node) {
+                // apply properties for tree node from corresponding tree-conf
+                if (node.getOlLayer()) {
+                    var origTreeNodeConf = node.getOlLayer().get(&#39;_origTreeConf&#39;) || {};
+                    me.applyTreeConfigsToNode(node, origTreeNodeConf);
+                }
+            });
+
+            // preserve tree config to access later on
+            CpsiMapview.treeConfig = treeJson.treeConfig;
+
+            // inform subscribers that LayerTree is ready
+            me.getView().fireEvent(&#39;cmv-init-layertree&#39;, me);
+        });
+
+        // fallback in case loading the JSON tree structure failed:
+        // create a flat store holding all map layers at one hierarchy
+        treeJsonPromise.catch(function () {
+            Ext.Logger.warn(&#39;Loading of JSON structure for LayerTree failed&#39; +
+                &#39;- creating flat layer hierarchy as fallback&#39;);
+
+            var layerTreeStore = Ext.create(&#39;GeoExt.data.store.LayersTree&#39;, {
+                layerGroup: me.map.get(&#39;layerTreeRoot&#39;) || me.map.getLayerGroup()
+            });
+
+            me.getView().setStore(layerTreeStore);
+
+            // inform subscribers that LayerTree is ready
+            me.getView().fireEvent(&#39;cmv-init-layertree&#39;, me);
+        });
+    },
+
+<span id='global-method-loadTreeStructure'>    /**
+</span>     * Loads the JSON tree structure from &#39;resources/data/layers/tree.json&#39;.
+     *
+     * @return {Ext.Promise} Promise resolving once the JSON is loaded
+     */
+    loadTreeStructure: function () {
+        return new Ext.Promise(function (resolve, reject) {
+            Ext.Ajax.request({
+                url: &#39;resources/data/layers/tree.json&#39;,
+                method: &#39;GET&#39;,
+                success: function (response) {
+                    var respJson = Ext.decode(response.responseText);
+                    resolve(respJson);
+                },
+                failure: function (response) {
+                    reject(response.status);
+                }
+            });
+        });
+    },
+
+<span id='global-method-getGroupedLayers'>    /**
+</span>     * Re-groups the layers of the #map, so they are put into a folder hierarchy
+     * based on the given tree structure loaded in #loadTreeStructure.
+     * For each folder an OL layer group is created and gets aggregated in a
+     * root layer group.
+     *
+     * @param  {Object} treeJson LayerTree structure
+     * @return {ol.layer.Group}  Root layer group
+     */
+    getGroupedLayers: function (treeConfJson) {
+        var me = this;
+
+        // wrapping all under the &#39;root&#39; node aggregating all together
+        var rootLayerGroup = new ol.layer.Group({
+            name: &#39;root&#39;,
+            layers: []
+        });
+        // recursively create the OL layer group by the given tree structure
+        me.createOlLayerGroups(treeConfJson.children, rootLayerGroup);
+
+        return rootLayerGroup;
+    },
+
+<span id='global-method-createOlLayerGroups'>    /**
+</span>     * Creates recursively the OL layer groups for the given tree structure and
+     * puts them all together in the given parent group so they get folders in the LayerTree.
+     * Layers are directly put to the given parent group so they appear as &quot;leafs&quot; in the LayerTree.
+     *
+     * @param  {Object} treeNodesJson Child section of the LayerTree structure
+     * @param  {ol.layer.Group} parentGroup The parent group to put children (another groups / layers) into
+     */
+    createOlLayerGroups: function (treeNodeChilds, parentGroup) {
+        var me = this;
+        // go over all passed in tree childs nodes
+        Ext.each(treeNodeChilds, function (child) {
+            // apply defaults for tree nodes from config
+            var generalDefaults = me.treeConfDefaults.general || {};
+            Ext.applyIf(child, generalDefaults);
+
+            // respect &quot;isLeaf&quot; for legacy reasons (but recommended using &quot;leaf&quot;)
+            var isLeaf = Ext.isDefined(child.isLeaf) ? child.isLeaf : child.leaf;
+            // layer groups --&gt; folders in tree
+            if (isLeaf !== true) {
+                // create empty layer group for this level
+                var layerGroup = new ol.layer.Group({
+                    name: child.title,
+                    layers: [],
+                });
+
+                // preserve the original tree JSON config to re-use it later on
+                layerGroup.set(&#39;_origTreeConf&#39;, child);
+
+                var parentLayers = parentGroup.getLayers();
+                parentLayers.insertAt(0, layerGroup);
+
+                // recursion
+                me.createOlLayerGroups(child.children, layerGroup);
+            } else {
+                // layers --&gt; leafs in tree
+                var mapLyr = BasiGX.util.Layer.getLayerBy(&#39;layerKey&#39;, child.id);
+
+                if (mapLyr) {
+                    // apply tree config to OL layer
+                    // needed since the LayerTreeNode model derives them from OL layer
+                    me.applyTreeConfigsToOlLayer(mapLyr, child);
+
+                    // preserve the original tree JSON config to re-use it later on
+                    mapLyr.set(&#39;_origTreeConf&#39;, child);
+
+                    // add OL layer to parent OL LayerGroup
+                    me.map.removeLayer(mapLyr);
+                    parentGroup.getLayers().insertAt(0, mapLyr);
+
+                } else {
+                    Ext.Logger.warn(&#39;Layer with layerKey &#39; + child.id + &#39; not found in map layers&#39;);
+                }
+            }
+        });
+    },
+
+<span id='global-method-applyTreeConfigsToOlLayer'>    /**
+</span>     * Applies the values from the tree layer config to OL the given
+     * OL layer.
+     *
+     * @param {ol.layer.Base} olLayer The OL layer to apply tree conf values to
+     * @param {Object} treeNodeConf The tree node layer config JSON
+     */
+    applyTreeConfigsToOlLayer: function (olLayer, treeNodeConf) {
+        // name gets transformed to text on the layer tree node
+        olLayer.set(&#39;name&#39;, treeNodeConf.text);
+        // description gets transformed to qtip on the layer tree node
+        olLayer.set(&#39;description&#39;, treeNodeConf.qtip);
+        // descTitle gets transformed to qtitle on the layer tree node
+        olLayer.set(&#39;descTitle&#39;, treeNodeConf.text);
+        // changes the icon in the layer tree leaf
+        olLayer.set(&#39;iconCls&#39;, treeNodeConf.iconCls);
+    },
+
+<span id='global-method-applyTreeConfigsToNode'>    /**
+</span>     * Applies the values from the tree layer config to the given
+     * tree node instance.
+     *
+     * @param {Ext.data.NodeInterface} node The tree node to apply tree conf values to
+     * @param {Object} treeNodeConf The tree node layer config JSON
+     */
+    applyTreeConfigsToNode: function (node, treeNodeConf) {
+        node.set(&#39;cls&#39;, treeNodeConf.cls);
+        node.set(&#39;expandable&#39;, Ext.isDefined(treeNodeConf.expandable) ? treeNodeConf.expandable : true);
+        node.set(&#39;glyph&#39;, treeNodeConf.glyph);
+        node.set(&#39;icon&#39;, treeNodeConf.icon);
+        node.set(&#39;qshowDelay&#39;, treeNodeConf.qshowDelay);
+
+        node.set(&#39;text&#39;, treeNodeConf.text);
+
+        // expand configured folders in this tree
+        node.set(&#39;expanded&#39;, treeNodeConf.expanded);
+
+        // hide checkbox on tree node if configured
+        // setting checked to undefined has no effect since GeoExt.data.model.LayerTreeNode
+        // overwrites this with the layer&#39;s visibility.
+        if (treeNodeConf.checked === false) {
+            node.addCls(&#39;cpsi-tree-no-checkbox&#39;);
+        }
+    },
+
+<span id='global-method-updateSwitchLayerNodes'>    /**
+</span>     * Adds configuration to updated switch layer nodes.
+     *
+     * Ensures all layer information is transfered to the new
+     * switch layer after the switch event
+     *
+     * @param {Ext.data.TreeModel} groupNode The folder node that is expanded
+     */
+    updateSwitchLayerNodes: function(groupNode) {
+        var me = this;
+        groupNode.cascade(function(child){
+            var layer = child.getData();
+            if (!layer || !layer.get(&#39;isSwitchLayer&#39;)) {
+                // we only care about switch layers
+                return;
+            }
+            // the configuration for the tree node got lost during
+            // the switch. We read it again from the layer and apply
+            // it to the node.
+            var origTreeNodeConf = child.getOlLayer().get(&#39;_origTreeConf&#39;) || {};
+            me.applyTreeConfigsToNode(child, origTreeNodeConf);
+        });
+    },
+
+<span id='global-method-onAddWmsToggle'>    /**
+</span>     * This reacts on toggling the add wms Button in the layertree. It shows a window with an AddWmsForm.
+     * @param {Ext.button.Button} button
+     * @param {boolean} pressed
+     */
+    onAddWmsToggle: function (button, pressed) {
+        var me = this;
+
+        if (pressed) {
+            if (!this.addWmsWindow) {
+                this.addWmsWindow = Ext.create(me.getView().addWmsWindowConfig);
+                this.addWmsWindow.on(&#39;close&#39;, function () {
+                    button.setPressed(false);
+                });
+            }
+            this.addWmsWindow.show();
+
+        } else if (this.addWmsWindow) {
+            this.addWmsWindow.close();
+        }
+    },
+
+<span id='global-method-onBeforeDestroy'>    /**
+</span>    * Destroy any associated windows when this component gets destroyed
+    */
+    onBeforeDestroy: function () {
+        if (this.addWmsWindow) {
+            this.addWmsWindow.destroy();
+            this.addWmsWindow = null;
+        }
+    }
+});
+</pre>
+</body>
+</html>

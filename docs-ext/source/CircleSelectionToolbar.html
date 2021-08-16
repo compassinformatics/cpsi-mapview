@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+  <title>The source code</title>
+  <link href="../resources/prettify/prettify.css" type="text/css" rel="stylesheet" />
+  <script type="text/javascript" src="../resources/prettify/prettify.js"></script>
+  <style type="text/css">
+    .highlight { display: block; background-color: #ddd; }
+  </style>
+  <script type="text/javascript">
+    function highlight() {
+      document.getElementById(location.hash.replace(/#/, "")).className = "highlight";
+    }
+  </script>
+</head>
+<body onload="prettyPrint(); highlight();">
+  <pre class="prettyprint lang-js"><span id='global-property-'>/**
+</span> * This class is the circle selection toolbar of cpsi mapview application
+ * It can be used e.g. for manipulating the radius of a drawn circle
+ * and using that circle for filtering features.
+ */
+<span id='CpsiMapview-view-toolbar-CircleSelectionToolbar'>/**
+</span> * Circle Selection Toolbar
+ *
+ * @class CpsiMapview.view.toolbar.CircleSelectionToolbar
+ */
+Ext.define(&#39;CpsiMapview.view.toolbar.CircleSelectionToolbar&#39;, {
+    extend: &#39;Ext.toolbar.Toolbar&#39;,
+
+    xtype: &#39;cmv_circle_selection_toolbar&#39;,
+
+    requires: [
+        &#39;Ext.form.field.Number&#39;,
+        &#39;CpsiMapview.controller.toolbar.CircleSelectionToolbar&#39;,
+        &#39;CpsiMapview.model.toolbar.CircleSelectionToolbar&#39;
+    ],
+
+<span id='CpsiMapview-view-toolbar-CircleSelectionToolbar-property-viewModel'>    viewModel: &#39;cmv_circle_selection_toolbar&#39;,
+</span>
+<span id='CpsiMapview-view-toolbar-CircleSelectionToolbar-property-controller'>    controller: &#39;cmv_circle_selection_toolbar&#39;,
+</span>
+<span id='CpsiMapview-view-toolbar-CircleSelectionToolbar-property-cls'>    cls: &#39;cmv_circle_selection_toolbar&#39;,
+</span>
+<span id='CpsiMapview-view-toolbar-CircleSelectionToolbar-property-name'>    name: &#39;circleSelectionTool&#39;,
+</span>
+<span id='CpsiMapview-view-toolbar-CircleSelectionToolbar-property-dock'>    dock: &#39;top&#39;,
+</span>
+<span id='CpsiMapview-view-toolbar-CircleSelectionToolbar-property-feature'>    /**
+</span>     * ol circle feature that will be manipulated by toolbar
+     */
+    feature: null,
+
+<span id='CpsiMapview-view-toolbar-CircleSelectionToolbar-property-items'>    items: [
+</span>        {
+            xtype: &#39;numberfield&#39;,
+            name: &#39;circleRadius&#39;,
+            bind: {
+                value: &#39;{radius}&#39;,
+                fieldLabel: &#39;Radius in {unit}&#39;
+            },
+            minValue: 0,
+            enableKeyEvents: true, // required for keypress event
+            listeners: {
+                change: &#39;onRadiusChange&#39;,
+                keypress: &#39;handleEnterKey&#39;
+            }
+        }, {
+            xtype: &#39;button&#39;,
+            text: &#39;Apply&#39;,
+            handler: &#39;handleApply&#39;,
+            bind: {
+                disabled: &#39;{!radius}&#39;
+            }
+        }, {
+            xtype: &#39;button&#39;,
+            text: &#39;Cancel&#39;,
+            handler: &#39;handleCancel&#39;
+        }
+    ]
+});
+</pre>
+</body>
+</html>

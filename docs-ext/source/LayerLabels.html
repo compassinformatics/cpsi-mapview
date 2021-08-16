@@ -1,0 +1,345 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+  <title>The source code</title>
+  <link href="../resources/prettify/prettify.css" type="text/css" rel="stylesheet" />
+  <script type="text/javascript" src="../resources/prettify/prettify.js"></script>
+  <style type="text/css">
+    .highlight { display: block; background-color: #ddd; }
+  </style>
+  <script type="text/javascript">
+    function highlight() {
+      document.getElementById(location.hash.replace(/#/, "")).className = "highlight";
+    }
+  </script>
+</head>
+<body onload="prettyPrint(); highlight();">
+  <pre class="prettyprint lang-js"><span id='CpsiMapview-view-menuitem-LayerLabels'>/**
+</span> * MenuItem showing a checkbox in the layer context menu that allows
+ * a separate label layer to be displayed alongside the feature layer.
+ *
+ * @class CpsiMapview.view.menuitem.LayerLabels
+ */
+Ext.define(&#39;CpsiMapview.view.menuitem.LayerLabels&#39;, {
+    extend: &#39;Ext.menu.CheckItem&#39;,
+    xtype: &#39;cmv_menuitem_layerlabels&#39;,
+    requires: [
+        &#39;CpsiMapview.util.Legend&#39;,
+        &#39;CpsiMapview.util.WmsFilter&#39;
+    ],
+
+<span id='CpsiMapview-view-menuitem-LayerLabels-cfg-layer'>    /**
+</span>     * The connected layer for this item.
+     * @cfg {ol.layer.Base}
+     */
+    layer: null,
+
+<span id='CpsiMapview-view-menuitem-LayerLabels-cfg-text'>    /**
+</span>     * Text shown in this MenuItem.
+     * @cfg {String}
+     */
+    text: &#39;Labels&#39;,
+
+<span id='CpsiMapview-view-menuitem-LayerLabels-property-labelClassName'>    /**
+</span>     * The style name for the labels layer.
+     * @property {String}
+     * @readonly
+     */
+    labelClassName: null,
+
+<span id='CpsiMapview-view-menuitem-LayerLabels-property-hasSingleStyle'>    /**
+</span>     * Is true if all single style properties
+     * are given for labeling (sldUrl, sldUrlLabel).
+     * False otherwise.
+     * @property{Boolean}
+     * @readonly
+     */
+    hasSingleStyle: null,
+
+<span id='CpsiMapview-view-menuitem-LayerLabels-property-hasMultiStyle'>    /**
+</span>     * Is true if all multi style properties
+     * are given for labeling (styles, styles.label, stylesBaseUrl).
+     * False otherwise.
+     * @property{Boolean}
+     * @readonly
+     */
+    hasMultiStyle: null,
+
+<span id='CpsiMapview-view-menuitem-LayerLabels-property-clientSideStyle'>    /**
+</span>     * Switch if the style should be applied
+     * client sided or not
+     * @property{Boolean}
+     * @private
+     */
+    clientSideStyle: null,
+
+<span id='CpsiMapview-view-menuitem-LayerLabels-method-initComponent'>    /**
+</span>     * @private
+     */
+    initComponent: function () {
+        var me = this;
+        if (me.layer &amp;&amp; !(me.layer instanceof ol.layer.Group)) {
+            me.clientSideStyle = (
+                me.layer.getSource() instanceof ol.source.VectorTile
+                || me.layer.getSource() instanceof ol.source.Vector
+            );
+            // try to detect the &#39;labelClassName&#39; property of a WMS layer
+            if (me.layer.getSource() instanceof ol.source.TileWMS ||
+                me.layer.getSource() instanceof ol.source.ImageWMS) {
+                me.labelClassName = me.layer.get(&#39;labelClassName&#39;);
+            }
+        }
+        me.callParent();
+
+        if (me.clientSideStyle) {
+            me.hasSingleStyle = !Ext.isEmpty(me.layer.get(&#39;sldUrl&#39;)) &amp;&amp; !Ext.isEmpty(me.layer.get(&#39;sldUrlLabel&#39;));
+            me.hasMultiStyle = (
+                !Ext.isEmpty(me.layer.get(&#39;stylesBaseUrl&#39;))
+                &amp;&amp; !Ext.isEmpty(me.layer.get(&#39;styles&#39;))
+                &amp;&amp; CpsiMapview.util.Legend.hasLabels(me.layer.get(&#39;styles&#39;))
+            );
+            // if neither sldUrlLabel nor styles[x].label are defined, labeling is not enabled
+            me.setHidden(!me.hasSingleStyle &amp;&amp; !me.hasMultiStyle);
+        } else {
+            me.setHidden(Ext.isEmpty(me.labelClassName));
+        }
+
+        me.on(&#39;afterrender&#39;, me.onAfterrender);
+        me.on(&#39;checkchange&#39;, me.onCheckChange);
+    },
+
+<span id='CpsiMapview-view-menuitem-LayerLabels-method-onAfterrender'>    /**
+</span>     * Handles the &#39;afterrender&#39; event of this menu item.
+     * Checks / unchecks box dependent on if labels are displayed.
+     *
+     * @param  {Ext.menu.CheckItem} checkItem The menu item itself
+     */
+    onAfterrender: function (checkItem) {
+        var me = this;
+        if (me.clientSideStyle) {
+            me.onAfterrenderClientSide(checkItem);
+        } else {
+            me.onAfterrenderServerSide(checkItem);
+        }
+    },
+
+<span id='CpsiMapview-view-menuitem-LayerLabels-method-onAfterrenderClientSide'>    /**
+</span>     * Handles the &#39;afterrender&#39; event of this menu item for client
+     * side labeling.
+     * Checks / unchecks box dependent on if labels are displayed.
+     *
+     * @param  {Ext.menu.CheckItem} checkItem The menu item itself
+     */
+    onAfterrenderClientSide: function (checkItem) {
+        var me = this;
+        var activeLabelStyle = me.layer.get(&#39;activeLabelStyle&#39;);
+
+        if (!me.hasSingleStyle &amp;&amp; !me.hasMultiStyle) {
+            return;
+        }
+
+        var labelStyleUrls = me.getLabelStyleUrls();
+        if (labelStyleUrls.indexOf(activeLabelStyle) !== -1) {
+            checkItem.setChecked(true);
+        } else {
+            checkItem.setChecked(false);
+        }
+    },
+
+<span id='CpsiMapview-view-menuitem-LayerLabels-method-onAfterrenderServerSide'>    /**
+</span>     * Handles the &#39;afterrender&#39; event of this menu item for server
+     * side labeling.
+     * Checks / unchecks box dependent on if labels are displayed.
+     *
+     * @param  {Ext.menu.CheckItem} checkItem The menu item itself
+     */
+    onAfterrenderServerSide: function (checkItem) {
+        var me = this;
+        if (Ext.isEmpty(me.labelClassName)) {
+            return;
+        }
+        var wmsSource = me.layer.getSource();
+        var wmsParams = wmsSource.getParams();
+
+        // set the checkbox value, but no need to call onCheckChange again
+        var suppressEvents = true;
+
+        if (wmsParams &amp;&amp; !Ext.isEmpty(wmsParams.STYLES) &amp;&amp;
+            wmsParams.STYLES.indexOf(me.labelClassName) !== -1) {
+            checkItem.setChecked(true, suppressEvents);
+        } else {
+            checkItem.setChecked(false, suppressEvents);
+        }
+    },
+
+<span id='CpsiMapview-view-menuitem-LayerLabels-method-onCheckChange'>    /**
+</span>     * Handles the &#39;checkchange&#39; event of this menu item.
+     *
+     * @param  {Ext.menu.CheckItem} checkItem The menu item itself
+     * @param  {Boolean}            checked   Current checked state
+     */
+    onCheckChange: function (checkItem, checked) {
+        var me = this;
+        if (me.clientSideStyle) {
+            me.addLabelStyle(checked);
+        } else {
+            me.addStyleParameters(checked);
+        }
+    },
+
+<span id='CpsiMapview-view-menuitem-LayerLabels-method-addLabelStyle'>    /**
+</span>     * Add label style to the layer on the map by loading the specified
+     * SLD in the layer configuration.
+     *
+     * @param  {Boolean} addLabel Add or remove the label layer
+     */
+    addLabelStyle: function (addLabel) {
+        var me = this;
+        var layer = me.layer;
+        var activatedStyle = layer.get(&#39;activatedStyle&#39;);
+
+        var url;
+        if (addLabel) {
+
+            url = layer.get(&#39;sldUrlLabel&#39;);
+            if (!Ext.isEmpty(activatedStyle)) {
+                url = me.getLabelStyleUrl(activatedStyle);
+            }
+
+            if (url) {
+                layer.set(&#39;activeLabelStyle&#39;, url);
+                layer.set(&#39;labelsActive&#39;, true);
+                LayerFactory.loadSld(layer, url);
+            }
+
+        } else {
+
+            url = layer.get(&#39;sldUrl&#39;);
+
+            if (!Ext.isEmpty(activatedStyle)) {
+                url = layer.get(&#39;stylesBaseUrl&#39;) + activatedStyle;
+            }
+
+            if (url) {
+                layer.set(&#39;activeLabelStyle&#39;, undefined);
+                layer.set(&#39;labelsActive&#39;, false);
+                LayerFactory.loadSld(layer, url);
+            }
+
+        }
+    },
+
+<span id='CpsiMapview-view-menuitem-LayerLabels-method-addStyleParameters'>    /**
+</span>     * Add label styles to the layer on the map by adding a separate layer in
+     * WMS LAYERS param with custom style.
+     *
+     * @param  {Boolean} addLabel Add or remove the label layer
+     */
+    addStyleParameters: function (addLabel) {
+        var me = this;
+        var layer = me.layer;
+        var labelClassName = me.labelClassName;
+        var wmsSource = layer.getSource();
+        var wmsParams = wmsSource.getParams();
+        var layers = wmsParams.LAYERS || [];
+        var styles = wmsParams.STYLES || &#39;&#39;;
+        var layerList = Ext.isArray(layers) ? layers : layers.split(&#39;,&#39;);
+        var stylesList = Ext.isArray(styles) ? styles : styles.split(&#39;,&#39;);
+
+        if (addLabel) {
+            if (layerList.length === 1) {
+                // add a duplicate of the layer
+                layerList.push(layerList[0]);
+                // apply the label style on the duplicated layer
+                stylesList.push(labelClassName);
+
+                // mark layer that labels are active
+                layer.set(&#39;labelsActive&#39;, true);
+            }
+        } else {
+            // remove any duplicate layer names created by adding labels
+            layerList = Ext.Array.unique(layerList);
+            // remove any label styles
+            Ext.Array.remove(stylesList, labelClassName);
+
+            // mark layer that labels are inactive
+            layer.set(&#39;labelsActive&#39;, false);
+        }
+
+        wmsSource.getParams().LAYERS = layerList.join(&#39;,&#39;);
+
+        // once the LAYERS parameter has been updated
+        // ensure there is a filter for every layer listed in the WMS request (required by MapServer)
+        var wmsFilterUtil = CpsiMapview.util.WmsFilter;
+        var wmsFilterString = wmsFilterUtil.getWmsFilterString(layer);
+
+        var newParams = {
+            FILTER: wmsFilterString,
+            STYLES: stylesList.join(&#39;,&#39;)
+        };
+
+        wmsSource.updateParams(newParams);
+
+    },
+
+<span id='CpsiMapview-view-menuitem-LayerLabels-method-getLabelStyleUrls'>    /**
+</span>     * Helper function to build and get all urls that refer
+     * to label styles.
+     */
+    getLabelStyleUrls: function () {
+        var me = this;
+        var layer = me.layer;
+        var sldUrlLabel = layer.get(&#39;sldUrlLabel&#39;);
+        var styles = layer.get(&#39;styles&#39;);
+        var stylesBaseUrl = layer.get(&#39;stylesBaseUrl&#39;);
+
+        if (me.hasSingleStyle) {
+            return [sldUrlLabel];
+        }
+        if (me.hasMultiStyle) {
+            var labelStyleUrls = [];
+            Ext.each(styles, function (style) {
+                if (!Ext.isEmpty(style.label)) {
+                    labelStyleUrls.push(stylesBaseUrl + style.label);
+                }
+            });
+            return labelStyleUrls;
+        }
+    },
+
+<span id='CpsiMapview-view-menuitem-LayerLabels-method-getLabelStyleUrl'>    /**
+</span>     * Helper function to get the label style url that
+     * matches the currently activated style.
+     *
+     * @param {String} activatedStyle Name of the currently activated style
+     */
+    getLabelStyleUrl: function (activatedStyle) {
+        var me = this;
+        var stylesBaseUrl = me.layer.get(&#39;stylesBaseUrl&#39;);
+        var styles = me.layer.get(&#39;styles&#39;);
+
+        var labelStyle;
+        if (!me.hasMultiStyle) {
+            return;
+        }
+
+        labelStyle = styles.find(function (style) {
+            return style.name === activatedStyle;
+        });
+
+        if (!labelStyle) {
+            return;
+        }
+
+        if (Ext.isEmpty(labelStyle.label)) {
+            return;
+        }
+
+        return stylesBaseUrl + labelStyle.label;
+    }
+
+});
+</pre>
+</body>
+</html>

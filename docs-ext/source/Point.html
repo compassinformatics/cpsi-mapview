@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+  <title>The source code</title>
+  <link href="../resources/prettify/prettify.css" type="text/css" rel="stylesheet" />
+  <script type="text/javascript" src="../resources/prettify/prettify.js"></script>
+  <style type="text/css">
+    .highlight { display: block; background-color: #ddd; }
+  </style>
+  <script type="text/javascript">
+    function highlight() {
+      document.getElementById(location.hash.replace(/#/, "")).className = "highlight";
+    }
+  </script>
+</head>
+<body onload="prettyPrint(); highlight();">
+  <pre class="prettyprint lang-js"><span id='CpsiMapview-field-Point'>/**
+</span>* A custom field for storing point features.
+* The field handles loading and serializing features to and from an associated store.
+* The linked map layer can have styling properties customized through field properties.
+*/
+Ext.define(&#39;CpsiMapview.field.Point&#39;, {
+    extend: &#39;CpsiMapview.field.Feature&#39;,
+
+    requires: [
+        &#39;BasiGX.util.Map&#39;
+    ],
+
+    alias: &#39;data.field.point&#39;,
+
+<span id='CpsiMapview-field-Point-cfg-extentBuffer'>    /**
+</span>     * The distance used to buffer a feature when the zoomToFeature
+     * function is used
+     * @cfg {Number}
+     */
+    extentBuffer: 100,
+
+<span id='CpsiMapview-field-Point-method-serialize'>    /**
+</span>     * Return a the geometry of a single point feature
+     */
+    serialize: function (v, rec) {
+        var me = this;
+        var featureStore = rec.featureStores[me.name];
+        return this.getPointGeometry(featureStore.layer);
+    },
+
+<span id='CpsiMapview-field-Point-method-getPointGeometry'>    /**
+</span>     * Return a single point associated with the layer as a GeoJSON object
+     * @param {any} rec
+     */
+    getPointGeometry: function (pointLayer) {
+
+        var feats, gj = null;
+
+        feats = pointLayer.getSource().getFeatures();
+
+        if (feats.length &gt;= 1) {
+
+            if (feats.length &gt; 1) {
+                Ext.log.warn(&#39;Multiple points found in the point feature layer&#39;);
+            }
+            var writer = new ol.format.GeoJSON();
+            var geom = feats[feats.length - 1].getGeometry(); // get the last created feature
+            gj = writer.writeGeometryObject(geom);
+        }
+
+        return gj;
+    },
+
+<span id='CpsiMapview-field-Point-method-createStyle'>    /**
+</span>    * Create a new ol style
+    *
+    * @return {ol.style.Style} The new style
+    */
+    createStyle: function () {
+        var fill = new ol.style.Fill({
+            color: &#39;DarkOrange&#39;
+        });
+
+        var stroke = new ol.style.Stroke({
+            color: &#39;Maroon&#39;,
+            width: 1.25
+        });
+
+        var style = new ol.style.Style({
+            image: new ol.style.Circle({
+                fill: fill,
+                stroke: stroke,
+                radius: 7
+            }),
+            fill: fill,
+            stroke: stroke
+        });
+
+        return style;
+    },
+
+<span id='CpsiMapview-field-Point-method-createSelectStyle'>    /**
+</span>    * Create a new ol style for showing points when selected
+    *
+    * @return {ol.style.Style} The new style
+    */
+    createSelectStyle: function () {
+        return null;
+    }
+});
+</pre>
+</body>
+</html>

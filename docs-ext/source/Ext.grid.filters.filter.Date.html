@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+  <title>The source code</title>
+  <link href="../resources/prettify/prettify.css" type="text/css" rel="stylesheet" />
+  <script type="text/javascript" src="../resources/prettify/prettify.js"></script>
+  <style type="text/css">
+    .highlight { display: block; background-color: #ddd; }
+  </style>
+  <script type="text/javascript">
+    function highlight() {
+      document.getElementById(location.hash.replace(/#/, "")).className = "highlight";
+    }
+  </script>
+</head>
+<body onload="prettyPrint(); highlight();">
+  <pre class="prettyprint lang-js">Ext.override(Ext.grid.filters.filter.Date, {
+<span id='global-method-setValue'>    /**
+</span>     * The grid Date filter currently ignores the dateFormat and passes raw dates back to
+     * the server. This function converts them prior to sending them back using the dateFormat
+     * property of the filter.
+     * Date filters are subclasses of Ext.grid.filters.filter.TriFilter so its properties appear
+     * to be ignored.
+     * @param {any} filter
+     */
+    setValue: function (filter) {
+        var me = this;
+
+        // values are in the format {lt: Wed Oct 07 2020 00:00:00 GMT+0200 (Central European Summer Time)}
+        var key = Object.keys(filter)[0];
+        var val = filter[key];
+        if (val) {
+            val = Ext.Date.format(val, me.dateFormat);
+        }
+
+        filter[key] = val;
+        me.callParent([filter]);
+    }
+});
+</pre>
+</body>
+</html>

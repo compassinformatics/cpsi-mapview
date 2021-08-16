@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+  <title>The source code</title>
+  <link href="../resources/prettify/prettify.css" type="text/css" rel="stylesheet" />
+  <script type="text/javascript" src="../resources/prettify/prettify.js"></script>
+  <style type="text/css">
+    .highlight { display: block; background-color: #ddd; }
+  </style>
+  <script type="text/javascript">
+    function highlight() {
+      document.getElementById(location.hash.replace(/#/, "")).className = "highlight";
+    }
+  </script>
+</head>
+<body onload="prettyPrint(); highlight();">
+  <pre class="prettyprint lang-js"><span id='CpsiMapview-plugin-BasicTreeColumnLegends'>/**
+</span> * A plugin for Ext.grid.column.Column that overwrites the internal cellTpl to
+ * support legends.
+ */
+Ext.define(&#39;CpsiMapview.plugin.BasicTreeColumnLegends&#39;, {
+    extend: &#39;Ext.plugin.Abstract&#39;,
+    alias: &#39;plugin.cmv_basic_tree_column_legend&#39;,
+<span id='CpsiMapview-plugin-BasicTreeColumnLegends-property-pluginId'>    pluginId: &#39;cmv_basic_tree_column_legend&#39;,
+</span>
+    requires: [&#39;CpsiMapview.util.Legend&#39;],
+
+<span id='CpsiMapview-plugin-BasicTreeColumnLegends-property-originalCellTpl'>    /**
+</span>     * @private
+     */
+    originalCellTpl: Ext.clone(Ext.tree.Column.prototype.cellTpl).join(&#39;&#39;),
+
+<span id='CpsiMapview-plugin-BasicTreeColumnLegends-property-valueReplacementTpl'>    /**
+</span>     * The Xtemplate strings that will be used instead of the plain {value}
+     * when rendering
+     * We add a additional div in order to expand and collapse the legends. The syntax in templates is picky here...
+     */
+    valueReplacementTpl: [
+        &#39;{value}&#39;,
+        &#39;&lt;tpl if=&quot;this.hasLegend(values.record)&quot;&gt;&lt;br /&gt;&#39;,
+        &#39;&lt;tpl for=&quot;lines&quot;&gt;&#39;,
+        &#39;&lt;img src=&quot;{parent.blankUrl}&quot;&#39;,
+        &#39; class=&quot;{parent.childCls} {parent.elbowCls}-img &#39;,
+        &#39;{parent.elbowCls}-&lt;tpl if=&quot;.&quot;&gt;line&lt;tpl else&gt;empty&lt;/tpl&gt;&quot;&#39;,
+        &#39; role=&quot;presentation&quot;/&gt;&#39;,
+        &#39;&lt;/tpl&gt;&#39;,
+        &#39;&lt;img src=&quot;{blankUrl}&quot; class=&quot;{childCls} x-tree-elbow-img&quot;&gt;&#39;,
+        &#39;&lt;img src=&quot;{blankUrl}&quot; class=&quot;{childCls} x-tree-elbow-img&quot;&gt;&#39;,
+        &#39;&lt;img src=&quot;{blankUrl}&quot; class=&quot;{childCls} x-tree-elbow-img&quot;&gt;&#39;,
+        &#39;{[this.getLegendHtml(values.record)]}&#39;,
+        &#39;&lt;/tpl&gt;&#39;
+    ],
+
+<span id='CpsiMapview-plugin-BasicTreeColumnLegends-property-valueReplacementContext'>    /**
+</span>     * The context for methods available in the template
+     */
+    valueReplacementContext: {
+        hasLegend: function(rec) {
+            var isChecked = rec.get(&#39;checked&#39;);
+            var layer = rec.data;
+            return isChecked &amp;&amp; !(layer instanceof ol.layer.Group);
+        },
+        getLegendHtml: function(rec) {
+            var staticMe = CpsiMapview.plugin.BasicTreeColumnLegends;
+            var layer = rec.data;
+            var layerKey = layer.get(&#39;layerKey&#39;);
+
+            // a layer can have different legends for different styles
+            // ensure each of these are cached
+            if (layer.getSource &amp;&amp; layer.getSource().getParams) {
+                var styles = layer.getSource().getParams().STYLES;
+                if (styles) {
+                    layerKey += &#39;_&#39; +  styles.toUpperCase();
+                }
+            } else {
+                // for WFS we also use the WMS legend so make sure we create a cache
+                // key for these or it will always use just the layerKey
+                var activatedStyle = layer.get(&#39;activatedStyle&#39;);
+                if (activatedStyle) {
+                    layerKey += &#39;_&#39; + LegendUtil.getWmsStyleFromSldFile(activatedStyle).toUpperCase();
+                }
+            }
+
+            var legendUrl = layer.get(&#39;legendUrl&#39;);
+            var w = layer.get(&#39;legendWidth&#39;);
+            var h = layer.get(&#39;legendHeight&#39;);
+
+            if (!legendUrl) {
+                legendUrl = LegendUtil.createGetLegendGraphicUrl(layer);
+            }
+            // if the legend cannot be obtained (which happens e.g. for cascaded
+            // WMS layers, as geoserver does not support legends for these
+            // layers) we remove the broken image and the other dom elements
+            // that otherwise would lead to vertical gap between layers in the
+            // tree.
+            if (!legendUrl) {
+                // 1px×1px transparent gif
+                legendUrl = staticMe.transparentGif;
+                w = h = 1;
+            }
+
+            var legendDataUrl = CpsiMapview.view.LayerTree.legendImgLookup[layerKey];
+            if (!legendDataUrl) {
+                // load the legend image and cache it in an static lookup for later re-use
+                // without any server request
+
+                // check if there is an ongoing loading for the legend of this layer
+                // since getLegendHtml is executed several times for one refresh due to
+                // unknown reasons
+                // Flag set / reset in LegendUtil.getLegendImgHtmlTpl
+                var isLoading = LegendUtil[&#39;legendLoading_&#39; + layerKey];
+                if (isLoading) {
+                    // skip loading
+                    return LegendUtil.getLegendImgHtmlTpl(legendUrl, w, h);
+                }
+
+                LegendUtil.cacheLegendImgAsDataUrl(legendUrl, layerKey);
+
+            } else {
+                legendUrl = legendDataUrl;
+            }
+
+            return LegendUtil.getLegendImgHtmlTpl(legendUrl, w, h);
+        }
+    },
+
+    statics: {
+<span id='CpsiMapview-plugin-BasicTreeColumnLegends-static-property-transparentGif'>        transparentGif: &#39;data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP&#39; +
+</span>            &#39;///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7&#39;,
+<span id='CpsiMapview-plugin-BasicTreeColumnLegends-static-method-checkCleanup'>        checkCleanup: function(img) {
+</span>            var staticMe = CpsiMapview.plugin.BasicTreeColumnLegends;
+            var el = Ext.get(img);
+            var w = parseInt(el.getAttribute(&#39;width&#39;), 10);
+            var h = parseInt(el.getAttribute(&#39;height&#39;), 10);
+            var src = el.getAttribute(&#39;src&#39;);
+            if(w === 1 &amp;&amp; h === 1 &amp;&amp; src === staticMe.transparentGif) {
+                var parent = Ext.get(img.parentNode);
+                var removeElems = parent.query(&#39;br, img&#39;);
+                Ext.each(removeElems, function(removeElem) {
+                    Ext.get(removeElem).destroy();
+                });
+            }
+        }
+    },
+
+<span id='CpsiMapview-plugin-BasicTreeColumnLegends-method-init'>    init: function(column) {
+</span>        var me = this;
+        if (!(column instanceof Ext.grid.column.Column)) {
+            Ext.log.warn(&#39;Plugin shall only be applied to instances of&#39; +
+                    &#39; Ext.grid.column.Column&#39;);
+            return;
+        }
+        var valuePlaceHolderRegExp = /\{value\}/g;
+        var replacementTpl = me.valueReplacementTpl.join(&#39;&#39;);
+        var newCellTpl = me.originalCellTpl.replace(
+            valuePlaceHolderRegExp, replacementTpl
+        );
+
+        column.cellTpl = [
+            newCellTpl,
+            me.valueReplacementContext
+        ];
+    }
+});
+</pre>
+</body>
+</html>

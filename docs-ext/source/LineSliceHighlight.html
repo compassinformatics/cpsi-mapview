@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+  <title>The source code</title>
+  <link href="../resources/prettify/prettify.css" type="text/css" rel="stylesheet" />
+  <script type="text/javascript" src="../resources/prettify/prettify.js"></script>
+  <style type="text/css">
+    .highlight { display: block; background-color: #ddd; }
+  </style>
+  <script type="text/javascript">
+    function highlight() {
+      document.getElementById(location.hash.replace(/#/, "")).className = "highlight";
+    }
+  </script>
+</head>
+<body onload="prettyPrint(); highlight();">
+  <pre class="prettyprint lang-js"><span id='CpsiMapview-plugin-LineSliceHighlight'>/**
+</span> * With this plugin slices of LineString geometries can be highlighted.
+ */
+Ext.define(&#39;CpsiMapview.plugin.LineSliceHighlight&#39;, {
+    extend: &#39;Ext.plugin.Abstract&#39;,
+    alias: &#39;plugin.cmv_line_slice_highlight&#39;,
+<span id='CpsiMapview-plugin-LineSliceHighlight-property-pluginId'>    pluginId: &#39;cmv_line_slice_highlight&#39;,
+</span>
+<span id='CpsiMapview-plugin-LineSliceHighlight-property-style'>    /**
+</span>     * @type {ol.StyleFunction|ol.style.Style}
+     */
+    style: null,
+
+<span id='CpsiMapview-plugin-LineSliceHighlight-method-init'>    init: function () {
+</span>        this.style = new ol.style.Style({
+            stroke: new ol.style.Stroke({
+                color: &#39;red&#39;,
+                width: 2
+            })
+        });
+    },
+
+<span id='CpsiMapview-plugin-LineSliceHighlight-method-calculateSlice'>    /**
+</span>     * Calculates the slice of geometry from start to end
+     * @param {ol.geom.LineString} geometry
+     * @param {number} start in m
+     * @param {number} end in m
+     * @returns {ol.geom.LineString}
+     */
+    calculateSlice: function (geometry, start, end) {
+        var length = 0;
+        var coordinates = [];
+        geometry.forEachSegment(function (a, b) {
+            var segment = new ol.geom.LineString([a, b]);
+            var segmentLength = ol.sphere.getLength(segment);
+            if (length &lt;= start &amp;&amp; start &lt; length + segmentLength) {
+                // start is in this segment
+                coordinates.push(segment.getCoordinateAt((start - length) / segmentLength));
+            }
+            if (start &lt;= length + segmentLength &amp;&amp; length + segmentLength &lt;= end) {
+                // the endpoint of the segment is between start and end
+                // openlayers forEachSegment reuses the arrays for the coordinates so it needs to be cloned
+                coordinates.push(b.slice());
+            }
+            if (length &lt;= end &amp;&amp; end &lt; length + segmentLength) {
+                // end is in this segment
+                coordinates.push(segment.getCoordinateAt((end - length) / segmentLength));
+            }
+
+            length += segmentLength;
+        });
+        return new ol.geom.LineString(coordinates);
+    },
+
+<span id='CpsiMapview-plugin-LineSliceHighlight-method-highlightSlice'>    /**
+</span>     * This methods highlights a slice of the given LineString geometry between start and end.
+     * @param {ol.geom.LineString} geometry
+     * @param {number} start
+     * @param {number} end
+     */
+    highlightSlice: function (geometry, start, end) {
+        var map = BasiGX.util.Map.getMapComponent().map;
+
+        if (!this.layer) {
+            this.layer = new ol.layer.Vector({
+                style: this.style,
+                source: new ol.source.Vector(),
+                map: map
+            });
+        } else {
+            this.layer.getSource().clear();
+        }
+
+        var feature = new ol.Feature(this.calculateSlice(geometry, start, end));
+
+        this.layer.getSource().addFeature(feature);
+    },
+
+<span id='CpsiMapview-plugin-LineSliceHighlight-method-removeHighlight'>    /**
+</span>     * This method removes the current highlight from the map.
+     */
+    removeHighlight: function () {
+        if (this.layer) {
+            this.layer.setMap(null);
+            this.layer = null;
+        }
+    },
+
+<span id='CpsiMapview-plugin-LineSliceHighlight-method-setStyle'>    /**
+</span>     * This method set the style for the highlight.
+     * @param {ol.style.Style} style
+     */
+    setStyle: function (style) {
+        this.style = style;
+        if (this.layer) {
+            this.layer.setStyle(style);
+        }
+    },
+
+<span id='CpsiMapview-plugin-LineSliceHighlight-method-destroy'>    /**
+</span>     * Remove any highlights and cleanup
+     */
+    destroy: function () {
+        this.removeHighlight();
+        this.style = null;
+        this.callParent();
+    }
+});
+</pre>
+</body>
+</html>

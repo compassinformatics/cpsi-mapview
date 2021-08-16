@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+  <title>The source code</title>
+  <link href="../resources/prettify/prettify.css" type="text/css" rel="stylesheet" />
+  <script type="text/javascript" src="../resources/prettify/prettify.js"></script>
+  <style type="text/css">
+    .highlight { display: block; background-color: #ddd; }
+  </style>
+  <script type="text/javascript">
+    function highlight() {
+      document.getElementById(location.hash.replace(/#/, "")).className = "highlight";
+    }
+  </script>
+</head>
+<body onload="prettyPrint(); highlight();">
+  <pre class="prettyprint lang-js"><span id=''>/**
+</span> * Bug ID EXTJS-27043
+ * See https://forum.sencha.com/forum/showthread.php?471594-ExtJS-6-x-Cancel-new-record-in-grid-raise-exception
+ * Still not fixed in https://docs.sencha.com/extjs/7.3.1/classic/src/RowEditor.js.html
+ */
+Ext.override(Ext.grid.RowEditor, {
+
+<span id='-method-cancelEdit'>    cancelEdit: function () {
+</span>        var me = this,
+            form = me.getForm(),
+            fields = form.getFields(),
+            items = fields.items,
+            length = items.length,
+            i,
+            context = me.context;
+
+        if (me._cachedNode) {
+            me.clearCache();
+        }
+
+        me.hide();
+
+        // If we are editing a new record, and we cancel still in invalid state, then remove it.
+        if (context) { // additional guard added to fix bug
+            var record = context.record;
+            if (record &amp;&amp; record.phantom &amp;&amp; !record.modified &amp;&amp; me.removeUnmodified) {
+                me.editingPlugin.grid.store.remove(record);
+            }
+        }
+        form.clearInvalid();
+
+        // temporarily suspend events on form fields before resetting the form to prevent
+        // the fields&#39; change events from firing
+        for (i = 0; i &lt; length; i++) {
+            items[i].suspendEvents();
+        }
+
+        form.reset();
+
+        for (i = 0; i &lt; length; i++) {
+            items[i].resumeEvents();
+        }
+    }
+});</pre>
+</body>
+</html>

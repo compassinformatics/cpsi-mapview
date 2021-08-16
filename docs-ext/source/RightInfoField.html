@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+  <title>The source code</title>
+  <link href="../resources/prettify/prettify.css" type="text/css" rel="stylesheet" />
+  <script type="text/javascript" src="../resources/prettify/prettify.js"></script>
+  <style type="text/css">
+    .highlight { display: block; background-color: #ddd; }
+  </style>
+  <script type="text/javascript">
+    function highlight() {
+      document.getElementById(location.hash.replace(/#/, "")).className = "highlight";
+    }
+  </script>
+</head>
+<body onload="prettyPrint(); highlight();">
+  <pre class="prettyprint lang-js"><span id='CpsiMapview-form-RightInfoField'>/**
+</span> * A mixin to handle hiding and showing layers associated with an edit model
+ *
+ * @class CpsiMapview.form.RightInfoField
+ */
+Ext.define(&#39;CpsiMapview.form.RightInfoField&#39;, {
+    xtype: &#39;cmv_rightinfofield&#39;,
+    extend: &#39;Ext.form.FieldContainer&#39;,
+
+<span id='CpsiMapview-form-RightInfoField-method-setInfoIconTooltip'>    /**
+</span>     * Setter method for the infoIconTooltip property
+     * @param {any} tooltip
+     */
+    setInfoIconTooltip: function (tooltip) {
+        var me = this;
+        me.toolTip = tooltip;
+        me.updateTooltip();
+    },
+
+<span id='CpsiMapview-form-RightInfoField-method-updateTooltip'>    updateTooltip: function () {
+</span>
+        var me = this;
+        Ext.tip.QuickTipManager.unregister(me.iconPanel);
+
+        Ext.tip.QuickTipManager.register({
+            target: me.iconPanel.getId(),
+            text: me.toolTip,
+            autoHide: false
+        });
+
+    },
+
+<span id='CpsiMapview-form-RightInfoField-method-constructor'>    constructor: function (config) {
+</span>        var me = this;
+
+        me.callParent(arguments);
+
+        // as field is an object in the config we want to make sure
+        // settings are applied to field if set in the containing component
+        if (config.defaults) {
+            Ext.applyIf(config.field, config.defaults.field);
+        }
+
+        me.toolTip = config.field.infoIconTooltip || &#39;&amp;nbsp;&#39;;
+
+        Ext.applyIf(config.field, {
+            labelAlign: &#39;left&#39;,
+            labelWidth: 140,
+            width: 320
+        });
+
+        me.iconPanel = Ext.create(&#39;Ext.panel.Panel&#39;, {
+            cls: &#39;icon-gtk-info_16x16&#39;,
+            width: 16,
+            height: 16,
+            margin: &#39;0 6 0 2&#39;,
+            bodyStyle: {
+                background: &#39;none !important&#39;,
+                border: &#39;none !important&#39;
+            },
+            listeners: {
+                afterrender: me.updateTooltip, // run this afterrender or the tooltips don&#39;t appear on first hover
+                scope: me
+            }
+        });
+
+        me.setLayout({
+            type: &#39;hbox&#39;,
+            align: &#39;middle&#39;
+        });
+
+        me.add(config.field);
+        me.add(me.iconPanel);
+    }
+});
+</pre>
+</body>
+</html>

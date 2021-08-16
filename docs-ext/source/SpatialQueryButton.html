@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+  <title>The source code</title>
+  <link href="../resources/prettify/prettify.css" type="text/css" rel="stylesheet" />
+  <script type="text/javascript" src="../resources/prettify/prettify.js"></script>
+  <style type="text/css">
+    .highlight { display: block; background-color: #ddd; }
+  </style>
+  <script type="text/javascript">
+    function highlight() {
+      document.getElementById(location.hash.replace(/#/, "")).className = "highlight";
+    }
+  </script>
+</head>
+<body onload="prettyPrint(); highlight();">
+  <pre class="prettyprint lang-js"><span id='CpsiMapview-view-button-SpatialQueryButton'>/**
+</span> * This class is the button of cpsi mapview application that can be used to
+ * query an assigned layer by a drawn geometry. After the button is toggled,
+ * a draw interaction is activated on the map to define the query geometry.
+ *
+ * @class CpsiMapview.view.button.SpatialQueryButton
+ */
+Ext.define(&#39;CpsiMapview.view.button.SpatialQueryButton&#39;, {
+    extend: &#39;Ext.button.Button&#39;,
+    xtype: &#39;cmv_spatial_query_button&#39;,
+
+    requires: [
+        &#39;CpsiMapview.model.button.SpatialQueryButton&#39;,
+        &#39;CpsiMapview.controller.button.SpatialQueryButtonController&#39;
+    ],
+
+    statics: {
+<span id='CpsiMapview-view-button-SpatialQueryButton-static-method-findAssociatedPermanentLayer'>        /**
+</span>         * Finds the associated permanent layer of a layer that is
+         * used for the spatial query. This is done by comparing the
+         * layerKey of the layer to the associatedLayerKey property
+         * of the permanent layer.
+         * @param {ol.Map} map the map in which to look for the layer
+         * @param {String} layerKey layerKey property of the layer
+         */
+        findAssociatedPermanentLayer: function (map, layerKey) {
+            var layers = map.getLayers().getArray();
+            var associatedPermanentLayer = layers.find(function (layer) {
+                var isSpatialQueryLayer = layer.get(&#39;isSpatialQueryLayer&#39;);
+                var associatedLayerKey = layer.get(&#39;associatedLayerKey&#39;);
+                return isSpatialQueryLayer &amp;&amp; (associatedLayerKey === layerKey);
+            });
+            return associatedPermanentLayer;
+        },
+
+<span id='CpsiMapview-view-button-SpatialQueryButton-static-method-clearAssociatedPermanentLayer'>        /**
+</span>         * Clears the geometries of the associated permanent
+         * layer of a layer that is used for the spatial query.
+         * @param {ol.Map} map the map in which to look for the layer
+         * @param {String} layerKey layerKey property of the layer
+         */
+        clearAssociatedPermanentLayer: function (map, layerKey) {
+            var associatedPermanentLayer = CpsiMapview.view.button.SpatialQueryButton.findAssociatedPermanentLayer(map, layerKey);
+            if (associatedPermanentLayer !== undefined) {
+                associatedPermanentLayer.getSource().clear();
+            }
+        },
+
+<span id='CpsiMapview-view-button-SpatialQueryButton-static-method-showAssociatedPermanentLayer'>        /**
+</span>         * Shows the associated permanent layer of a layer that
+         * is used for the spatial query.
+         * @param {ol.Map} map the map in which to look for the layer
+         * @param {String} layerKey layerKey property of the layer
+         */
+        showAssociatedPermanentLayer: function (map, layerKey) {
+            var associatedPermanentLayer = CpsiMapview.view.button.SpatialQueryButton.findAssociatedPermanentLayer(map, layerKey);
+            if (associatedPermanentLayer !== undefined) {
+                associatedPermanentLayer.setVisible(true);
+            }
+        },
+
+<span id='CpsiMapview-view-button-SpatialQueryButton-static-method-hideAssociatedPermanentLayer'>        /**
+</span>         * Hides the associated permanent layer of a layer that
+         * is used for the spatial query.
+         * @param {ol.Map} map the map in which to look for the layer
+         * @param {String} layerKey layerKey property of the layer
+         */
+        hideAssociatedPermanentLayer: function (map, layerKey) {
+            var associatedPermanentLayer = CpsiMapview.view.button.SpatialQueryButton.findAssociatedPermanentLayer(map, layerKey);
+            if (associatedPermanentLayer !== undefined) {
+                associatedPermanentLayer.setVisible(false);
+            }
+        },
+    },
+
+    config: {
+<span id='CpsiMapview-view-button-SpatialQueryButton-cfg-queryLayerName'>        /**
+</span>         * The name of the layer to query
+         * This property will be ignored if queryLayer is defined
+         */
+        queryLayerName: null,
+
+<span id='CpsiMapview-view-button-SpatialQueryButton-cfg-vectorLayerKey'>        /**
+</span>         * The layerKey property of the layer to query
+         */
+        vectorLayerKey: null
+    },
+
+<span id='CpsiMapview-view-button-SpatialQueryButton-property-viewModel'>    /**
+</span>     * The viewModel for this class
+     */
+    viewModel: &#39;cmv_spatial_query_btn&#39;,
+
+<span id='CpsiMapview-view-button-SpatialQueryButton-property-controller'>    /**
+</span>     * The controller for this class
+     */
+    controller: &#39;cmv_spatial_query_btn&#39;,
+
+<span id='CpsiMapview-view-button-SpatialQueryButton-property-name'>    /**
+</span>     * The name to be used e.g. in ComponentQueries
+     */
+    name: &#39;spatialQueryBtn&#39;,
+
+<span id='CpsiMapview-view-button-SpatialQueryButton-property-drawGeometryType'>    /**
+</span>     * The type of the geometry to draw / query with
+     * (Polygon, LineString, Point)
+     * Will be ignored if spatialOperator === &#39;bbox&#39;
+     */
+    drawGeometryType: null,
+
+<span id='CpsiMapview-view-button-SpatialQueryButton-property-spatialOperator'>    /**
+</span>     * The type of spatial operator to use, see GeoExt.util.OGCFilter.
+     *                               topologicalOrSpatialFilterOperators
+     */
+    spatialOperator: null,
+
+<span id='CpsiMapview-view-button-SpatialQueryButton-property-queryLayer'>    /**
+</span>     * The layer to query
+     */
+    queryLayer: null,
+
+<span id='CpsiMapview-view-button-SpatialQueryButton-property-queryFeatures'>    /**
+</span>     * The drawn feature to query with
+     */
+    queryFeatures: new ol.Collection(),
+
+<span id='CpsiMapview-view-button-SpatialQueryButton-property-displayPermanently'>    /**
+</span>     * If true, the filter geometry will be displayed until filter was cleared
+     * If false, the filter geometry will disappear after filtering
+     */
+    displayPermanently: false,
+
+<span id='CpsiMapview-view-button-SpatialQueryButton-property-enableToggle'>    /**
+</span>     * Enable toggle
+     */
+    enableToggle: true,
+
+<span id='CpsiMapview-view-button-SpatialQueryButton-property-listeners'>    /**
+</span>     * Register the listeners and redirect them
+     * to their corresponding controller methods
+     */
+    listeners: {
+        toggle: &#39;onSpatialQueryBtnToggle&#39;,
+        clearAssociatedPermanentLayer: &#39;onClearAssociatedPermanentLayer&#39;,
+        hideAssociatedPermanentLayer: &#39;onHideAssociatedPermanentLayer&#39;,
+        showAssociatedPermanentLayer: &#39;onShowAssociatedPermanentLayer&#39;,
+        beforedestroy: &#39;onBeforeDestroy&#39;
+    },
+
+<span id='CpsiMapview-view-button-SpatialQueryButton-property-bind'>    bind: {
+</span>        tooltip: &#39;{tooltip}&#39;
+    },
+
+<span id='CpsiMapview-view-button-SpatialQueryButton-cfg-triggerWfsRequest'>    /**
+</span>    * If set to true a Wfs GetFeatures request will be automatically triggered
+    *
+    * @cfg {Boolean} triggerWfsRequest Whether or not to trigger a Wfs GetFeatures request
+    */
+    triggerWfsRequest: true
+
+});
+</pre>
+</body>
+</html>

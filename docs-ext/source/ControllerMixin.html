@@ -1,0 +1,400 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+  <title>The source code</title>
+  <link href="../resources/prettify/prettify.css" type="text/css" rel="stylesheet" />
+  <script type="text/javascript" src="../resources/prettify/prettify.js"></script>
+  <style type="text/css">
+    .highlight { display: block; background-color: #ddd; }
+  </style>
+  <script type="text/javascript">
+    function highlight() {
+      document.getElementById(location.hash.replace(/#/, "")).className = "highlight";
+    }
+  </script>
+</head>
+<body onload="prettyPrint(); highlight();">
+  <pre class="prettyprint lang-js"><span id='CpsiMapview-form-ControllerMixin'>/**
+</span> * A mixin for any edit window controller allowing for
+ * validation, saving, deletion, exports etc.
+ *
+ * @class CpsiMapview.form.ControllerMixin
+ */
+Ext.define(&#39;CpsiMapview.form.ControllerMixin&#39;, {
+    extend: &#39;Ext.Mixin&#39;,
+    mixins: {
+        zoomer: &#39;CpsiMapview.util.ZoomerMixin&#39;,
+        validation: &#39;CpsiMapview.form.ValidationMessages&#39;
+    },
+
+<span id='CpsiMapview-form-ControllerMixin-property-errorCodes'>    /** The possible return codes from the services */
+</span>    errorCodes: {
+        None: 0,
+        AccountLockedOut: 1,
+        AccountDoesNotExist: 2,
+        UserTokenExpired: 3,
+        CookieHeaderMissing: 4,
+        NoPermission: 5,
+
+        GeneralServerError: 500,
+        FileNotFound: 404
+    },
+
+<span id='CpsiMapview-form-ControllerMixin-method-getResponseJson'>    getResponseJson: function (operation) {
+</span>
+        var response = operation.getResponse();
+
+        // IE11 does not use responseJson and instead we have to decode the JSON in responseText
+        return response.responseJson ? response.responseJson : Ext.JSON.decode(response.responseText);
+    },
+
+<span id='CpsiMapview-form-ControllerMixin-method-onSaveFailed'>    /**
+</span>     * Action when save fails
+     * @param {any} record
+     * @param {any} operation
+     */
+    onSaveFailed: function (record, operation) {
+
+        var me = this;
+        var response = operation.getResponse() ? operation.getResponse() : operation._response;
+
+        var result = !response ? { errorCode: me.errorCodes.GeneralServerError } :
+            (response.responseType == &#39;json&#39;
+                ? response.responseJson
+                : (response.responseXML ? response.responseXML : JSON.parse(response.responseText))
+            );
+        switch (result.errorCode) {
+            case me.errorCodes.UserTokenExpired:
+            case me.errorCodes.CookieHeaderMissing:
+                // if the error is related to session expired it has been managed in CpsiMapview.util.ApplicationMixin, we&#39;ll ignore it here.
+                break;
+            default:
+                Ext.Msg.show({
+                    title: &#39;Error&#39;,
+                    message: (operation.error ? operation.error.statusText : (!Ext.isEmpty(result.message) ? result.message : &#39;The save operation failed.&#39;)),
+                    buttons: Ext.MessageBox.OK,
+                    iconCls: Ext.MessageBox.ERROR
+                });
+        }
+    },
+
+<span id='CpsiMapview-form-ControllerMixin-method-onSaveSucceded'>    /**
+</span>     * Action when save succeeds
+     * @param {any} record
+     * @param {any} operation
+     */
+    onSaveSucceded: function (record, operation) {
+
+        var me = this;
+
+        var vm = me.getViewModel();
+
+        // ensure the client-side record matches the server record
+        // by loading the response back into the model
+
+        var response = operation.getResponse();
+        var serverData = response.responseJson ? response.responseJson.data : JSON.parse(response.responseText).data;
+        var modelPrototype = Ext.ClassManager.get(record.$className);
+        var serverRec = modelPrototype.loadData(serverData);
+
+        me.reloadRecord(serverRec);
+
+        var itemName = vm.get(&#39;parentType&#39;) || &#39;Item&#39;;
+        Ext.Msg.show({
+            title: &#39;Success&#39;,
+            message: itemName + &#39; saved successfully!&#39;,
+            buttons: Ext.MessageBox.OK,
+            iconCls: Ext.MessageBox.INFO
+        });
+
+        // fire an event
+        var view = me.getView();
+        view.fireEvent(&#39;savesucceeded&#39;);
+    },
+
+<span id='CpsiMapview-form-ControllerMixin-method-onSaveClick'>    /**
+</span>     * Action when the save button is clicked
+     * */
+    onSaveClick: function () {
+        var me = this;
+        var win = me.getView();
+        var f = win.down(&#39;form&#39;);
+        if (!f) {
+            throw &#39;Editing windows must have a top level &quot;xtype: \&#39;form\&#39;&quot; container&#39;;
+        }
+
+        var goAhead = f.isValid() &amp;&amp; (!this.beforeSave || this.beforeSave());
+
+        if (goAhead) {
+            me.saveRecord();
+        }
+    },
+
+<span id='CpsiMapview-form-ControllerMixin-method-saveRecord'>    /**
+</span>     * Save the current record to the server
+     */
+    saveRecord: function () {
+
+        var me = this;
+        var win = me.getView();
+        var vm = me.getViewModel();
+        var currentRecord = vm.get(&#39;currentRecord&#39;);
+
+        // use currentRecord.getData({associated: true})
+        // to check JSON that will be sent to the server
+        // or currentRecord.getProxy().getWriter().getRecordData(currentRecord)
+
+        win.mask(&#39;Saving...&#39;);
+        currentRecord.save({
+            failure: me.onSaveFailed,
+            success: me.onSaveSucceded,
+            callback: function () {
+                // do something whether the save succeeded or failed
+                win.unmask();
+            },
+            scope: me
+        });
+
+    },
+
+<span id='CpsiMapview-form-ControllerMixin-method-onDeleteFailed'>    /**
+</span>     * Action when a delete fails
+     * @param {any} record
+     * @param {any} operation
+     */
+    onDeleteFailed: function (record, operation) {
+        Ext.log(&#39;ERASE FAILED&#39;);
+        Ext.Msg.alert(&#39;Error&#39;, operation.getResponse().responseJson.message);
+    },
+
+<span id='CpsiMapview-form-ControllerMixin-method-onDeleteSucceeded'>    /**
+</span>     * Action when a delete succeeds
+     * @param {any} record
+     */
+    onDeleteSucceeded: function (record) {
+
+        var me = this;
+        // trigger grid refresh
+        record.onModelSaved();
+        record.destroy();
+
+        // close the window
+        var w = me.getView();
+        w.close();
+    },
+
+<span id='CpsiMapview-form-ControllerMixin-method-onDelete'>    /**
+</span>     * Action for deletion
+     * */
+    onDelete: function () {
+        var me = this;
+        var w = me.getView();
+        var vm = w.getViewModel();
+        w.mask(&#39;Deleting...&#39;);
+        var rec = vm.get(&#39;currentRecord&#39;);
+        rec.proxy.erase(Ext.create(&#39;Ext.data.operation.Destroy&#39;, {
+            url: rec.proxy.getUrl(),
+            records: [rec],
+            callback: function (records, operation, success) {
+                w.unmask();
+                // do something whether the delete succeeded or failed
+                if (success) {
+                    me.onDeleteSucceeded(records[0], operation);
+                }
+                else {
+                    me.onDeleteFailed(records[0], operation);
+                }
+            },
+            scope: me
+        }));
+    },
+
+<span id='CpsiMapview-form-ControllerMixin-method-onDeleteCancel'>    onDeleteCancel: Ext.emptyFn,
+</span>
+<span id='CpsiMapview-form-ControllerMixin-method-onDeleteClick'>    /**
+</span>     * Action when the delete button is clicked
+     * */
+    onDeleteClick: function () {
+
+        var me = this;
+        var beforeDeleteConfig = { avoidConfirmationRequest: false };
+        var goAhead = (me.beforeDelete ? me.beforeDelete(beforeDeleteConfig) : true);
+        if (goAhead) {
+            if (beforeDeleteConfig.avoidConfirmationRequest) {
+                me.onDelete.call(me);
+            } else {
+                Ext.Msg.confirm(&#39;Delete&#39;, &#39;Are you sure you want to proceed with deletion?&#39;,
+                    function (buttonId) {
+                        if (buttonId == &#39;yes&#39;) {
+                            me.onDelete.call(me);
+                        } else {
+                            me.onDeleteCancel.call(me);
+                        }
+                    }
+                );
+            }
+        }
+        else {
+            me.onDeleteCancel.call(me);
+        }
+    },
+
+<span id='CpsiMapview-form-ControllerMixin-method-onCancelClick'>    /**
+</span>     * Action when the cancel button is clicked
+     * */
+    onCancelClick: function () {
+        var win = this.getView();
+        var goAhead = !this.beforeCancel || this.beforeCancel();
+        if (goAhead) {
+            var rec = this.getViewModel().get(&#39;currentRecord&#39;);
+            if (rec) {
+                rec.reject();
+            }
+            win.close();
+        }
+    },
+
+<span id='CpsiMapview-form-ControllerMixin-method-onExportClick'>    /**
+</span>     * Action when the export button is clicked
+     * */
+    onExportClick: Ext.emptyFn,
+
+<span id='CpsiMapview-form-ControllerMixin-method-onZoomClick'>    /**
+</span>     * Action when the zoom button is clicked
+     */
+    onZoomClick: function () {
+        var me = this;
+        var goAhead = !me.beforeZoom || me.beforeZoom();
+        if (goAhead) {
+            // call the mixin function with the controller as the scope
+            me.mixins.zoomer.zoomToRecordExtent.call(me);
+        }
+    },
+
+<span id='CpsiMapview-form-ControllerMixin-method-reloadRecord'>    /**
+</span>     * Reload a record with fresh data from the server
+     * @param {any} serverRec
+     */
+    reloadRecord: function (serverRec) {
+
+        var me = this;
+        var vm = me.getViewModel();
+
+        // destroy the previously loaded record to ensure any feature stores
+        // are removed and recreated
+        var existingRec = vm.get(&#39;currentRecord&#39;);
+        vm.set(&#39;currentRecord&#39;, serverRec);
+        vm.notify(); // flush all bindings, otherwise the grid may still be bound to the old layer
+
+        // we also need to update the featureStores for any associated tools
+        // as when a model is reloaded then the featureStore and layer
+        // are recreated, and the tool is pointing to the old layer
+
+        // see bindings in CpsiMapview.form.ViewMixin
+
+        var resultLayer = vm.get(&#39;resultLayer&#39;);
+        var polygonLayer = vm.get(&#39;polygonLayer&#39;);
+        var vw = me.getView();
+
+        var tool, toolCtrl;
+
+        if (vm.get(&#39;hideDigitisePointButton&#39;) === false) {
+            tool = vw.down(&#39;#pointDigitiserButton&#39;);
+            toolCtrl = tool.getController();
+            toolCtrl.setResultLayer(resultLayer);
+            toolCtrl.setDrawLayer(resultLayer);
+        }
+
+        if (vm.get(&#39;hideDigitiseAreaButton&#39;) === false) {
+            tool = vw.down(&#39;#areaDigitiserButton&#39;);
+            toolCtrl = tool.getController();
+            toolCtrl.setResultLayer(resultLayer);
+            toolCtrl.setDrawLayer(polygonLayer);
+        }
+
+        if (vm.get(&#39;circleDigitiserButton&#39;) === false) {
+            tool = vw.down(&#39;#circleDigitiserButton&#39;);
+            toolCtrl = tool.getController();
+            toolCtrl.setResultLayer(resultLayer);
+            toolCtrl.setDrawLayer(polygonLayer);
+        }
+
+        if (vm.get(&#39;hideDigitiseSegmentButton&#39;) === false) {
+            tool = vw.down(&#39;#segmentDigitiserButton&#39;);
+            toolCtrl = tool.getController();
+            toolCtrl.setResultLayer(resultLayer);
+        }
+
+        // only destroy this after the new record has been set as getting errors in checkHadValue &gt; getChildValue
+        // it seems to be an issue with checkBoxes only
+        existingRec.destroy();
+    },
+
+<span id='CpsiMapview-form-ControllerMixin-method-onRefreshClick'>    /**
+</span>    * Allow a record to be reloaded from the server
+    **/
+    onRefreshClick: function () {
+
+        var me = this;
+        var win = me.getView();
+        var vm = me.getViewModel();
+
+        win.mask(&#39;Refreshing Record...&#39;);
+
+        var currentRecord = vm.get(&#39;currentRecord&#39;);
+
+        // only allow refreshing of existing records
+        if (!currentRecord || currentRecord.isPhantom()) {
+            return;
+        }
+
+        var modelPrototype = Ext.ClassManager.get(currentRecord.$className);
+
+        modelPrototype.load(currentRecord.getId(), {
+            success: me.reloadRecord,
+            callback: function () {
+                win.unmask();
+            },
+            scope: this
+        });
+    },
+
+<span id='CpsiMapview-form-ControllerMixin-method-onBeforeTabChange'>    /**
+</span>     * Do not allow the tab to change if a grid is currently
+     * being edited (the wrong data could be saved)
+     * @param {any} tabPanel
+     * @param {any} newCard
+     * @param {any} oldCard
+     */
+    onBeforeTabChange: function (tabPanel, newCard, oldCard) {
+        var grids = oldCard.down(&#39;grid&#39;);
+
+        var ret = true;
+
+        Ext.each(grids, function (grid) {
+            var editingPlugin = grid.editingPlugin;
+            if (editingPlugin &amp;&amp; editingPlugin.editing) {
+                ret = false;
+            }
+        });
+
+        return ret;
+    },
+
+<span id='CpsiMapview-form-ControllerMixin-method-onFieldChanged'>    onFieldChanged: function () {
+</span>        var me = this;
+        var vm = me.getViewModel();
+        var rec = vm.get(&#39;currentRecord&#39;);
+        if (rec) {
+            // call the mixin function with the controller as the scope
+            me.mixins.validation.checkValid.call(me, rec);
+
+            // update a custom timestamp property on the viewmodel
+            // so any validation logic can be retriggered if required
+            vm.set(&#39;timestamp&#39;, Ext.Date.now());
+        }
+    }
+});</pre>
+</body>
+</html>

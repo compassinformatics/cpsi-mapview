@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+  <title>The source code</title>
+  <link href="../resources/prettify/prettify.css" type="text/css" rel="stylesheet" />
+  <script type="text/javascript" src="../resources/prettify/prettify.js"></script>
+  <style type="text/css">
+    .highlight { display: block; background-color: #ddd; }
+  </style>
+  <script type="text/javascript">
+    function highlight() {
+      document.getElementById(location.hash.replace(/#/, "")).className = "highlight";
+    }
+  </script>
+</head>
+<body onload="prettyPrint(); highlight();">
+  <pre class="prettyprint lang-js"><span id='CpsiMapview-view-button-FeatureSelectionButton'>/**
+</span> * This class represents a button, which is mainly used within a feature grid
+ * (CpsiMapview.view.grid.Grid) and allows the user to select features on the
+ * map by clicking when the button is pressed.
+ * For selection the ID of the clicked feature is detected and forwarded to the
+ * owner grid and its underlying WFS store.
+ *
+ * @class CpsiMapview.view.button.FeatureSelectionButton
+ */
+Ext.define(&#39;CpsiMapview.view.button.FeatureSelectionButton&#39;, {
+    extend: &#39;Ext.button.Button&#39;,
+    xtype: &#39;cmv_feature_selection_button&#39;,
+
+    requires: [
+        &#39;CpsiMapview.controller.button.FeatureSelectionButtonController&#39;
+    ],
+
+    statics: {
+    },
+
+    config: {
+<span id='CpsiMapview-view-button-FeatureSelectionButton-cfg-vectorLayerKey'>        /**
+</span>         * The layerKey property of the layer to query
+         */
+        vectorLayerKey: null
+    },
+
+<span id='CpsiMapview-view-button-FeatureSelectionButton-property-viewModel'>    viewModel: {
+</span>        data: {
+            text: &#39;Select&#39;,
+            tooltip: &#39;Select features on the map by click.&#39;,
+            addToSelectionLabel: &#39;Add to Selection&#39;,
+            newSelectionLabel: &#39;New Selection&#39;
+        }
+    },
+
+<span id='CpsiMapview-view-button-FeatureSelectionButton-property-controller'>    /**
+</span>     * The controller for this class
+     */
+    controller: &#39;cmv_feature_selection_btn&#39;,
+
+<span id='CpsiMapview-view-button-FeatureSelectionButton-property-name'>    /**
+</span>     * The name to be used e.g. in ComponentQueries
+     */
+    name: &#39;featureSelectionBtn&#39;,
+
+<span id='CpsiMapview-view-button-FeatureSelectionButton-property-queryLayer'>    /**
+</span>     * The layer to query
+     */
+    queryLayer: null,
+
+<span id='CpsiMapview-view-button-FeatureSelectionButton-property-showNoSelectionMessage'>    /**
+</span>     * Flag steering if a message is showm if no features are selected
+     */
+    showNoSelectionMessage: true,
+
+<span id='CpsiMapview-view-button-FeatureSelectionButton-property-enableToggle'>    /**
+</span>     * Enable toggle
+     */
+    enableToggle: true,
+
+<span id='CpsiMapview-view-button-FeatureSelectionButton-property-listeners'>    /**
+</span>     * Register the listeners and redirect them
+     * to their corresponding controller methods
+     */
+    listeners: {
+        toggle: &#39;onBtnToggle&#39;,
+    },
+
+<span id='CpsiMapview-view-button-FeatureSelectionButton-property-bind'>    bind: {
+</span>        text: &#39;{text}&#39;,
+        tooltip: &#39;{tooltip}&#39;
+    },
+
+
+<span id='CpsiMapview-view-button-FeatureSelectionButton-method-initComponent'>    /**
+</span>     * Initializes this component
+     */
+    initComponent: function () {
+        var me = this;
+        me.callParent();
+    }
+
+});
+</pre>
+</body>
+</html>

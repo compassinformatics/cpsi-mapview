@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+  <title>The source code</title>
+  <link href="../resources/prettify/prettify.css" type="text/css" rel="stylesheet" />
+  <script type="text/javascript" src="../resources/prettify/prettify.js"></script>
+  <style type="text/css">
+    .highlight { display: block; background-color: #ddd; }
+  </style>
+  <script type="text/javascript">
+    function highlight() {
+      document.getElementById(location.hash.replace(/#/, "")).className = "highlight";
+    }
+  </script>
+</head>
+<body onload="prettyPrint(); highlight();">
+  <pre class="prettyprint lang-js"><span id='CpsiMapview-plugin-FeatureInfoWindow'>/**
+</span> * This is a plugin for the `GeoExt.component.Map` component. It provides a window that opens on a singleclick on the map.
+ * All WMS that have the property `featureInfoWindow` set to true will be queried for feature info in format `geojson`.
+ * The resulting informations will be shown in property grids.
+ */
+Ext.define(&#39;CpsiMapview.plugin.FeatureInfoWindow&#39;, {
+    extend: &#39;Ext.plugin.Abstract&#39;,
+    alias: &#39;plugin.cmv_feature_info_window&#39;,
+<span id='CpsiMapview-plugin-FeatureInfoWindow-property-pluginId'>    pluginId: &#39;cmv_feature_info_window&#39;,
+</span>
+    requires: [
+        &#39;Ext.panel.Panel&#39;,
+        &#39;CpsiMapview.view.window.MinimizableWindow&#39;,
+        &#39;BasiGX.view.grid.FeaturePropertyGrid&#39;,
+        &#39;BasiGX.util.Map&#39;
+    ],
+
+<span id='CpsiMapview-plugin-FeatureInfoWindow-property-highlightSource'>    /**
+</span>     * A source containing a feature that highlights the click on the map.
+     * @property {ol.source.Vector}
+     */
+    highlightSource: null,
+
+<span id='CpsiMapview-plugin-FeatureInfoWindow-method-init'>    init: function () {
+</span>        var me = this;
+
+        var mapComp = me.getCmp();
+        var mapPanel = mapComp.up(&#39;cmv_map&#39;);
+        var map = mapComp.getMap();
+
+        mapPanel.on(&#39;cmv-mapclick&#39;, function (clickedFeatures, evt) {
+            if (map.get(&#39;defaultClickEnabled&#39;)) {
+                me.requestFeatureInfos(clickedFeatures, evt);
+            }
+        });
+    },
+
+<span id='CpsiMapview-plugin-FeatureInfoWindow-method-requestFeatureInfos'>    /**
+</span>     * This method queries all configured layers for feature information. It calls the methods to highlight the click,
+     * open a window and display the information
+     * @param {ol.MapBrowserEvent} evt
+     */
+    requestFeatureInfos: function (clickedFeatures, evt) {
+        var me = this;
+
+        var mapComp = me.getCmp();
+        var map = mapComp.getMap();
+
+        var layers = [];
+        var resolution = map.getView().getResolution();
+        var projection = map.getView().getProjection();
+        var format = new ol.format.GeoJSON();
+
+        this.highlightClick(evt);
+
+        map.forEachLayerAtPixel(evt.pixel, function (layer) {
+            layers.push(layer);
+        }, {
+            layerFilter: function (layer) {
+                return layer.get(&#39;featureInfoWindow&#39;);
+            }
+        });
+
+        var win = me.openFeatureInfoWindow();
+
+        if (layers.length &lt;= 1) {
+            win.getLayout().setConfig({
+                hideCollapseTool: true
+            });
+        } else {
+            win.getLayout().setConfig({
+                hideCollapseTool: false
+            });
+        }
+
+        if (layers.length === 0) {
+            win.add(Ext.create(&#39;Ext.panel.Panel&#39;, {
+                title: &#39;No results found&#39;
+            }));
+        } else {
+            layers.forEach(function (layer) {
+                var url = layer.getSource().getFeatureInfoUrl(evt.coordinate, resolution, projection, {
+                    INFO_FORMAT: &#39;geojson&#39;
+                });
+
+                Ext.Ajax.request({
+                    url: url
+                }).then(function (response) {
+                    var features = format.readFeatures(response.responseText);
+                    win.add(me.createFeaturePanels(layer, features));
+                }).then(undefined, function (error) {
+                    Ext.log.error(error);
+                });
+            });
+        }
+    },
+
+<span id='CpsiMapview-plugin-FeatureInfoWindow-method-highlightClick'>    /**
+</span>     * This method highlights the clicked point on the map.
+     * @param {ol.MapBrowserEvent} evt
+     */
+    highlightClick: function (evt) {
+        var me = this;
+        var map = me.getCmp().getMap();
+
+        if (!this.highlightSource) {
+            this.highlightSource = new ol.source.Vector();
+            new ol.layer.Vector({
+                source: this.highlightSource,
+                style: new ol.style.Style({
+                    image: new ol.style.Circle({
+                        radius: 5,
+                        stroke: new ol.style.Stroke({
+                            color: &#39;red&#39;,
+                            width: 2
+                        })
+                    })
+                }),
+                map: map
+            });
+        } else {
+            this.highlightSource.clear();
+        }
+
+        var feature = new ol.Feature(new ol.geom.Point(evt.coordinate));
+        this.highlightSource.addFeature(feature);
+    },
+
+<span id='CpsiMapview-plugin-FeatureInfoWindow-method-openFeatureInfoWindow'>    /**
+</span>     * This method opens a window to display the results in.
+     * @returns {CpsiMapview.view.window.MinimizableWindow}
+     */
+    openFeatureInfoWindow: function () {
+        var me = this;
+
+        // set the initial height of the window to 80% of the viewport height
+        // a user is then free to resize as they wish
+        var height = Ext.getBody().getViewSize().height * 0.8;
+
+        if (this.window) {
+            this.window.removeAll(true);
+        } else {
+            this.window = Ext.create(&#39;CpsiMapview.view.window.MinimizableWindow&#39;, {
+                title: &#39;Feature Information&#39;,
+                closeAction: &#39;hide&#39;, // reuse the window for all requests so a user can fix the position
+                scollable: true,
+                height: height,
+                width: 400,
+                layout: {
+                    type: &#39;accordion&#39;,
+                    titleCollapse: false,
+                    animate: true
+                }
+            });
+
+            this.window.on(&#39;close&#39;, function () {
+                me.highlightSource.clear();
+            });
+        }
+
+        this.window.show();
+
+        return this.window;
+    },
+
+<span id='CpsiMapview-plugin-FeatureInfoWindow-method-createFeaturePanels'>    /**
+</span>     * This method returns a property grid for every feature given.
+     * @param {ol.layer.Layer} layer
+     * @param {ol.Feature[]} features
+     * @returns {BasiGX.view.grid.FeaturePropertyGrid[]}
+     */
+    createFeaturePanels: function ( layer, features) {
+        return features.map(function (feature) {
+            return Ext.create(&#39;BasiGX.view.grid.FeaturePropertyGrid&#39;, {
+                title: layer.get(&#39;name&#39;),
+                olFeature: feature,
+                propertyWhiteList: Object.keys(feature.getProperties()),
+                scrollable: true,
+                nameColumnWidth: 150,
+                viewConfig: {
+                    enableTextSelection: true,
+                    // the following is needed to make `enableTextSelection` work. See https://stackoverflow.com/questions/42760943
+                    getRowClass: function () {
+                        return this.enableTextSelection ? &#39;x-selectable&#39; : &#39;&#39;;
+                    }
+                }
+            });
+        });
+    },
+});
+</pre>
+</body>
+</html>

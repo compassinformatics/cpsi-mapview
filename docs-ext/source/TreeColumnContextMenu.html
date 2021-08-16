@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+  <title>The source code</title>
+  <link href="../resources/prettify/prettify.css" type="text/css" rel="stylesheet" />
+  <script type="text/javascript" src="../resources/prettify/prettify.js"></script>
+  <style type="text/css">
+    .highlight { display: block; background-color: #ddd; }
+  </style>
+  <script type="text/javascript">
+    function highlight() {
+      document.getElementById(location.hash.replace(/#/, "")).className = "highlight";
+    }
+  </script>
+</head>
+<body onload="prettyPrint(); highlight();">
+  <pre class="prettyprint lang-js"><span id='CpsiMapview-plugin-TreeColumnContextMenu'>/**
+</span> * Plugin in order to show a ContextMenu for a layer in the LayerTree.
+ * ContextMenu is opened on right-clicking a layer in the tree and shows all
+ * configured menu items / tools.
+ *
+ * @class CpsiMapview.plugin.TreeColumnContextMenu
+ */
+Ext.define(&#39;CpsiMapview.plugin.TreeColumnContextMenu&#39;, {
+    extend: &#39;GeoExt.plugin.layertreenode.ContextMenu&#39;,
+    alias: &#39;plugin.cmv_tree_column_context_menu&#39;,
+<span id='CpsiMapview-plugin-TreeColumnContextMenu-property-pluginId'>    pluginId: &#39;cmv_tree_column_context_menu&#39;,
+</span>
+<span id='CpsiMapview-plugin-TreeColumnContextMenu-cfg-menuItems'>    /**
+</span>     * The &#39;xtypes&#39; of the items, which will be shown in this context menu.
+     *
+     * @cfg {String[]}
+     */
+    menuItems: [],
+
+<span id='CpsiMapview-plugin-TreeColumnContextMenu-method-init'>    /**
+</span>     * @private
+     */
+    init: function () {
+        this.callParent(arguments);
+    },
+
+<span id='CpsiMapview-plugin-TreeColumnContextMenu-method-createContextUi'>    /**
+</span>     * Implements the abstract #createContextUi of the father class in order to
+     * create a menu with all items accordinng to the corresponding layer
+     * properties, e.g. &#39;refreshLayerOption&#39; to show an item to refresh / redraw
+     * the layer.
+     *
+     * @param  {GeoExt.data.model.LayerTreeNode} layerTreeNode
+     *     The LayerTreeNode of the right-clicked layer
+     * @return {Ext.menu.Menu} The menu holding all configured items / tools
+     */
+    createContextUi: function (layerTreeNode) {
+        var me = this;
+        var menuItems = [];
+
+        // create all menu items / tools
+        Ext.each(me.menuItems, function (menuItem) {
+            menuItems.push({
+                xtype: menuItem,
+                layer: layerTreeNode.getOlLayer()
+            });
+        });
+
+        // create the menu and hide if empty
+        var emptyMenu = menuItems.length === 0;
+        var menu = Ext.create(&#39;Ext.menu.Menu&#39;, {
+            items: menuItems,
+            hidden: emptyMenu
+        });
+
+        return menu;
+    }
+
+});
+</pre>
+</body>
+</html>

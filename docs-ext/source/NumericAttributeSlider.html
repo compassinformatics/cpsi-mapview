@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+  <title>The source code</title>
+  <link href="../resources/prettify/prettify.css" type="text/css" rel="stylesheet" />
+  <script type="text/javascript" src="../resources/prettify/prettify.js"></script>
+  <style type="text/css">
+    .highlight { display: block; background-color: #ddd; }
+  </style>
+  <script type="text/javascript">
+    function highlight() {
+      document.getElementById(location.hash.replace(/#/, "")).className = "highlight";
+    }
+  </script>
+</head>
+<body onload="prettyPrint(); highlight();">
+  <pre class="prettyprint lang-js"><span id='CpsiMapview-view-panel-NumericAttributeSlider'>/**
+</span> * A toggleable slider which constructs a numeric filter and applies that to
+ * associated layers.
+ *
+ * @class CpsiMapview.view.panel.NumericAttributeSlider
+ */
+Ext.define(&#39;CpsiMapview.view.panel.NumericAttributeSlider&#39;, {
+    extend: &#39;Ext.panel.Panel&#39;,
+    xtype: &#39;cmv_numericattributeslider&#39;,
+
+    requires: [
+        &#39;Ext.form.field.Checkbox&#39;,
+        &#39;Ext.slider.Multi&#39;,
+        &#39;CpsiMapview.controller.panel.NumericAttributeSlider&#39;
+    ],
+
+<span id='CpsiMapview-view-panel-NumericAttributeSlider-property-controller'>    controller: &#39;cmv_numericattributeslider&#39;,
+</span>
+<span id='CpsiMapview-view-panel-NumericAttributeSlider-property-layout'>    layout: &#39;hbox&#39;,
+</span>
+    config: {
+<span id='CpsiMapview-view-panel-NumericAttributeSlider-cfg-minValue'>        minValue: 0,
+</span><span id='CpsiMapview-view-panel-NumericAttributeSlider-cfg-maxValue'>        maxValue: 15,
+</span><span id='CpsiMapview-view-panel-NumericAttributeSlider-cfg-currLowerValue'>        currLowerValue: 5,
+</span><span id='CpsiMapview-view-panel-NumericAttributeSlider-cfg-currUpperValue'>        currUpperValue: 11,
+</span><span id='CpsiMapview-view-panel-NumericAttributeSlider-cfg-increment'>        increment: 0.5,
+</span><span id='CpsiMapview-view-panel-NumericAttributeSlider-cfg-sliderLabel'>        sliderLabel: &#39;Num. attribute&#39;,
+</span><span id='CpsiMapview-view-panel-NumericAttributeSlider-cfg-checkboxLabel'>        checkboxLabel: &#39;active?&#39;,
+</span><span id='CpsiMapview-view-panel-NumericAttributeSlider-cfg-enabled'><span id='CpsiMapview-view-panel-NumericAttributeSlider-cfg-numericField'>        numericField: null, // required, or better at the layer level?
+</span></span>        enabled: true
+    },
+
+<span id='CpsiMapview-view-panel-NumericAttributeSlider-property-cls'>    /**
+</span>     * The CSS class of the slider
+     */
+    cls: &#39;cpsi-numeric-attribute-slider&#39;,
+
+<span id='CpsiMapview-view-panel-NumericAttributeSlider-method-constructor'>    /**
+</span>     * Construct an instance of the numeric attribute slider. We need to take
+     * care of the correct handling of the inherited disabled configuration.
+     *
+     * @param {object} config The configuration object.
+     */
+    constructor: function(config) {
+        var cfg = config || {};
+        var cfgEnabled = cfg.enabled;
+        var cfgDisabled = cfg.disabled;
+        delete cfg.enabled;
+        delete cfg.disabled;
+
+        var hasPassedCfgEnabled = Ext.isDefined(cfgEnabled);
+        var hasPassedCfgDisabled = Ext.isDefined(cfgDisabled);
+
+        var finalEnabled = cfgEnabled; // either undefined or user defined
+
+        if (hasPassedCfgEnabled &amp;&amp; hasPassedCfgDisabled) {
+            // user passed both, ensure they make sense or warn
+            if (cfgEnabled !== !cfgDisabled) { // semantically not same
+                Ext.Logger.warn(&#39;Conflicting disabled/enabled configs found. &#39;
+                    + &#39;NumericAttributeSlider will be using &quot;enabled:&#39;
+                    + finalEnabled + &#39;&quot;.&#39;);
+            }
+        } else if (hasPassedCfgDisabled) {
+            // user passed only disabled, warn and switch to enabled
+            finalEnabled = !cfgDisabled;
+            Ext.Logger.info(&#39;Config option &quot;disabled=&#39; + cfgDisabled + &#39;&quot; passed,&#39;
+                + &#39; transforming to option &quot;enabled=&#39; + finalEnabled + &#39;&quot;.&#39;);
+        } else if (!hasPassedCfgEnabled) {
+            // reinitiate the default of this class
+            var clazz = CpsiMapview.view.panel.NumericAttributeSlider;
+            finalEnabled = clazz.prototype.config.enabled;
+        }
+
+        cfg.enabled = finalEnabled;
+
+        this.callParent([cfg]);
+    },
+
+<span id='CpsiMapview-view-panel-NumericAttributeSlider-method-initComponent'>    /**
+</span>     * Initializes the numeric attribute slider.
+     */
+    initComponent: function () {
+        var me = this;
+        var values = [me.getCurrLowerValue(), me.getCurrUpperValue()];
+        me.items = [{
+            xtype: &#39;multislider&#39;,
+            name: &#39;slider&#39;,
+            labelAlign: &#39;right&#39;,
+            listeners: {
+                afterrender: &#39;initSlider&#39;,
+                changecomplete: &#39;applySliderEffects&#39;
+            },
+            constrainThumbs: false,
+            tipText: &#39;getTipText&#39;,
+            fieldLabel: me.getSliderLabel(),
+            width: 200,
+            values: values,
+            increment: me.getIncrement(),
+            minValue: me.getMinValue(),
+            maxValue: me.getMaxValue(),
+            disabled: !me.getEnabled()
+        },
+        {
+            xtype: &#39;checkbox&#39;,
+            name: &#39;active&#39;,
+            boxLabel: me.getCheckboxLabel(),
+            checked: me.getEnabled(),
+            listeners: {
+                change: &#39;onCheckChange&#39;
+            }
+        }];
+
+        me.callParent();
+    },
+
+<span id='CpsiMapview-view-panel-NumericAttributeSlider-method-setDisabled'>    /**
+</span>     * Overide the inherited setDisabled, to handle disabling like we would.
+     * One might argue that disabling should also actually disable the
+     * checkbox, this can be added if agreed upon.
+     *
+     * @param {boolean} newDisabled
+     */
+    setDisabled: function(newDisabled) {
+        // override the original method and
+        // fast forward to checkbox check / uncheck
+        var newEnabled = !newDisabled;
+        this.setEnabled(newEnabled);
+        var cb = this.down(&#39;checkbox[name=&quot;active&quot;]&#39;);
+        cb.setValue(newEnabled);
+        return this; // the original method is chainable
+    }
+
+});
+</pre>
+</body>
+</html>

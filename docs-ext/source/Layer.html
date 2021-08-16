@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+  <title>The source code</title>
+  <link href="../resources/prettify/prettify.css" type="text/css" rel="stylesheet" />
+  <script type="text/javascript" src="../resources/prettify/prettify.js"></script>
+  <style type="text/css">
+    .highlight { display: block; background-color: #ddd; }
+  </style>
+  <script type="text/javascript">
+    function highlight() {
+      document.getElementById(location.hash.replace(/#/, "")).className = "highlight";
+    }
+  </script>
+</head>
+<body onload="prettyPrint(); highlight();">
+  <pre class="prettyprint lang-js"><span id='CpsiMapview-util-Layer'>/**
+</span> * Util class for working with map layers
+ *
+ * @class CpsiMapview.util.Layer
+ */
+Ext.define(&#39;CpsiMapview.util.Layer&#39;, {
+    alternateClassName: &#39;LayerUtil&#39;,
+    requires: [
+        &#39;BasiGX.util.Object&#39;
+    ],
+
+    singleton: true,
+
+<span id='CpsiMapview-util-Layer-method-layerRefresh'>    /**
+</span>    * Executed when this menu item is clicked.
+    * Forces redraw of the connected layer.
+    */
+    layerRefresh: function (layer) {
+
+        var source = layer.getSource();
+
+        // mostly WMS layers
+        if (source.updateParams) {
+            var params = source.getParams();
+            params.TIMESTAMP = Ext.Date.now();
+            source.updateParams(params);
+            source.refresh();
+        } else if (layer.get(&#39;isWfs&#39;) === true) {
+            if (source instanceof ol.source.Cluster) {
+                // for clustered layers we need to get the original source - see #203
+                source = source.getSource();
+            }
+            // for WFS trigger reload of source
+            source.set(&#39;timestamp&#39;, Ext.Date.now());
+            source.refresh();
+        } else {
+            // only refresh for other layers and sources (to not loose data)
+            source.refresh();
+        }
+    }
+});
+</pre>
+</body>
+</html>

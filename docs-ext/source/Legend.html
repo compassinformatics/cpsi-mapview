@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+  <title>The source code</title>
+  <link href="../resources/prettify/prettify.css" type="text/css" rel="stylesheet" />
+  <script type="text/javascript" src="../resources/prettify/prettify.js"></script>
+  <style type="text/css">
+    .highlight { display: block; background-color: #ddd; }
+  </style>
+  <script type="text/javascript">
+    function highlight() {
+      document.getElementById(location.hash.replace(/#/, "")).className = "highlight";
+    }
+  </script>
+</head>
+<body onload="prettyPrint(); highlight();">
+  <pre class="prettyprint lang-js"><span id='CpsiMapview-util-Legend'>/**
+</span> * Util class for legends related functions.
+ *
+ * @class CpsiMapview.util.Legend
+ */
+Ext.define(&#39;CpsiMapview.util.Legend&#39;, {
+    alternateClassName: &#39;LegendUtil&#39;,
+    requires: [
+        &#39;BasiGX.util.Object&#39;,
+        &#39;CpsiMapview.util.Html&#39;
+    ],
+
+    singleton: true,
+
+<span id='CpsiMapview-util-Legend-method-createGetLegendGraphicUrl'>    /**
+</span>     * Creates a WMS getLegendGraphic request URL for the given OL layer.
+     * For WMS it uses the standard WMS mechanism / information.
+     * For WFS the assumption is that MapServer uses the same configuration for
+     * WMS and WFS so we can create the getLegendGraphic the same way.
+     * STYLE parameter is derived by the corresponding SLD file name
+     * (see #getWmsStyleFromSldFile).
+     *
+     * @param  {ol.layer.Base} layer The OL layer to get the request URL for
+     * @return {String}       The getLegendGraphic request URL
+     */
+    createGetLegendGraphicUrl: function (layer) {
+
+        var source = layer.getSource();
+        var url;
+        var requestParams = &#39;&#39;;
+
+        var activatedStyle;
+        if (layer.get(&#39;isWms&#39;) || layer.get(&#39;isVt&#39;)) {
+            if (source.getUrls) {
+                url = source.getUrls()[0];
+            } else {
+                url = source.getUrl(); // for a ol.source.ImageWMS layer
+            }
+
+            var layers;
+            activatedStyle = layer.get(&#39;activatedStyle&#39;);
+
+            if (layer.get(&#39;isVt&#39;)) {
+                var splitUrl = url.toLowerCase().split(&#39;?&#39;);
+                url = splitUrl[0];
+                layers = Ext.Object.fromQueryString(splitUrl[1]).layers;
+                activatedStyle = this.getWmsStyleFromSldFile(activatedStyle);
+            } else {
+                layers = BasiGX.util.Object.layersFromParams(source.getParams());
+            }
+
+            if (!url || !layers) {
+                return;
+            }
+
+            // Remove possible duplicates created by adding labels
+            // (CpsiMapview.view.menuitem.LayerLabels) because GetLegendGraphic
+            // accepts only one layer in its LAYER param
+            layers = LegendUtil.getUniqueLayersParam(layers);
+
+            requestParams += &#39;SERVICE=WMS&amp;VERSION=1.3.0&amp;REQUEST=GetLegendGraphic&amp;&#39;;
+            requestParams += &#39;FORMAT=image%2Fpng&amp;TRANSPARENT=TRUE&amp;SLD_VERSION=1.1.0&amp;&#39;;
+            requestParams += &#39;LAYER=&#39; + layers + &#39;&amp;&#39;;
+            if (activatedStyle) {
+                requestParams += &#39;STYLE=&#39; + activatedStyle;
+            }
+
+        } else if (layer.get(&#39;isWfs&#39;)) {
+
+            url = layer.get(&#39;url&#39;);
+            var ft = layer.get(&#39;featureType&#39;);
+            activatedStyle = layer.get(&#39;activatedStyle&#39;);
+            if (!url || !ft) {
+                return;
+            }
+
+            requestParams += &#39;SERVICE=WMS&amp;VERSION=1.3.0&amp;REQUEST=GetLegendGraphic&amp;&#39;;
+            requestParams += &#39;FORMAT=image%2Fpng&amp;TRANSPARENT=TRUE&amp;SLD_VERSION=1.1.0&amp;&#39;;
+            requestParams += &#39;LAYER=&#39; + ft + &#39;&amp;&#39;;
+            if (activatedStyle) {
+                requestParams += &#39;STYLE=&#39; + LegendUtil.getWmsStyleFromSldFile(activatedStyle);
+            }
+        }
+        if (!url) {
+            return;
+        }
+
+        if (!url.endsWith(&#39;?&#39;) &amp;&amp; !url.endsWith(&#39;&amp;&#39;)) {
+            url += &#39;?&#39;;
+        }
+
+        url += requestParams;
+
+        return url;
+    },
+
+<span id='CpsiMapview-util-Legend-method-getWmsStyleFromSldFile'>    /**
+</span>     * Derives the STYLE parameter by the corresponding SLD file name.
+     * Convention is LAYERS_STYLES.xml (whereas in STYLES we replace blanks by
+     * underscores), e.g. LightUnit_Unit_Type.xml =&gt; &#39;Unit Type&#39;.
+     *
+     * @param  {String} sldFileName The SLD file name
+     * @return {String}             The WMS STYLE parameter
+     */
+    getWmsStyleFromSldFile: function (sldFileName) {
+        // LightUnit_Unit_Type.xml =&gt; [&#39;LightUnit&#39;, &#39;Unit&#39;, &#39;Type&#39;]
+        var parts = sldFileName
+            .replace(&#39;.xml&#39;, &#39;&#39;)
+            .split(&#39;_&#39;);
+        // remove first item since it is the LAYERS name
+        parts.shift();
+        // =&gt; &#39;Unit Type&#39;
+        return parts.join(&#39; &#39;);
+    },
+
+<span id='CpsiMapview-util-Legend-method-getSldFileFromWmsStyle'>    /**
+</span>    * Derives the SLD file name by the corresponding WMS STYLES and LAYERS
+    * parameter.
+    * Convention is LAYERS_STYLES.xml (whereas for STYLES we replace blanks by
+    * underscores), e.g. &#39;Unit Type&#39; and &#39;LightUnit&#39; =&gt; LightUnit_Unit_Type.xml
+    *
+     * @param  {String} wmsStyle  The WMS STYLE parameter
+     * @param  {String} wmsLayers The WMS LAYERS parameter
+     * @return {String}           The SLD file name
+     */
+    getSldFileFromWmsStyle: function (wmsStyle, wmsLayers) {
+        return wmsLayers + &#39;_&#39; + wmsStyle.replace(&#39; &#39;, &#39;_&#39;) + &#39;.xml&#39;;
+    },
+
+<span id='CpsiMapview-util-Legend-method-hasLabels'>    /**
+</span>     * Helper function to check if all styles
+     * have a non-empty label property.
+     * @param {Object[]} styles Styles object from layerConfig to check
+     */
+    hasLabels: function (styles) {
+        var hasLabels = styles.every(function (style) {
+            return !Ext.isEmpty(style.label);
+        });
+        return hasLabels;
+    },
+
+<span id='CpsiMapview-util-Legend-method-getUniqueLayersParam'>    /*
+</span>     * Removes any duplicate layer name from the given LAYERS parameter value.
+     *
+     * @param  {String} layers WMS LAYERS parameter value, e.g. (layer1,layer2)
+     * @return {String}        WMS LAYERS parameter without duplicates
+     */
+    getUniqueLayersParam: function (layers) {
+        var layerList = Ext.isArray(layers) ? layers : layers.split(&#39;,&#39;);
+        // remove any duplicate layer names
+        var reducedLayerList = Ext.Array.unique(layerList);
+
+        return reducedLayerList.join(&#39;,&#39;);
+    },
+
+<span id='CpsiMapview-util-Legend-method-getLegendImgHtmlTpl'>    /**
+</span>     * Returns a string-based HTML template for a legend image.
+     * Can be used within CpsiMapview.plugin.BasicTreeColumnLegend.
+     *
+     * @param {String} legendUrl The URL to the legend image
+     * @param {Number} width Width of the legend image
+     * @param {Number} height Height of the legend image
+     */
+    getLegendImgHtmlTpl: function (legendUrl, width, height) {
+        var ns = &#39;CpsiMapview.plugin.BasicTreeColumnLegends&#39;;
+        return &#39;&lt;img&#39; +
+            &#39; class=&quot;cpsi-layer-legend&quot;&#39; +
+            &#39; src=&quot;&#39; + legendUrl + &#39;&quot;&#39; +
+            (width ? &#39; width=&quot;&#39; + width + &#39;&quot;&#39; : &#39;&#39;) +
+            (height ? &#39; height=&quot;&#39; + height + &#39;&quot;&#39; : &#39;&#39;) +
+            &#39; onerror=&quot;&#39; + ns + &#39;.checkCleanup(this);&quot;&#39; +
+            &#39; onload=&quot;&#39; + ns + &#39;.checkCleanup(this);&quot;&#39; +
+            &#39;/&gt;&#39;;
+    },
+
+<span id='CpsiMapview-util-Legend-method-cacheLegendImgAsDataUrl'>    /**
+</span>     * Caches the given legend image for a layer as dataURL in the
+     * static lookup of CpsiMapview.view.LayerTree.
+     *
+     * @param {String} legendUrl The URL to the legend image
+     * @param {String} layerKey The key / ID of the layer (used for storing in lookup)
+     */
+    cacheLegendImgAsDataUrl: function(legendUrl, layerKey) {
+        var legendImage = new Image();
+        legendImage.crossOrigin = &#39;anonymous&#39;;
+        CpsiMapview.util.Html.addEvent(
+            legendImage, &#39;load&#39;, function() {
+
+                // set width and height
+                var width = this.naturalWidth;
+                var height = this.naturalHeight;
+                // convert to base64 to avoid
+                // reloading of the image
+                var canvas = document.createElement(&#39;canvas&#39;);
+                canvas.width = width;
+                canvas.height = height;
+
+                var ctx = canvas.getContext(&#39;2d&#39;);
+                ctx.drawImage(this, 0, 0);
+                var legendDataUrl = canvas.toDataURL(&#39;image/png&#39;);
+
+                // store in cache for later reuse
+                CpsiMapview.view.LayerTree.legendImgLookup[layerKey] = legendDataUrl;
+
+                LegendUtil[&#39;legendLoading_&#39; + layerKey] = false;
+            });
+
+        LegendUtil[&#39;legendLoading_&#39; + layerKey] = true;
+
+        // set original legend url to trigger loading
+        legendImage.src = legendUrl;
+    }
+});
+</pre>
+</body>
+</html>

@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+  <title>The source code</title>
+  <link href="../resources/prettify/prettify.css" type="text/css" rel="stylesheet" />
+  <script type="text/javascript" src="../resources/prettify/prettify.js"></script>
+  <style type="text/css">
+    .highlight { display: block; background-color: #ddd; }
+  </style>
+  <script type="text/javascript">
+    function highlight() {
+      document.getElementById(location.hash.replace(/#/, "")).className = "highlight";
+    }
+  </script>
+</head>
+<body onload="prettyPrint(); highlight();">
+  <pre class="prettyprint lang-js"><span id='CpsiMapview-view-toolbar-MinimizedWindows'>/**
+</span> * This class is the toolbar of cpsi mapview application that contains
+ * minimized windows. After a window was resized, the toolbar will be visible.
+ * If a window was minimized without adding this toolbar in advance, the window
+ * will minimize into nowhere.
+ *
+ * @class CpsiMapview.view.toolbar.MinimizedWindows
+ */
+Ext.define(&#39;CpsiMapview.view.toolbar.MinimizedWindows&#39;, {
+    extend: &#39;Ext.toolbar.Toolbar&#39;,
+    xtype: &#39;cmv_minimized_windows_toolbar&#39;,
+
+    requires: [
+        &#39;CpsiMapview.controller.toolbar.MinimizedWindows&#39;
+    ],
+
+<span id='CpsiMapview-view-toolbar-MinimizedWindows-property-controller'>    controller: &#39;cmv_minimized_windows_toolbar&#39;,
+</span>
+<span id='CpsiMapview-view-toolbar-MinimizedWindows-property-cls'>    cls: &#39;cmv_minimized_windows_toolbar&#39;,
+</span>
+<span id='CpsiMapview-view-toolbar-MinimizedWindows-property-name'>    name: null,
+</span>
+<span id='CpsiMapview-view-toolbar-MinimizedWindows-property-hidden'>    hidden: true,
+</span>
+<span id='CpsiMapview-view-toolbar-MinimizedWindows-property-listeners'>    listeners: {
+</span>        addMinimizedWindow: &#39;onAddMinimizedWindow&#39;,
+        restoreFromWindow: &#39;onRestoreFromWindow&#39;
+    }
+});
+</pre>
+</body>
+</html>

@@ -1,0 +1,417 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+  <title>The source code</title>
+  <link href="../resources/prettify/prettify.css" type="text/css" rel="stylesheet" />
+  <script type="text/javascript" src="../resources/prettify/prettify.js"></script>
+  <style type="text/css">
+    .highlight { display: block; background-color: #ddd; }
+  </style>
+  <script type="text/javascript">
+    function highlight() {
+      document.getElementById(location.hash.replace(/#/, "")).className = "highlight";
+    }
+  </script>
+</head>
+<body onload="prettyPrint(); highlight();">
+  <pre class="prettyprint lang-js"><span id='CpsiMapview-view-main-Map'>/**
+</span> * Main map view.
+ */
+Ext.define(&#39;CpsiMapview.view.main.Map&#39;, {
+    extend: &#39;Ext.panel.Panel&#39;,
+    xtype: &#39;cmv_map&#39;,
+
+    requires: [
+        &#39;GeoExt.component.Map&#39;,
+        &#39;GeoExt.state.PermalinkProvider&#39;,
+
+        &#39;CpsiMapview.view.toolbar.MapFooter&#39;,
+        &#39;CpsiMapview.view.toolbar.MapTools&#39;,
+        &#39;CpsiMapview.view.toolbar.MinimizedWindows&#39;,
+        &#39;CpsiMapview.controller.panel.TimeSlider&#39;,
+        &#39;CpsiMapview.controller.MapController&#39;,
+        &#39;CpsiMapview.plugin.FeatureInfoWindow&#39;,
+
+        &#39;BasiGX.util.Projection&#39;,
+        &#39;CpsiMapview.plugin.FeatureAttributeGrouping&#39;,
+        &#39;CpsiMapview.util.SwitchLayer&#39;
+    ],
+
+<span id='CpsiMapview-view-main-Map-property-layout'>    layout: &#39;fit&#39;,
+</span>
+<span id='CpsiMapview-view-main-Map-property-controller'>    controller: &#39;cmv_map&#39;,
+</span>
+<span id='CpsiMapview-view-main-Map-property-dockedItems'>    dockedItems: [{
+</span>        xtype: &#39;cmv_maptools&#39;,
+        dock: &#39;top&#39;,
+    }, {
+        xtype: &#39;cmv_mapfooter&#39;,
+        dock: &#39;bottom&#39;
+    }],
+
+<span id='CpsiMapview-view-main-Map-property-plugins'>    plugins: [
+</span>        {
+            ptype: &#39;cmv_feature_attribute_grouping&#39;,
+            startGroupingEvent: &#39;click&#39;,
+            endGroupingEvent: &#39;context&#39;
+        }
+    ],
+
+<span id='CpsiMapview-view-main-Map-property-enableMapClick'>    /**
+</span>     * Enables a click handler on the map which fires an event
+     * &#39;cmv-mapclick&#39; with all clicked vector features and their corresponding
+     * layers.
+     * @config {Boolean}
+     */
+    enableMapClick: true,
+
+<span id='CpsiMapview-view-main-Map-property-enableMapHover'>    /**
+</span>     * Enables a &#39;pointerrest&#39; handler on the map which fires an event
+     * &#39;cmv-map-pointerrest&#39; with all hovered vector features and their
+     * corresponding layers.
+     * @config {Boolean}
+     */
+    enableMapHover: true,
+
+<span id='CpsiMapview-view-main-Map-property-addScaleBarToMap'>    /*
+</span>     * Flag that to add a scale bar to the map or not
+     * @config {Boolean}
+     */
+    addScaleBarToMap: true,
+
+<span id='CpsiMapview-view-main-Map-property-enablePermalink'>    /*
+</span>     * Flag that enables/disables permalink functionality
+     * @config {Boolean}
+     */
+    enablePermalink: true,
+
+<span id='CpsiMapview-view-main-Map-property-shouldUpdatePermalink'>    /**
+</span>     * Flag to show if permalink should be updated or not.
+     * We do not update the URL when the view was changed in the &#39;popstate&#39;
+     * handler.
+     * @property {Boolean}
+     * @private
+     */
+    shouldUpdatePermalink: true,
+
+<span id='CpsiMapview-view-main-Map-property-roundPermalinkCoords'>    /**
+</span>     * Flag to steer if center coordinates in the permalink should be rounded or
+     * not
+     * @config {Boolean}
+     */
+    roundPermalinkCoords: true,
+
+
+<span id='CpsiMapview-view-main-Map-property-lastResolution'>    /**
+</span>     * Remembers the last resolution before change.
+     * Necessary for detecting resolution change events.
+     * @property {Number}
+     * @private
+     */
+    lastResolution: null,
+
+<span id='CpsiMapview-view-main-Map-event-cmv-mapclick'>    /**
+</span>     * @event cmv-mapclick
+     * Fires when the OL map is clicked.
+     * @param {CpsiMapview.view.main.Map} this
+     * @param {Object[]} clickInfo The clicked features and the corresponding layers, like `[{feature: aFeat, layer: aLayer}, ...]`
+     * @param {ol.MapBrowserEvent)} evt The original &#39;singleclick&#39; event of OpenLayers
+     */
+
+<span id='CpsiMapview-view-main-Map-event-cmv-init-layersadded'>    /**
+</span>     * @event cmv-init-layersadded
+     * Fires when all initial layers from the config have been created and added to the OL map.
+     * @param {CpsiMapview.view.main.Map} this
+     */
+
+    inheritableStatics: {
+<span id='CpsiMapview-view-main-Map-static-method-guess'>        /**
+</span>         * Tries to detect the first occurance of this map panel.
+         * @return {CpsiMapview.view.main.Map} The map panel, which is at least
+         *     a GeoExt.component.Map and possibly an instance of this class.
+         */
+        guess: function() {
+            return BasiGX.util.Map.getMapComponent(this.xtype);
+        }
+    },
+
+<span id='CpsiMapview-view-main-Map-method-applyDefaultsToLayerConf'>    /**
+</span>     * Applies the default values to each layer
+     * @param {*} layerConf
+     * @param {*} defaults
+     */
+    applyDefaultsToLayerConf : function(layerConf, defaults){
+
+        var newLayerConf = {};
+
+        // general default
+        var generalDefaults = defaults[&#39;general&#39;];
+        Ext.Object.merge(newLayerConf, generalDefaults);
+
+        // layer type default
+        var typeDefaults = defaults[layerConf.layerType];
+        Ext.Object.merge(newLayerConf,typeDefaults);
+
+        // actual config
+        Ext.Object.merge(newLayerConf, layerConf);
+        return newLayerConf;
+    },
+
+<span id='CpsiMapview-view-main-Map-method-applyDefaultsToApplicationConf'>    /**
+</span>     * Takes the configuration file of the application
+     * and applies the default values to each layer definition.
+     * @param {*} layerJson
+     */
+    applyDefaultsToApplicationConf: function(layerJson){
+        var me = this;
+
+        var defaults = layerJson.defaults;
+
+        var newConfiguration = {&#39;layers&#39;:[]};
+
+        // loop through layers and apply defaults
+        Ext.each(layerJson.layers, function (layerConf) {
+
+            var newLayerConf = me.applyDefaultsToLayerConf(layerConf, defaults);
+
+            // additionally update sublayers of switch layers
+            if(newLayerConf.layerType == &#39;switchlayer&#39;){
+
+                var updatedSubLayers = [];
+                // loop through sublayers and apply defaults
+                Ext.each(newLayerConf.layers, function(subLayerConf){
+
+                    var newSubLayerConf = me.applyDefaultsToLayerConf( subLayerConf, defaults);
+                    updatedSubLayers.push(newSubLayerConf);
+                });
+                // replace old layers with updated layers
+                newLayerConf.layers = updatedSubLayers;
+            }
+            // add updated layer config to new configuration file
+            newConfiguration.layers.push(newLayerConf);
+        });
+        return newConfiguration;
+    },
+
+
+<span id='CpsiMapview-view-main-Map-method-initComponent'>    /**
+</span>     * @private
+     */
+    initComponent: function () {
+        var me = this;
+
+        // create a default map if one has not already been created in a derived class
+        if (!me.map) {
+            me.map = new ol.Map({
+                // layers will be created from config in initComponent
+                layers: [],
+                controls: ol.control.defaults().extend([
+                    new ol.control.FullScreen()
+                ]),
+                interactions: ol.interaction.defaults().extend([
+                    new ol.interaction.DragRotateAndZoom()
+                ]),
+                view: new ol.View({
+                    center: ol.proj.fromLonLat([-8, 53.5]),
+                    zoom: 8
+                })
+            });
+        }
+
+        // create default items if not already been created in a derived class
+        if (!me.items) {
+            me.items = [{
+                xtype: &#39;gx_map&#39;,
+                pointerRest: true,
+                pointerRestInterval: 500,
+                stateful: true,
+                stateId: &#39;cmv_mapstate&#39;,
+                map: me.map,
+                plugins: [
+                    {
+                        ptype: &#39;cmv_feature_info_window&#39;
+                    }
+                ],
+                listeners: {
+                    afterrender: &#39;afterMapRender&#39;
+                }
+            }, {
+                xtype: &#39;cmv_minimized_windows_toolbar&#39;
+            }];
+        }
+
+        // Load layer JSON configuration
+        Ext.Ajax.request({
+            url: &#39;resources/data/layers/default.json&#39;,
+            success: function (response) {
+                var layerJson = Ext.decode(response.responseText);
+                var newConfiguration = me.applyDefaultsToApplicationConf(layerJson);
+
+                Ext.each(newConfiguration.layers, function (layerConf) {
+                    var layer = LayerFactory.createLayer(layerConf);
+                    if (layer) {
+                        me.olMap.addLayer(layer);
+                    }
+                });
+
+                // fire event to inform subscribers that all layers are loaded
+                me.fireEvent(&#39;cmv-init-layersadded&#39;, me);
+
+                var timeSlider = me.down(&#39;cmv_timeslider&#39;);
+                if (timeSlider) {
+                    timeSlider.fireEvent(&#39;allLayersAdded&#39;,
+                        timeSlider.down(&#39;multislider&#39;));
+                }
+            }
+        });
+
+        me.callParent(arguments);
+
+        // make sub components accessible as members
+        me.mapCmp = me.down(&#39;gx_map&#39;);
+        me.olMap = me.mapCmp.map;
+
+        if (me.enableMapClick) {
+            me.olMap.on(&#39;singleclick&#39;, function(evt) {
+                var clickedFeatures = [];
+                me.olMap.forEachFeatureAtPixel(evt.pixel,
+                    function(feature, layer) {
+                        // collect all clicked features and their layers
+                        clickedFeatures.push({feature: feature, layer: layer});
+                    }
+                );
+
+                // fire event to forward click info to subscribers
+                me.fireEvent(&#39;cmv-mapclick&#39;, clickedFeatures, evt);
+            });
+        }
+
+        if (me.enableMapHover) {
+            me.mapCmp.on(&#39;pointerrest&#39;, function(evt) {
+                var hoveredFeatures = [];
+                me.olMap.forEachFeatureAtPixel(evt.pixel,
+                    function(feature, layer) {
+                        // collect all clicked features and their layers
+                        hoveredFeatures.push({feature: feature, layer: layer});
+                    }
+                );
+
+                // fire event to forward hover info to subscribers
+                me.fireEvent(&#39;cmv-map-pointerrest&#39;, hoveredFeatures, evt);
+            });
+
+            me.mapCmp.on(&#39;pointerrestout&#39;, function () {
+                me.fireEvent(&#39;cmv-map-pointerrestout&#39;);
+            });
+
+            me.olMap.on(&#39;pointermove&#39;, function () {
+                me.fireEvent(&#39;cmv-map-pointermove&#39;);
+            });
+
+            // event for resolution change
+            // we intentionally do not use the &#39;change:resolution&#39;,
+            // because it fires too often
+            // (see https://github.com/openlayers/openlayers/issues/7402)
+            me.olMap.on(&#39;moveend&#39;, function (evt) {
+                var targetResolution = evt.target.getView().getResolution();
+                if (targetResolution === me.lastResolution) {
+                    // resolution has not changed
+                    return;
+                }
+                me.lastResolution = targetResolution;
+
+                var switchLayerUtil = CpsiMapview.util.SwitchLayer;
+                switchLayerUtil.handleSwitchLayerOnResolutionChange(targetResolution);
+            }
+            );
+        }
+
+        if (me.enablePermalink) {
+
+            // create permalink provider
+            var plProvider = Ext.create(&#39;GeoExt.state.PermalinkProvider&#39;);
+            // set it in the state manager
+            Ext.state.Manager.setProvider(plProvider);
+
+            me.permalinkProvider = plProvider;
+
+            if (window.location.hash !== &#39;&#39;) {
+                // try to restore center, zoom-level and rotation from the URL
+                me.mapCmp.applyState(
+                    me.permalinkProvider.readPermalinkHash(window.location.hash)
+                );
+            }
+
+            me.registerPermalinkEvents();
+        }
+
+        Ext.GlobalEvents.fireEvent(&#39;cmv-mapready&#39;, me);
+
+        var grouping = this.getPlugin(&#39;cmv_feature_attribute_grouping&#39;);
+        if (grouping) {
+            grouping.initGrouping(me.mapCmp, me.olMap);
+        }
+
+        me.olMap.set(&#39;defaultClickEnabled&#39;, true);
+    },
+
+<span id='CpsiMapview-view-main-Map-method-registerPermalinkEvents'>    /**
+</span>     * Registers the events to have a permalink synchronization.
+     *
+     * @private
+     */
+    registerPermalinkEvents: function () {
+        var me = this;
+
+        // update permalink when visible map state changes
+        me.permalinkProvider.on(&#39;statechange&#39;, function (stateProvider, stateId, state) {
+            if (stateId === &#39;cmv_mapstate&#39;) {
+                me.updatePermalink(state);
+            }
+        });
+
+        // restore the view state when navigating through the history, see
+        // https://developer.mozilla.org/en-US/docs/Web/API/WindowEventHandlers/onpopstate
+        window.addEventListener(&#39;popstate&#39;, function(event) {
+            if (event.state === null) {
+                return;
+            }
+            me.olMap.getView().setCenter(event.state.center);
+            me.olMap.getView().setZoom(event.state.zoom);
+            me.olMap.getView().setRotation(event.state.rotation);
+            me.shouldUpdatePermalink = false;
+        });
+    },
+
+<span id='CpsiMapview-view-main-Map-method-updatePermalink'>    /**
+</span>     * Updates the permalink as URL hash and pushes the state into the window
+     * history.
+     *
+     * @private
+     */
+    updatePermalink: function (mapState) {
+        var me = this;
+
+        if (!me.shouldUpdatePermalink) {
+            // do not update the URL when the view was changed in the &#39;popstate&#39;
+            // handler
+            me.shouldUpdatePermalink = true;
+            return;
+        }
+
+        // check if we have to round the coords (if no coordinates in deegrees)
+        var doRound =
+            me.roundPermalinkCoords &amp;&amp;
+            me.olMap.getView().getProjection().getUnits() !== &#39;degrees&#39;;
+
+        var hash = me.permalinkProvider.getPermalinkHash(doRound);
+
+        // push the state into the window history (to navigate with browser&#39;s
+        // back and forward buttons)
+        window.history.pushState(mapState, &#39;map&#39;, hash);
+    }
+});
+</pre>
+</body>
+</html>

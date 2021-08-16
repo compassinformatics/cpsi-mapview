@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+  <title>The source code</title>
+  <link href="../resources/prettify/prettify.css" type="text/css" rel="stylesheet" />
+  <script type="text/javascript" src="../resources/prettify/prettify.js"></script>
+  <style type="text/css">
+    .highlight { display: block; background-color: #ddd; }
+  </style>
+  <script type="text/javascript">
+    function highlight() {
+      document.getElementById(location.hash.replace(/#/, "")).className = "highlight";
+    }
+  </script>
+</head>
+<body onload="prettyPrint(); highlight();">
+  <pre class="prettyprint lang-js"><span id='CpsiMapview-view-layer-StyleSwitcherRadioGroup'>/**
+</span> * RadioGroup showing a radio button for each style connected to a layer.
+ */
+Ext.define(&#39;CpsiMapview.view.layer.StyleSwitcherRadioGroup&#39;, {
+    extend: &#39;Ext.form.RadioGroup&#39;,
+    xtype: &#39;cmv_layer_styleswitcher_radiogroup&#39;,
+    requires: [
+        &#39;Ext.form.field.Radio&#39;,
+        &#39;CpsiMapview.util.Legend&#39;,
+        &#39;CpsiMapview.util.Style&#39;
+    ],
+
+<span id='CpsiMapview-view-layer-StyleSwitcherRadioGroup-property-simpleValue'>    /** @private */
+</span>    simpleValue: true,
+
+<span id='CpsiMapview-view-layer-StyleSwitcherRadioGroup-property-defaultType'>    /** @private */
+</span>    defaultType: &#39;radiofield&#39;,
+
+<span id='CpsiMapview-view-layer-StyleSwitcherRadioGroup-property-defaults'>    /** @private */
+</span>    defaults: {
+        flex: 1
+    },
+
+<span id='CpsiMapview-view-layer-StyleSwitcherRadioGroup-property-layout'>    /** @private */
+</span>    layout: &#39;vbox&#39;,
+
+<span id='CpsiMapview-view-layer-StyleSwitcherRadioGroup-property-style'>    /** @private */
+</span>    style: {
+        paddingLeft: &#39;75px&#39;
+    },
+
+<span id='CpsiMapview-view-layer-StyleSwitcherRadioGroup-cfg-renderedBelowTreeNode'>    /**
+</span>     * Flag indicating if this radio group is directly rendered below the
+     * corresponding layer tree node (`true`) or within the context menu
+     * (`false`).
+     * @cfg
+     */
+    renderedBelowTreeNode: true,
+
+<span id='CpsiMapview-view-layer-StyleSwitcherRadioGroup-method-initComponent'>    /**
+</span>     * @private
+     */
+    initComponent: function () {
+        var me = this;
+        var styleUtil = CpsiMapview.util.Style;
+        var radioButtons = [];
+        var layerStyles = me.layer.get(&#39;styles&#39;);
+        var salt = Math.random();
+
+        // create a &#39;radiofield&#39; for each style connected to the layer
+        Ext.each(layerStyles, function (layerStyle) {
+
+            var layerTitle;
+            var layerName;
+
+            // check if style has title property
+            if (layerStyle[&#39;title&#39;] &amp;&amp; layerStyle[&#39;name&#39;]) {
+                // has title property
+                layerTitle = layerStyle[&#39;title&#39;];
+                layerName = layerStyle[&#39;name&#39;];
+            } else {
+                // does not have title property
+                // title generated from stlye name
+                layerTitle = styleUtil.getLayerStyleLabel(layerStyle, me.layer);
+                layerName = layerStyle;
+            }
+
+            radioButtons.push({
+                name: &#39;sldstyle&#39; + salt,
+                boxLabel: layerTitle,
+                inputValue: layerName,
+                checked: me.getCheckedState(layerName),
+                listeners: {
+                    change: me.onStyleChange,
+                    scope: me
+                }
+            });
+        }
+        );
+
+        me.items = radioButtons;
+
+        me.callParent();
+
+        if (me.renderedBelowTreeNode === false) {
+            // adjust layout for usage in menu item
+            me.setStyle(&#39;paddingLeft&#39;, &#39;5px&#39;);
+        }
+    },
+
+<span id='CpsiMapview-view-layer-StyleSwitcherRadioGroup-method-getCheckedState'>    /**
+</span>     * Detects the checked state of the given style name based on the layer&#39;s
+     * current active style (property &#39;activatedStyle&#39;).
+     *
+     * @param  {String} sldStyle The style name to get the checked state for
+     * @return {Boolean}         Checked state
+     */
+    getCheckedState: function (sldStyle) {
+        var me = this;
+
+        if (me.layer.get(&#39;activatedStyle&#39;) &amp;&amp; me.layer.get(&#39;activatedStyle&#39;) === sldStyle) {
+            return true;
+        } else {
+            return false;
+        }
+    },
+
+<span id='CpsiMapview-view-layer-StyleSwitcherRadioGroup-method-onStyleChange'>    /**
+</span>     * Handles the &#39;change&#39; event of the radiogroup.
+     * Applies the new style (by newly checked radio button) to the connected
+     * layer (WMS / or WFS).
+     *
+     * @param  {Ext.form.field.Radio } radioBtn The changed radio button
+     * @param  {Boolean} newVal   [description] The new value of the changed radio button
+     */
+    onStyleChange: function (radioBtn, newVal) {
+        var me = this;
+        var styleUtil = CpsiMapview.util.Style;
+
+        if (newVal === true) {
+            var layer = me.layer;
+            var newStyle = radioBtn.inputValue;
+            var layerTreePanel = Ext.ComponentQuery.query(&#39;cmv_layertree&#39;)[0];
+
+            // preserve active style as lookup
+            layer.set(&#39;activatedStyle&#39;, newStyle);
+
+            if (layer.get(&#39;isWms&#39;)) {
+
+                // check if a label STYLES parameter was added --&gt; keep this
+                // the STYLES value (SLD) for the labels
+                var labelClassName = layer.get(&#39;labelClassName&#39;);
+                if (layer.get(&#39;labelsActive&#39;) === true) {
+                    newStyle += &#39;,&#39; + labelClassName;
+                }
+
+                // apply new style parameter and reload layer
+                var newParams = {
+                    STYLES: newStyle
+                };
+                layer.getSource().updateParams(newParams);
+
+                if (layerTreePanel) {
+                    // force update of corresponding layer node UI (e.g. legend)
+                    layerTreePanel.updateLayerNodeUi(layer);
+                }
+
+            } else if (layer.get(&#39;isWfs&#39;) || layer.get(&#39;isVt&#39;)) {
+
+                var sldUrl = layer.get(&#39;stylesBaseUrl&#39;) + newStyle;
+
+                var hasLabels = CpsiMapview.util.Legend.hasLabels;
+
+                // use style with label if one was specified
+                if (layer.get(&#39;labelsActive&#39;) === true &amp;&amp; !Ext.isEmpty(layer.get(&#39;styles&#39;)) &amp;&amp; hasLabels(layer.get(&#39;styles&#39;))) {
+                    var styleObj = layer.get(&#39;styles&#39;).find(function (style) {
+                        return style.name === newStyle;
+                    });
+                    if (styleObj &amp;&amp; !Ext.isEmpty(styleObj.label)) {
+                        sldUrl = layer.get(&#39;stylesBaseUrl&#39;) + styleObj.label;
+                        layer.set(&#39;activeLabelStyle&#39;, sldUrl);
+                    } else {
+                        layer.set(&#39;activeLabelStyle&#39;, undefined);
+                    }
+
+                }
+                // load and parse SLD and apply it to layer
+                LayerFactory.loadSld(layer, sldUrl);
+
+                if (layerTreePanel) {
+                    // force update of corresponding layer node UI (e.g. legend)
+                    layerTreePanel.updateLayerNodeUi(layer);
+                }
+
+            } else {
+                Ext.Logger.info(&#39;Layer type not supported in StyleSwitcherRadioGroup&#39;);
+            }
+
+            var styleTitle = styleUtil.getLayerStyleTitle(newStyle, layer);
+            me.fireEvent(&#39;cmv-layer-style-change&#39;, me, newStyle, styleTitle, layer);
+        }
+    }
+});
+</pre>
+</body>
+</html>

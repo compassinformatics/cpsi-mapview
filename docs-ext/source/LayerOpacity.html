@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+  <title>The source code</title>
+  <link href="../resources/prettify/prettify.css" type="text/css" rel="stylesheet" />
+  <script type="text/javascript" src="../resources/prettify/prettify.js"></script>
+  <style type="text/css">
+    .highlight { display: block; background-color: #ddd; }
+  </style>
+  <script type="text/javascript">
+    function highlight() {
+      document.getElementById(location.hash.replace(/#/, "")).className = "highlight";
+    }
+  </script>
+</head>
+<body onload="prettyPrint(); highlight();">
+  <pre class="prettyprint lang-js"><span id='CpsiMapview-view-menuitem-LayerOpacity'>/**
+</span> * MenuItem to show a slider to change the layer&#39;s opacity.
+ *
+ * @class CpsiMapview.view.menuitem.LayerOpacity
+ */
+Ext.define(&#39;CpsiMapview.view.menuitem.LayerOpacity&#39;, {
+    extend: &#39;Ext.menu.Item&#39;,
+    xtype: &#39;cmv_menuitem_layeropacity&#39;,
+    requires: [],
+
+<span id='CpsiMapview-view-menuitem-LayerOpacity-cfg-layer'>    /**
+</span>     * The connected layer for this item.
+     *
+     * @cfg {ol.layer.Base}
+     */
+    layer: null,
+
+<span id='CpsiMapview-view-menuitem-LayerOpacity-cfg-text'>    /**
+</span>     * Text shown in this MenuItem
+     * @cfg {String}
+     */
+    text: &#39;Opacity&#39;,
+
+
+<span id='CpsiMapview-view-menuitem-LayerOpacity-method-initComponent'>    /**
+</span>     * @private
+     */
+    initComponent: function () {
+        var me = this;
+        var allowOpacitySlider = false;
+
+        if (me.layer) {
+            allowOpacitySlider = me.layer.get(&#39;opacitySlider&#39;);
+        }
+
+        var opacitySlider = Ext.create(&#39;Ext.slider.Single&#39;, {
+            width: 200,
+            value: me.layer.getOpacity() * 100,
+            minValue: 0,
+            maxValue: 100,
+            tipText: function (thumb) {
+                return Ext.String.format(&#39;&lt;div&gt;Visibility: {0}%&lt;/div&gt;&#39;, thumb.value);
+            },
+            listeners: {
+                change: me.onOpacityChange,
+                scope: me
+            }
+        });
+        me.menu = {
+            plain: true,
+            items: [opacitySlider]
+        };
+
+        me.callParent();
+
+        me.setHidden(!allowOpacitySlider);
+    },
+
+<span id='CpsiMapview-view-menuitem-LayerOpacity-method-onOpacityChange'>    /**
+</span>     * Executed when the opacity slider in this menu is changed.
+     *
+     * @param  {Ext.slider.Single} slider The opacity slider
+     * @param  {Number} newValue The new value which the slider has been changed to.
+     */
+    onOpacityChange: function (slider, newValue) {
+        var me = this;
+        var opac = newValue / 100;
+
+        me.layer.setOpacity(opac);
+
+        // treat vector tile layers as a special case since setOpacity has no effect
+        // on them, see https://github.com/openlayers/openlayers/issues/4758
+        if (me.layer.get(&#39;isVt&#39;)) {
+            var setLayerOpacity = function(evt) {
+                evt.context.globalAlpha = opac;
+            };
+            me.layer.on(&#39;prerender&#39;, setLayerOpacity);
+            CpsiMapview.view.main.Map.guess().olMap.render();
+        }
+
+    }
+});
+</pre>
+</body>
+</html>

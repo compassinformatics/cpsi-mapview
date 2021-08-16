@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+  <title>The source code</title>
+  <link href="../resources/prettify/prettify.css" type="text/css" rel="stylesheet" />
+  <script type="text/javascript" src="../resources/prettify/prettify.js"></script>
+  <style type="text/css">
+    .highlight { display: block; background-color: #ddd; }
+  </style>
+  <script type="text/javascript">
+    function highlight() {
+      document.getElementById(location.hash.replace(/#/, "")).className = "highlight";
+    }
+  </script>
+</head>
+<body onload="prettyPrint(); highlight();">
+  <pre class="prettyprint lang-js"><span id='CpsiMapview-view-fileupload-FileUploadWindowController'>/**
+</span> * Controller for the window used to add new attachments
+ *
+ * File uploads are not performed using normal &#39;Ajax&#39; techniques, that is they are
+ * not performed using XMLHttpRequests.
+ * Instead the form is submitted in the standard manner with the DOM &lt;form&gt; element temporarily modified to have
+ * its target set to refer to a dynamically generated, hidden &lt;iframe&gt; which is inserted into the document but
+ * removed after the return data has been gathered.
+ * The server response is parsed by the browser to create the document for the IFRAME.
+ * If the server is using JSON to send the return object, then the Content-Type header must
+ * be set to &#39;text/html&#39; in order to tell the browser to insert the text unchanged into the document body.
+ *
+ * Characters which are significant to an HTML parser must be sent as HTML entities,
+ * so encode &#39;&lt;&#39; as &#39;&amp;lt;&#39;, &#39;&amp;&#39; as &#39;&amp;amp;&#39; etc.
+ *
+ * The response text is retrieved from the document, and a fake XMLHttpRequest object is created containing a
+ * responseText property in order to conform to the requirements of event handlers and callbacks.
+ * Be aware that file upload packets are sent with the content type multipart/form and some server
+ * technologies (notably JEE) may require some custom processing in order to retrieve parameter names
+ * and parameter values from the packet content.
+ *
+ * @class CpsiMapview.view.fileupload.FileUploadWindowController
+ */
+
+Ext.define(&#39;CpsiMapview.view.fileupload.FileUploadWindowController&#39;, {
+    extend: &#39;Ext.app.ViewController&#39;,
+    alias: &#39;controller.cmv_fileuploadwindowcontroller&#39;,
+
+    requires: [
+        &#39;CpsiMapview.model.fileupload.Attachment&#39;
+    ],
+
+<span id='CpsiMapview-view-fileupload-FileUploadWindowController-method-getAttachmentUploadUrl'>    getAttachmentUploadUrl: function () {
+</span>
+        var me = this;
+        var parentRecord = me.getViewModel().getData().currentRecord;
+        var serviceUrl = parentRecord.proxy.url;
+        return Ext.String.format(&#39;{0}/{1}/attachment&#39;, serviceUrl, parentRecord.getId());
+    },
+
+<span id='CpsiMapview-view-fileupload-FileUploadWindowController-method-onAttachmentSave'>    /**
+</span>     * Save the attachment to the server
+     */
+    onAttachmentSave: function () {
+
+        var me = this;
+        var form = me.getView().down(&#39;form&#39;);
+
+        if (form.isValid()) {
+
+            form.submit({
+                clientValidation: true,
+                url: me.getAttachmentUploadUrl(),
+                waitMsg: &#39;Uploading your file...&#39;,
+                scope: me,
+                // the following is ignored for a form submission request
+                // adding into an options object is also ignored
+                headers: {
+                    &#39;Accept&#39;: &#39;application/json&#39;
+                },
+                success: me.onSuccess,
+                failure: me.onFailure
+            });
+        }
+    },
+
+<span id='CpsiMapview-view-fileupload-FileUploadWindowController-method-onSuccess'>    /**
+</span>     * Inform the user that the attachment was successfully uploaded and
+     * trigger an event to the new record can be added to the attachments grid
+     * TODO - return full object in response when saving
+     * @param {any} form
+     * @param {any} action
+     */
+    onSuccess: function (form, action) {
+
+        var me = this;
+        var formValues = form.getFieldValues();
+        // create a new object containing the attributes of the attachment
+        // after it was successfully associated
+        // with the parent object. This record can then be added to a store
+
+        var newAttachment = CpsiMapview.model.fileupload.Attachment.create({
+            attachmentId: action.result.data.attachmentId,
+            name: formValues.documentName,
+            description: formValues.documentDescription,
+            extension: &#39;Extension&#39;,
+            fileName: formValues.filePath,
+            fileSize: &#39;&#39;,
+            lastUpdatedDateUtc: Date(),
+            isThumbnailAvailable: false
+        });
+
+        // now update the attachment URLs so it can be deleted
+        var parentRecord = me.getViewModel().getData().currentRecord;
+        var serviceUrl = parentRecord.proxy.url;
+        newAttachment.updateAttachmentUrls(serviceUrl);
+
+        // now show a message box to show the file was successfully uploaded
+
+        var parentType = me.getViewModel().getData().parentType;
+        var msg = Ext.String.format(&#39;The file {0} has been associated with the {1}&#39;, formValues.documentName, parentType);
+
+        var vw = me.getView();
+        Ext.Msg.alert(&#39;Success&#39;, msg, function () {
+            vw.fireEvent(&#39;fileadded&#39;, newAttachment);
+            vw.close();
+        }, me);
+
+    },
+
+<span id='CpsiMapview-view-fileupload-FileUploadWindowController-method-onFailure'>    /**
+</span>     * Alert the user the file was not successfully uploaded
+     * JSON error messages are wrapped up in HTML
+     * responseText: &#39;&lt;pre style=&#39;word-wrap: break-word; white-space: pre-wrap;&#39;&gt;{&#39;success&#39;:false,&#39;message&#39;:&#39;The cookie header with user token has not been provided.&#39;}&lt;/pre&gt;&#39;
+     * so get just the error message
+     * relevant link http://stackoverflow.com/questions/18150134/response-of-a-submit-form-is-adding-pre-to-json
+     *
+     * The server response is parsed by the browser to create the document for the IFRAME.
+     * If the server is using JSON to send the return object, then the Content-Type header
+     * must be set to &#39;text/html&#39; (on the server-side) in order to tell the browser to insert the text
+     * unchanged into the document body.
+     *
+     * @param {any} form
+     * @param {any} action
+     */
+    onFailure: function (form, action) {
+
+        switch (action.failureType) {
+            case Ext.form.Action.CLIENT_INVALID:
+                Ext.Msg.alert(&#39;Failure&#39;, &#39;Form fields may not be submitted with invalid values&#39;);
+                break;
+            case Ext.form.Action.CONNECT_FAILURE:
+                Ext.Msg.alert(&#39;Failure&#39;, &#39;Ajax communication failed&#39;);
+                break;
+            case Ext.form.Action.SERVER_INVALID:
+                // the header for errors should be html/text
+                // however 404 errors or non-JSON errors will produce a huge error box
+                var txt = action.response.responseText;
+                if (Ext.JSON.decode(txt, true) === null) {
+                    // display any non-JSON errors
+                    // JSON errors will be handled in CpsiMapview.util.ApplicationMixin
+                    Ext.Msg.alert(&#39;Server Error&#39;, txt);
+                }
+                break;
+            default:
+                break;
+        }
+    },
+
+<span id='CpsiMapview-view-fileupload-FileUploadWindowController-method-onAttachmentCancelUpload'>    /**
+</span>     * Close the form on cancel
+     * */
+    onAttachmentCancelUpload: function () {
+        this.getView().close();
+    }
+});</pre>
+</body>
+</html>

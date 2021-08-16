@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+  <title>The source code</title>
+  <link href="../resources/prettify/prettify.css" type="text/css" rel="stylesheet" />
+  <script type="text/javascript" src="../resources/prettify/prettify.js"></script>
+  <style type="text/css">
+    .highlight { display: block; background-color: #ddd; }
+  </style>
+  <script type="text/javascript">
+    function highlight() {
+      document.getElementById(location.hash.replace(/#/, "")).className = "highlight";
+    }
+  </script>
+</head>
+<body onload="prettyPrint(); highlight();">
+  <pre class="prettyprint lang-js"><span id='CpsiMapview-model-fileupload-Attachment'>/**
+</span> * This class is the model used for file
+ * attachments used by mapview
+ *
+ * @class CpsiMapview.model.fileupload.Attachment
+ */
+Ext.define(&#39;CpsiMapview.model.fileupload.Attachment&#39;, {
+    extend: &#39;Ext.data.Model&#39;,
+    alias: &#39;model.Attachment&#39;,
+<span id='CpsiMapview-model-fileupload-Attachment-property-entityName'>    entityName: &#39;Attachment&#39;,
+</span><span id='CpsiMapview-model-fileupload-Attachment-property-idProperty'>    idProperty: &#39;attachmentId&#39;,
+</span><span id='CpsiMapview-model-fileupload-Attachment-property-fields'>    fields: [
+</span>        { name: &#39;attachmentId&#39;, type: &#39;int&#39; },
+        { name: &#39;contentType&#39;, type: &#39;string&#39; },
+        { name: &#39;description&#39;, type: &#39;string&#39; },
+        { name: &#39;extension&#39;, type: &#39;string&#39; },
+        { name: &#39;fileName&#39;, type: &#39;string&#39; },
+        { name: &#39;fileSize&#39;, type: &#39;int&#39; },
+        { name: &#39;isDefaultImage&#39;, type: &#39;boolean&#39; },
+        { name: &#39;isThumbnailAvailable&#39;, type: &#39;boolean&#39; },
+        { name: &#39;lastUpdatedDateUtc&#39;, type: &#39;date&#39; },
+        { name: &#39;name&#39;, type: &#39;string&#39; },
+        { name: &#39;attachmentUrl&#39;, type: &#39;string&#39; }, // calculated client-side
+        { name: &#39;thumbnailUrl&#39;, type: &#39;string&#39; } // calculated client-side
+    ],
+
+<span id='CpsiMapview-model-fileupload-Attachment-method-updateAttachmentUrls'>    /**
+</span>     * Attachements are typically associated with a parent object (which has multiple
+     * attachments)
+     * This function allows full URLs to be created for downloading attachments and also
+     * thumbnails if the attachment is an image file
+     * @param {any} parentUrl the service URL of the parent owner
+     */
+    updateAttachmentUrls: function (parentUrl) {
+
+        var me = this;
+        var thumbnailUrl = &#39;&#39;;
+        var attachmentUrl = &#39;&#39;;
+
+        if (me.get(&#39;isThumbnailAvailable&#39;) === true) {
+            // if there are thumbnails then the attachment is an image
+            thumbnailUrl = Ext.String.format(&#39;{0}/attachment/{1}/thumbnail&#39;, parentUrl, me.getId());
+        }
+
+        attachmentUrl = Ext.String.format(&#39;{0}/attachment/{1}&#39;, parentUrl, me.getId());
+
+        me.set({
+            thumbnailUrl: thumbnailUrl,
+            attachmentUrl: attachmentUrl
+        }, {
+            dirty: false
+        });
+    }
+});
+</pre>
+</body>
+</html>

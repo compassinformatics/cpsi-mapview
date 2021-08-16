@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+  <title>The source code</title>
+  <link href="../resources/prettify/prettify.css" type="text/css" rel="stylesheet" />
+  <script type="text/javascript" src="../resources/prettify/prettify.js"></script>
+  <style type="text/css">
+    .highlight { display: block; background-color: #ddd; }
+  </style>
+  <script type="text/javascript">
+    function highlight() {
+      document.getElementById(location.hash.replace(/#/, "")).className = "highlight";
+    }
+  </script>
+</head>
+<body onload="prettyPrint(); highlight();">
+  <pre class="prettyprint lang-js"><span id='CpsiMapview-view-menuitem-LayerMetadata'>/**
+</span> * MenuItem to show a metadata window for a layer
+ *
+ * @class CpsiMapview.view.menuitem.LayerMetadata
+ */
+Ext.define(&#39;CpsiMapview.view.menuitem.LayerMetadata&#39;, {
+    extend: &#39;Ext.menu.Item&#39;,
+    xtype: &#39;cmv_menuitem_layermetadata&#39;,
+    requires: [
+        &#39;CpsiMapview.util.Layer&#39;
+    ],
+
+<span id='CpsiMapview-view-menuitem-LayerMetadata-cfg-layer'>    /**
+</span>     * The connected layer for this item.
+     *
+     * @cfg {ol.layer.Base}
+     */
+    layer: null,
+
+<span id='CpsiMapview-view-menuitem-LayerMetadata-cfg-text'>    /**
+</span>     * Text shown in this MenuItem
+     * @cfg {String}
+     */
+    text: &#39;Metadata&#39;,
+
+<span id='CpsiMapview-view-menuitem-LayerMetadata-method-initComponent'>    /**
+</span>     * @private
+     */
+    initComponent: function () {
+        var me = this;
+
+        me.handler = me.handlerFunc;
+
+        var hasMetadata = false;
+        if (me.layer) {
+            hasMetadata = me.layer.get(&#39;hasMetadata&#39;);
+        }
+
+        me.callParent();
+        me.setHidden(!hasMetadata);
+    },
+
+<span id='CpsiMapview-view-menuitem-LayerMetadata-method-handlerFunc'>    /**
+</span>     * Executed when this menu item is clicked.
+     * Opens a window with metadata for the connected layer.
+     */
+    handlerFunc: function () {
+        var me = this;
+
+        // retrive layername for different types of layers
+        var layerName;
+        var baseurl;
+        if(me.layer.get(&#39;isWfs&#39;)){
+            layerName = me.layer.get(&#39;featureType&#39;);
+            baseurl = me.layer.get(&#39;url&#39;);
+        }
+        else if(me.layer.get(&#39;isWms&#39;)){
+            layerName = me.layer.get(&#39;layers&#39;);
+            baseurl = me.layer.get(&#39;url&#39;);
+        }
+        else if(me.layer.get(&#39;isVt&#39;)){
+            layerName = me.layer.get(&#39;layerIdentificationName&#39;);
+            baseurl = me.layer.get(&#39;baseurl&#39;);
+        }
+        else{
+            // Currently only metadata from WMS and WFS can be received
+            // because other layers do not come from MapServer
+            // VectorTiles are an exception: the config does
+            // not provide easy access to name and baseurl
+            me.alertNoMetadata();
+            return;
+        }
+
+        // build url to Metadata XML
+        var requestUrl = baseurl + &#39;&amp;REQUEST=GetMetadata&#39; + &#39;&amp;layer=&#39; + layerName;
+
+        Ext.Ajax.request({
+            url: requestUrl,
+            success: function (response) {
+
+                var xmlText = response.responseText;
+                var schemas =[
+                    ISO19139_GMD_20060504,
+                    ISO19139_GCO_20060504,
+                    ISO19139_GTS_20060504,
+                    ISO19139_GSS_20060504,
+                    ISO19139_GSR_20060504,
+                    GML_3_2_0,
+                    XLink_1_0
+                ];
+
+                // convert XML to JSON
+                var context = new Jsonix.Context(schemas);
+                var unmarshaller = context.createUnmarshaller();
+
+                // handle case if XML is not formated as expected
+                try{
+                    var jsonMetadata = unmarshaller.unmarshalString(xmlText);
+
+                    // extract required properties
+                    var relevantObj = jsonMetadata.value.identificationInfo[0].abstractMDIdentification.value;
+
+                    var source = {};
+
+                    // citation
+                    var citationObj = relevantObj.citation.ciCitation.title.characterString;
+                    if(citationObj){
+                        var citation = citationObj.value;
+                        source[&#39;title&#39;] = citation;
+                    }
+
+                    // abstract
+                    var abstractObj = relevantObj._abstract.characterString;
+                    if(abstractObj){
+                        var abstract = abstractObj.value;
+                        source[&#39;abstract&#39;] = abstract;
+                    }
+                    // keywords
+                    var keywordString = &#39;&#39;;
+                    var keywordsObj = relevantObj.descriptiveKeywords;
+                    if(keywordsObj){
+                        var rawKeywords = keywordsObj[0].mdKeywords.keyword;
+                        // convert keywords to comma separated string
+                        Ext.each(rawKeywords, function(item){
+                            var extractedKeyWord = item.characterString.value;
+                            if(keywordString !== &#39;&#39;){
+                                keywordString = keywordString + &#39;, &#39;;
+                            }
+                            keywordString = keywordString + extractedKeyWord;
+                        }
+                        );
+                        source[&#39;keywords&#39;] = keywordString;
+                    }
+
+                    // case no metadata could be extracted
+                    if(Ext.Object.isEmpty(source)){
+                        me.alertNoMetadata();
+                    }
+                    // metadata is fine and can be displayed
+                    else{
+                        var windowTitle = me.layer.get(&#39;name&#39;) + &#39; Metadata&#39; ;
+
+                        // check if window already exists
+                        // identified by window title
+                        var existingMetadataWindow = Ext.ComponentQuery.query(&#39;window[title=&quot;&#39; + windowTitle + &#39;&quot;]&#39;);
+
+                        var window;
+                        if(existingMetadataWindow.length &gt; 0){
+                            // use existing window
+                            window = existingMetadataWindow[0];
+                        }
+                        else {
+                            window = Ext.create(&#39;CpsiMapview.view.window.MinimizableWindow&#39;, {
+                                title: windowTitle,
+                                width: 400,
+                                layout: &#39;fit&#39;,
+                                constrain: true,
+                                items: [{
+                                    xtype: &#39;propertygrid&#39;,
+                                    source: source
+                                }]
+                            });
+                        }
+                        window.show();
+                    }
+                }
+                catch(err) {
+                    me.alertNoMetadata();
+                }
+            },
+            failure: function() {
+                me.alertNoMetadata();
+            }
+        });
+    },
+
+<span id='CpsiMapview-view-menuitem-LayerMetadata-method-alertNoMetadata'>    /**
+</span>    * Notifies user that metadata is not availble
+    */
+    alertNoMetadata: function(){
+        Ext.Msg.alert(&#39;Info&#39;, &#39;Metadata is not available.&#39;);
+    }
+});
+</pre>
+</body>
+</html>

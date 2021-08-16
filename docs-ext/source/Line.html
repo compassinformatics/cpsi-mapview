@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+  <title>The source code</title>
+  <link href="../resources/prettify/prettify.css" type="text/css" rel="stylesheet" />
+  <script type="text/javascript" src="../resources/prettify/prettify.js"></script>
+  <style type="text/css">
+    .highlight { display: block; background-color: #ddd; }
+  </style>
+  <script type="text/javascript">
+    function highlight() {
+      document.getElementById(location.hash.replace(/#/, "")).className = "highlight";
+    }
+  </script>
+</head>
+<body onload="prettyPrint(); highlight();">
+  <pre class="prettyprint lang-js"><span id='CpsiMapview-field-Line'>/**
+</span>* A custom field for storing line features
+* The field handles loading and serializing features to and from an associated store.
+* The linked map layer can have styling properties customized through field properties.
+*/
+Ext.define(&#39;CpsiMapview.field.Line&#39;, {
+    extend: &#39;CpsiMapview.field.Feature&#39;,
+
+    alias: &#39;data.field.line&#39;,
+
+<span id='CpsiMapview-field-Line-property-styleDefaults'>    /**
+</span>     * Colors and sizes for the default point and line styles
+     */
+    styleDefaults: {
+        lineColor: &#39;#FFFC17&#39;,
+        pointColor: &#39;#E9AB17&#39;,
+        radius: 5,
+        width: 4
+    },
+
+<span id='CpsiMapview-field-Line-property-selectStyleDefaults'>    /**
+</span>     * Colors and sizes for the point and line selection styles
+     */
+    selectStyleDefaults: {
+        lineColor: &#39;red&#39;,
+        pointColor: &#39;red&#39;
+    },
+
+<span id='CpsiMapview-field-Line-method-defaultFeatureFilter'>    /**
+</span>     * Filter to apply to the feature store
+     */
+    defaultFeatureFilter: function (rec) {
+        // only display LineString and MultiLineString in an associated feature grid
+        var geomType = rec.getFeature().getGeometry().getType();
+        return (Ext.Array.contains([&#39;LineString&#39;, &#39;MultiLineString&#39;], geomType));
+    },
+
+<span id='CpsiMapview-field-Line-method-serialize'>    /**
+</span>     * Return simplified feature properties rather than full GeoJSON
+     */
+    serialize: function (v, rec) {
+
+        var me = this;
+        var featureStore = rec.featureStores ? rec.featureStores[me.name] : null;
+        return me.getFeatureAttributes(featureStore);
+    },
+
+<span id='CpsiMapview-field-Line-method-getFeatureAttributes'>    /**
+</span>     * Create an array containing feature properties
+     */
+    getFeatureAttributes: function (featureStore) {
+
+        var feats = featureStore.getRange();
+        var recs = [];
+
+        Ext.each(feats, function (s) {
+            recs.push(s.data);
+        });
+
+        return recs;
+    },
+
+<span id='CpsiMapview-field-Line-method-createPointLineStyle'>    /**
+</span>    * Create a new ol style for showing points and lines
+    *
+    * @return {ol.style.Style} The new style
+    */
+    createPointLineStyle: function (lineColor, pointColor) {
+
+        var me = this;
+
+        var style = new ol.style.Style({
+            image: new ol.style.Circle({
+                radius: me.styleDefaults.radius,
+                // point fill
+                fill: new ol.style.Fill({
+                    color: pointColor
+                }),
+                // point outline
+                stroke: new ol.style.Stroke({
+                    color: lineColor
+                })
+            }),
+            // line style
+            stroke: new ol.style.Stroke({
+                color: lineColor,
+                width: me.styleDefaults.width
+            })
+        });
+
+        return style;
+    },
+
+<span id='CpsiMapview-field-Line-method-createStyle'>    /**
+</span>    * Create a new ol style
+    *
+    * @return {ol.style.Style} The new style
+    */
+    createStyle: function () {
+
+        var me = this;
+        var cfg = me.featureStoreConfig || {};
+
+        var lineColor = cfg.lineColor || me.styleDefaults.lineColor;
+        var pointColor = cfg.pointColor || me.styleDefaults.pointColor;
+
+        return me.createPointLineStyle(lineColor, pointColor);
+    },
+
+<span id='CpsiMapview-field-Line-method-createSelectStyle'>    /**
+</span>    * Create a new ol style for showing points and lines when selected
+    *
+    * @return {ol.style.Style} The new style
+    */
+    createSelectStyle: function () {
+
+        var me = this;
+        var cfg = me.featureStoreConfig || {};
+
+        var lineColor = cfg.selectLineColor || me.selectStyleDefaults.lineColor;
+        var pointColor = cfg.selectPointColor || me.selectStyleDefaults.pointColor;
+
+        return me.createPointLineStyle(lineColor, pointColor);
+
+    }
+});
+</pre>
+</body>
+</html>

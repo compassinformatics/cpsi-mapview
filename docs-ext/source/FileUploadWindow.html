@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+  <title>The source code</title>
+  <link href="../resources/prettify/prettify.css" type="text/css" rel="stylesheet" />
+  <script type="text/javascript" src="../resources/prettify/prettify.js"></script>
+  <style type="text/css">
+    .highlight { display: block; background-color: #ddd; }
+  </style>
+  <script type="text/javascript">
+    function highlight() {
+      document.getElementById(location.hash.replace(/#/, "")).className = "highlight";
+    }
+  </script>
+</head>
+<body onload="prettyPrint(); highlight();">
+  <pre class="prettyprint lang-js"><span id='CpsiMapview-view-fileupload-FileUploadWindow'>/**
+</span> * A simple form in a modal window to allow a user to select a local file
+ * to upload
+ *
+ * @class CpsiMapview.view.fileupload.FileUploadWindow
+ */
+Ext.define(&#39;CpsiMapview.view.fileupload.FileUploadWindow&#39;, {
+    extend: &#39;Ext.window.Window&#39;,
+    xtype: &#39;cmv_fileuploadwindow&#39;,
+    requires: [
+        &#39;CpsiMapview.view.fileupload.FileUploadWindowController&#39;
+    ],
+<span id='CpsiMapview-view-fileupload-FileUploadWindow-property-modal'>    modal: true,
+</span><span id='CpsiMapview-view-fileupload-FileUploadWindow-property-layout'>    layout: &#39;anchor&#39;,
+</span><span id='CpsiMapview-view-fileupload-FileUploadWindow-property-width'>    width: 500,
+</span><span id='CpsiMapview-view-fileupload-FileUploadWindow-property-closeAction'>    closeAction: &#39;destroy&#39;,
+</span><span id='CpsiMapview-view-fileupload-FileUploadWindow-property-controller'>    controller: &#39;cmv_fileuploadwindowcontroller&#39;,
+</span><span id='CpsiMapview-view-fileupload-FileUploadWindow-property-bind'>    bind: {
+</span>        title: &#39;Associate a File with the {parentType}&#39;
+    },
+<span id='CpsiMapview-view-fileupload-FileUploadWindow-property-items'>    items: [
+</span>        {
+            xtype: &#39;form&#39;,
+            itemId: &#39;fileSelector&#39;,
+            fileUpload: true,
+            anchor: &#39;100%&#39;,
+            layout: &#39;anchor&#39;,
+            bodyStyle: &#39;padding: 10px 10px 0 10px;&#39;,
+            labelWidth: 150,
+            defaults: {
+                anchor: &#39;100%&#39;,
+                allowBlank: false, // all fields are required for the form to be valid
+                msgTarget: &#39;side&#39;
+            },
+            items: [
+                {
+                    xtype: &#39;textfield&#39;,
+                    name: &#39;documentName&#39;,
+                    fieldLabel: &#39;Name*&#39;,
+                    emptyText: &#39;Enter a name for the document...&#39;
+                },
+                {
+                    xtype: &#39;textfield&#39;,
+                    name: &#39;documentDescription&#39;,
+                    fieldLabel: &#39;Description*&#39;,
+                    emptyText: &#39;Enter a description for the document...&#39;
+                },
+                {
+                    xtype: &#39;fileuploadfield&#39;,
+                    emptyText: &#39;Select a file&#39;,
+                    fieldLabel: &#39;Document*&#39;,
+                    name: &#39;filePath&#39;,
+                    buttonConfig: {
+                        iconCls: &#39;add icon-add&#39;,
+                        cls: &#39;bordered-button&#39;,
+                        text: &#39;&#39;
+                    }
+                }
+            ]
+        }
+    ],
+<span id='CpsiMapview-view-fileupload-FileUploadWindow-property-bbar'>    bbar: [
+</span>        { xtype: &#39;tbfill&#39; },
+        {
+            text: &#39;Save&#39;,
+            handler: &#39;onAttachmentSave&#39;,
+            formBind: true
+        },
+        {
+            text: &#39;Cancel&#39;,
+            handler: &#39;onAttachmentCancelUpload&#39;
+        }
+    ]
+});
+</pre>
+</body>
+</html>

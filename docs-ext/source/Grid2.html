@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+  <title>The source code</title>
+  <link href="../resources/prettify/prettify.css" type="text/css" rel="stylesheet" />
+  <script type="text/javascript" src="../resources/prettify/prettify.js"></script>
+  <style type="text/css">
+    .highlight { display: block; background-color: #ddd; }
+  </style>
+  <script type="text/javascript">
+    function highlight() {
+      document.getElementById(location.hash.replace(/#/, "")).className = "highlight";
+    }
+  </script>
+</head>
+<body onload="prettyPrint(); highlight();">
+  <pre class="prettyprint lang-js"><span id='CpsiMapview-view-grid-Grid'>/**
+</span> * Base class for WFS-based data grids with filtering
+ * and Excel exports.
+ */
+Ext.define(&#39;CpsiMapview.view.grid.Grid&#39;, {
+    extend: &#39;Ext.grid.Panel&#39;,
+
+    requires: [
+        &#39;Ext.toolbar.Paging&#39;,
+        &#39;GeoExt.toolbar.WfsPaging&#39;,
+        &#39;GeoExt.selection.FeatureModel&#39;,
+        &#39;BasiGX.util.Layer&#39;,
+        &#39;CpsiMapview.view.button.SpatialQueryButton&#39;,
+        &#39;CpsiMapview.controller.grid.Grid&#39;,
+        &#39;CpsiMapview.view.button.FeatureSelectionButton&#39;
+    ],
+
+    xtype: &#39;cmv_grid&#39;,
+<span id='CpsiMapview-view-grid-Grid-property-controller'>    controller: &#39;cmv_grid&#39;,
+</span><span id='CpsiMapview-view-grid-Grid-property-viewModel'>    viewModel: &#39;cmv_grid&#39;,
+</span>
+<span id='CpsiMapview-view-grid-Grid-property-plugins'>    plugins: [&#39;gridfilters&#39;],
+</span><span id='CpsiMapview-view-grid-Grid-property-width'>    width: 1050,
+</span>
+<span id='CpsiMapview-view-grid-Grid-cfg-extentBuffer'>    /**
+</span>     * The distance used to buffer a feature when the zoomToFeature
+     * function is used
+     * @cfg {Number}
+     */
+    extentBuffer: 100,
+
+<span id='CpsiMapview-view-grid-Grid-cfg-exportTitle'>    /**
+</span>     * The title added to the Excel document
+     * @cfg {String}
+     */
+    exportTitle: &#39;Records Export&#39;,
+
+<span id='CpsiMapview-view-grid-Grid-cfg-exportFileName'>    /**
+</span>     * The filename of the Excel export
+     * @cfg {String}
+     */
+    exportFileName: &#39;RecordsExport.xlsx&#39;,
+
+<span id='CpsiMapview-view-grid-Grid-property-bind'>    bind: {
+</span>        store: &#39;{gridstore}&#39;
+    },
+
+<span id='CpsiMapview-view-grid-Grid-property-viewConfig'>    viewConfig: {  //this config is passed to the view
+</span>        loadingText: &#39;Loading records&#39;,
+        enableTextSelection: true
+        //loadMask: {
+        //    msg: &#39;Loading records&#39; // TODO not sure why this isn&#39;t applied to the loadMask
+        //}
+    },
+
+<span id='CpsiMapview-view-grid-Grid-property-selModel'>    selModel: {
+</span>        type: &#39;featuremodel&#39;,
+        mode: &#39;SINGLE&#39;,
+        allowDeselect: true,
+        mapSelection: true,
+        selectStyle: new ol.style.Style({
+            image: new ol.style.Circle({
+                radius: 10,
+                stroke: new ol.style.Stroke({
+                    color: &#39;#0ff&#39;,
+                    width: 3
+                })
+            }),
+            stroke: new ol.style.Stroke({
+                width: 3,
+                color: &#39;#0ff&#39;
+            })
+        }),
+        bind: {
+            map: &#39;{map}&#39;
+            // TODO can&#39;t bind to a formula in the ViewModel
+            //selectStyle: &#39;{selectStyle}&#39;
+        }
+    },
+
+<span id='CpsiMapview-view-grid-Grid-property-listeners'>    /**
+</span>     * Functions attached to various listeners on the grid
+     */
+    listeners: {
+        filterchange: &#39;updateAssociatedLayers&#39;,
+        itemcontextmenu: &#39;onItemContextMenu&#39;,
+        columnhide: &#39;onColumnHide&#39;,
+        columnshow: &#39;onColumnShow&#39;,
+        rowdblclick: &#39;onRowDblClick&#39;,
+        // ensure columns are set when the store is bound to the grid
+        reconfigure: &#39;onColumnsReconfigure&#39;,
+        show: &#39;onShow&#39;,
+        clearfilters: &#39;clearFilters&#39;,
+        applypresetfilters: &#39;applyPresetFilters&#39;
+    },
+
+<span id='CpsiMapview-view-grid-Grid-property-dockedItems'>    /**
+</span>     * Collection of tools and buttons at the top of the grid
+     */
+    dockedItems: [{
+        xtype: &#39;toolbar&#39;,
+        dock: &#39;top&#39;,
+        items: [{
+            xtype: &#39;button&#39;,
+            text: &#39;Clear Filters&#39;,
+            glyph: &#39;f0b0@FontAwesome&#39;,
+            handler: &#39;clearFilters&#39;
+        },
+        {
+            xtype: &#39;button&#39;,
+            text: &#39;Clear Sorting&#39;,
+            glyph: &#39;f039@FontAwesome&#39;,
+            handler: &#39;onClearSort&#39;
+        },
+        {
+            xtype: &#39;button&#39;,
+            text: &#39;Apply Preset Filters&#39;,
+            glyph: &#39;f005@FontAwesome&#39;,
+            handler: &#39;applyPresetFilters&#39;,
+            bind: {
+                hidden: &#39;{!usePresetFilters}&#39;
+            }
+        },
+        &#39;-&gt;&#39;,
+        {
+            xtype: &#39;cmv_spatial_query_button&#39;,
+            drawGeometryType: &#39;Polygon&#39;,
+            text: &#39;Select by Shape&#39;,
+            spatialOperator: &#39;intersect&#39;,
+            toggleGroup: &#39;map&#39;,
+            triggerWfsRequest: false,
+            displayPermanently: true,
+            glyph: &#39;xf044@FontAwesome&#39;,
+            bind: {
+                hidden: &#39;{!useSimpleSelection}&#39;
+            },
+            listeners: {
+                &#39;cmv-spatial-query-filter&#39;: &#39;onSpatialFilter&#39;
+            }
+        },
+        {
+            xtype: &#39;segmentedbutton&#39;,
+            allowDepress: true,
+            bind: {
+                hidden: &#39;{!useAdvancedSelection}&#39;
+            },
+            items: [
+                {
+                    xtype: &#39;cmv_spatial_query_button&#39;,
+                    drawGeometryType: &#39;Polygon&#39;,
+                    text: &#39;Select by Shape&#39;,
+                    spatialOperator: &#39;intersect&#39;,
+                    //toggleGroup: &#39;map&#39;, // does not seem to work when in a segmentedbutton
+                    triggerWfsRequest: false,
+                    displayPermanently: true,
+                    glyph: &#39;xf044@FontAwesome&#39;,
+                    listeners: {
+                        &#39;cmv-spatial-query-filter&#39;: &#39;onSpatialFilter&#39;
+                    }
+                },
+                {
+                    xtype: &#39;cmv_feature_selection_button&#39;,
+                    triggerWfsRequest: false,
+                    glyph: &#39;xf245@FontAwesome&#39;,
+                    listeners: {
+                        &#39;cmv-reset-grid-filters&#39;: &#39;resetFilters&#39;,
+                        &#39;cmv-id-filter-set&#39;: &#39;onIdFilterSet&#39;
+                    }
+                }
+            ]
+        },
+        {
+            xtype: &#39;button&#39;,
+            bind: {
+                pressed: &#39;{isGroupEditingEnabled}&#39;,
+                hidden: &#39;{!isGroupEditingVisible}&#39;
+            },
+            text: &#39;Group Edit&#39;,
+            enableToggle: true,
+            glyph: &#39;xf040@FontAwesome&#39;,
+            toggleHandler: &#39;onGroupEditToggle&#39;
+        },
+        {
+            xtype: &#39;button&#39;,
+            text: &#39;Export to Excel&#39;,
+            glyph: &#39;xf1c3@FontAwesome&#39;,
+            handler: &#39;exportToExcel&#39;,
+            bind: {
+                hidden: &#39;{!exportExcelVisible}&#39;
+            }
+        },
+        {
+            xtype: &#39;button&#39;,
+            text: &#39;Export to Shapefile&#39;,
+            glyph: &#39;eaa2@font-gis&#39;,
+            handler: &#39;exportToShapefile&#39;,
+            bind: {
+                hidden: &#39;{!exportShapefileVisible}&#39;
+            }
+        }]
+    },
+    {
+        xtype: &#39;toolbar&#39;,
+        dock: &#39;bottom&#39;,
+        items: [
+            {
+                xtype: &#39;gx_wfspaging_toolbar&#39;,
+                displayInfo: true,
+                bind: {
+                    store: &#39;{gridstore}&#39;
+                }
+            },
+            {
+                xtype: &#39;checkbox&#39;,
+                itemId: &#39;pagingCheckbox&#39;,
+                checked: true,
+                boxLabel: &#39;Page Records?&#39;,
+                handler: &#39;togglePaging&#39;
+            }]
+    }],
+});
+</pre>
+</body>
+</html>

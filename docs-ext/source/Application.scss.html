@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+  <title>The source code</title>
+  <link href="../resources/prettify/prettify.css" type="text/css" rel="stylesheet" />
+  <script type="text/javascript" src="../resources/prettify/prettify.js"></script>
+  <style type="text/css">
+    .highlight { display: block; background-color: #ddd; }
+  </style>
+  <script type="text/javascript">
+    function highlight() {
+      document.getElementById(location.hash.replace(/#/, "")).className = "highlight";
+    }
+  </script>
+</head>
+<body onload="prettyPrint(); highlight();">
+  <pre class="prettyprint lang-js">/*
+ *  This file can be used to set variables and supply global styling.  View specific 
+ *  styling should be located the view&#39;s corresponding scss file.
+ */
+$enable-font-awesome: dynamic(true);
+
+$font-size: dynamic(12px);
+
+$form-field-padding: dynamic(2px 6px 1px);
+$form-field-height: dynamic(22px);
+$form-item-margin-bottom: dynamic(5px);
+
+$form-date-trigger-glyph: dynamic($fa-var-calendar 12px $font-icon-font-family);
+$spinner-trigger-up-glyph: dynamic($ext-var-spinner-up 12px ExtJS);
+$spinner-trigger-down-glyph: dynamic($ext-var-spinner-down 12px ExtJS);
+
+
+$fieldset-header-line-height: dynamic(0px);
+$fieldset-header-font-size: $font-size;
+
+$grid-row-cell-font-size: $font-size; // -1; // -1px;
+$grid-row-cell-line-height: dynamic(8px);
+
+.#{$prefix}btn-default-small {
+    padding: 2px;
+}
+
+// space added below layers groups and layers items
+.#{$prefix}form-checkboxgroup {
+    padding-top: 10px;
+}
+
+.x-form-trigger-spinner-default, .x-form-spinner-default {
+    width: 12px !important;
+}
+
+$tab-padding: dynamic(3px 13px 0px 10px);
+
+.right-aligned-value .x-form-display-field {
+    text-align: right;
+    padding-right: 7px;
+}</pre>
+</body>
+</html>

@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+  <title>The source code</title>
+  <link href="../resources/prettify/prettify.css" type="text/css" rel="stylesheet" />
+  <script type="text/javascript" src="../resources/prettify/prettify.js"></script>
+  <style type="text/css">
+    .highlight { display: block; background-color: #ddd; }
+  </style>
+  <script type="text/javascript">
+    function highlight() {
+      document.getElementById(location.hash.replace(/#/, "")).className = "highlight";
+    }
+  </script>
+</head>
+<body onload="prettyPrint(); highlight();">
+  <pre class="prettyprint lang-js"><span id='CpsiMapview-field-Polygon'>/**
+</span>* A custom field for storing polygon features.
+* The field handles loading and serializing features to and from an associated store.
+* The linked map layer can have styling properties customized through field properties.
+*/
+Ext.define(&#39;CpsiMapview.field.Polygon&#39;, {
+    extend: &#39;CpsiMapview.field.Feature&#39;,
+
+    requires: [
+        &#39;BasiGX.util.Map&#39;
+    ],
+
+    alias: &#39;data.field.polygon&#39;,
+
+<span id='CpsiMapview-field-Polygon-method-serialize'>    /**
+</span>     * Return a the geometry of a single polygon feature
+     */
+    serialize: function (v, rec) {
+        var me = this;
+        var featureStore = rec.featureStores[me.name];
+        return this.getPolygonGeometry(featureStore.layer);
+    },
+
+<span id='CpsiMapview-field-Polygon-method-getPolygonGeometry'>    /**
+</span>     * Return a single polygon associated with the layer as a GeoJSON object
+     * @param {any} rec
+     */
+    getPolygonGeometry: function (polygonLayer) {
+
+        var feats, gj = null;
+
+        feats = polygonLayer.getSource().getFeatures();
+
+        if (feats.length &gt;= 1) {
+
+            if (feats.length &gt; 1) {
+                Ext.log.warn(&#39;Multiple polygons found in the polygon feature layer&#39;);
+            }
+            var writer = new ol.format.GeoJSON();
+            var geom = feats[feats.length -1].getGeometry(); // get the last created feature
+            if (geom.getType() === &#39;Circle&#39;) {
+                // ol.geom.Circle is not supported
+                // in GeoJSON https://stackoverflow.com/questions/16942697/geojson-circles-supported-or-not
+                // convert to a polygon first
+                geom = ol.geom.Polygon.fromCircle(geom);
+            }
+            gj = writer.writeGeometryObject(geom);
+        }
+
+        return gj;
+    },
+
+<span id='CpsiMapview-field-Polygon-method-createStyle'>    /**
+</span>    * Create a new ol style
+    *
+    * @return {ol.style.Style} The new style
+    */
+    createStyle: function () {
+
+        var fill = new ol.style.Fill({
+            color: &#39;rgba(255,255,255,0.4)&#39;
+        });
+
+        var stroke = new ol.style.Stroke({
+            color: &#39;#3399CC&#39;,
+            width: 1.25
+        });
+
+        var style = new ol.style.Style({
+            image: new ol.style.Circle({
+                fill: fill,
+                stroke: stroke,
+                radius: 5
+            }),
+            fill: fill,
+            stroke: stroke
+        });
+
+        return style;
+    },
+
+<span id='CpsiMapview-field-Polygon-method-createSelectStyle'>    /**
+</span>    * Create a new ol style for showing polygons when selected
+    *
+    * @return {ol.style.Style} The new style
+    */
+    createSelectStyle: function () {
+        return null;
+    }
+});
+</pre>
+</body>
+</html>

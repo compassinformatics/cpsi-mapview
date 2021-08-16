@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+  <title>The source code</title>
+  <link href="../resources/prettify/prettify.css" type="text/css" rel="stylesheet" />
+  <script type="text/javascript" src="../resources/prettify/prettify.js"></script>
+  <style type="text/css">
+    .highlight { display: block; background-color: #ddd; }
+  </style>
+  <script type="text/javascript">
+    function highlight() {
+      document.getElementById(location.hash.replace(/#/, "")).className = "highlight";
+    }
+  </script>
+</head>
+<body onload="prettyPrint(); highlight();">
+  <pre class="prettyprint lang-js"><span id='CpsiMapview-view-combo-Gazetteer'>/**
+</span> * Base class for a ComboBox using a custom CPSI Gazetteer service.
+ */
+Ext.define(&#39;CpsiMapview.view.combo.Gazetteer&#39;, {
+    extend: &#39;GeoExt.form.field.GeocoderComboBox&#39;,
+    xtype: &#39;cmv_gazetteer_combo&#39;,
+
+<span id='CpsiMapview-view-combo-Gazetteer-cfg-queryParam'>    /**
+</span>     * The query parameter for the user entered search text.
+     * Not used for this Gazetteer service.
+     *
+     * @cfg {String}
+     */
+    queryParam: null,
+
+<span id='CpsiMapview-view-combo-Gazetteer-cfg-minChars'>    /**
+</span>     * Minimum number of entered characters to trigger a search.
+     *
+     * @cfg {Number}
+     */
+    minChars: 2,
+
+<span id='CpsiMapview-view-combo-Gazetteer-cfg-srs'>    /**
+</span>     * The SRS used by the Gazetteer service.
+     *
+     * @cfg {String}
+     */
+    srs: &#39;EPSG:3857&#39;,
+
+<span id='CpsiMapview-view-combo-Gazetteer-method-onFocus'>    onFocus: Ext.emptyFn,
+</span>
+<span id='CpsiMapview-view-combo-Gazetteer-method-initComponent'>    /**
+</span>     * @private
+     */
+    initComponent: function () {
+        var me = this;
+
+        // Enable the proxying of key events for the HTML input field
+        me.enableKeyEvents = true;
+
+        // Add missing &#39;/&#39; to end of URL if missing
+        if (me.url.slice(-1) !== &#39;/&#39;) {
+            me.url += &#39;/&#39;;
+        }
+
+        me.locationLayerStyle = new ol.style.Style({
+            stroke: new ol.style.Stroke({
+                color: &#39;turquoise&#39;,
+                width: 2,
+                lineDash: [8, 4]
+            })
+        });
+
+        me.callParent();
+
+        me.on({
+            keyup: function () {
+                var val = me.getRawValue();
+
+                if (Ext.isEmpty(val)) {
+                    me.removeLocationFeature();
+                }
+
+            },
+            beforequery: function () {
+                var val = this.getRawValue();
+
+                // clear any previous query feature
+                me.removeLocationFeature();
+
+                if (val) {
+                    // only trigger a request if text has been entered
+                    var url = me.url + encodeURIComponent(val.trim());
+                    me.getStore().getProxy().setUrl(url);
+                    return true;
+                } else {
+                    return false;
+                }
+            },
+            afterrender: function () {
+                // set a key on the layer using the unique id of the combo
+                me.locationLayer.set(&#39;layerKey&#39;, me.id);
+            }
+        });
+
+    },
+
+<span id='CpsiMapview-view-combo-Gazetteer-method-convertToExtent'>    /**
+</span>     * Function to convert the data delivered by the Gazetteer service to an
+     * ol.Extent ([minx, miny, maxx, maxy]).
+     *
+     * @param  {Mixed}          v   The data value as read by the Reader
+     * @param  {Ext.data.Model} rec The data record containing raw data
+     * @return {ol.Extent}          The created ol.Extent
+     */
+    convertToExtent: function (v, rec) {
+        var minx = rec.get(&#39;minX3857&#39;);
+        var miny = rec.get(&#39;minY3857&#39;);
+        var maxx = rec.get(&#39;maxX3857&#39;);
+        var maxy = rec.get(&#39;maxY3857&#39;);
+
+        return [minx, miny, maxx, maxy];
+    }
+});
+</pre>
+</body>
+</html>

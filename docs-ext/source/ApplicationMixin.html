@@ -1,0 +1,303 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+  <title>The source code</title>
+  <link href="../resources/prettify/prettify.css" type="text/css" rel="stylesheet" />
+  <script type="text/javascript" src="../resources/prettify/prettify.js"></script>
+  <style type="text/css">
+    .highlight { display: block; background-color: #ddd; }
+  </style>
+  <script type="text/javascript">
+    function highlight() {
+      document.getElementById(location.hash.replace(/#/, "")).className = "highlight";
+    }
+  </script>
+</head>
+<body onload="prettyPrint(); highlight();">
+  <pre class="prettyprint lang-js">
+<span id='CpsiMapview-util-ApplicationMixin'>/**
+</span> * A mapview Application mixin containing generic functions that can be reused
+ * between applications
+ */
+Ext.define(&#39;CpsiMapview.util.ApplicationMixin&#39;, {
+    extend: &#39;Ext.Mixin&#39;,
+
+<span id='CpsiMapview-util-ApplicationMixin-property-quickTips'>    // see https://docs.sencha.com/extjs/6.7.0/classic/Ext.app.Application.html#cfg-quickTips
+</span>    quickTips: false,
+
+<span id='CpsiMapview-util-ApplicationMixin-property-loginWindow'>    /**
+</span>     * Property to store a reference to the login window
+     */
+    loginWindow: null,
+
+<span id='CpsiMapview-util-ApplicationMixin-property-requireLogin'>    /**
+</span>     * Does the application require a login window for access
+     */
+    requireLogin: true,
+
+<span id='CpsiMapview-util-ApplicationMixin-property-platformConfig'>    // when the platform is matched any properties are placed on the class
+</span>    platformConfig: {
+        desktop: {
+            quickTips: true
+        }
+    },
+
+<span id='CpsiMapview-util-ApplicationMixin-property-mixinConfig'>    mixinConfig: {
+</span>        after: {
+            constructor: &#39;onApplicationCreated&#39;
+        }
+    },
+
+<span id='CpsiMapview-util-ApplicationMixin-property-serviceUrls'>    /**
+</span>     * URLs to monitor for service errors
+     */
+    serviceUrls: [],
+
+<span id='CpsiMapview-util-ApplicationMixin-property-excludedUrls'>    /**
+</span>     * URLs to ignore for errors
+     */
+    excludedUrls: [],
+
+<span id='CpsiMapview-util-ApplicationMixin-property-rootHelpUrl'>    /**
+</span>     * URL to use as the root for any window helpUrl
+     */
+    rootHelpUrl: &#39;&#39;,
+
+<span id='CpsiMapview-util-ApplicationMixin-property-tokenName'>    /**
+</span>     * The token name within a cookie that stores a login token
+     */
+    tokenName: &#39;cookietoken&#39;,
+
+<span id='CpsiMapview-util-ApplicationMixin-property-errorCode'>    errorCode: {
+</span>        None: 0,
+        AccountLockedOut: 1,
+        AccountDoesNotExist: 2,
+        UserTokenExpired: 3,
+        CookieHeaderMissing: 4,
+        NoPermission: 5,
+        GeneralServerError: 500,
+        FileNotFound: 404
+    },
+
+<span id='CpsiMapview-util-ApplicationMixin-method-onAjaxBeforeRequest'>    onAjaxBeforeRequest: function () {
+</span>        Ext.emptyFn();
+    },
+
+<span id='CpsiMapview-util-ApplicationMixin-method-onAjaxRequestComplete'>    onAjaxRequestComplete: function (connection, response) {
+</span>
+        var me = this;
+
+        var msg = &#39;The operation failed.&#39;;
+        var result;
+        var requestUrl = response.request.url;
+        var success = response.status === 200;
+
+        var urlTest = function (url) {
+            var ignoreCase = true;
+            return Ext.String.startsWith(requestUrl, url, ignoreCase);
+        };
+
+        if (Ext.Array.some(me.serviceUrls, urlTest) === true) {
+            if (Ext.Array.some(me.excludedUrls, urlTest) === false) {
+
+                var responseType = response.responseType ? response.responseType : response.getResponseHeader ? response.getResponseHeader(&#39;content-type&#39;) : null;
+
+                // check for geojson (coming from MapServer)
+                if (responseType &amp;&amp; responseType.includes(&#39;subtype=geojson&#39;)) {
+                    responseType = &#39;geojson&#39;;
+                }
+
+                // form submissions (i.e. attachments upload) return bogus responses with no content-type
+                // we can try and parse the response to see if it is valid JSON
+                if (responseType === null) {
+                    if (Ext.JSON.decode(response.responseText, true)) { // pass true to avoid errors
+                        responseType = &#39;json&#39;;
+                    }
+                }
+
+                switch (responseType) {
+                    case &#39;json&#39;:
+                    case &#39;application/json&#39;:
+                        if (response.responseJson) {
+                            result = response.responseJson;
+                        }
+                        else {
+                            result = JSON.parse(response.responseText);
+                        }
+
+                        if (result.success !== true) {
+                            switch (result.errorCode) {
+                                case me.errorCode.UserTokenExpired:
+                                case me.errorCode.CookieHeaderMissing:
+                                    // user must login again
+                                    me.doLogin();
+                                    break;
+                                case null:
+                                    Ext.Msg.alert(&#39;Error&#39;, result.message);
+                                    break;
+                                default:
+                                    Ext.log.error(requestUrl, msg);
+                                    break;
+                            }
+                        }
+                        break;
+                    case &#39;geojson&#39;:
+                        break;
+                    case &#39;xml&#39;:
+                        result = response.responseXML;
+                        break;
+                    default:
+                        result = response.responseText;
+                        break;
+                }
+            }
+        }
+        return success;
+    },
+
+<span id='CpsiMapview-util-ApplicationMixin-method-onAjaxRequestException'>    onAjaxRequestException: function (/*connection, response, options, eOpts*/) {
+</span>        Ext.emptyFn();
+    },
+
+<span id='CpsiMapview-util-ApplicationMixin-method-onApplicationCreated'>    onApplicationCreated: function () {
+</span>
+        var me = this;
+        me.setupRequestHooks();
+        if (me.requireLogin) {
+            me.doLogin();
+        }
+        // add a listener for whenever any button in the map toggleGroup is toggled
+        me.control({
+            &#39;button[toggleGroup=map]&#39;: {
+                toggle: me.onMapToolsToggle
+            }
+        });
+
+        // setup all the projections required for the application
+        proj4.defs(&#39;EPSG:4326&#39;, &#39;+proj=longlat +datum=WGS84 +no_defs&#39;);
+        proj4.defs(&#39;EPSG:3857&#39;, &#39;+proj=merc +a=6378137 +b=6378137 +lat_ts=0.0 +lon_0=0.0 +x_0=0.0 +y_0=0 +k=1.0 +units=m +nadgrids=@null +wktext  +no_defs&#39;);
+        proj4.defs(&#39;EPSG:2157&#39;, &#39;+proj=tmerc +lat_0=53.5 +lon_0=-8 +k=0.99982 +x_0=600000 +y_0=750000 +ellps=GRS80 +towgs84=0,0,0,0,0,0,0 +units=m +no_defs&#39;);
+        proj4.defs(&#39;EPSG:29902&#39;, &#39;+proj=tmerc +lat_0=53.5 +lon_0=-8 +k=1.000035 +x_0=200000 +y_0=250000 +ellps=mod_airy +towgs84=482.5,-130.6,564.6,-1.042,-0.214,-0.631,8.15 +units=m +no_defs&#39;);
+
+        ol.proj.proj4.register(proj4);
+    },
+
+<span id='CpsiMapview-util-ApplicationMixin-method-onMapToolsToggle'>    /**
+</span>     * Whenever any tools that are part of the &#39;map&#39; toggleGroup are toggled
+     * we check to see if any tools are still active.
+     * The defaultClickEnabled value is then used to check if the
+     * default CpsiMapview.plugin.FeatureInfoWindow tool should be active
+     * */
+    onMapToolsToggle: function () {
+
+        var buttonsInToggleGroup = Ext.ComponentQuery.query(&#39;button[toggleGroup=map]&#39;);
+        var pressedStates = Ext.Array.pluck(buttonsInToggleGroup, &#39;pressed&#39;);
+        var uniquePressedStates = Ext.Array.unique(pressedStates);
+        var activeTools = Ext.Array.contains(uniquePressedStates, true);
+
+        var map = BasiGX.util.Map.getMapComponent().map;
+        map.set(&#39;defaultClickEnabled&#39;, !activeTools);
+    },
+
+<span id='CpsiMapview-util-ApplicationMixin-method-setupRequestHooks'>    /**
+</span>     * Add hooks for all AJAX request to handle errors and logins
+     * */
+    setupRequestHooks: function () {
+
+        var me = this;
+
+        Ext.Ajax.on({
+            beforerequest: this.onAjaxBeforeRequest,
+            requestcomplete: this.onAjaxRequestComplete,
+            requesteexception: this.onAjaxRequestException,
+            scope: me
+        });
+    },
+
+<span id='CpsiMapview-util-ApplicationMixin-method-doLogin'>    /**
+</span>     * Open the login form when the application is opened. Attempt
+     * to login automatically if the user already has a cookie and token.
+     * If the form has already been created then simply show it.
+     * */
+    doLogin: function () {
+
+        var me = this;
+
+        if (!me.loginWindow) {
+            me.loginWindow = Ext.create(&#39;CpsiMapview.view.form.Login&#39;, {
+                viewModel: {
+                    tokenName: this.tokenName,
+                    serviceUrl: &#39;/WebServices/authorization/authenticate&#39;,
+                    validateUrl: &#39;/WebServices/authorization/validateToken&#39;
+                }
+            });
+            me.loginWindow.getController().tryAutomaticLogin();
+        } else {
+            me.loginWindow.show();
+        }
+    },
+
+<span id='CpsiMapview-util-ApplicationMixin-method-getUrlParameter'>    /**
+</span>     * Get a value from the hostname in the browser
+     * using the supplied regex
+     * @param {any} regex
+     */
+    getUrlParameter: function (regex) {
+
+        var str = location.hostname;
+        var matches = [];
+        var m;
+
+        do {
+            m = regex.exec(str);
+            if (m) {
+                matches.push(m[1]);
+            }
+        } while (m);
+
+        var value;
+
+        if (matches.length &gt; 0) {
+            value = matches[0];
+        }
+
+        return value;
+    },
+
+<span id='CpsiMapview-util-ApplicationMixin-method-getSiteSettings'>    /**
+</span>     * When multiple sites are supported, lookup
+     * application settings from a store using the
+     * supplied key
+     * @param {any} storeKey
+     * @param {any} siteKey
+     */
+    getSiteSettings: function (storeKey, siteKey) {
+
+        var store = Ext.data.StoreManager.lookup(storeKey);
+        var idx = store.findExact(&#39;key&#39;, siteKey);
+        var rec = null;
+
+        if (idx !== -1) {
+            rec = store.getAt(idx);
+        }
+
+        return rec;
+    },
+
+<span id='CpsiMapview-util-ApplicationMixin-method-onAppUpdate'>    /**
+</span>     * Ask the use if they wish to refresh the browser following an application update
+     * */
+    onAppUpdate: function () {
+        Ext.Msg.confirm(&#39;Application Update&#39;, &#39;This application has an update, reload?&#39;,
+            function (choice) {
+                if (choice === &#39;yes&#39;) {
+                    window.location.reload();
+                }
+            }
+        );
+    }
+});
+</pre>
+</body>
+</html>

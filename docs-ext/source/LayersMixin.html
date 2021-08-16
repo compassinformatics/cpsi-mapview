@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+  <title>The source code</title>
+  <link href="../resources/prettify/prettify.css" type="text/css" rel="stylesheet" />
+  <script type="text/javascript" src="../resources/prettify/prettify.js"></script>
+  <style type="text/css">
+    .highlight { display: block; background-color: #ddd; }
+  </style>
+  <script type="text/javascript">
+    function highlight() {
+      document.getElementById(location.hash.replace(/#/, "")).className = "highlight";
+    }
+  </script>
+</head>
+<body onload="prettyPrint(); highlight();">
+  <pre class="prettyprint lang-js"><span id='CpsiMapview-form-LayersMixin'>/**
+</span> * A mixin to handle hiding and showing layers associated with an edit model
+ *
+ * @class CpsiMapview.form.LayersMixin
+ */
+Ext.define(&#39;CpsiMapview.form.LayersMixin&#39;, {
+    extend: &#39;Ext.Mixin&#39;,
+
+    requires: [&#39;BasiGX.util.Map&#39;],
+
+<span id='CpsiMapview-form-LayersMixin-property-syncLayerWindowVisibility'>    // hide/show the form layer with the form
+</span>    syncLayerWindowVisibility: false,
+
+<span id='CpsiMapview-form-LayersMixin-property-mixinConfig'>    // see https://docs.sencha.com/extjs/6.7.0/classic/Ext.Mixin.html
+</span>
+    mixinConfig: {
+        after: {
+            // the CpsiMapview.controller.window.MinimizableWindow
+            // already has a onShow function so we add an additional
+            // function with a different name or it is ignored
+            // (as the mixin takes lower priority)
+            onShow: &#39;onWindowShow&#39;,
+            hide: &#39;onHide&#39;
+        }
+    },
+
+<span id='CpsiMapview-form-LayersMixin-method-toggleLayerVisibility'>    toggleLayerVisibility: function (show) {
+</span>
+        var vm = this.getView().getViewModel();
+
+        var layer = vm.get(&#39;resultLayer&#39;);
+
+        if (layer) {
+            layer.setVisible(show);
+        }
+
+        // if the form also has a polygon layer for selection
+        // then hide this also
+        var polygonLayer = vm.get(&#39;polygonLayer&#39;);
+
+        if (polygonLayer) {
+            polygonLayer.setVisible(show);
+        }
+    },
+
+<span id='CpsiMapview-form-LayersMixin-method-onHide'>    onHide: function () {
+</span>        if (this.syncLayerWindowVisibility) {
+            this.toggleLayerVisibility(false);
+        }
+    },
+
+<span id='CpsiMapview-form-LayersMixin-method-onWindowShow'>    onWindowShow: function () {
+</span>        if (this.syncLayerWindowVisibility) {
+            this.toggleLayerVisibility(true);
+        }
+    }
+});</pre>
+</body>
+</html>

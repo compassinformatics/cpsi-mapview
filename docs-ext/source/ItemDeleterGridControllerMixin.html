@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+  <title>The source code</title>
+  <link href="../resources/prettify/prettify.css" type="text/css" rel="stylesheet" />
+  <script type="text/javascript" src="../resources/prettify/prettify.js"></script>
+  <style type="text/css">
+    .highlight { display: block; background-color: #ddd; }
+  </style>
+  <script type="text/javascript">
+    function highlight() {
+      document.getElementById(location.hash.replace(/#/, "")).className = "highlight";
+    }
+  </script>
+</head>
+<body onload="prettyPrint(); highlight();">
+  <pre class="prettyprint lang-js"><span id='CpsiMapview-controller-grid-ItemDeleterGridControllerMixin'>/**
+</span> *  To be mixed in to the controller of a grid which uses ItemDeleter
+ *  Can be provided with the following custom handlers
+ *
+ *  - beforeDelete          =&gt; if returns &quot;false&quot; deletion is aborted, runs BEFORE the user is asked for confirmation
+ *
+ *  - onRowDelete           =&gt; the actual deletion implementation, if the user confirms
+ *  - onRowDeleteCancelled  =&gt; in case we want to do something when the user doesn&#39;t confirm or beforeDelete returns false
+ */
+
+Ext.define(&#39;CpsiMapview.controller.grid.ItemDeleterGridControllerMixin&#39;, {
+    extend: &#39;Ext.Mixin&#39;,
+
+<span id='CpsiMapview-controller-grid-ItemDeleterGridControllerMixin-method-beforeDelete'>    beforeDelete: function (/*config*/) { return true; },
+</span><span id='CpsiMapview-controller-grid-ItemDeleterGridControllerMixin-method-onRowDeleteFail'>    onRowDeleteFail: Ext.emptyFn,
+</span><span id='CpsiMapview-controller-grid-ItemDeleterGridControllerMixin-method-onRowDeleteSuccess'>    onRowDeleteSuccess: Ext.emptyFn,
+</span><span id='CpsiMapview-controller-grid-ItemDeleterGridControllerMixin-method-onRowDeleteCallback'>    onRowDeleteCallback: Ext.emptyFn,
+</span>
+<span id='CpsiMapview-controller-grid-ItemDeleterGridControllerMixin-method-onRowDelete'>    /**
+</span>    * Function to run when a user selects to delete a row. Override this as required.
+    */
+    onRowDelete: function (tableView, rowIndex, colIndex, item, e, record) {
+        tableView.getStore().remove(record);
+    },
+
+<span id='CpsiMapview-controller-grid-ItemDeleterGridControllerMixin-method-onRowDeleteCancelled'>    /**
+</span>    * Function to run when delete is cancelled by the user or by business logic. Override this as required.
+    */
+    onRowDeleteCancelled: Ext.emptyFn,
+
+<span id='CpsiMapview-controller-grid-ItemDeleterGridControllerMixin-method-onDeleteRowClick'>    onDeleteRowClick: function (tableView, rowIndex, colIndex, item, e, record, tableRow) {
+</span>        var me = this;
+        var beforeDeleteConfig = { avoidConfirmationRequest: item.avoidConfirmationRequest || false, record: record };
+        var goAhead = (me.beforeDelete ? me.beforeDelete(beforeDeleteConfig) : true);
+        if (goAhead) {
+            if (beforeDeleteConfig.avoidConfirmationRequest) {
+                me.onRowDelete(tableView, rowIndex, colIndex, item, e, record, tableRow);
+            } else {
+                Ext.Msg.confirm(&#39;Delete&#39;, &#39;Are you sure you want to proceed with deletion?&#39;,
+                    function (buttonId) {
+                        if (buttonId == &#39;yes&#39;) {
+                            me.onRowDelete(tableView, rowIndex, colIndex, item, e, record, tableRow);
+                        } else {
+                            me.onRowDeleteCancelled(tableView, rowIndex, colIndex, item, e, record, tableRow);
+                        }
+                    }
+                );
+            }
+        }
+        else {
+            me.onRowDeleteCancelled(tableView, rowIndex, colIndex, item, e, record, tableRow);
+        }
+    }
+
+});</pre>
+</body>
+</html>
