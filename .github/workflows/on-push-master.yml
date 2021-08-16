@@ -1,4 +1,4 @@
-name: Run coveralls 
+name: Build and publish application 
 
 on:
   push:
