@@ -1,0 +1,100 @@
+name: Build and publish application 
+
+on:
+  push:
+    branches:
+      - master
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout repository and submodules
+      uses: actions/checkout@v2
+      with:
+        submodules: recursive
+
+    - name: Use Node.js 14.x
+      uses: actions/setup-node@v1
+      with:
+        node-version: 14.x
+
+    - name: Install needed Java version
+      uses: actions/setup-java@v1
+      with:
+        java-version: '8'
+
+    - name: Install ruby
+      uses: actions/setup-ruby@v1
+      with:
+        ruby-version: '2.6'
+
+    - name: Install jsduck
+      run: gem install jsduck
+
+    - name: Cache Node.js modules 💾
+      uses: actions/cache@v2
+      with:
+        path: |
+          node_modules
+        key: ${{ runner.OS }}-node-${{ hashFiles('**/package-lock.json') }}
+        restore-keys: |
+          ${{ runner.OS }}-node-
+          ${{ runner.OS }}-
+
+    - name: Cache ext 💾
+      uses: actions/cache@v2
+      with:
+        path: |
+          resources/external
+          ext-6.2.0
+          ext-6.2.0-gpl.zip
+          sencha-cmd-download
+          sencha-cmd
+        key: ${{ runner.OS }}-node-${{ hashFiles('resources/external/ext-all.js') }}
+        restore-keys: |
+          ${{ runner.OS }}-node-
+          ${{ runner.OS }}-
+
+    - name: Download ExtJS, install sencha cmd
+      run: |
+        if (test ! -f ext-6.2.0-gpl.zip); then wget -q http://cdn.sencha.com/ext/gpl/ext-6.2.0-gpl.zip -O ext-6.2.0-gpl.zip; fi
+        if (test ! -d ext-6.2.0); then unzip -qo ext-6.2.0-gpl.zip; fi
+        mkdir -p sencha-cmd-download
+        if (test ! -f sencha-cmd-download/SenchaCmd-7.3.0.19-linux-amd64.sh.zip); then wget -q http://cdn.sencha.com/cmd/7.3.0.19/no-jre/SenchaCmd-7.3.0.19-linux-amd64.sh.zip -O sencha-cmd-download/SenchaCmd-7.3.0.19-linux-amd64.sh.zip; fi
+        if (test ! -f sencha-cmd-download/SenchaCmd-7.3.0.19-linux-amd64.sh); then unzip -q -d sencha-cmd-download sencha-cmd-download/SenchaCmd-7.3.0.19-linux-amd64.sh.zip; fi
+        mkdir -p sencha-cmd
+        if (test ! -f sencha-cmd/sencha); then ./sencha-cmd-download/SenchaCmd-7.3.0.19-linux-amd64.sh -q -dir "$PWD/sencha-cmd"; fi
+        mv ext-6.2.0 ext
+
+    - name: Install dependencies ⏬
+      run: npm install
+
+    - name: Testing 🔎
+      run: npm test
+
+    - name: Generate coverage 🧪
+      run: npm run test:coverage
+
+    - name: Publish to coveralls ⭐
+      uses: coverallsapp/github-action@master
+      with:
+        github-token: ${{ secrets.GITHUB_TOKEN }}
+
+    - name: Build sencha app
+      run: |
+        SENCHACMD="$PWD/sencha-cmd/sencha"
+        $SENCHACMD app build
+
+    - name: Cleanup and prepare pages
+      run: |
+        mkdir -p docs-ext
+        npm run generate:docs
+
+    - name: Deploy gh-pages
+      uses: peaceiris/actions-gh-pages@v3
+      with:
+        github_token: ${{ secrets.GITHUB_TOKEN }}
+        publish_dir: ./build/production/CpsiMapview
+        destination_dir: .

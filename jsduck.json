@@ -1,0 +1,17 @@
+{
+  "--external": [
+    "ol.*"
+  ],
+  "--ignore-html": "debug",
+  "--output": "docs-ext",
+  "--processes": 0,
+  "--title": "Compass MapView v1.0.0 Documentation",
+  "--warnings": [
+    "-extend",
+    "-link",
+    "-inheritdoc"
+  ],
+  "--": [
+    "app/"
+  ]
+}
