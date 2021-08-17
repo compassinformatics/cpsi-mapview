@@ -44,16 +44,21 @@ Ext.define(&#39;CpsiMapview.field.Line&#39;, {
     },
 
 <span id='CpsiMapview-field-Line-method-defaultFeatureFilter'>    /**
-</span>     * Filter to apply to the feature store
+</span>     * Filter to apply to the feature store, this is added to the store filters
+     * in {@link CpsiMapview.model.FeatureStoreMixin#createFeatureStore}
+     * Only display LineString and MultiLineStrings in the associated feature grid
      */
     defaultFeatureFilter: function (rec) {
-        // only display LineString and MultiLineString in an associated feature grid
         var geomType = rec.getFeature().getGeometry().getType();
         return (Ext.Array.contains([&#39;LineString&#39;, &#39;MultiLineString&#39;], geomType));
     },
 
 <span id='CpsiMapview-field-Line-method-serialize'>    /**
-</span>     * Return simplified feature properties rather than full GeoJSON
+</span>     * Override {@link Ext.data.field.Field#serialize}
+     * to return simplified feature properties rather than full GeoJSON
+     *
+     * @param {any} v the field value, this can be set to null as we get the value from the store
+     * @param {any} rec
      */
     serialize: function (v, rec) {
 
@@ -70,15 +75,15 @@ Ext.define(&#39;CpsiMapview.field.Line&#39;, {
         var feats = featureStore.getRange();
         var recs = [];
 
-        Ext.each(feats, function (s) {
-            recs.push(s.data);
+        Ext.each(feats, function (f) {
+            recs.push(f.data);
         });
 
         return recs;
     },
 
 <span id='CpsiMapview-field-Line-method-createPointLineStyle'>    /**
-</span>    * Create a new ol style for showing points and lines
+</span>    * Create a new ol style for points and lines in the layer associated with the store
     *
     * @return {ol.style.Style} The new style
     */
