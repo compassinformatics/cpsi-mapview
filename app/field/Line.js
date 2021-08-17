@@ -27,16 +27,21 @@ Ext.define('CpsiMapview.field.Line', {
     },
 
     /**
-     * Filter to apply to the feature store
+     * Filter to apply to the feature store, this is added to the store filters
+     * in {@link CpsiMapview.model.FeatureStoreMixin#createFeatureStore}
+     * Only display LineString and MultiLineStrings in the associated feature grid
      */
     defaultFeatureFilter: function (rec) {
-        // only display LineString and MultiLineString in an associated feature grid
         var geomType = rec.getFeature().getGeometry().getType();
         return (Ext.Array.contains(['LineString', 'MultiLineString'], geomType));
     },
 
     /**
-     * Return simplified feature properties rather than full GeoJSON
+     * Override {@link Ext.data.field.Field#serialize}
+     * to return simplified feature properties rather than full GeoJSON
+     *
+     * @param {any} v the field value, this can be set to null as we get the value from the store
+     * @param {any} rec
      */
     serialize: function (v, rec) {
 
@@ -53,15 +58,15 @@ Ext.define('CpsiMapview.field.Line', {
         var feats = featureStore.getRange();
         var recs = [];
 
-        Ext.each(feats, function (s) {
-            recs.push(s.data);
+        Ext.each(feats, function (f) {
+            recs.push(f.data);
         });
 
         return recs;
     },
 
     /**
-    * Create a new ol style for showing points and lines
+    * Create a new ol style for points and lines in the layer associated with the store
     *
     * @return {ol.style.Style} The new style
     */

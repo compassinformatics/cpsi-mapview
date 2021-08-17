@@ -6,21 +6,14 @@
 Ext.define('CpsiMapview.field.Point', {
     extend: 'CpsiMapview.field.Feature',
 
-    requires: [
-        'BasiGX.util.Map'
-    ],
-
     alias: 'data.field.point',
 
     /**
-     * The distance used to buffer a feature when the zoomToFeature
-     * function is used
-     * @cfg {Number}
-     */
-    extentBuffer: 100,
-
-    /**
-     * Return a the geometry of a single point feature
+     * Override {@link Ext.data.field.Field#serialize}
+     * to return a the geometry of a single point feature
+     *
+     * @param {any} v the field value, this can be set to null as we get the value from the store
+     * @param {any} rec
      */
     serialize: function (v, rec) {
         var me = this;
