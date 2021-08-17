@@ -7,6 +7,10 @@ Ext.define('CpsiMapview.form.RightInfoField', {
     xtype: 'cmv_rightinfofield',
     extend: 'Ext.form.FieldContainer',
 
+    requires: [
+        'Ext.tip.QuickTipManager'
+    ],
+
     /**
      * Setter method for the infoIconTooltip property
      * @param {any} tooltip
@@ -17,16 +21,24 @@ Ext.define('CpsiMapview.form.RightInfoField', {
         me.updateTooltip();
     },
 
+    /**
+     * Update the tooltip text
+     */
     updateTooltip: function () {
 
         var me = this;
-        Ext.tip.QuickTipManager.unregister(me.iconPanel);
 
-        Ext.tip.QuickTipManager.register({
-            target: me.iconPanel.getId(),
-            text: me.toolTip,
-            autoHide: false
-        });
+        if (Ext.tip.QuickTipManager.isEnabled() === true) {
+            Ext.tip.QuickTipManager.unregister(me.iconPanel);
+
+            Ext.tip.QuickTipManager.register({
+                target: me.iconPanel.getId(),
+                text: me.toolTip,
+                autoHide: false
+            });
+        } else {
+            Ext.log.warn('Ext.tip.QuickTipManager is not enabled');
+        }
 
     },
 
@@ -41,7 +53,7 @@ Ext.define('CpsiMapview.form.RightInfoField', {
             Ext.applyIf(config.field, config.defaults.field);
         }
 
-        me.toolTip = config.field.infoIconTooltip || '&nbsp;';
+        me.toolTip = config.field.infoIconTooltip || '&nbsp;'; // set to a space if no tt is provided
 
         Ext.applyIf(config.field, {
             labelAlign: 'left',
@@ -49,15 +61,11 @@ Ext.define('CpsiMapview.form.RightInfoField', {
             width: 320
         });
 
-        me.iconPanel = Ext.create('Ext.panel.Panel', {
+        me.iconPanel = Ext.create('Ext.container.Container', {
             cls: 'icon-gtk-info_16x16',
             width: 16,
             height: 16,
             margin: '0 6 0 2',
-            bodyStyle: {
-                background: 'none !important',
-                border: 'none !important'
-            },
             listeners: {
                 afterrender: me.updateTooltip, // run this afterrender or the tooltips don't appear on first hover
                 scope: me
@@ -69,6 +77,7 @@ Ext.define('CpsiMapview.form.RightInfoField', {
             align: 'middle'
         });
 
+        // add the components
         me.add(config.field);
         me.add(me.iconPanel);
     }
