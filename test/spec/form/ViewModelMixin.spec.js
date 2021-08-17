@@ -1,3 +1,13 @@
+Ext.define('CpsiMapview.form.TestViewModelModel', {
+    extend: 'Ext.data.Model',
+    fields: ['id']
+});
+
+Ext.define('CpsiMapview.form.TestViewModel', {
+    extend: 'Ext.app.ViewModel',
+    mixins: ['CpsiMapview.form.ViewModelMixin']
+});
+
 describe('CpsiMapview.form.ViewModelMixin', function () {
 
     it('is defined', function () {
@@ -12,16 +22,6 @@ describe('CpsiMapview.form.ViewModelMixin', function () {
     describe('Functions', function () {
 
         var vm, currentRecord;
-
-        Ext.define('CpsiMapview.form.TestViewModelModel', {
-            extend: 'Ext.data.Model',
-            fields: ['id']
-        });
-
-        Ext.define('CpsiMapview.form.TestViewModel', {
-            extend: 'Ext.app.ViewModel',
-            mixins: ['CpsiMapview.form.ViewModelMixin']
-        });
 
         beforeEach(function () {
             // create a new view with the mixin

@@ -1,3 +1,12 @@
+Ext.define('CpsiMapview.form.TestWindow', {
+    extend: 'Ext.window.Window',
+    mixins: ['CpsiMapview.form.ViewMixin'],
+    viewModel: {},
+    tools: [{
+        type: 'help'
+    }]
+});
+
 describe('CpsiMapview.form.ViewMixin', function () {
 
     it('is defined', function () {
@@ -13,15 +22,6 @@ describe('CpsiMapview.form.ViewMixin', function () {
 
         var editWindow;
         var buttonBar;
-
-        Ext.define('CpsiMapview.form.TestWindow', {
-            extend: 'Ext.window.Window',
-            mixins: ['CpsiMapview.form.ViewMixin'],
-            viewModel: {},
-            tools: [{
-                type: 'help'
-            }]
-        });
 
         beforeEach(function () {
 
