@@ -7,6 +7,9 @@
 trigger:
   - none # set to master to re-enable
 
+  # also disable on pull requests
+pr: none
+
 pool:
   vmImage: 'windows-2019'
 

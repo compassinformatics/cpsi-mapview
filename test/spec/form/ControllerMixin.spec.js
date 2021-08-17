@@ -1,3 +1,14 @@
+Ext.define('CpsiMapview.form.TestControllerModel', {
+    extend: 'Ext.data.Model',
+    fields: ['id']
+});
+
+Ext.define('CpsiMapview.form.TestController', {
+    extend: 'Ext.app.ViewController',
+    alias: 'controller.TestController',
+    mixins: ['CpsiMapview.form.ControllerMixin']
+});
+
 describe('CpsiMapview.form.ControllerMixin', function () {
 
     it('is defined', function () {
@@ -13,20 +24,9 @@ describe('CpsiMapview.form.ControllerMixin', function () {
 
         var editForm;
 
-        Ext.define('TestModel', {
-            extend: 'Ext.data.Model',
-            fields: ['id']
-        });
-
-        Ext.define('TestController', {
-            extend: 'Ext.app.ViewController',
-            alias: 'controller.TestController',
-            mixins: ['CpsiMapview.form.ControllerMixin']
-        });
-
         beforeEach(function () {
 
-            var model = Ext.create('TestModel');
+            var model = Ext.create('CpsiMapview.form.TestControllerModel');
 
             // create a new view with the controller and mixin
             editForm = Ext.create('Ext.window.Window', {

@@ -8,4 +8,12 @@
             'CpsiMapview': '../app'
         }
     });
+
+    // Get "Ext.getApplication is not a function" when running tests so mock this here
+    Ext.getApplication = function () {
+        return {
+            enableIsLocked: true // enable the padlock icon
+        };
+    }
+
 }(document, this));
