@@ -20,6 +20,7 @@ Ext.define('CpsiMapview.model.FeatureStoreMixin', {
 
     /**
      * The default buffer distance to use when zooming to points
+     * @cfg {Number}
      */
     extentBuffer: 100,
 
@@ -156,6 +157,7 @@ Ext.define('CpsiMapview.model.FeatureStoreMixin', {
 
         Ext.each(me.getFields(), function (f) {
             switch (true) {
+                case (f.type === 'feature'):
                 case (f.type === 'line' || f.superclass.type == 'line'):
                 case (f.type === 'polygon' || f.superclass.type == 'polygon'):
                 case (f.type === 'point' || f.superclass.type == 'point'):

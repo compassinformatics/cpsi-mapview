@@ -6,10 +6,6 @@
 Ext.define('CpsiMapview.field.Polygon', {
     extend: 'CpsiMapview.field.Feature',
 
-    requires: [
-        'BasiGX.util.Map'
-    ],
-
     alias: 'data.field.polygon',
 
     /**
@@ -22,7 +18,10 @@ Ext.define('CpsiMapview.field.Polygon', {
     },
 
     /**
-     * Return a single polygon associated with the layer as a GeoJSON object
+     * Override {@link Ext.data.field.Field#serialize}
+     * to return a single polygon associated with the layer as a GeoJSON object
+     *
+     * @param {any} v the field value, this can be set to null as we get the value from the store
      * @param {any} rec
      */
     getPolygonGeometry: function (polygonLayer) {

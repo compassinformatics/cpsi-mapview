@@ -1,8 +1,8 @@
 /**
 * A custom field for linking OpenLayers features
-* The field handles loading to an associated store.
-* The field itself will be set to an array of OpenLayers features.
-* This is set both in the convert function below, and also by
+* The field handles loading GeoJSON from a web service into a store associated with the field.
+* The field value itself will be set to an array of OpenLayers features.
+* The field value is set both in the convert function below, and also by
 * CpsiMapview.model.FeatureStoreMixin with the `add`, `clear`, and `remove`
 * listeners on the FeatureStore. This triggers any field validation which may be
 * set.
@@ -38,6 +38,20 @@ Ext.define('CpsiMapview.field.Feature', {
         }
 
         return features;
-    }
+    },
+
+    /**
+    * Create a default style for the layer associated with the feature field
+    *
+    * @template
+    */
+    createStyle: Ext.emptyFn,
+
+    /**
+    * Create a selection style for the layer associated with the feature field
+    *
+    * @template
+    */
+    createSelectStyle: Ext.emptyFn
 
 });

@@ -25,7 +25,7 @@
   "homepage": "https://github.com/compassinformatics/cpsi-mapview#readme",
   "dependencies": {
     "@geoext/openlayers-legacy": "^6.5.4",
-    "eslint": "^6.2.1",
+    "eslint": "^6.8.0",
     "font-gis": "^1.0.2",
     "geostyler-openlayers-parser": "^2.3.1",
     "geostyler-sld-parser": "^2.3.0",
