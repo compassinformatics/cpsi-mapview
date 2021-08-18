@@ -127,7 +127,7 @@ Ext.define(&#39;CpsiMapview.view.main.Map&#39;, {
 
     inheritableStatics: {
 <span id='CpsiMapview-view-main-Map-static-method-guess'>        /**
-</span>         * Tries to detect the first occurance of this map panel.
+</span>         * Tries to detect the first occurrence of this map panel.
          * @return {CpsiMapview.view.main.Map} The map panel, which is at least
          *     a GeoExt.component.Map and possibly an instance of this class.
          */
@@ -146,12 +146,12 @@ Ext.define(&#39;CpsiMapview.view.main.Map&#39;, {
         var newLayerConf = {};
 
         // general default
-        var generalDefaults = defaults[&#39;general&#39;];
+        var generalDefaults = defaults ? defaults[&#39;general&#39;] : {};
         Ext.Object.merge(newLayerConf, generalDefaults);
 
         // layer type default
-        var typeDefaults = defaults[layerConf.layerType];
-        Ext.Object.merge(newLayerConf,typeDefaults);
+        var typeDefaults = defaults ? defaults[layerConf.layerType] : {};
+        Ext.Object.merge(newLayerConf, typeDefaults);
 
         // actual config
         Ext.Object.merge(newLayerConf, layerConf);

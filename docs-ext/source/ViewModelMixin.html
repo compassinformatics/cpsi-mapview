@@ -71,7 +71,13 @@ Ext.define(&#39;CpsiMapview.form.ViewModelMixin&#39;, {
 <span id='CpsiMapview-form-ViewModelMixin-cfg-formulas'>        formulas: {
 </span>
             map: function () {
-                return BasiGX.util.Map.getMapComponent().getMap();
+                var cmp = BasiGX.util.Map.getMapComponent();
+                if (cmp) {
+                    return cmp.getMap();
+                }
+                else {
+                    return null;
+                }
             },
 
             resultLayer: {
@@ -123,7 +129,9 @@ Ext.define(&#39;CpsiMapview.form.ViewModelMixin&#39;, {
                 get: function (data) {
                     var ret = data.isValid;
                     ret = ret &amp;&amp; (data.isLocked !== true);
-                    ret = ret &amp;&amp; this.getFormulas().belongsToRoleReadWrite.call(this, this.getFormulaFn);
+                    if (this.getFormulas().belongsToRoleReadWrite) {
+                        ret = ret &amp;&amp; this.getFormulas().belongsToRoleReadWrite.call(this, this.getFormulaFn);
+                    }
                     return ret;
                 }
             },
@@ -135,7 +143,9 @@ Ext.define(&#39;CpsiMapview.form.ViewModelMixin&#39;, {
                 },
                 get: function (data) {
                     var ret = (data.isLocked !== true) &amp;&amp; !data.phantom;
-                    ret = ret &amp;&amp; this.getFormulas().belongsToRoleReadWrite.call(this, this.getFormulaFn);
+                    if (this.getFormulas().belongsToRoleReadWrite) {
+                        ret = ret &amp;&amp; this.getFormulas().belongsToRoleReadWrite.call(this, this.getFormulaFn);
+                    }
                     return ret;
                 }
             },
@@ -146,6 +156,9 @@ Ext.define(&#39;CpsiMapview.form.ViewModelMixin&#39;, {
                     phantom: &#39;{currentRecord.phantom}&#39;
                 },
                 get: function (data) {
+                    if (!data.currentRecord || !data.currentRecord.isPhantom) {
+                        return false;
+                    }
                     return !data.currentRecord.isPhantom();
                 }
             }
