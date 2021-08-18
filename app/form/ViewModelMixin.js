@@ -54,7 +54,13 @@ Ext.define('CpsiMapview.form.ViewModelMixin', {
         formulas: {
 
             map: function () {
-                return BasiGX.util.Map.getMapComponent().getMap();
+                var cmp = BasiGX.util.Map.getMapComponent();
+                if (cmp) {
+                    return cmp.getMap();
+                }
+                else {
+                    return null;
+                }
             },
 
             resultLayer: {
@@ -106,7 +112,9 @@ Ext.define('CpsiMapview.form.ViewModelMixin', {
                 get: function (data) {
                     var ret = data.isValid;
                     ret = ret && (data.isLocked !== true);
-                    ret = ret && this.getFormulas().belongsToRoleReadWrite.call(this, this.getFormulaFn);
+                    if (this.getFormulas().belongsToRoleReadWrite) {
+                        ret = ret && this.getFormulas().belongsToRoleReadWrite.call(this, this.getFormulaFn);
+                    }
                     return ret;
                 }
             },
@@ -118,7 +126,9 @@ Ext.define('CpsiMapview.form.ViewModelMixin', {
                 },
                 get: function (data) {
                     var ret = (data.isLocked !== true) && !data.phantom;
-                    ret = ret && this.getFormulas().belongsToRoleReadWrite.call(this, this.getFormulaFn);
+                    if (this.getFormulas().belongsToRoleReadWrite) {
+                        ret = ret && this.getFormulas().belongsToRoleReadWrite.call(this, this.getFormulaFn);
+                    }
                     return ret;
                 }
             },
@@ -129,6 +139,9 @@ Ext.define('CpsiMapview.form.ViewModelMixin', {
                     phantom: '{currentRecord.phantom}'
                 },
                 get: function (data) {
+                    if (!data.currentRecord || !data.currentRecord.isPhantom) {
+                        return false;
+                    }
                     return !data.currentRecord.isPhantom();
                 }
             }

@@ -27,7 +27,7 @@ describe('CpsiMapview.form.ViewMixin', function () {
 
             // create a new view with the mixin
             editWindow = Ext.create('CpsiMapview.form.TestWindow');
-            editWindow.show();
+            editWindow.show(); // we need to show the window to create the tools
             buttonBar = editWindow.down('buttonBar');
         });
 
