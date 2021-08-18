@@ -82,9 +82,15 @@ Ext.define('CpsiMapview.controller.toolbar.CircleSelectionToolbar', {
      */
     setCurrentUnit: function () {
         var me = this;
-        var map = BasiGX.util.Map.getMapComponent().map;
-        var unit = map.getView().getProjection().getUnits();
-        me.getViewModel().set('unit', unit);
+        var cmp = BasiGX.util.Map.getMapComponent();
+
+        if (cmp) {
+            var map = cmp.map;
+            var unit = map.getView().getProjection().getUnits();
+            me.getViewModel().set('unit', unit);
+        } else {
+            Ext.log.warn('No map component found for the CircleSelectionToolbar');
+        }
     },
 
     /**

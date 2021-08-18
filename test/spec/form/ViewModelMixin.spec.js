@@ -1,10 +1,10 @@
 Ext.define('CpsiMapview.form.TestViewModelModel', {
-    extend: 'Ext.data.Model',
-    fields: ['id']
+    extend: 'Ext.data.Model'
 });
 
 Ext.define('CpsiMapview.form.TestViewModel', {
     extend: 'Ext.app.ViewModel',
+    alias: 'viewmodel.cmv_testviewmodel',
     mixins: ['CpsiMapview.form.ViewModelMixin']
 });
 
@@ -21,12 +21,17 @@ describe('CpsiMapview.form.ViewModelMixin', function () {
 
     describe('Functions', function () {
 
-        var vm, currentRecord;
+        var editForm, vm, currentRecord;
 
         beforeEach(function () {
-            // create a new view with the mixin
-            vm = Ext.create('CpsiMapview.form.TestViewModel');
+            // create a new view with the viewmodel and mixin
+            editForm = Ext.create('Ext.window.Window', {
+                viewModel: {
+                    type: 'cmv_testviewmodel'
+                }
+            });
 
+            vm = editForm.getViewModel();
             currentRecord = Ext.create('CpsiMapview.form.TestViewModelModel');
             vm.set('currentRecord', currentRecord);
 
@@ -50,6 +55,6 @@ describe('CpsiMapview.form.ViewModelMixin', function () {
             vm.destroy();
             expect(currentRecord).not.to.be(undefined);
         });
-
     });
+
 });
