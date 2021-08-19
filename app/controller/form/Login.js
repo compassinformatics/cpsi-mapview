@@ -55,6 +55,10 @@ Ext.define('CpsiMapview.controller.form.Login', {
         return me.getViewModel().tokenName;
     },
 
+    /**
+     * Set the login cookie and fire a global login event
+     * @param {any} response
+     */
     login: function (response) {
 
         var me = this;
@@ -68,9 +72,13 @@ Ext.define('CpsiMapview.controller.form.Login', {
 
         loginData[tokenName] = response.data;
         me.updateCookie(loginData);
-        me.fireEvent('login', loginData);
+        Ext.GlobalEvents.fireEvent('login', loginData);
+
     },
 
+    /**
+     * Clear the login cookie and fire a global logout event
+     * */
     logout: function () {
 
         // issues with Cookies clear - http://www.sencha.com/forum/showthread.php?98070-CLOSED-Ext.util.Cookies.clear%28%29-not-working
@@ -88,7 +96,7 @@ Ext.define('CpsiMapview.controller.form.Login', {
         loginData[tokenName] = '';
 
         me.updateCookie(loginData);
-        me.fireEvent('logout');
+        Ext.GlobalEvents.fireEvent('logout', loginData);
     },
 
     updateCookie: function (loginData) {
@@ -135,13 +143,21 @@ Ext.define('CpsiMapview.controller.form.Login', {
                 }
                 else {
                     //username / password login failure
-                    me.fireEvent('loginfail', result.statusText);
+                    Ext.toast({
+                        html: response.message,
+                        title: 'Login Failed',
+                        align: 'br'
+                    });
                     view.show();
                 }
             },
             failure: function (result) {
                 // indicates HTTP failure
-                me.fireEvent('loginfail', result.statusText);
+                Ext.toast({
+                    html: result.statusText,
+                    title: 'Login Failed',
+                    align: 'br'
+                });
                 if (showMask) {
                     view.unmask();
                 }
