@@ -25,7 +25,7 @@ Ext.define(&#39;CpsiMapview.view.toolbar.MapFooter&#39;, {
     requires: [
         &#39;BasiGX.view.combo.ScaleCombo&#39;,
         &#39;BasiGX.view.MapLoadingStatusBar&#39;,
-        &#39;CpsiMapview.view.form.Login&#39;,
+        &#39;CpsiMapview.view.button.LoginButton&#39;,
         &#39;CpsiMapview.view.button.MinimizeAllButton&#39;
     ],
 
@@ -56,13 +56,7 @@ Ext.define(&#39;CpsiMapview.view.toolbar.MapFooter&#39;, {
             currUpperValue: 100
         }, &#39;-&gt;&#39;,
         {
-            xtype: &#39;button&#39;,
-            text: &#39;Login&#39;,
-            scope: this,
-            handler: function () {
-                var win = Ext.create(&#39;CpsiMapview.view.form.Login&#39;, {});
-                win.show();
-            }
+            xtype: &#39;cmv_login_button&#39;
         }
     ]
 });

@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+  <title>The source code</title>
+  <link href="../resources/prettify/prettify.css" type="text/css" rel="stylesheet" />
+  <script type="text/javascript" src="../resources/prettify/prettify.js"></script>
+  <style type="text/css">
+    .highlight { display: block; background-color: #ddd; }
+  </style>
+  <script type="text/javascript">
+    function highlight() {
+      document.getElementById(location.hash.replace(/#/, "")).className = "highlight";
+    }
+  </script>
+</head>
+<body onload="prettyPrint(); highlight();">
+  <pre class="prettyprint lang-js"><span id='CpsiMapview-model-button-LoginButton'>/**
+</span> * This class is the view model for the LoginButton
+ */
+Ext.define(&#39;CpsiMapview.model.button.LoginButton&#39;, {
+    extend: &#39;Ext.app.ViewModel&#39;,
+
+    requires: [
+        &#39;Ext.util.Cookies&#39;
+    ],
+
+    alias: &#39;viewmodel.cmv_login_button&#39;,
+
+<span id='CpsiMapview-model-button-LoginButton-property-data'>    data: {
+</span>        loggedIn: false
+    },
+
+<span id='CpsiMapview-model-button-LoginButton-property-formulas'>    formulas: {
+</span>
+        tooltip: function (get) {
+
+            var tooltip = &#39;&#39;;
+            var me = this;
+
+            if (get(&#39;loggedIn&#39;)) {
+                tooltip = me.getView().getController().getLoginDetails();
+            }
+
+            return tooltip;
+        },
+
+        glyph: function (get) {
+            if (get(&#39;loggedIn&#39;)) {
+                return &#39;f08b@FontAwesome&#39;; // sign-out icon
+            } else {
+                return &#39;f090@FontAwesome&#39;; // sign-in icon
+            }
+        },
+
+        text: function (get) {
+            if (get(&#39;loggedIn&#39;)) {
+                return &#39;Logout&#39;;
+            } else {
+                return &#39;Login&#39;;
+            }
+        }
+    }
+
+});
+</pre>
+</body>
+</html>

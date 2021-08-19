@@ -72,6 +72,10 @@
         return me.getViewModel().tokenName;
     },
 
+<span id='global-method-login'>    /**
+</span>     * Set the login cookie and fire a global login event
+     * @param {any} response
+     */
     login: function (response) {
 
         var me = this;
@@ -85,9 +89,13 @@
 
         loginData[tokenName] = response.data;
         me.updateCookie(loginData);
-        me.fireEvent(&#39;login&#39;, loginData);
+        Ext.GlobalEvents.fireEvent(&#39;login&#39;, loginData);
+
     },
 
+<span id='global-method-logout'>    /**
+</span>     * Clear the login cookie and fire a global logout event
+     * */
     logout: function () {
 
         // issues with Cookies clear - http://www.sencha.com/forum/showthread.php?98070-CLOSED-Ext.util.Cookies.clear%28%29-not-working
@@ -105,7 +113,7 @@
         loginData[tokenName] = &#39;&#39;;
 
         me.updateCookie(loginData);
-        me.fireEvent(&#39;logout&#39;);
+        Ext.GlobalEvents.fireEvent(&#39;logout&#39;, loginData);
     },
 
     updateCookie: function (loginData) {
@@ -152,13 +160,21 @@
                 }
                 else {
                     //username / password login failure
-                    me.fireEvent(&#39;loginfail&#39;, result.statusText);
+                    Ext.toast({
+                        html: response.message,
+                        title: &#39;Login Failed&#39;,
+                        align: &#39;br&#39;
+                    });
                     view.show();
                 }
             },
             failure: function (result) {
                 // indicates HTTP failure
-                me.fireEvent(&#39;loginfail&#39;, result.statusText);
+                Ext.toast({
+                    html: result.statusText,
+                    title: &#39;Login Failed&#39;,
+                    align: &#39;br&#39;
+                });
                 if (showMask) {
                     view.unmask();
                 }
