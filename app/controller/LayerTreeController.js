@@ -6,7 +6,8 @@ Ext.define('CpsiMapview.controller.LayerTreeController', {
     requires: [
         'BasiGX.util.Map',
         'BasiGX.util.Layer',
-        'CpsiMapview.data.model.LayerTreeNode'
+        'CpsiMapview.data.model.LayerTreeNode',
+        'CpsiMapview.view.main.Map'
     ],
 
     statics: {

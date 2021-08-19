@@ -44,7 +44,6 @@ var storeConfig = {
 
 // define the model
 Ext.define('CpsiMapview.model.GridFiltersExample', {
-    requires: 'GeoExt.data.model.Feature',
     extend: 'GeoExt.data.model.Feature',
     idProperty: 'OBJECTID',
     fields: [
