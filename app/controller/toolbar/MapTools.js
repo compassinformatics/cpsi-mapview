@@ -25,5 +25,5 @@ Ext.define('CpsiMapview.controller.toolbar.MapTools', {
             btn.getViewModel().get('lineMeasureTooltip') :
             btn.getViewModel().get('polygonMeasureAreaTooltip');
         btn.tooltipStr = tTipStr;
-    },
+    }
 });
