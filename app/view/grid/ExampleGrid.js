@@ -4,7 +4,6 @@
 
 // define the model
 Ext.define('CpsiMapview.model.GridExample', {
-    requires: 'GeoExt.data.model.Feature',
     extend: 'GeoExt.data.model.Feature',
     idProperty: 'osm_id',
     fields: [

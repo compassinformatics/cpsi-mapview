@@ -8,6 +8,7 @@ Ext.define('CpsiMapview.model.FeatureStoreMixin', {
     extend: 'Ext.Mixin',
     requires: [
         'GeoExt.data.store.Features',
+        'GeoExt.data.model.Feature',
         'BasiGX.util.Map'
     ],
     mixinConfig: {

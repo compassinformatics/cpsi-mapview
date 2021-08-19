@@ -146,6 +146,7 @@ Ext.define('CpsiMapview.controller.form.Login', {
                     Ext.toast({
                         html: response.message,
                         title: 'Login Failed',
+                        width: 200,
                         align: 'br'
                     });
                     view.show();
@@ -156,6 +157,7 @@ Ext.define('CpsiMapview.controller.form.Login', {
                 Ext.toast({
                     html: result.statusText,
                     title: 'Login Failed',
+                    width: 200,
                     align: 'br'
                 });
                 if (showMask) {
@@ -180,10 +182,6 @@ Ext.define('CpsiMapview.controller.form.Login', {
         var serviceUrl = me.getViewModel().serviceUrl;
         me.callLoginService(jsonData, serviceUrl, true);
 
-    },
-
-    initViewModel: function () {
-        this.tryAutomaticLogin();
     }
 
 });
