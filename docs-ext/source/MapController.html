@@ -51,27 +51,7 @@ Ext.define(&#39;CpsiMapview.controller.MapController&#39;, {
             });
             mapPanel.olMap.addControl(scaleLineCtrl);
         }
-    },
-
-<span id='CpsiMapview-controller-MapController-method-initializeMeasureBtn'>    /**
-</span>     * Initialize measure buttons
-     * @param {Ext.button.Button} btn The measure button
-     */
-    initializeMeasureBtn: function (btn) {
-
-        // avoid showing &quot;null&quot; in IE11 by setting to an empty string
-        btn.getViewModel().set(&#39;clickToDrawText&#39;, &#39;&#39;);
-
-        btn.setBind({
-            text: &#39;{measureTooltext}&#39;,
-            tooltip: btn.measureType === &#39;line&#39; ? &#39;{lineMeasureTooltip}&#39; :
-                &#39;{polygonMeasureAreaTooltip}&#39;
-        });
-        var tTipStr = btn.measureType === &#39;line&#39; ?
-            btn.getViewModel().get(&#39;lineMeasureTooltip&#39;) :
-            btn.getViewModel().get(&#39;polygonMeasureAreaTooltip&#39;);
-        btn.tooltipStr = tTipStr;
-    },
+    }
 });
 </pre>
 </body>
