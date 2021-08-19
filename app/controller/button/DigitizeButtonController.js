@@ -1124,15 +1124,15 @@ Ext.define('CpsiMapview.controller.button.DigitizeButtonController', {
                     widget: {
                         xtype: 'gx_renderer'
                     },
-                    onWidgetAttach: function (column, gxRenderer, record) {
-                        // update the symbolizer with the related feature
-                        var featureRenderer = GeoExt.component.FeatureRenderer;
-                        var feature = record.getFeature();
-                        gxRenderer.update({
-                            feature: feature,
-                            symbolizers: featureRenderer.determineStyle(record)
-                        });
-                    }
+                    //onWidgetAttach: function (column, gxRenderer, record) {
+                    //    // update the symbolizer with the related feature
+                    //    var featureRenderer = GeoExt.component.FeatureRenderer;
+                    //    var feature = record.getFeature();
+                    //    gxRenderer.update({
+                    //        feature: feature,
+                    //        symbolizers: featureRenderer.determineStyle(record)
+                    //    });
+                    //}
                 }, {
                     text: 'ID',
                     dataIndex: 'segmentId',
