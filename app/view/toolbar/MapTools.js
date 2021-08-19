@@ -14,7 +14,7 @@ Ext.define('CpsiMapview.view.toolbar.MapTools', {
         'CpsiMapview.view.button.DigitizeButton',
         'CpsiMapview.model.button.MeasureButton',
         'CpsiMapview.controller.button.MeasureButtonController',
-        'CpsiMapview.controller.MapController',
+        'CpsiMapview.controller.toolbar.MapTools',
         'CpsiMapview.view.combo.Gazetteer',
         'CpsiMapview.view.button.StreetViewTool',
         'CpsiMapview.view.panel.TimeSlider',
@@ -22,7 +22,7 @@ Ext.define('CpsiMapview.view.toolbar.MapTools', {
         'CpsiMapview.view.lineSliceGridExample.LineSliceGridButton'
     ],
 
-    controller: 'cmv_map',
+    controller: 'cmv_maptools',
 
     dock: 'top',
 
