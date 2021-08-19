@@ -163,6 +163,7 @@
                     Ext.toast({
                         html: response.message,
                         title: &#39;Login Failed&#39;,
+                        width: 200,
                         align: &#39;br&#39;
                     });
                     view.show();
@@ -173,6 +174,7 @@
                 Ext.toast({
                     html: result.statusText,
                     title: &#39;Login Failed&#39;,
+                    width: 200,
                     align: &#39;br&#39;
                 });
                 if (showMask) {
@@ -197,10 +199,6 @@
         var serviceUrl = me.getViewModel().serviceUrl;
         me.callLoginService(jsonData, serviceUrl, true);
 
-    },
-
-    initViewModel: function () {
-        this.tryAutomaticLogin();
     }
 
 });
