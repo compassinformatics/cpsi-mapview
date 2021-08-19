@@ -13,3 +13,8 @@ package-lock.json
 # VSCode workspace
 *.code-workspace
 .vscode
+/.vs/ProjectSettings.json
+/.vs/VSWorkspaceState.json
+/.vs/cpsi-mapview/config/applicationhost.config
+/.vs/cpsi-mapview/v16/.suo
+/.vs/slnx.sqlite
