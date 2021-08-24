@@ -94,7 +94,7 @@ jobs:
 
     - name: Copy presentation to output folder and prepare pages
       run: |
-        cp -r presentation build/production/CpsiMapview/presentation"
+        cp -r presentation build/production/CpsiMapview/presentation
 
     - name: Deploy gh-pages
       uses: peaceiris/actions-gh-pages@v3
