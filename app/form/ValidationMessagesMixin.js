@@ -2,9 +2,9 @@
  * A mixin to handle form validation and displaying
  * the reason why the Save button is disabled
  *
- * @class CpsiMapview.form.ValidationMessages
+ * @class CpsiMapview.form.ValidationMessagesMixin
  */
-Ext.define('CpsiMapview.form.ValidationMessages', {
+Ext.define('CpsiMapview.form.ValidationMessagesMixin', {
     extend: 'Ext.Mixin',
 
     checkValid: function (rec) {

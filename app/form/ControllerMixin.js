@@ -8,7 +8,7 @@ Ext.define('CpsiMapview.form.ControllerMixin', {
     extend: 'Ext.Mixin',
     mixins: {
         zoomer: 'CpsiMapview.util.ZoomerMixin',
-        validation: 'CpsiMapview.form.ValidationMessages'
+        validation: 'CpsiMapview.form.ValidationMessagesMixin'
     },
 
     /** The possible return codes from the services */
@@ -60,6 +60,10 @@ Ext.define('CpsiMapview.form.ControllerMixin', {
                     iconCls: Ext.MessageBox.ERROR
                 });
         }
+
+        // fire an event that saving the model failed
+        var view = me.getView();
+        view.fireEvent('savefailed');
     },
 
     /**

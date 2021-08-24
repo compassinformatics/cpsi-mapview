@@ -13,7 +13,7 @@ Ext.define('CpsiMapview.form.ViewModelMixin', {
 
     mixinConfig: {
         before: {
-            destroy: 'destroyUtil'
+            destroy: 'destroyCurrentRecord'
         },
         after: {
             initConfig: 'onInitConfig'
@@ -23,7 +23,7 @@ Ext.define('CpsiMapview.form.ViewModelMixin', {
     /**
      * Destroy the currently associated record
      * */
-    destroyUtil: function () {
+    destroyCurrentRecord: function () {
         var me = this;
         var rec = me.get('currentRecord');
         rec.destroy();

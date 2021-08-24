@@ -1,3 +1,9 @@
+/**
+ * A customized version of {@link GeoExt.data.store.WfsFeatures} with
+ * preset store properties
+ *
+ * @class CpsiMapview.store.WfsFeatures
+ */
 Ext.define('CpsiMapview.store.WfsFeatures', {
     extend: 'GeoExt.data.store.WfsFeatures',
     cacheFeatureCount: false,

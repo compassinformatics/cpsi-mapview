@@ -1,3 +1,8 @@
+/**
+ * This is the controller for the {@link CpsiMapview.view.panel.NumericAttributeSlider} component
+ *
+ * @class CpsiMapview.controller.panel.NumericAttributeSlider
+ */
 Ext.define('CpsiMapview.controller.panel.NumericAttributeSlider', {
     extend: 'Ext.app.ViewController',
 

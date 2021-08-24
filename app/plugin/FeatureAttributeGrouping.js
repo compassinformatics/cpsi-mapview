@@ -1,3 +1,9 @@
+/**
+ * A plugin that highlights features in a {ol.layer.Vector} which share
+ * a property
+ *
+ * @class CpsiMapview.plugin.FeatureAttributeGrouping
+ */
 Ext.define('CpsiMapview.plugin.FeatureAttributeGrouping', {
     extend: 'Ext.plugin.Abstract',
     alias: 'plugin.cmv_feature_attribute_grouping',

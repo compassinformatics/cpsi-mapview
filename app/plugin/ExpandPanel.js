@@ -1,3 +1,9 @@
+/**
+ * A plugin that allows a panel nested in a form
+ * to be expanded to a full-size window
+ *
+ * @class CpsiMapview.plugin.ExpandPanel
+ */
 Ext.define('CpsiMapview.plugin.ExpandPanel', {
     extend: 'Ext.plugin.Abstract',
     alias: 'plugin.cmv_expand_panel',

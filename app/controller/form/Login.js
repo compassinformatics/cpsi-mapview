@@ -1,3 +1,8 @@
+/**
+ * The controller for the {@link CpsiMapview.view.form.Login}
+ *
+ * @class CpsiMapview.controller.form.Login
+ */
 Ext.define('CpsiMapview.controller.form.Login', {
     extend: 'Ext.app.ViewController',
     requires: [
