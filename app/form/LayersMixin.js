@@ -51,7 +51,7 @@ Ext.define('CpsiMapview.form.LayersMixin', {
     /**
      * Hides the layers associated with the form when the
      * form is hidden
-     * */
+     */
     onHide: function () {
         if (this.syncLayerWindowVisibility) {
             this.toggleLayerVisibility(false);
@@ -61,7 +61,7 @@ Ext.define('CpsiMapview.form.LayersMixin', {
     /**
      * Shows the layers associated with the form when the
      * form is hidden
-     * */
+     */
     onWindowShow: function () {
         if (this.syncLayerWindowVisibility) {
             this.toggleLayerVisibility(true);
