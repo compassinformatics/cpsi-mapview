@@ -1,0 +1,86 @@
+<!doctype html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+
+    <title>Compass Informatics MapView</title>
+
+    <link rel="stylesheet" href="dist/reset.css">
+    <link rel="stylesheet" href="dist/reveal.css">
+    <link rel="stylesheet" href="dist/theme/moon.css">
+
+    <!-- Theme used for syntax highlighted code -->
+    <link rel="stylesheet" href="plugin/highlight/monokai.css">
+</head>
+<body>
+    <div class="reveal">
+        <div class="slides">
+            <section>
+                <a href="https://compass.ie/">
+                    <img src="images/Compass-Informatics_0cafdda5.svg" alt="Compass Informatics logo" style="height: 180px; margin: 0 auto 4rem auto; background: transparent;" class="demo-logo">
+                </a>
+                <h3><a href="https://github.com/compassinformatics/cpsi-mapview/">Compass Informatics MapView</a></h3>
+                <p>
+                    <small><a href="https://github.com/compassinformatics/cpsi-mapview/graphs/contributors">Contributors</a></small>
+                </p>
+            </section>
+            <section data-markdown>
+                ### Overview
+
+                - Desktop GIS replacement
+                - Built on open services such as WMS and WFS
+                - Reusable components and plugins
+                - Powerful grid component
+            </section>
+            <section data-background-size="35%" data-background="images/js_libraries.png">
+
+                <div style="position: absolute; width: 40%; right: 0; box-shadow: 0 1px 4px rgba(0,0,0,0.5), 0 5px 25px rgba(0,0,0,0.2); background-color: rgba(0, 0, 0, 0.9); color: #fff; padding: 20px; font-size: 20px; text-align: left;">
+                    <h2>JavaScript Libraries</h2>
+                </div>
+            </section>
+            <section data-markdown>
+                ### JavaScript Libraries
+
+                - [OpenLayers](https://openlayers.org/) (v6.5)
+                - [Proj4JS](https://github.com/proj4js/proj4js) (v2.7)
+                - [GeoExt](https://geoext.github.io/geoext/) (v4.0)
+                - [ExtJS](https://www.sencha.com/products/extjs/) (v6.7)
+                - [BasiGX](https://github.com/terrestris/BasiGX) (v6.7)
+                - [GeoStyler](https://geostyler.github.io/geostyler-demo/) for SLD and OpenLayers styles
+                - [Font GIS](https://viglino.github.io/font-gis/) for icons
+
+                See [package.json](https://github.com/compassinformatics/cpsi-mapview/blob/master/package.json) for details
+            </section>
+            <section data-background-iframe="https://compassinformatics.github.io/cpsi-mapview/" data-background-interactive>
+                <div style="position: absolute; width: 40%; right: 0; box-shadow: 0 1px 4px rgba(0,0,0,0.5), 0 5px 25px rgba(0,0,0,0.2); background-color: rgba(0, 0, 0, 0.9); color: #fff; padding: 20px; font-size: 20px; text-align: left;">
+                    <h2>Kitchen Sink Demo</h2>
+                    <a href="https://compassinformatics.github.io/cpsi-mapview/">Link</a>
+                </div>
+            </section>
+            <section data-background-iframe="https://compassinformatics.github.io/cpsi-mapview/docs-ext/" data-background-interactive>
+                <div style="position: absolute; width: 40%; right: 0; box-shadow: 0 1px 4px rgba(0,0,0,0.5), 0 5px 25px rgba(0,0,0,0.2); background-color: rgba(0, 0, 0, 0.9); color: #fff; padding: 20px; font-size: 20px; text-align: left;">
+                    <h2>API Documentation</h2>
+                    <a href="https://compassinformatics.github.io/cpsi-mapview/docs-ext/">Link</a>
+                </div>
+            </section>
+        </div>
+    </div>
+
+    <script src="dist/reveal.js"></script>
+    <script src="plugin/notes/notes.js"></script>
+    <script src="plugin/markdown/markdown.js"></script>
+    <script src="plugin/highlight/highlight.js"></script>
+    <script>
+        // More info about initialization & config:
+        // - https://revealjs.com/initialization/
+        // - https://revealjs.com/config/
+        Reveal.initialize({
+            hash: true,
+
+            // Learn about plugins: https://revealjs.com/plugins/
+            plugins: [RevealMarkdown, RevealHighlight, RevealNotes]
+        });
+    </script>
+</body>
+</html>

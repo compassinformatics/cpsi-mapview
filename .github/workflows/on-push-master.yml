@@ -92,6 +92,10 @@ jobs:
         mkdir -p docs-ext
         npm run generate:docs
 
+    - name: Copy presentation to output folder and prepare pages
+      run: |
+        cp -r presentation build/production/CpsiMapview/presentation"
+
     - name: Deploy gh-pages
       uses: peaceiris/actions-gh-pages@v3
       with:
