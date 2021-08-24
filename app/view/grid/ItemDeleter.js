@@ -1,3 +1,9 @@
+/**
+ * A column action that displays a button that can be used to delete a record
+ * in a grid
+ *
+ * @class CpsiMapview.view.grid.ItemDeleter
+ */
 Ext.define('CpsiMapview.view.grid.ItemDeleter',
     {
         extend: 'Ext.grid.column.Action',

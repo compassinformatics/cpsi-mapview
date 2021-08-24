@@ -1,5 +1,9 @@
 /**
- * A mixin to handle hiding and showing layers associated with an edit model
+ * A field container that wraps a field component and adds an "i"
+ * button with a tooltip that gives a description of the field.
+ * 
+ * This allows the tooltip to always be available, unlike the
+ * built-in field tooltip which is used to show field validation messages.
  *
  * @class CpsiMapview.form.RightInfoField
  */

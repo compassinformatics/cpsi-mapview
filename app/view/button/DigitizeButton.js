@@ -1,9 +1,5 @@
 /**
- * This class is the digitize button of cpsi mapview application
- * It can be used e.g. for the zone tool
- */
-/**
- * Digitize Button
+ * A digitize button used for drawing and modifying features
  *
  * @class CpsiMapview.view.button.DigitizeButton
  */

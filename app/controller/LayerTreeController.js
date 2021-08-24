@@ -1,3 +1,8 @@
+/**
+ * The controller for the {@link CpsiMapview.view.LayerTree}
+ *
+ * @class CpsiMapview.controller.LayerTreeController
+ */
 Ext.define('CpsiMapview.controller.LayerTreeController', {
     extend: 'Ext.app.ViewController',
 

@@ -215,7 +215,7 @@ Ext.define('CpsiMapview.form.ViewMixin', {
                         itemId: 'saveButton',
                         text: 'Save',
                         handler: 'onSaveClick',
-                        // Save button tooltips are updated using CpsiMapview.form.ValidationMessages
+                        // Save button tooltips are updated using CpsiMapview.form.ValidationMessagesMixin
                         tooltip: 'Save the record',
                         bind: {
                             disabled: '{!canSave}',
