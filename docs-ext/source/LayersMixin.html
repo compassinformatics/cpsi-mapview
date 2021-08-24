@@ -41,8 +41,13 @@ Ext.define(&#39;CpsiMapview.form.LayersMixin&#39;, {
         }
     },
 
-<span id='CpsiMapview-form-LayersMixin-method-toggleLayerVisibility'>    toggleLayerVisibility: function (show) {
-</span>
+<span id='CpsiMapview-form-LayersMixin-method-toggleLayerVisibility'>    /**
+</span>     * Changes the visibility of any of the layers associated
+     * with the form (layers are defined in the viewmodel)
+     * @param {boolean} show
+     */
+    toggleLayerVisibility: function (show) {
+
         var vm = this.getView().getViewModel();
 
         var layer = vm.get(&#39;resultLayer&#39;);
@@ -60,14 +65,22 @@ Ext.define(&#39;CpsiMapview.form.LayersMixin&#39;, {
         }
     },
 
-<span id='CpsiMapview-form-LayersMixin-method-onHide'>    onHide: function () {
-</span>        if (this.syncLayerWindowVisibility) {
+<span id='CpsiMapview-form-LayersMixin-method-onHide'>    /**
+</span>     * Hides the layers associated with the form when the
+     * form is hidden
+     */
+    onHide: function () {
+        if (this.syncLayerWindowVisibility) {
             this.toggleLayerVisibility(false);
         }
     },
 
-<span id='CpsiMapview-form-LayersMixin-method-onWindowShow'>    onWindowShow: function () {
-</span>        if (this.syncLayerWindowVisibility) {
+<span id='CpsiMapview-form-LayersMixin-method-onWindowShow'>    /**
+</span>     * Shows the layers associated with the form when the
+     * form is hidden
+     */
+    onWindowShow: function () {
+        if (this.syncLayerWindowVisibility) {
             this.toggleLayerVisibility(true);
         }
     }

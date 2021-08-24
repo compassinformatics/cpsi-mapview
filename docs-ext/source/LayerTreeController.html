@@ -15,7 +15,12 @@
   </script>
 </head>
 <body onload="prettyPrint(); highlight();">
-  <pre class="prettyprint lang-js">Ext.define(&#39;CpsiMapview.controller.LayerTreeController&#39;, {
+  <pre class="prettyprint lang-js"><span id='CpsiMapview-controller-LayerTreeController'>/**
+</span> * The controller for the {@link CpsiMapview.view.LayerTree}
+ *
+ * @class CpsiMapview.controller.LayerTreeController
+ */
+Ext.define(&#39;CpsiMapview.controller.LayerTreeController&#39;, {
     extend: &#39;Ext.app.ViewController&#39;,
 
     alias: &#39;controller.cmv_layertree&#39;,
@@ -28,7 +33,7 @@
     ],
 
     statics: {
-<span id='global-method-getTreeNodeConf'>        /**
+<span id='CpsiMapview-controller-LayerTreeController-static-method-getTreeNodeConf'>        /**
 </span>         * Detects the original tree node config from tree.json file for a
          * layer identified by the given layerKey.
          *
@@ -67,7 +72,7 @@
     },
 
 
-<span id='global-cfg-structureMode'>    /**
+<span id='CpsiMapview-controller-LayerTreeController-cfg-structureMode'>    /**
 </span>     * Mode in order to steer how the layers in tree will be structured.
      * At the moment &#39;BASELAYER_OVERLAY&#39; will divide the layers in 2 folders
      * &#39;Base Layers&#39; and &#39;Overlays&#39; (depending on their property &#39;isBaseLayer&#39;).
@@ -77,7 +82,7 @@
      */
     structureMode: null,
 
-<span id='global-property-initLayersAdded'>    /**
+<span id='CpsiMapview-controller-LayerTreeController-property-initLayersAdded'>    /**
 </span>     * Shows if the event &#39;cmv-init-layersadded&#39; has been fired or not.
      *
      * @property {Boolean}
@@ -85,7 +90,7 @@
      */
     initLayersAdded: false,
 
-<span id='global-property-treeConfDefaults'>    /**
+<span id='CpsiMapview-controller-LayerTreeController-property-treeConfDefaults'>    /**
 </span>     * Holds the default values for tree nodes of the config file tree.json.
      * Will be set in #makeLayerStore function.
      *
@@ -94,8 +99,8 @@
      */
     treeConfDefaults: {},
 
-    constructor: function () {
-        var me = this;
+<span id='CpsiMapview-controller-LayerTreeController-method-constructor'>    constructor: function () {
+</span>        var me = this;
 
         var mapPanel = CpsiMapview.view.main.Map.guess();
 
@@ -105,7 +110,7 @@
         });
     },
 
-<span id='global-method-autoConnectToMap'>    /**
+<span id='CpsiMapview-controller-LayerTreeController-method-autoConnectToMap'>    /**
 </span>     * Guesses the mapcomponent and assigns the appropriate layers store, if one
      * could be guessed.
      */
@@ -122,7 +127,7 @@
         }
     },
 
-<span id='global-method-makeLayerStore'>    /**
+<span id='CpsiMapview-controller-LayerTreeController-method-makeLayerStore'>    /**
 </span>     * This method will return an instance of the GeoExt class
      * `GeoExt.data.store.LayersTree` based on the connected OL #map. The layers
      * of the `ol.Map` are restructured and divided into groups based on the
@@ -193,7 +198,7 @@
         });
     },
 
-<span id='global-method-loadTreeStructure'>    /**
+<span id='CpsiMapview-controller-LayerTreeController-method-loadTreeStructure'>    /**
 </span>     * Loads the JSON tree structure from &#39;resources/data/layers/tree.json&#39;.
      *
      * @return {Ext.Promise} Promise resolving once the JSON is loaded
@@ -214,7 +219,7 @@
         });
     },
 
-<span id='global-method-getGroupedLayers'>    /**
+<span id='CpsiMapview-controller-LayerTreeController-method-getGroupedLayers'>    /**
 </span>     * Re-groups the layers of the #map, so they are put into a folder hierarchy
      * based on the given tree structure loaded in #loadTreeStructure.
      * For each folder an OL layer group is created and gets aggregated in a
@@ -237,7 +242,7 @@
         return rootLayerGroup;
     },
 
-<span id='global-method-createOlLayerGroups'>    /**
+<span id='CpsiMapview-controller-LayerTreeController-method-createOlLayerGroups'>    /**
 </span>     * Creates recursively the OL layer groups for the given tree structure and
      * puts them all together in the given parent group so they get folders in the LayerTree.
      * Layers are directly put to the given parent group so they appear as &quot;leafs&quot; in the LayerTree.
@@ -294,7 +299,7 @@
         });
     },
 
-<span id='global-method-applyTreeConfigsToOlLayer'>    /**
+<span id='CpsiMapview-controller-LayerTreeController-method-applyTreeConfigsToOlLayer'>    /**
 </span>     * Applies the values from the tree layer config to OL the given
      * OL layer.
      *
@@ -312,7 +317,7 @@
         olLayer.set(&#39;iconCls&#39;, treeNodeConf.iconCls);
     },
 
-<span id='global-method-applyTreeConfigsToNode'>    /**
+<span id='CpsiMapview-controller-LayerTreeController-method-applyTreeConfigsToNode'>    /**
 </span>     * Applies the values from the tree layer config to the given
      * tree node instance.
      *
@@ -339,7 +344,7 @@
         }
     },
 
-<span id='global-method-updateSwitchLayerNodes'>    /**
+<span id='CpsiMapview-controller-LayerTreeController-method-updateSwitchLayerNodes'>    /**
 </span>     * Adds configuration to updated switch layer nodes.
      *
      * Ensures all layer information is transfered to the new
@@ -363,7 +368,7 @@
         });
     },
 
-<span id='global-method-onAddWmsToggle'>    /**
+<span id='CpsiMapview-controller-LayerTreeController-method-onAddWmsToggle'>    /**
 </span>     * This reacts on toggling the add wms Button in the layertree. It shows a window with an AddWmsForm.
      * @param {Ext.button.Button} button
      * @param {boolean} pressed
@@ -385,7 +390,7 @@
         }
     },
 
-<span id='global-method-onBeforeDestroy'>    /**
+<span id='CpsiMapview-controller-LayerTreeController-method-onBeforeDestroy'>    /**
 </span>    * Destroy any associated windows when this component gets destroyed
     */
     onBeforeDestroy: function () {

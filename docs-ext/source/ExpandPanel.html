@@ -15,27 +15,33 @@
   </script>
 </head>
 <body onload="prettyPrint(); highlight();">
-  <pre class="prettyprint lang-js">Ext.define(&#39;CpsiMapview.plugin.ExpandPanel&#39;, {
+  <pre class="prettyprint lang-js"><span id='CpsiMapview-plugin-ExpandPanel'>/**
+</span> * A plugin that allows a panel nested in a form
+ * to be expanded to a full-size window
+ *
+ * @class CpsiMapview.plugin.ExpandPanel
+ */
+Ext.define(&#39;CpsiMapview.plugin.ExpandPanel&#39;, {
     extend: &#39;Ext.plugin.Abstract&#39;,
     alias: &#39;plugin.cmv_expand_panel&#39;,
 
-    layout: &#39;fit&#39;,
-
-<span id='global-property-parentPanel'>    /**
+<span id='CpsiMapview-plugin-ExpandPanel-property-layout'>    layout: &#39;fit&#39;,
+</span>
+<span id='CpsiMapview-plugin-ExpandPanel-property-parentPanel'>    /**
 </span>     * This is the parent panel that the expanded panel will be reinserted after maximizing. By default is set to the
      * direct parent. A parent panel needs to exist for this plugin to work.
      * If a window should be made expandable use the config `maximizable` instead.
      */
     parentPanel: null,
 
-<span id='global-property-positionInParentPanel'>    /**
+<span id='CpsiMapview-plugin-ExpandPanel-property-positionInParentPanel'>    /**
 </span>     * The original position of the panel in the parent. Will be calculated if the panel can be found in the items of
      * the direct parent.
      */
     positionInParentPanel: 0,
 
-    init: function () {
-        var me = this;
+<span id='CpsiMapview-plugin-ExpandPanel-method-init'>    init: function () {
+</span>        var me = this;
         var cmp = me.getCmp();
 
         me.maxTool = Ext.create(&#39;Ext.panel.Tool&#39;, {
@@ -50,7 +56,7 @@
         me.callParent();
     },
 
-<span id='global-method-expand'>    /**
+<span id='CpsiMapview-plugin-ExpandPanel-method-expand'>    /**
 </span>     * Creates a maximized window containing the panel.
      */
     expand: function () {
@@ -96,7 +102,7 @@
         me.parentPanel.fireEvent(&#39;expand&#39;, cmp);
     },
 
-<span id='global-method-restore'>    /**
+<span id='CpsiMapview-plugin-ExpandPanel-method-restore'>    /**
 </span>     * Reinserts the maximized panel it its original parent.
      */
     restore: function () {

@@ -15,12 +15,17 @@
   </script>
 </head>
 <body onload="prettyPrint(); highlight();">
-  <pre class="prettyprint lang-js">Ext.define(&#39;CpsiMapview.controller.panel.NumericAttributeSlider&#39;, {
+  <pre class="prettyprint lang-js"><span id='CpsiMapview-controller-panel-NumericAttributeSlider'>/**
+</span> * This is the controller for the {@link CpsiMapview.view.panel.NumericAttributeSlider} component
+ *
+ * @class CpsiMapview.controller.panel.NumericAttributeSlider
+ */
+Ext.define(&#39;CpsiMapview.controller.panel.NumericAttributeSlider&#39;, {
     extend: &#39;Ext.app.ViewController&#39;,
 
     alias: &#39;controller.cmv_numericattributeslider&#39;,
 
-<span id='global-method-initSlider'>    /**
+<span id='CpsiMapview-controller-panel-NumericAttributeSlider-method-initSlider'>    /**
 </span>     * Initially filter if enabled.
      */
     initSlider: function() {
@@ -29,14 +34,14 @@
         }
     },
 
-<span id='global-method-getAffectedLayers'>    /**
+<span id='CpsiMapview-controller-panel-NumericAttributeSlider-method-getAffectedLayers'>    /**
 </span>     * Returns those layers that the slider will affect.
      */
     getAffectedLayers: function() {
         return BasiGX.util.Layer.getLayersBy(&#39;isNumericDependent&#39;, true);
     },
 
-<span id='global-method-orderValues'>    /**
+<span id='CpsiMapview-controller-panel-NumericAttributeSlider-method-orderValues'>    /**
 </span>     * Orders the values of the slider so that the first index always is the
      * lower value, and the second is at least equally big.
      * @param {number[]} values
@@ -47,7 +52,7 @@
         return [lower, upper];
     },
 
-<span id='global-method-getTipText'>    /**
+<span id='CpsiMapview-controller-panel-NumericAttributeSlider-method-getTipText'>    /**
 </span>     * Returns the current range of the slider as tooltip.
      * @param {Ext.slider.Thumb} thumb
      */
@@ -69,7 +74,7 @@
         return lower + &#39; - &#39; + upper;
     },
 
-<span id='global-method-onCheckChange'>    /**
+<span id='CpsiMapview-controller-panel-NumericAttributeSlider-method-onCheckChange'>    /**
 </span>     * Handles the changing of the checked state of the active-checkbox.
      * @param {Ext.form.field.Checkbox} cb
      * @param {boolean} checked
@@ -86,7 +91,7 @@
         }
     },
 
-<span id='global-method-applySliderEffects'>    /**
+<span id='CpsiMapview-controller-panel-NumericAttributeSlider-method-applySliderEffects'>    /**
 </span>     * Applies the effect of the slider, e.g. filters by the numeric values.
      */
     applySliderEffects: function() {
@@ -127,7 +132,7 @@
         });
     },
 
-<span id='global-method-removeSliderEffects'>    /**
+<span id='CpsiMapview-controller-panel-NumericAttributeSlider-method-removeSliderEffects'>    /**
 </span>     * Removes the effects of the slider, e.g. unfilters by the numeric values.
      */
     removeSliderEffects: function () {

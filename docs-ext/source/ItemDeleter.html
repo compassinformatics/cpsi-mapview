@@ -15,20 +15,26 @@
   </script>
 </head>
 <body onload="prettyPrint(); highlight();">
-  <pre class="prettyprint lang-js">Ext.define(&#39;CpsiMapview.view.grid.ItemDeleter&#39;,
+  <pre class="prettyprint lang-js"><span id='CpsiMapview-view-grid-ItemDeleter'>/**
+</span> * A column action that displays a button that can be used to delete a record
+ * in a grid
+ *
+ * @class CpsiMapview.view.grid.ItemDeleter
+ */
+Ext.define(&#39;CpsiMapview.view.grid.ItemDeleter&#39;,
     {
         extend: &#39;Ext.grid.column.Action&#39;,
         xtype: &#39;cmv_itemdeleter&#39;,
-        width: 55,
-        menuDisabled: true, // disable the column header menu containing sort/hide options
-        iconCls: &#39;x-fa fa-delete&#39;,
-        avoidConfirmationRequest: false,
-        isActionColumn: true,
-        hideable: false, // prevent the user from hiding this column
-        draggable: false,
-        tooltip: &#39;Click here to remove the record&#39;,
-
-<span id='global-property-editor'>        /**
+<span id='CpsiMapview-view-grid-ItemDeleter-property-width'>        width: 55,
+</span><span id='CpsiMapview-view-grid-ItemDeleter-property-iconCls'><span id='CpsiMapview-view-grid-ItemDeleter-property-menuDisabled'>        menuDisabled: true, // disable the column header menu containing sort/hide options
+</span></span>        iconCls: &#39;x-fa fa-delete&#39;,
+<span id='CpsiMapview-view-grid-ItemDeleter-property-avoidConfirmationRequest'>        avoidConfirmationRequest: false,
+</span><span id='CpsiMapview-view-grid-ItemDeleter-property-isActionColumn'>        isActionColumn: true,
+</span><span id='CpsiMapview-view-grid-ItemDeleter-property-draggable'><span id='CpsiMapview-view-grid-ItemDeleter-property-hideable'>        hideable: false, // prevent the user from hiding this column
+</span></span>        draggable: false,
+<span id='CpsiMapview-view-grid-ItemDeleter-property-tooltip'>        tooltip: &#39;Click here to remove the record&#39;,
+</span>
+<span id='CpsiMapview-view-grid-ItemDeleter-property-editor'>        /**
 </span>            Possible bug when a row editor plugin is added to the same grid as the ItemDeleter?
 
             column.getEditor().hide() called - and there is no Editor for the ItemDeleter
@@ -42,13 +48,13 @@
             text: &#39;&#39;
         },
 
-        // to be overridden in extended classes for custom disabling
-        itemIsDisabled: function () {
+<span id='CpsiMapview-view-grid-ItemDeleter-method-itemIsDisabled'>        // to be overridden in extended classes for custom disabling
+</span>        itemIsDisabled: function () {
             return this.disabled;
         },
 
-        constructor: function() {
-            this.callParent(arguments);
+<span id='CpsiMapview-view-grid-ItemDeleter-method-constructor'>        constructor: function() {
+</span>            this.callParent(arguments);
             this.items = [
                 {
                     avoidConfirmationRequest: this.avoidConfirmationRequest,

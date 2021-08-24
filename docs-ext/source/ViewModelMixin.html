@@ -30,17 +30,17 @@ Ext.define(&#39;CpsiMapview.form.ViewModelMixin&#39;, {
 
 <span id='CpsiMapview-form-ViewModelMixin-property-mixinConfig'>    mixinConfig: {
 </span>        before: {
-            destroy: &#39;destroyUtil&#39;
+            destroy: &#39;destroyCurrentRecord&#39;
         },
         after: {
             initConfig: &#39;onInitConfig&#39;
         }
     },
 
-<span id='CpsiMapview-form-ViewModelMixin-method-destroyUtil'>    /**
+<span id='CpsiMapview-form-ViewModelMixin-method-destroyCurrentRecord'>    /**
 </span>     * Destroy the currently associated record
      * */
-    destroyUtil: function () {
+    destroyCurrentRecord: function () {
         var me = this;
         var rec = me.get(&#39;currentRecord&#39;);
         rec.destroy();

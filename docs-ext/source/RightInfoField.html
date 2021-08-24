@@ -16,7 +16,11 @@
 </head>
 <body onload="prettyPrint(); highlight();">
   <pre class="prettyprint lang-js"><span id='CpsiMapview-form-RightInfoField'>/**
-</span> * A mixin to handle hiding and showing layers associated with an edit model
+</span> * A field container that wraps a field component and adds an &quot;i&quot;
+ * button with a tooltip that gives a description of the field.
+ *
+ * This allows the tooltip to always be available, unlike the
+ * built-in field tooltip which is used to show field validation messages.
  *
  * @class CpsiMapview.form.RightInfoField
  */
