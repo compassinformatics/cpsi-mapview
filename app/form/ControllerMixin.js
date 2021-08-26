@@ -286,6 +286,13 @@ Ext.define('CpsiMapview.form.ControllerMixin', {
 
         var tool, toolCtrl;
 
+        if (vm.get('hideDigitiseLineButton') === false) {
+            tool = vw.down('#lineDigitiserButton');
+            toolCtrl = tool.getController();
+            toolCtrl.setResultLayer(resultLayer);
+            toolCtrl.setDrawLayer(resultLayer);
+        }
+
         if (vm.get('hideDigitisePointButton') === false) {
             tool = vw.down('#pointDigitiserButton');
             toolCtrl = tool.getController();
