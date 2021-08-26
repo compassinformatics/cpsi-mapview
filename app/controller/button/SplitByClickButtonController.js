@@ -222,7 +222,8 @@ Ext.define('CpsiMapview.controller.button.SplitByClickButtonController', {
     handleFinalResult: function(features) {
         if (features) {
             var me = this;
-            var resultSource = me.resultLayer.getSource().clear();
+            var resultSource = me.resultLayer.getSource();
+            resultSource.clear();
             resultSource.addFeatures(features);
         }
     },
