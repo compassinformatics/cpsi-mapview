@@ -74,6 +74,7 @@ Ext.define(&#39;CpsiMapview.form.ViewMixin&#39;, {
             hideRefreshButton: true,
             hideDigitiseSegmentButton: true,
             hideDigitiseAreaButton: true,
+            hideDigitiseLineButton: true,
             hideDigitiseCircleButton: true,
             hideDigitisePointButton: true,
             hideSaveButton: false,
@@ -193,6 +194,22 @@ Ext.define(&#39;CpsiMapview.form.ViewMixin&#39;, {
                             disabled: &#39;{isLocked}&#39;,
                             resultLayer: &#39;{resultLayer}&#39;,
                             hidden: &#39;{hideDigitiseAreaButton}&#39;
+                        }
+                    },
+                    {
+                        xtype: &#39;cmv_digitize_button&#39;,
+                        itemId: &#39;lineDigitiserButton&#39;,
+                        type: &#39;LineString&#39;,
+                        tooltip: &#39;Create features by drawing lines&#39;,
+                        toggleGroup: &#39;map&#39;,
+                        resetOnToggle: false,
+                        iconCls: &#39;icon-line3&#39;,
+                        glyph: null,
+                        bind: {
+                            drawLayer: &#39;{resultLayer}&#39;,
+                            disabled: &#39;{isLocked}&#39;,
+                            resultLayer: &#39;{resultLayer}&#39;,
+                            hidden: &#39;{hideDigitiseLineButton}&#39;
                         }
                     },
                     {
