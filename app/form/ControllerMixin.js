@@ -320,6 +320,12 @@ Ext.define('CpsiMapview.form.ControllerMixin', {
             toolCtrl.setResultLayer(resultLayer);
         }
 
+        if (vm.get('hideSplitByClickButton') === false) {
+            tool = vw.down('#splitByClickButton');
+            toolCtrl = tool.getController();
+            toolCtrl.setResultLayer(resultLayer);
+        }
+
         // only destroy this after the new record has been set as getting errors in checkHadValue > getChildValue
         // it seems to be an issue with checkBoxes only
         existingRec.destroy();

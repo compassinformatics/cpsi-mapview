@@ -6,7 +6,8 @@
 Ext.define('CpsiMapview.form.ViewMixin', {
     extend: 'Ext.Mixin',
     requires: [
-        'CpsiMapview.view.button.DigitizeButton'
+        'CpsiMapview.view.button.DigitizeButton',
+        'CpsiMapview.view.button.SplitByClickButton'
     ],
     mixinConfig: {
         after: {
@@ -60,6 +61,7 @@ Ext.define('CpsiMapview.form.ViewMixin', {
             hideDigitiseLineButton: true,
             hideDigitiseCircleButton: true,
             hideDigitisePointButton: true,
+            hideSplitByClickButton: true,
             hideSaveButton: false,
             hideCancelButton: false,
             hideConfirmButton: true,
@@ -224,6 +226,16 @@ Ext.define('CpsiMapview.form.ViewMixin', {
                             disabled: '{isLocked}',
                             resultLayer: '{resultLayer}',
                             hidden: '{hideDigitisePointButton}'
+                        }
+                    },
+                    {
+                        xtype: 'cmv_split_by_click_button',
+                        itemId: 'splitByClickButton',
+                        apiUrl: '/WebServices/roadschedule/publicprivatesplit/split',
+                        bind: {
+                            disabled: '{isProcessed}',
+                            resultLayer: '{resultLayer}',
+                            hidden: '{hideSplitByClickButton}'
                         }
                     },
                     { xtype: 'tbfill' },
