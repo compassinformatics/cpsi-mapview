@@ -33,6 +33,24 @@ Ext.define('CpsiMapview.controller.button.SplitByClickButtonController', {
         me.callParent(arguments);
     },
 
+    /**
+     * Set the layer used to store features returned by the split service
+     * @param {ol.Layer} layer
+     */
+    setResultLayer: function(layer) {
+        var me = this;
+
+        if (!me.map) {
+            return;
+        }
+
+        if (me.resultLayer) {
+            me.map.removeLayer(me.resultLayer);
+        }
+
+        me.resultLayer = layer;
+    },
+
 
     /**
      * Main handler which activates or deactivates the click listener for the
