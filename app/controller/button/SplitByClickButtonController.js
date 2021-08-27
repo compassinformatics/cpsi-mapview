@@ -176,6 +176,7 @@ Ext.define('CpsiMapview.controller.button.SplitByClickButtonController', {
         var url = view.getApiUrl();
 
         if (!url) {
+            Ext.log.warn('No API URL passed - split is not possible.');
             return;
         }
 
