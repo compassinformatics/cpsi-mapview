@@ -1,0 +1,286 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+  <title>The source code</title>
+  <link href="../resources/prettify/prettify.css" type="text/css" rel="stylesheet" />
+  <script type="text/javascript" src="../resources/prettify/prettify.js"></script>
+  <style type="text/css">
+    .highlight { display: block; background-color: #ddd; }
+  </style>
+  <script type="text/javascript">
+    function highlight() {
+      document.getElementById(location.hash.replace(/#/, "")).className = "highlight";
+    }
+  </script>
+</head>
+<body onload="prettyPrint(); highlight();">
+  <pre class="prettyprint lang-js"><span id='CpsiMapview-controller-button-SplitByClickButtonController'>/**
+</span> * This class is the controller for the SplitByClick button.
+ */
+Ext.define(&#39;CpsiMapview.controller.button.SplitByClickButtonController&#39;, {
+    extend: &#39;Ext.app.ViewController&#39;,
+    requires: [
+        &#39;BasiGX.util.Map&#39;,
+        &#39;GeoExt.component.FeatureRenderer&#39;,
+        &#39;GeoExt.data.store.Features&#39;
+    ],
+
+    alias: &#39;controller.cmv_split_by_click_button&#39;,
+
+<span id='CpsiMapview-controller-button-SplitByClickButtonController-property-map'>    /**
+</span>     * The OpenLayers map. If not given, will be auto-detected
+     */
+    map: null,
+
+<span id='CpsiMapview-controller-button-SplitByClickButtonController-property-mapComponent'>    /**
+</span>     * The BasiGX mapComponent. If not given, will be auto-detected
+     */
+    mapComponent: null,
+
+<span id='CpsiMapview-controller-button-SplitByClickButtonController-property-resultLayer'>    /**
+</span>     * Temporary vector layer used to display the response split features
+     */
+    resultLayer: null,
+
+<span id='CpsiMapview-controller-button-SplitByClickButtonController-method-constructor'>    constructor: function() {
+</span>        var me = this;
+        me.splitOnClickedPosition = me.splitOnClickedPosition.bind(me);
+
+        me.callParent(arguments);
+    },
+
+<span id='CpsiMapview-controller-button-SplitByClickButtonController-method-setResultLayer'>    /**
+</span>     * Set the layer used to store features returned by the split service
+     * @param {ol.Layer} layer
+     */
+    setResultLayer: function(layer) {
+        var me = this;
+
+        if (!me.map) {
+            return;
+        }
+
+        if (me.resultLayer) {
+            me.map.removeLayer(me.resultLayer);
+        }
+
+        me.resultLayer = layer;
+    },
+
+
+<span id='CpsiMapview-controller-button-SplitByClickButtonController-method-onToggle'>    /**
+</span>     * Main handler which activates or deactivates the click listener for the
+     * map.
+     *
+     * @param {Ext.button.Button} btn The button that has been pressed
+     * @param {boolean} pressed The toggle state of the button
+     */
+    onToggle: function(btn, pressed) {
+        var me = this;
+        var view = me.getView();
+
+        // guess the map if not given
+        if (!me.map) {
+            me.map = BasiGX.util.Map.getMapComponent().map;
+        }
+
+        // create a result layer unless one has already been set
+        if (!me.resultLayer) {
+            me.resultLayer = view.resultLayer;
+        }
+
+        if (pressed) {
+            me.map.on(&#39;click&#39;, me.splitOnClickedPosition);
+        } else {
+            me.map.un(&#39;click&#39;, me.splitOnClickedPosition);
+        }
+    },
+
+<span id='CpsiMapview-controller-button-SplitByClickButtonController-method-splitOnClickedPosition'>    /**
+</span>     * Asynchronously request and proceed split features depending on clicked
+     * position.
+     *
+     * @param {Event} evt OpenLayers click event
+     * @returns {Ext.Promise&lt;any|undefined&gt;}
+     */
+    splitOnClickedPosition: function(evt) {
+        var me = this;
+        var map = me.map;
+        var proj = map.getView().getProjection().getCode();
+        var coordinates = evt.coordinate;
+        var point = new ol.Feature(new ol.geom.Point(coordinates));
+        var extent = point.getGeometry().getExtent();
+        var associatedWin = this.getView().up(&#39;window&#39;);
+        var associatedVm = associatedWin.getViewModel();
+        var parentId = associatedVm.get(&#39;currentRecord.publicPrivateSplitId&#39;);
+        var buffered = ol.extent.buffer(extent, me.getView().getPointExtentBuffer());
+        // transform to ITM since this projection is expected by backend.
+        var bufferedITM = ol.proj.transformExtent(buffered, proj, &#39;EPSG:2157&#39;);
+        var bboxSearchParam = &#39;&amp;bbox=&#39; + encodeURIComponent(bufferedITM.join(&#39;,&#39;));
+        var idParam = &#39;publicPrivateSplitId=&#39;;
+
+        if (isNaN(parentId)) {
+            // we&#39;re going to create a new split
+            idParam += &#39;0&#39;;
+        } else {
+            // we&#39;re going to edit the existing one
+            idParam += parentId;
+        }
+        var searchParams = idParam + bboxSearchParam;
+
+        return me.doAjaxRequest(searchParams)
+            .then(me.parseSplitResponse.bind(me))
+            .then(me.handleFinalResult.bind(me));
+    },
+
+<span id='CpsiMapview-controller-button-SplitByClickButtonController-method-parseSplitResponse'>    /**
+</span>     * Parses the split result to OpenLayers features
+     *
+     * @param {XMLHttpRequest} response
+     * @returns {ol.Feature[]}
+     */
+    parseSplitResponse: function(response) {
+        if (response) {
+            var json;
+
+            if (!Ext.isEmpty(response.responseText)) {
+
+                try {
+                    json = Ext.decode(response.responseText);
+                } catch (e) {
+                    BasiGX.error(&#39;Could not parse the response: &#39; +
+                        response.responseText);
+                    return;
+                }
+
+                if (json.success &amp;&amp; json.data) {
+                    var existingPpSplitId = json.data.existingPublicPrivateSplitId;
+                    if (existingPpSplitId !== null) {
+                        this.handleExistingSplit(existingPpSplitId);
+                    } else {
+                        var splitEdgeFeats = json.data.splitEdgeFeatures;
+                        if (splitEdgeFeats.features &amp;&amp; splitEdgeFeats.features.length === 2) {
+                            var format = new ol.format.GeoJSON();
+                            return format.readFeaturesFromObject(splitEdgeFeats);
+                        }
+                    }
+                } else {
+                    BasiGX.error(&#39;Could not perform the split: &#39; +
+                        (json.message ? json.message : JSON.stringify(json)));
+                }
+            } else {
+                BasiGX.error(&#39;Could not perform the split: &#39; +
+                    (json.message ? json.message : JSON.stringify(json)));
+            }
+        } else {
+            BasiGX.error(&#39;Response was empty&#39;);
+        }
+    },
+
+<span id='CpsiMapview-controller-button-SplitByClickButtonController-method-doAjaxRequest'>    /**
+</span>     * Issues an Ext.Ajax.request against the configured endpoint with
+     * the given params.
+     *
+     * @param {string} searchParams The serarchParams which will be
+     *   appended to the request url
+     * @returns {Ext.request.Base}
+     */
+    doAjaxRequest: function(searchParams) {
+        var me = this;
+        var mapComponent = me.mapComponent || BasiGX.util.Map.getMapComponent();
+        var view = me.getView();
+        var url = view.getApiUrl();
+
+        if (!url) {
+            Ext.log.warn(&#39;No API URL passed - split is not possible.&#39;);
+            return;
+        }
+
+        if (searchParams) {
+            url = Ext.urlAppend(url, searchParams);
+        }
+
+        mapComponent.setLoading(true);
+
+        return new Ext.Promise(function(resolve) {
+            Ext.Ajax.request({
+                url: url,
+                method: &#39;GET&#39;,
+                success: function(response) {
+                    mapComponent.setLoading(false);
+                    resolve(response);
+                },
+                failure: function(response) {
+                    mapComponent.setLoading(false);
+
+                    if (response.aborted !== true) {
+                        var errorMessage = &#39;Error while requesting the API endpoint&#39;;
+
+                        if (response.responseText &amp;&amp; response.responseText.message) {
+                            errorMessage += &#39;: &#39; + response.responseText.message;
+                        }
+
+                        BasiGX.error(errorMessage);
+                    }
+                }
+            });
+        });
+    },
+
+<span id='CpsiMapview-controller-button-SplitByClickButtonController-method-handleExistingSplit'>    /**
+</span>     * Show confirm dialog to decide, whether the found existing split should be
+     * opened for edit.
+     * @param {number} splitId
+     */
+    handleExistingSplit: function(splitId) {
+
+        var msg = &#39;This edge has already been split. Open existing split record?&#39;;
+        var me = this;
+
+        BasiGX.confirm(msg, {
+            title: &#39;Open Existing Split?&#39;,
+            fn: function(buttonId) {
+                if (buttonId === &#39;yes&#39;) {
+                    var win = me.getView().up(&#39;window&#39;);
+                    win.fireEvent(&#39;splitedgesupdate&#39;, splitId);
+                }
+            }
+        });
+    },
+
+<span id='CpsiMapview-controller-button-SplitByClickButtonController-method-handleFinalResult'>    /**
+</span>     * Handles the final result from endopoint. Refreshes the result layer with
+     * retrieved split features.
+     *
+     * @param {undefined|ol.Feature[]} features The features returned from the API.
+     */
+    handleFinalResult: function(features) {
+        if (features) {
+            var me = this;
+            var resultSource = me.resultLayer.getSource();
+            resultSource.clear();
+            resultSource.addFeatures(features);
+        }
+    },
+
+<span id='CpsiMapview-controller-button-SplitByClickButtonController-method-onBeforeDestroy'>    /**
+</span>     * Remove the result layer when this component gets destroyed.
+     */
+    onBeforeDestroy: function() {
+
+        var me = this;
+        var btn = me.getView();
+
+        // detoggle button
+        me.onToggle(btn, false);
+
+        if (me.resultLayer) {
+            me.map.removeLayer(me.resultLayer);
+        }
+
+    }
+});
+</pre>
+</body>
+</html>

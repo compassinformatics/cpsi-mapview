@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+  <title>The source code</title>
+  <link href="../resources/prettify/prettify.css" type="text/css" rel="stylesheet" />
+  <script type="text/javascript" src="../resources/prettify/prettify.js"></script>
+  <style type="text/css">
+    .highlight { display: block; background-color: #ddd; }
+  </style>
+  <script type="text/javascript">
+    function highlight() {
+      document.getElementById(location.hash.replace(/#/, "")).className = "highlight";
+    }
+  </script>
+</head>
+<body onload="prettyPrint(); highlight();">
+  <pre class="prettyprint lang-js"><span id='global-property-'>/**
+</span> * This class is the split by click button of cpsi mapview application
+ * It can be used e.g. for the public/private splits tool
+ */
+<span id='CpsiMapview-view-button-SplitByClickButton'>/**
+</span> * SplitByClick Button
+ *
+ * @class CpsiMapview.view.button.SplitByClickButton
+ */
+Ext.define(&#39;CpsiMapview.view.button.SplitByClickButton&#39;, {
+    extend: &#39;Ext.button.Button&#39;,
+    xtype: &#39;cmv_split_by_click_button&#39;,
+
+    requires: [
+        &#39;CpsiMapview.model.button.SplitByClickButtonModel&#39;,
+        &#39;CpsiMapview.controller.button.SplitByClickButtonController&#39;
+    ],
+
+<span id='CpsiMapview-view-button-SplitByClickButton-property-viewModel'>    /**
+</span>     * The viewModel for this class
+     */
+    viewModel: &#39;cmv_split_by_click_button&#39;,
+
+<span id='CpsiMapview-view-button-SplitByClickButton-property-controller'>    /**
+</span>     * The controller for this class
+     */
+    controller: &#39;cmv_split_by_click_button&#39;,
+
+<span id='CpsiMapview-view-button-SplitByClickButton-property-glyph'>    /**
+</span>     * The icon (scissors) used for the button
+     */
+    glyph: &#39;xf0c4@FontAwesome&#39;,
+
+    config: {
+
+<span id='CpsiMapview-view-button-SplitByClickButton-cfg-apiUrl'>        /**
+</span>         * URL needs to be set on instantiation of button
+         */
+        apiUrl: null,
+
+<span id='CpsiMapview-view-button-SplitByClickButton-cfg-pointExtentBuffer'>        /**
+</span>         * If set higher than 0 the request URL gets appended with a `bbox`
+         * parameter, which is calculated by the point and
+         * this buffer in units of the maps projection.
+         * Internally, this uses the `buffer` method of ol.extent
+         */
+        pointExtentBuffer: 50,
+
+<span id='CpsiMapview-view-button-SplitByClickButton-cfg-resultLayer'>        /**
+</span>         * Set a layer to store the split results
+         * If not set a layer will be created and added to the map automatically
+         */
+        resultLayer: null
+    },
+
+<span id='CpsiMapview-view-button-SplitByClickButton-property-name'>    /**
+</span>     * The name to be used e.g. in ComponentQueries
+     */
+    name: &#39;splitByClickButton&#39;,
+
+<span id='CpsiMapview-view-button-SplitByClickButton-property-toggleGroup'>    /**
+</span>     * The name of the toggleGroup
+     * Activates the toggle behaviour of the button
+     */
+    toggleGroup: &#39;map&#39;,
+
+<span id='CpsiMapview-view-button-SplitByClickButton-property-listeners'>    /**
+</span>     * Register the listeners and redirect them
+     * to their corresponding controller methods
+     */
+    listeners: {
+        toggle: &#39;onToggle&#39;,
+        beforedestroy: &#39;onBeforeDestroy&#39;
+    }
+});
+</pre>
+</body>
+</html>

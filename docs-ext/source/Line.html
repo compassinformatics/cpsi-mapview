@@ -114,7 +114,8 @@ Ext.define(&#39;CpsiMapview.field.Line&#39;, {
     },
 
 <span id='CpsiMapview-field-Line-method-createStyle'>    /**
-</span>    * Create a new ol style
+</span>    * Create a new ol style. One of the ol.style.Style or OpenLayers style function
+    * will be returned.
     *
     * @return {ol.style.Style} The new style
     */
@@ -122,6 +123,10 @@ Ext.define(&#39;CpsiMapview.field.Line&#39;, {
 
         var me = this;
         var cfg = me.featureStoreConfig || {};
+
+        if (cfg &amp;&amp; cfg.styleFn) {
+            return cfg.styleFn;
+        }
 
         var lineColor = cfg.lineColor || me.styleDefaults.lineColor;
         var pointColor = cfg.pointColor || me.styleDefaults.pointColor;
