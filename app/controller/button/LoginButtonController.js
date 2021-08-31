@@ -22,7 +22,7 @@ Ext.define('CpsiMapview.controller.button.LoginButtonController', {
      * */
     onClick: function () {
 
-        var app = Ext.getApplication();
+        var app = Ext.getApplication ? Ext.getApplication() : Ext.app.Application.instance;
         var loginWin;
 
         if (app && app.loginWindow) {
