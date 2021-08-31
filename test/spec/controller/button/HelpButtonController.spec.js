@@ -1,0 +1,12 @@
+describe('CpsiMapview.controller.button.HelpButtonController', function() {
+    describe('Basics', function() {
+        it('is defined', function() {
+            expect(CpsiMapview.controller.button.HelpButtonController).not.to.be(undefined);
+        });
+
+        it('can be created', function() {
+            var ctrl = new CpsiMapview.controller.button.HelpButtonController();
+            expect(ctrl).to.not.be(undefined);
+        });
+    });
+});

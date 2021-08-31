@@ -16,16 +16,19 @@ Ext.define('CpsiMapview.form.HelpMixin', {
     onHelp: function () {
 
         var me = this;
-        var helpUrl = me.getViewModel().get('helpUrl');
 
-        if (!helpUrl) {
-            // no link provided
-            return;
-        }
+        // get the helpUrl from the viewmodel (if set)
+        var vm = me.getViewModel();
+        var helpUrl = vm ? vm.get('helpUrl') : '';
 
         // unsure why Ext.getApplication is sometimes undefined
         var app = Ext.getApplication ? Ext.getApplication() : Ext.app.Application.instance;
         var rootUrl = app.rootHelpUrl;
+
+        if (!helpUrl && !rootUrl) {
+            // no link provided
+            return;
+        }
 
         var fullUrl = me.buildHelpUrl(helpUrl, rootUrl);
         var win = window.open(fullUrl, 'mapview-help'); // use '_blank' if we want a new window each time
