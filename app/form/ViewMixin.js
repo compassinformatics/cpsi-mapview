@@ -27,7 +27,8 @@ Ext.define('CpsiMapview.form.ViewMixin', {
 
         // depending on the global application flag enableIsLocked
         // hide or show the padlock icon in the window header
-        var addPadlock = Ext.getApplication().enableIsLocked;
+        var app = Ext.getApplication ? Ext.getApplication() : Ext.app.Application.instance;
+        var addPadlock = app.enableIsLocked;
 
         if (addPadlock !== false) {
             var toolConfig = {

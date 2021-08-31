@@ -6,6 +6,8 @@ Ext.define('CpsiMapview.controller.window.MinimizableWindow', {
 
     alias: 'controller.cmv_minimizable_window',
 
+    mixins: ['CpsiMapview.form.HelpMixin'],
+
     /**
      * When closing the window in code make
      * sure that the window is restored first so
@@ -66,37 +68,6 @@ Ext.define('CpsiMapview.controller.window.MinimizableWindow', {
             if (minimizeTo) {
                 minimizeTo.fireEvent('restoreFromWindow', me.getView());
             }
-        }
-    },
-
-    /**
-     * Opens any associated helpUrl in a new browser tab
-     * If the URL does not start with 'http' then an application
-     * rootHelpUrl is appended to the URL if present
-     * */
-    onHelp: function () {
-
-        var me = this;
-        var url = me.getViewModel().get('helpUrl');
-
-        if (!url) {
-            return;
-        }
-
-        // TODO unsure why Ext.getApplication is sometimes undefined
-        var app = Ext.getApplication ? Ext.getApplication() : Ext.app.Application.instance;
-        var rootUrl = app.rootHelpUrl;
-
-        if (rootUrl && (Ext.String.startsWith(url, 'http') === false)){
-            url = rootUrl + url;
-        }
-
-        var win = window.open(url, 'mapview-help'); // use '_blank' if we want a new window each time
-
-        if (!win) {
-            Ext.Msg.alert('Pop-up Blocked', 'The help page was blocked from opening. Please allow pop-ups for this site.');
-        } else {
-            win.focus();
         }
     }
 });
