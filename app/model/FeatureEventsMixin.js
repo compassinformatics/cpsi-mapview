@@ -50,7 +50,7 @@ Ext.define('CpsiMapview.model.FeatureEventsMixin', {
                 layerUtil.layerRefresh(layer);
             } else {
                 //<debug>
-                Ext.log.error('layerKey "' + k + '" in layerKey invalid for ' + me.$className);
+                Ext.log.error('layerKey "' + k + '" in syncLayerKeys invalid for ' + me.$className);
                 //</debug>
             }
         });

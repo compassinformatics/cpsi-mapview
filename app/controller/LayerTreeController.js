@@ -287,7 +287,7 @@ Ext.define('CpsiMapview.controller.LayerTreeController', {
                     // so we check for layer keys in the config JSON
 
                     var childLayers = Ext.Array.pluck(layerJson.layers, 'layers').filter(Boolean);
-                    var allLayers = Ext.Array.merge(Ext.Array.flatten(childLayers), layerJson.layers)
+                    var allLayers = Ext.Array.merge(Ext.Array.flatten(childLayers), layerJson.layers);
                     var layerKeys = Ext.Array.pluck(allLayers, 'layerKey');
 
                     if (!Ext.Array.indexOf(layerKeys, child.id) === -1) {

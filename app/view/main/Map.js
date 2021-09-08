@@ -241,7 +241,7 @@ Ext.define('CpsiMapview.view.main.Map', {
                 //<debug>
                 // save the layer configuration as property on the application for debugging
                 var app = Ext.getApplication ? Ext.getApplication() : Ext.app.Application.instance;
-                app.layerJson = newConfiguration
+                app.layerJson = newConfiguration;
                 //</debug>
 
                 // fire event to inform subscribers that all layers are loaded
