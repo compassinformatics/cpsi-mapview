@@ -235,7 +235,7 @@ Ext.define('CpsiMapview.controller.LayerTreeController', {
      */
     createOlLayerGroups: function (treeNodeChilds, parentGroup) {
         var me = this;
-        // go over all passed in tree childs nodes
+        // go over all passed in tree child nodes
         Ext.each(treeNodeChilds, function (child) {
             // apply defaults for tree nodes from config
             var generalDefaults = me.treeConfDefaults.general || {};
@@ -276,7 +276,24 @@ Ext.define('CpsiMapview.controller.LayerTreeController', {
                     parentGroup.getLayers().insertAt(0, mapLyr);
 
                 } else {
-                    Ext.Logger.warn('Layer with layerKey ' + child.id + ' not found in map layers');
+                    //<debug>
+
+                    // get the layers config object
+                    var app = Ext.getApplication ? Ext.getApplication() : Ext.app.Application.instance;
+                    var layerJson = app.layerJson;
+
+
+                    // any switch layers not in the resolution when the app is loaded will be missing
+                    // so we check for layer keys in the config JSON
+
+                    var childLayers = Ext.Array.pluck(layerJson.layers, 'layers').filter(Boolean);
+                    var allLayers = Ext.Array.merge(Ext.Array.flatten(childLayers), layerJson.layers)
+                    var layerKeys = Ext.Array.pluck(allLayers, 'layerKey');
+
+                    if (!Ext.Array.indexOf(layerKeys, child.id) === -1) {
+                        Ext.Logger.warn('Layer with layerKey ' + child.id + ' not found in map layers');
+                    }
+                    //</debug>
                 }
             }
         });
