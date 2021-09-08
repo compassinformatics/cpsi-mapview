@@ -28,7 +28,8 @@ Ext.define('CpsiMapview.util.ApplicationMixin', {
 
     mixinConfig: {
         after: {
-            constructor: 'onApplicationCreated'
+            constructor: 'onApplicationCreated',
+            onAppUpdate: 'onApplicationUpdated'
         }
     },
 
@@ -271,7 +272,7 @@ Ext.define('CpsiMapview.util.ApplicationMixin', {
     /**
      * Ask the use if they wish to refresh the browser following an application update
      * */
-    onAppUpdate: function () {
+    onApplicationUpdated: function () {
         Ext.Msg.confirm('Application Update', 'This application has an update, reload?',
             function (choice) {
                 if (choice === 'yes') {
