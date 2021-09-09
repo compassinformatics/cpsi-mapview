@@ -10,16 +10,7 @@ module.exports = function(config) {
         'node_modules/@geoext/openlayers-legacy/dist/ol.js',
         'https://cdnjs.cloudflare.com/ajax/libs/extjs/6.2.0/ext-all-debug.js',
         'https://cdnjs.cloudflare.com/ajax/libs/extjs/6.2.0/packages/ux/classic/ux.js',
-        // GeoExt source files
-        {
-            pattern: 'lib/geoext3/src/**/*.js',
-            included: true
-        },
-        // GeoExt classic toolkit source files
-        {
-            pattern: 'lib/geoext3/classic/**/*.js',
-            included: true
-        },
+        'https://geoext.github.io/geoext3/master/GeoExt.js',
         'https://cdnjs.cloudflare.com/ajax/libs/opentype.js/0.6.9/opentype.min.js',
         'https://cdn.jsdelivr.net/npm/jsonix@3.0.0/jsonix.min.js',
         'https://cdn.jsdelivr.net/gh/bjornharrtell/jsts@gh-pages/1.4.0/jsts.min.js',
@@ -35,11 +26,11 @@ module.exports = function(config) {
         'https://cdn.jsdelivr.net/gh/highsource/w3c-schemas@1.4.0/scripts/lib/XLink_1_0.js',
         'https://cdn.jsdelivr.net/npm/proj4@2.5.0/dist/proj4-src.min.js',
         'https://maps.googleapis.com/maps/api/js?v=3.42&key=AIzaSyAj6xrC0L3G0YquO1q6Qsma1ZEfYgGQotU',
+        'lib/BasiGX/src/**/*.js',
         {
             pattern: 'app/**/*.js',
             included: true
         },
-        'lib/BasiGX/src/**/*.js',
         'test/test-helper-functions.js',
         'test/**/*.js',
         {pattern: 'test/resources/**/*', watched: false, included: false, served: true}
@@ -51,10 +42,8 @@ module.exports = function(config) {
         proxies: {
             '/resources': '/base/test/resources',
             '/spec': '/base/test/spec',
-            '/GeoExt': '/base/lib/geoext3/src',
             '/BasiGX': '/base/lib/BasiGX/src',
-            '/CpsiMapview': '/base/app',
-            '/app': '/base/app'
+            '/CpsiMapview': '/base/app'
         },
 
         // frameworks to use
