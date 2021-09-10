@@ -48,6 +48,10 @@ Ext.define('CpsiMapview.model.FeatureEventsMixin', {
             if (layers.length > 0) {
                 var layer = layers[0];
                 layerUtil.layerRefresh(layer);
+            } else {
+                //<debug>
+                Ext.log.error('layerKey "' + k + '" in syncLayerKeys invalid for ' + me.$className);
+                //</debug>
             }
         });
 
@@ -56,6 +60,15 @@ Ext.define('CpsiMapview.model.FeatureEventsMixin', {
             var store = Ext.data.StoreManager.lookup(k);
             if (store) {
                 store.reload();
+            } else {
+                //<debug>
+                // store may not be found if it has not yet been created
+                // so check if it can be created by the supplied alias
+                if (!Ext.ClassManager.getByAlias('store.' + k)) {
+                    Ext.log.error('Store alias "' + k + '" in syncStoreIds not found for '
+                        + me.$className);
+                }
+                //</debug>
             }
         });
 

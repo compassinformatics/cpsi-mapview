@@ -158,6 +158,9 @@ Ext.define('CpsiMapview.form.ViewMixin', {
                                 })
                             })
                         }),
+                        listeners: {
+                            toggle: 'onDigitizingToolToggle'
+                        },
                         bind: {
                             apiUrl: '{networkSolverUrl}',
                             disabled: '{isLocked}',
@@ -175,6 +178,9 @@ Ext.define('CpsiMapview.form.ViewMixin', {
                         resetOnToggle: false,
                         iconCls: 'icon-polygon2',
                         glyph: null,
+                        listeners: {
+                            toggle: 'onDigitizingToolToggle'
+                        },
                         bind: {
                             drawLayer: '{polygonLayer}',
                             disabled: '{isLocked}',
@@ -207,6 +213,9 @@ Ext.define('CpsiMapview.form.ViewMixin', {
                         apiUrl: '/WebServices/roadschedule/cutWithPolygon',
                         resetOnToggle: false,
                         glyph: 'xf1db@FontAwesome',
+                        listeners: {
+                            toggle: 'onDigitizingToolToggle'
+                        },
                         bind: {
                             drawLayer: '{polygonLayer}',
                             disabled: '{isLocked}',
