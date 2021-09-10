@@ -3,9 +3,8 @@
     Ext.Loader.setConfig({
         enabled: true,
         paths: {
-            'GeoExt': '../lib/geoext3',
-            'BasiGX': '../lib/BasiGX',
-            'CpsiMapview': '../app'
+            'BasiGX': '/BasiGX',
+            'CpsiMapview': '/CpsiMapview'
         }
     });
 

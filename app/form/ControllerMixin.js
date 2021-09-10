@@ -11,6 +11,8 @@ Ext.define('CpsiMapview.form.ControllerMixin', {
         validation: 'CpsiMapview.form.ValidationMessagesMixin'
     },
 
+    toolListenerAdded: false,
+
     /** The possible return codes from the services */
     errorCodes: {
         None: 0,
@@ -393,6 +395,45 @@ Ext.define('CpsiMapview.form.ControllerMixin', {
             // update a custom timestamp property on the viewmodel
             // so any validation logic can be retriggered if required
             vm.set('timestamp', Ext.Date.now());
+        }
+    },
+
+    /**
+     * Several forms can have both a line and polygon editing tools
+     * When a user switches from the polygon tool to the line tool
+     * the polygon should be removed so it is not sent to the server
+     */
+    onEdgesModified: function (evt) {
+
+        var me = this;
+        var vm = me.getViewModel();
+        var modifications = evt.modifications;
+
+        if ((modifications.newEdgeCount > 0) && (modifications.toolType !== 'Polygon' &&
+            modifications.toolType !== 'Circle')) {
+            var polygonLayer = vm.get('polygonLayer');
+            if (polygonLayer) {
+                polygonLayer.getSource().clear();
+            }
+        }
+
+    },
+
+    /**
+     * Whenever one of the digitizing buttons is activated
+     * add a listener to check for modifications to edges
+     * We can only add this listener when the tools are activated or the resultLayer
+     * won't have been created
+     */
+    onDigitizingToolToggle: function () {
+
+        var me = this;
+        var vm = me.getViewModel();
+        var resultLayer = vm.get('resultLayer');
+
+        if (resultLayer && (me.toolListenerAdded === false)) {
+            resultLayer.getSource().on('featuresupdated', me.onEdgesModified.bind(me));
+            me.toolListenerAdded = true;
         }
     }
 });

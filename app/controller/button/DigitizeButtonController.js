@@ -998,11 +998,17 @@ Ext.define('CpsiMapview.controller.button.DigitizeButtonController', {
                 newLength += f.get('length') ? f.get('length') : 0;
             });
 
+            var newEdgeCount = features.filter(function (feature) {
+                return feature.getGeometry() instanceof ol.geom.LineString;
+            }).length;
+
             var modifications = {
                 originalLength: originalLength,
                 newLength: newLength,
+                newEdgeCount: newEdgeCount,
                 originalSolverPoints: originalSolverPoints,
-                newSolverPoints: newSolverPoints
+                newSolverPoints: newSolverPoints,
+                toolType: me.getView().type
             };
 
             // fire a custom event from the source so a listener can be added once
