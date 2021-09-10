@@ -28,6 +28,8 @@ Ext.define(&#39;CpsiMapview.form.ControllerMixin&#39;, {
         validation: &#39;CpsiMapview.form.ValidationMessagesMixin&#39;
     },
 
+<span id='CpsiMapview-form-ControllerMixin-property-toolListenerAdded'>    toolListenerAdded: false,
+</span>
 <span id='CpsiMapview-form-ControllerMixin-property-errorCodes'>    /** The possible return codes from the services */
 </span>    errorCodes: {
         None: 0,
@@ -410,6 +412,45 @@ Ext.define(&#39;CpsiMapview.form.ControllerMixin&#39;, {
             // update a custom timestamp property on the viewmodel
             // so any validation logic can be retriggered if required
             vm.set(&#39;timestamp&#39;, Ext.Date.now());
+        }
+    },
+
+<span id='CpsiMapview-form-ControllerMixin-method-onEdgesModified'>    /**
+</span>     * Several forms can have both a line and polygon editing tools
+     * When a user switches from the polygon tool to the line tool
+     * the polygon should be removed so it is not sent to the server
+     */
+    onEdgesModified: function (evt) {
+
+        var me = this;
+        var vm = me.getViewModel();
+        var modifications = evt.modifications;
+
+        if ((modifications.newEdgeCount &gt; 0) &amp;&amp; (modifications.toolType !== &#39;Polygon&#39; &amp;&amp;
+            modifications.toolType !== &#39;Circle&#39;)) {
+            var polygonLayer = vm.get(&#39;polygonLayer&#39;);
+            if (polygonLayer) {
+                polygonLayer.getSource().clear();
+            }
+        }
+
+    },
+
+<span id='CpsiMapview-form-ControllerMixin-method-onDigitizingToolToggle'>    /**
+</span>     * Whenever one of the digitizing buttons is activated
+     * add a listener to check for modifications to edges
+     * We can only add this listener when the tools are activated or the resultLayer
+     * won&#39;t have been created
+     */
+    onDigitizingToolToggle: function () {
+
+        var me = this;
+        var vm = me.getViewModel();
+        var resultLayer = vm.get(&#39;resultLayer&#39;);
+
+        if (resultLayer &amp;&amp; (me.toolListenerAdded === false)) {
+            resultLayer.getSource().on(&#39;featuresupdated&#39;, me.onEdgesModified.bind(me));
+            me.toolListenerAdded = true;
         }
     }
 });
