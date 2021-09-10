@@ -242,6 +242,7 @@ Ext.define('CpsiMapview.form.ViewMixin', {
                         xtype: 'cmv_split_by_click_button',
                         itemId: 'splitByClickButton',
                         apiUrl: '/WebServices/roadschedule/publicprivatesplit/split',
+                        tooltip: 'Split a line by clicking on it',
                         bind: {
                             disabled: '{isProcessed}',
                             resultLayer: '{resultLayer}',
