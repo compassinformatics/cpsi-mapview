@@ -34,7 +34,6 @@ Ext.define('CpsiMapview.controller.toolbar.MapTools', {
     */
     setGazetteerExtent: function (cmb) {
 
-        var me = this;
         var map = BasiGX.util.Map.getMapComponent().map;
 
         var app = Ext.getApplication ? Ext.getApplication() : Ext.app.Application.instance;
@@ -62,6 +61,6 @@ Ext.define('CpsiMapview.controller.toolbar.MapTools', {
         Ext.each(gazetteers, function (cmb) {
             cmb.map = map;
             cmb.map.addLayer(cmb.locationLayer);
-        })
+        });
     }
 });

@@ -141,32 +141,18 @@ Ext.define('CpsiMapview.view.toolbar.MapTools', {
                 startDate: new Date(1946, 0, 1),
                 endDate: new Date(2020, 11, 30)
             }]
-        }
-    ],
-
-    /**
-     * @private
-     */
-    initComponent: function () {
-        var me = this;
-        var map = BasiGX.util.Map.getMapComponent().map;
-
-        // Nominatim based location search
-        me.items.push({
+        }, {
             xtype: 'buttongroup',
             title: 'Gazetteers',
             items: [{
-                xtype: 'gx_geocoder_combo',
-                map: map
+                xtype: 'gx_geocoder_combo'
             }, {
                 xtype: 'cmv_gazetteer_combo', // custom CPSI gazetteer
                 url: 'https://pmstipperarydev.compass.ie/WebServices/townland/gazetteer/',
                 proxyRootProperty: 'data',
                 displayValueMapping: 'name',
-                emptyText: 'Townland...',
-                map: map
+                emptyText: 'Townland...'
             }]
-        });
-        me.callParent();
-    }
+        }
+    ]
 });
