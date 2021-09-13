@@ -22,6 +22,7 @@ Ext.define(&#39;CpsiMapview.view.toolbar.MapTools&#39;, {
     extend: &#39;Ext.toolbar.Toolbar&#39;,
     xtype: &#39;cmv_maptools&#39;,
     requires: [
+        &#39;Ext.container.ButtonGroup&#39;,
         &#39;GeoExt.form.field.GeocoderComboBox&#39;,
         &#39;BasiGX.view.button.Measure&#39;,
         &#39;BasiGX.view.button.ZoomIn&#39;,
@@ -158,34 +159,20 @@ Ext.define(&#39;CpsiMapview.view.toolbar.MapTools&#39;, {
                 startDate: new Date(1946, 0, 1),
                 endDate: new Date(2020, 11, 30)
             }]
-        }
-    ],
-
-<span id='CpsiMapview-view-toolbar-MapTools-method-initComponent'>    /**
-</span>     * @private
-     */
-    initComponent: function () {
-        var me = this;
-        var map = BasiGX.util.Map.getMapComponent().map;
-
-        // Nominatim based location search
-        me.items.push({
+        }, {
             xtype: &#39;buttongroup&#39;,
             title: &#39;Gazetteers&#39;,
             items: [{
-                xtype: &#39;gx_geocoder_combo&#39;,
-                map: map
+                xtype: &#39;gx_geocoder_combo&#39;
             }, {
                 xtype: &#39;cmv_gazetteer_combo&#39;, // custom CPSI gazetteer
                 url: &#39;https://pmstipperarydev.compass.ie/WebServices/townland/gazetteer/&#39;,
                 proxyRootProperty: &#39;data&#39;,
                 displayValueMapping: &#39;name&#39;,
-                emptyText: &#39;Townland...&#39;,
-                map: map
+                emptyText: &#39;Townland...&#39;
             }]
-        });
-        me.callParent();
-    }
+        }
+    ]
 });
 </pre>
 </body>
