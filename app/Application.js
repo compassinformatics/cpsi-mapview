@@ -6,6 +6,12 @@
 Ext.define('CpsiMapview.Application', {
     extend: 'Ext.app.Application',
 
+    requires: [
+        'CpsiMapview.view.main.Main'
+    ],
+
+    mainViewXType: 'cmv_main',
+
     mixins: {
         appmixin: 'CpsiMapview.util.ApplicationMixin'
     },

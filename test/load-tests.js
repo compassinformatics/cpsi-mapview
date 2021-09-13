@@ -13,4 +13,9 @@
         enableIsLocked: true // enable the padlock icon
     };
 
+    // mock the getMap function to return a map
+    BasiGX.util.Map.getMapComponent = function () {
+        return Ext.create('GeoExt.component.Map');
+    };
+
 }(document, this));

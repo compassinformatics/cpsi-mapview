@@ -6,8 +6,19 @@
 Ext.define('CpsiMapview.util.ApplicationMixin', {
     extend: 'Ext.Mixin',
 
+    requires: [
+        'Ext.window.MessageBox',
+        'CpsiMapview.view.form.Login'
+    ],
+
     // see https://docs.sencha.com/extjs/6.7.0/classic/Ext.app.Application.html#cfg-quickTips
     quickTips: false,
+
+    /**
+     * The xtype of the main application viewport to be loaded
+     * once a user is logged in
+     */
+    mainViewXType: null,
 
     /**
      * Property to store a reference to the login window
@@ -26,10 +37,30 @@ Ext.define('CpsiMapview.util.ApplicationMixin', {
         }
     },
 
+    /**
+    * A counter property to keep track of how many stores need to
+    * be loaded before the application can become active
+    */
+    storeCounter: 0,
+
+    /**
+    * A flag to indicate if the viewport and stores have been loaded
+    * for the application
+    */
+    applicationLoaded: false,
+
+    /**
+    * Custom property to list all stores that should be loaded as soon as a user logs in
+    */
+    lookupStores: [],
+
     mixinConfig: {
         after: {
             constructor: 'onApplicationCreated',
             onAppUpdate: 'onApplicationUpdated'
+        }, before:
+        {
+            init: 'beforeInit'
         }
     },
 
@@ -62,6 +93,22 @@ Ext.define('CpsiMapview.util.ApplicationMixin', {
         NoPermission: 5,
         GeneralServerError: 500,
         FileNotFound: 404
+    },
+
+    /**
+     * Fire the global login event when the application is loaded
+     * @param {any} loginData
+     */
+    onLogin: function (loginData) {
+
+        var me = this;
+
+        if (me.applicationLoaded === false) {
+            me.loadApplication();
+            // now that the viewport is has been created re-fire the login event so any UI elements
+            // that listen to this can be updated
+            Ext.GlobalEvents.fireEvent('login', loginData);
+        }
     },
 
     onAjaxBeforeRequest: function () {
@@ -140,7 +187,7 @@ Ext.define('CpsiMapview.util.ApplicationMixin', {
         return success;
     },
 
-    onAjaxRequestException: function (/*connection, response, options, eOpts*/) {
+    onAjaxRequestException: function () {
         Ext.emptyFn();
     },
 
@@ -150,7 +197,10 @@ Ext.define('CpsiMapview.util.ApplicationMixin', {
         me.setupRequestHooks();
         if (me.requireLogin) {
             me.doLogin();
+        } else {
+            me.loadApplication();
         }
+
         // add a listener for whenever any button in the map toggleGroup is toggled
         me.control({
             'button[toggleGroup=map]': {
@@ -227,14 +277,13 @@ Ext.define('CpsiMapview.util.ApplicationMixin', {
      * using the supplied regex
      * @param {any} regex
      */
-    getUrlParameter: function (regex) {
+    getUrlParameter: function (regex, hostname) {
 
-        var str = location.hostname;
         var matches = [];
         var m;
 
         do {
-            m = regex.exec(str);
+            m = regex.exec(hostname);
             if (m) {
                 matches.push(m[1]);
             }
@@ -269,6 +318,47 @@ Ext.define('CpsiMapview.util.ApplicationMixin', {
         return rec;
     },
 
+
+    /**
+     * Loop through all remote stores in the custom lookupStores property
+     * and add a listener to keep track of then they are loaded
+     * */
+    loadAllStores: function () {
+
+        var me = this;
+        me.getMainView().mask('Loading...');
+
+        Ext.Array.each(me.lookupStores, function (storeClass) {
+            var store = Ext.create(storeClass);
+
+            if (store.autoLoad && !store.isLoaded()) {
+                me.storeCounter++;
+
+                store.on({
+                    load: {
+                        fn: me.storeLoaded,
+                        scope: me,
+                        single: true
+                    }
+                });
+            }
+        });
+    },
+
+    /**
+     * Decrease the storeCounter property and
+     * if all stores are loaded then unmask the application
+     * */
+    storeLoaded: function () {
+
+        var me = this;
+        me.storeCounter--;
+
+        if (me.storeCounter == 0) {
+            me.getMainView().unmask();
+        }
+    },
+
     /**
      * Ask the use if they wish to refresh the browser following an application update
      * */
@@ -280,5 +370,45 @@ Ext.define('CpsiMapview.util.ApplicationMixin', {
                 }
             }
         );
+    },
+
+    /**
+    * Add the main view to the viewport and load all the application stores
+    * We don't want to show the viewport and load stores until the user is logged in
+    * so we use a similar approach to that described in the Sencha sample
+    * login app at https://docs.sencha.com/extjs/7.2.0/guides/tutorials/login_app/login_app.html
+    * */
+    loadApplication: function () {
+
+        var me = this;
+
+        if (!me.mainViewXType) {
+            Ext.Error.raise('No mainViewXType defined for the application');
+        }
+
+        // setting the mainview also creates a new instance of the component so pass in an xtype
+        me.setMainView({ xtype: me.mainViewXType });
+
+        me.loadAllStores();
+
+        // set a flag so we don't try and load the application again when a user logs in after
+        // their token has expired
+        me.applicationLoaded = true;
+    },
+
+    /**
+     * Common setup code prior to initializing the application
+     * */
+    beforeInit: function () {
+
+        var me = this;
+        Ext.Ajax.timeout = 60000; // default is 30000 (30 seconds) increase to a minute
+
+        // disable warnings about the map panel having no title
+        // https://docs.sencha.com/extjs/6.0.0/guides/upgrades_migrations/extjs_upgrade_guide.html#upgrades_migrations-_-extjs_upgrade_guide_-_aria_regions_should_have_a_title
+        Ext.enableAriaPanels = false;
+        Ext.ariaWarn = Ext.emptyFn;
+
+        Ext.GlobalEvents.on('login', me.onLogin, me);
     }
 });
