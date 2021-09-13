@@ -15,7 +15,7 @@ describe('CpsiMapview.controller.button.DigitizeButtonController', function () {
 
             beforeEach(function () {
 
-                var btn = new CpsiMapview.view.button.DigitizeButton({ type: 'Point'});
+                var btn = new CpsiMapview.view.button.DigitizeButton({ type: 'Point' });
 
                 ctrl = btn.getController();
                 ctrl.resultLayer = new ol.layer.Vector({
@@ -25,6 +25,22 @@ describe('CpsiMapview.controller.button.DigitizeButtonController', function () {
                 });
             });
 
+            it('#parseNetsolverResponse handles valid response', function () {
+                var response = {
+                    responseText: '{"data":{"type":"FeatureCollection","features":[' +
+                        '{"type":"Feature","geometry":{"type":"LineString","coordinates":[[0,0],[1,1]]},"properties":{}}],' +
+                        '"crs":{"type":"name","properties":{"name":"EPSG: 3857"}},"bbox":null},"message":"","success":true}'
+                };
+                ctrl.parseNetsolverResponse(response);
+            });
+
+            it('#parseNetsolverResponse handles empty response', function () {
+                var response = {
+                    responseText: '{"data":null,"message":"","success":true}'
+                };
+
+                ctrl.parseNetsolverResponse(response);
+            });
 
             it('#handleFinalResult fires events', function (done) {
 
