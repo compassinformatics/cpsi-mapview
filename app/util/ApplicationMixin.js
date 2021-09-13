@@ -326,6 +326,11 @@ Ext.define('CpsiMapview.util.ApplicationMixin', {
     loadAllStores: function () {
 
         var me = this;
+
+        if (me.lookupStores.length === 0) {
+            return;
+        }
+
         me.getMainView().mask('Loading...');
 
         Ext.Array.each(me.lookupStores, function (storeClass) {
