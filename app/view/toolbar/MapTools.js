@@ -5,6 +5,7 @@ Ext.define('CpsiMapview.view.toolbar.MapTools', {
     extend: 'Ext.toolbar.Toolbar',
     xtype: 'cmv_maptools',
     requires: [
+        'Ext.container.ButtonGroup',
         'GeoExt.form.field.GeocoderComboBox',
         'BasiGX.view.button.Measure',
         'BasiGX.view.button.ZoomIn',

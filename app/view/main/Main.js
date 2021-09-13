@@ -10,6 +10,7 @@ Ext.define('CpsiMapview.view.main.Main', {
     xtype: 'cmv_main',
 
     requires: [
+        'Ext.layout.container.Border',
         'Ext.plugin.Viewport',
         'Ext.window.MessageBox',
         'CpsiMapview.view.main.Map',

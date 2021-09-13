@@ -8,6 +8,7 @@ Ext.define('CpsiMapview.view.toolbar.MapFooter', {
     requires: [
         'BasiGX.view.combo.ScaleCombo',
         'BasiGX.view.MapLoadingStatusBar',
+        'BasiGX.view.panel.CoordinateMousePositionPanel',
         'CpsiMapview.view.button.LoginButton',
         'CpsiMapview.view.button.MinimizeAllButton'
     ],
