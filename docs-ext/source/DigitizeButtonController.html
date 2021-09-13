@@ -878,8 +878,13 @@ Ext.define(&#39;CpsiMapview.controller.button.DigitizeButtonController&#39;, {
                         return format.readFeature(feat);
                     });
                 } else {
-                    BasiGX.error(&#39;Could not find features in the response: &#39; +
-                        (json.message ? json.message : JSON.stringify(json)));
+                    Ext.toast({
+                        html: &#39;No features found at this location&#39; +
+                            (json.message ? &#39; (&#39; + json.message + &#39;)&#39; : &#39;&#39;),
+                        title: &#39;No Features&#39;,
+                        width: 200,
+                        align: &#39;br&#39;
+                    });
                 }
             } else {
                 BasiGX.error(&#39;Response was empty&#39;);
