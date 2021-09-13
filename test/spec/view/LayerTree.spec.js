@@ -9,9 +9,6 @@ describe('CpsiMapview.view.LayerTree', function() {
             CpsiMapview.view.main.Map.guess = function() {
                 return {on: Ext.emptyFn};
             };
-            BasiGX.util.Map.getMapComponent = function () {
-                return Ext.create('GeoExt.component.Map');
-            };
             var inst = Ext.create('CpsiMapview.view.LayerTree', {});
             expect(inst).to.be.a(CpsiMapview.view.LayerTree);
         });
