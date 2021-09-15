@@ -23,10 +23,6 @@
             "qtip": "Right-click for a layer grid"
           },
           {
-            "id": "LIGHT_UNIT_WFS",
-            "leaf": true
-          },
-          {
             "id": "BOREHOLE_WMS",
             "leaf": true,
             "text": "Borehole WMS"
