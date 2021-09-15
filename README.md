@@ -62,22 +62,6 @@ For running tests various dependencies listed in package.json need to be install
 npm install
 ```
 
-## Updating the online demo
-
-1. Build the standalone version
-
-    ```
-    sencha app build
-    ```
-
-2. Publish using the [gh-pages](https://www.npmjs.com/package/gh-pages) Node module:
-
-    ```
-    npx gh-pages -d build/production/CpsiMapview/--dotfiles --repo https://github.com/compassinformatics/cpsi-mapview.git -b gh-pages
-    ```
-
-Note the `--dotfiles`` flag as `.nojekyll` is required on GitHub Pages to allow access to any JS files in the `node_modules` folder.
-
 ## Testing
 
 Navigate to the project folder and run the following:
