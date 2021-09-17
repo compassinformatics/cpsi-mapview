@@ -17,6 +17,7 @@ Ext.define('CpsiMapview.model.grid.Grid', {
     data: {
         vectorLayerKey: null,
         wmsLayerKey: null,
+        featureSelectionLayerKey: null, // used as the layer for selecting with the cmv_feature_selection_button
         gridStoreType: null,
         allowFeatureSelection: false,
         // when isSpatialGrid is set to false the 'Select by Shape' button will be hidden

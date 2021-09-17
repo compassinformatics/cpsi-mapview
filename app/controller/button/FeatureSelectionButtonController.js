@@ -79,9 +79,11 @@ Ext.define('CpsiMapview.controller.button.FeatureSelectionButtonController', {
         if (pressed) {
             // create and show selector UI
             me.addModeSelectorUi();
+            view.queryLayer.setVisible(true);
             me.map.on('click', me.onMapClick);
         } else {
             me.modeSelector.hide();
+            view.queryLayer.setVisible(false);
             me.map.un('click', me.onMapClick);
         }
 
@@ -99,7 +101,7 @@ Ext.define('CpsiMapview.controller.button.FeatureSelectionButtonController', {
                 bind: {
                     text: '{addToSelectionLabel}'
                 },
-                hidden: true,
+                hidden: false,
                 menu: new Ext.menu.Menu({
                     items: [
                         {
@@ -125,11 +127,9 @@ Ext.define('CpsiMapview.controller.button.FeatureSelectionButtonController', {
             });
 
             var tb = me.getView().up('toolbar');
-            var segBtn = me.getView().up('segmentedbutton');
-            if (tb && segBtn) {
-                var segBtnPos = tb.items.indexOf(segBtn);
-                var afterSegBtnPos = segBtnPos + 1;
-                tb.insert(afterSegBtnPos, me.modeSelector);
+            var btnGroup = me.getView().up('buttongroup');
+            if (tb && btnGroup) {
+                btnGroup.add(me.modeSelector);
             }
         }
 
@@ -143,7 +143,6 @@ Ext.define('CpsiMapview.controller.button.FeatureSelectionButtonController', {
     findWfsLayer: function () {
         var me = this;
         var view = me.getView();
-
         if (!view.queryLayer && view.vectorLayerKey) {
             view.queryLayer = BasiGX.util.Layer.getLayerBy(
                 'layerKey', view.vectorLayerKey
@@ -210,6 +209,7 @@ Ext.define('CpsiMapview.controller.button.FeatureSelectionButtonController', {
         // create ExtJS "IN" filter with unique values
         var uniqueFids = Ext.Array.unique(me.fidsToFilter);
         var extInFilter = new Ext.util.Filter({
+            type: 'fid',
             property: me.idProperty,
             value   : uniqueFids,
             operator: 'in'
