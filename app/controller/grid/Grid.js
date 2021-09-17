@@ -10,9 +10,10 @@ Ext.define('CpsiMapview.controller.grid.Grid', {
     requires: [
         'Ext.menu.Menu',
         'Ext.grid.filters.Filters',
+        'GeoExt.util.OGCFilter',
         'BasiGX.util.Layer',
         'CpsiMapview.util.WmsFilter',
-        'GeoExt.util.OGCFilter'
+        'CpsiMapview.util.Layer'
     ],
 
     /**
@@ -63,7 +64,8 @@ Ext.define('CpsiMapview.controller.grid.Grid', {
             {
                 zoom: zoom - 1,
                 duration: duration / 2
-            }, {
+            },
+            {
                 zoom: zoom,
                 duration: duration / 2
             }
@@ -127,32 +129,6 @@ Ext.define('CpsiMapview.controller.grid.Grid', {
     },
 
     /**
-     * Update any associated layer tree node to indicate that the layer is filtered or unfiltered
-     * @param {any} layer
-     * @param {any} filters
-     */
-    updateLayerNodeUI: function (layer, filters) {
-
-        // Get a reference to the layer trees
-        var treePanels = Ext.ComponentQuery.query('cmv_layertree');
-        if (treePanels.length === 1) {
-            // we will only ever have one layer tree for an application
-            var treePanel = treePanels[0];
-            var node = treePanel.getNodeForLayer(layer);
-            if (node) {
-                if (Ext.isEmpty(filters)) {
-                    node.set('glyph', null);
-                    node.removeCls('cpsi-tree-node-filtered');
-                } else {
-                    node.set('glyph', 'f0b0@FontAwesome');
-                    node.addCls('cpsi-tree-node-filtered');
-                }
-                node.triggerUIUpdate();
-            }
-        }
-    },
-
-    /**
      * Applies both attribute and spatial filters to
      * any associated WMS and vector layer and reloads both
      * If filters have not been modified the WMS layer is not updated unless forced
@@ -179,15 +155,17 @@ Ext.define('CpsiMapview.controller.grid.Grid', {
         }
 
         if (wmsLayer) {
+
             var wmsSource = wmsLayer.getSource();
             var wmsParams = wmsSource.getParams();
 
-            // save the current filter string
+            // save the current filter string to see if the filter has changed
             var originalFilterString = wmsParams.FILTER || '';
 
             // set any new filter
-            if (filters.length > 0) {
-                wmsParams.FILTER = GeoExt.util.OGCFilter.getOgcFilterFromExtJsFilter(filters, 'wms', 'and', '1.1.0');
+            if (filters && filters.length > 0) {
+                var ogcFilters = CpsiMapview.util.Layer.convertAndCombineFilters(filters);
+                wmsParams.FILTER = GeoExt.util.OGCFilter.combineFilters(ogcFilters, 'And', true, '1.1.0');
             } else {
                 wmsParams.FILTER = ''; // ensure the filter is reset if no filters are set
             }
@@ -205,9 +183,9 @@ Ext.define('CpsiMapview.controller.grid.Grid', {
                 });
             }
             // keep a reference to the raw filters so they can be applied to the vector layer
-            // when switching - see LayerFactory
+            // when switching
             wmsSource.set('additionalFilters', filters);
-            me.updateLayerNodeUI(wmsLayer, filters);
+            CpsiMapview.util.Layer.updateLayerNodeUI(wmsLayer);
         }
 
         var vectorLayer = me.getLayerByKey(viewModel.get('vectorLayerKey'));
@@ -225,7 +203,7 @@ Ext.define('CpsiMapview.controller.grid.Grid', {
 
             vectorSource.set('additionalFilters', filters);
             vectorSource.refresh();
-            me.updateLayerNodeUI(vectorLayer, filters);
+            CpsiMapview.util.Layer.updateLayerNodeUI(vectorLayer);
         }
 
     },
@@ -254,34 +232,13 @@ Ext.define('CpsiMapview.controller.grid.Grid', {
             filters.push(me.spatialFilter);
         }
 
-        // create the WFS filter based on either grid filters or spatial filter or both
-        var wfsGetFeatureFilter = GeoExt.util.OGCFilter.getOgcWfsFilterFromExtJsFilter(filters, 'And', '2.0.0');
-
-        // check if we have an addition feature ID filter and rework OGC filter accordingly
         if (me.idFilter) {
-            // get OGC filter bodies for grid filters and spatial filter
-            var standardOgcFilterBodies = [];
-            Ext.each(filters, function (filter) {
-                var filterBody = GeoExt.util.OGCFilter.getOgcFilterBodyFromExtJsFilterObject(filter, '2.0.0');
-                standardOgcFilterBodies.push(filterBody);
-            });
-
-            // combine grid filters and spatial filter with AND (as filter body)
-            var allOgcFilters = [];
-            if (standardOgcFilterBodies.length > 0) {
-                var standardOgcFilter = GeoExt.util.OGCFilter.combineFilterBodies(standardOgcFilterBodies, 'And', false, '2.0.0');
-                allOgcFilters.push(standardOgcFilter);
-            }
-
-            // create filter body for addition feature ID filter (as filter body)
-            var idOgcFilterBody = GeoExt.util.OGCFilter.getOgcFilterBodyFromExtJsFilterObject(me.idFilter, '2.0.0');
-            allOgcFilters.push(idOgcFilterBody);
-
-            // transform the filter bodies to one filter object
-            wfsGetFeatureFilter = GeoExt.util.OGCFilter.combineFilters(allOgcFilters, 'Or', false, '2.0.0');
+            filters.push(me.idFilter);
         }
 
-        if (wfsGetFeatureFilter) {
+        if (filters.length > 0) {
+            var ogcFilters = CpsiMapview.util.Layer.convertAndCombineFilters(filters);
+            var wfsGetFeatureFilter = GeoExt.util.OGCFilter.combineFilters(ogcFilters, 'And', true, '2.0.0');
             params.filter = wfsGetFeatureFilter;
         }
     },
@@ -330,7 +287,7 @@ Ext.define('CpsiMapview.controller.grid.Grid', {
     * Force a reload of the grid store
     * @param {Boolean} clearPaging True to clear paging parameters
     */
-    refreshStore: function(clearPaging){
+    refreshStore: function (clearPaging) {
 
         var me = this;
         var grid = me.getView();
@@ -338,7 +295,7 @@ Ext.define('CpsiMapview.controller.grid.Grid', {
 
         // clear any paging parameters as these will no longer apply
         // once filters have been applied
-        if(clearPaging === true){
+        if (clearPaging === true) {
             store.currentPage = 1;
         }
 
@@ -733,16 +690,23 @@ Ext.define('CpsiMapview.controller.grid.Grid', {
 
         var gridStoreType = viewModel.get('gridStoreType');
         var layerName = viewModel.get('gridLayerName');
-        var vectorLayerKey = viewModel.get('vectorLayerKey');
+        // var vectorLayerKey = viewModel.get('vectorLayerKey');
+        var featureSelectionLayerKey = viewModel.get('featureSelectionLayerKey');
 
         // TODO check why we can't simply add a {'queryLayerName'} binding in
         // the grid view - already created ?
-        var spatialQueryButton = viewModel.getView().down('cmv_spatial_query_button');
-        spatialQueryButton.setQueryLayerName(layerName);
-        spatialQueryButton.setVectorLayerKey(layerName); // this name will have _spatialfilter appended to it
 
+        // we can have 2 cmv_spatial_query_buttons depending on the selection type (simple or advanced)
+        var spatialQueryButtons = viewModel.getView().query('cmv_spatial_query_button');
+
+        Ext.Array.each(spatialQueryButtons, (function (btn) {
+            btn.setQueryLayerName(layerName);
+            btn.setVectorLayerKey(layerName); // this name will have _spatialfilter appended to it
+        }));
+
+        // we will only ever have 1 cmv_feature_selection_button tool per grid
         var featureSelectionButton = viewModel.getView().down('cmv_feature_selection_button');
-        featureSelectionButton.setVectorLayerKey(vectorLayerKey);
+        featureSelectionButton.setVectorLayerKey(featureSelectionLayerKey);
 
         // dynamically create the store based on the config setting
 
