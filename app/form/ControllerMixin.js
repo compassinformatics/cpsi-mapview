@@ -245,6 +245,14 @@ Ext.define('CpsiMapview.form.ControllerMixin', {
     },
 
     /**
+     * Action when the close button is clicked.
+     */
+    onCloseClick: function () {
+        var win = this.getView();
+        win.close();
+    },
+
+    /**
      * Action when the export button is clicked
      * */
     onExportClick: Ext.emptyFn,
