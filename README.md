@@ -37,6 +37,16 @@ Now add your ExtJS library. The project is tested with both 6.2 (GPL), and 6.7 (
 sencha app upgrade /path/to/local/extjs6.2
 ```
 
+Alternatively place a junction (shortcut) to point to an existing ExtJS folder:
+
+```
+# Command Prompt
+mklink /D ext D:\Tools\Sencha\ext-6.2.0
+
+# PowerShell
+new-item -itemtype symboliclink -path . -name ext -value D:\Tools\Sencha\ext-6.2.0
+```
+
 Start dev-server
 
 ```
@@ -69,6 +79,9 @@ Navigate to the project folder and run the following:
 ```
 npm test
 ```
+
+Note - if there are errors such as `BasiGX not defined`, ensure that the submodules have been
+created using `git submodule update --init --recursive`.
 
 To have tests continually running while making changes:
 

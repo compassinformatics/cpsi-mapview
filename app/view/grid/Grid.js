@@ -20,7 +20,7 @@ Ext.define('CpsiMapview.view.grid.Grid', {
     viewModel: 'cmv_grid',
 
     plugins: ['gridfilters'],
-    width: 1050,
+    width: 1090,
 
     /**
      * The distance used to buffer a feature when the zoomToFeature
@@ -139,8 +139,7 @@ Ext.define('CpsiMapview.view.grid.Grid', {
             }
         },
         {
-            xtype: 'segmentedbutton',
-            allowDepress: true,
+            xtype: 'buttongroup', // segmentedbutton does not support toggleGroup
             bind: {
                 hidden: '{!useAdvancedSelection}'
             },
@@ -150,7 +149,7 @@ Ext.define('CpsiMapview.view.grid.Grid', {
                     drawGeometryType: 'Polygon',
                     text: 'Select by Shape',
                     spatialOperator: 'intersect',
-                    //toggleGroup: 'map', // does not seem to work when in a segmentedbutton
+                    toggleGroup: 'map',
                     triggerWfsRequest: false,
                     displayPermanently: true,
                     glyph: 'xf044@FontAwesome',
@@ -161,6 +160,11 @@ Ext.define('CpsiMapview.view.grid.Grid', {
                 {
                     xtype: 'cmv_feature_selection_button',
                     triggerWfsRequest: false,
+                    allowMultiple: true,
+                    toggleGroup: 'map',
+                    bind: {
+                        vectorLayerKey: '{featureSelectionLayerKey}'
+                    },
                     glyph: 'xf245@FontAwesome',
                     listeners: {
                         'cmv-reset-grid-filters': 'resetFilters',

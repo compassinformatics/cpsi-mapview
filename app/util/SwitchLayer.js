@@ -7,6 +7,8 @@ Ext.define('CpsiMapview.util.SwitchLayer', {
     alternateClassName: 'SwitchLayerUtil',
     singleton: true,
 
+    requires: ['CpsiMapview.util.Layer'],
+
     /** The possible states of the layer switch */
     switchStates: {
         ABOVE_SWITCH_RESOLUTION : 'cmv_above_switch_resolution',
@@ -128,7 +130,8 @@ Ext.define('CpsiMapview.util.SwitchLayer', {
             }
 
             if (filters && filters.length > 0) {
-                newLayerSource.getParams().FILTER = GeoExt.util.OGCFilter.getOgcFilterFromExtJsFilter(filters, 'wms', 'and', '1.1.0');
+                var ogcFilters = CpsiMapview.util.Layer.convertAndCombineFilters(filters);
+                newLayerSource.getParams().FILTER = GeoExt.util.OGCFilter.combineFilters(ogcFilters, 'And', true, '1.1.0');
             }
 
             // ensure there is a filter for every layer listed in the WMS request (required by MapServer)
@@ -177,6 +180,9 @@ Ext.define('CpsiMapview.util.SwitchLayer', {
         treePanel.getController().applyTreeConfigsToOlLayer(newLayer, origTreeNodeConf);
 
         staticMe.updateLayerTreeForSwitchLayers();
+
+        // ensure the layer appears as filtered in the tree
+        CpsiMapview.util.Layer.updateLayerNodeUI(newLayer);
     },
 
     /**
