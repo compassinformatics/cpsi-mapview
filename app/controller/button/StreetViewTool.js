@@ -231,8 +231,8 @@ Ext.define('CpsiMapview.controller.button.StreetViewTool', {
                         }
                     },
                     destroy: function () {
-                        me.svPanorama = null;
                         me.unregisterGmapsEvents();
+                        me.svPanorama = null;
                         me.streetViewWin = null;
                         me.vectorLayer.getSource().clear();
                     }
@@ -305,6 +305,11 @@ Ext.define('CpsiMapview.controller.button.StreetViewTool', {
      */
     updatePositionFeature: function () {
         var me = this;
+
+        if (!me.svPanorama) {
+            return;
+        }
+
         var newHeading = me.getHeadingRad();
         var newPosCoord = me.getPositionCoord();
         var vectorSource = me.vectorLayer.getSource();
