@@ -129,10 +129,18 @@ Ext.define('CpsiMapview.util.Layer', {
 
         // for the remaining property features set by the grid convert from ExtJS filters to OGC FES strings
         Ext.each(allFilters, function (addFilter) {
-            var ogcUtil = GeoExt.util.OGCFilter;
-            var serializedFilter =
-                ogcUtil.getOgcFilterBodyFromExtJsFilterObject(addFilter, '2.0.0');
-            allOgcFilters.push(serializedFilter);
+            if (typeof addFilter === 'string') {
+                // timeFilters have already been converted to OGC FEX strings
+                //<debug>
+                Ext.Assert.truthy(Ext.String.startsWith(addFilter, '<ogc:'));
+                //</debug>
+                allOgcFilters.push(addFilter);
+            } else {
+                var ogcUtil = GeoExt.util.OGCFilter;
+                var serializedFilter =
+                    ogcUtil.getOgcFilterBodyFromExtJsFilterObject(addFilter, '2.0.0');
+                allOgcFilters.push(serializedFilter);
+            }
         });
 
         return allOgcFilters;
