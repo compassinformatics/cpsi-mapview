@@ -94,7 +94,7 @@ Ext.define('CpsiMapview.view.fileupload.FileGrid',
                 hidden: true
             },
             {
-                text: 'Thumnail Available',
+                text: 'Thumbnail Available',
                 dataIndex: 'isThumbnailAvailable',
                 hidden: true
             },
