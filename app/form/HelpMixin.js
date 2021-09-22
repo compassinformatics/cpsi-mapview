@@ -26,7 +26,9 @@ Ext.define('CpsiMapview.form.HelpMixin', {
         var rootUrl = app.rootHelpUrl;
 
         if (!helpUrl && !rootUrl) {
-            // no link provided
+            //<debug>
+            Ext.log.error('No helpUrl or rootUrl link provided');
+            //</debug>
             return;
         }
 
