@@ -37,7 +37,7 @@ Ext.define(&#39;CpsiMapview.view.grid.Grid&#39;, {
 </span><span id='CpsiMapview-view-grid-Grid-property-viewModel'>    viewModel: &#39;cmv_grid&#39;,
 </span>
 <span id='CpsiMapview-view-grid-Grid-property-plugins'>    plugins: [&#39;gridfilters&#39;],
-</span><span id='CpsiMapview-view-grid-Grid-property-width'>    width: 1050,
+</span><span id='CpsiMapview-view-grid-Grid-property-width'>    width: 1090,
 </span>
 <span id='CpsiMapview-view-grid-Grid-cfg-extentBuffer'>    /**
 </span>     * The distance used to buffer a feature when the zoomToFeature
@@ -156,8 +156,7 @@ Ext.define(&#39;CpsiMapview.view.grid.Grid&#39;, {
             }
         },
         {
-            xtype: &#39;segmentedbutton&#39;,
-            allowDepress: true,
+            xtype: &#39;buttongroup&#39;, // segmentedbutton does not support toggleGroup
             bind: {
                 hidden: &#39;{!useAdvancedSelection}&#39;
             },
@@ -167,7 +166,7 @@ Ext.define(&#39;CpsiMapview.view.grid.Grid&#39;, {
                     drawGeometryType: &#39;Polygon&#39;,
                     text: &#39;Select by Shape&#39;,
                     spatialOperator: &#39;intersect&#39;,
-                    //toggleGroup: &#39;map&#39;, // does not seem to work when in a segmentedbutton
+                    toggleGroup: &#39;map&#39;,
                     triggerWfsRequest: false,
                     displayPermanently: true,
                     glyph: &#39;xf044@FontAwesome&#39;,
@@ -178,6 +177,11 @@ Ext.define(&#39;CpsiMapview.view.grid.Grid&#39;, {
                 {
                     xtype: &#39;cmv_feature_selection_button&#39;,
                     triggerWfsRequest: false,
+                    allowMultiple: true,
+                    toggleGroup: &#39;map&#39;,
+                    bind: {
+                        vectorLayerKey: &#39;{featureSelectionLayerKey}&#39;
+                    },
                     glyph: &#39;xf245@FontAwesome&#39;,
                     listeners: {
                         &#39;cmv-reset-grid-filters&#39;: &#39;resetFilters&#39;,

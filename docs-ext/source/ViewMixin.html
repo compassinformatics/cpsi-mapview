@@ -82,6 +82,7 @@ Ext.define(&#39;CpsiMapview.form.ViewMixin&#39;, {
             hideSplitByClickButton: true,
             hideSaveButton: false,
             hideCancelButton: false,
+            hideCloseButton: true,
             hideConfirmButton: true,
             hideRejectButton: true,
             hideApproveButton: true,
@@ -298,6 +299,16 @@ Ext.define(&#39;CpsiMapview.form.ViewMixin&#39;, {
                         tooltip: &#39;Discard any changes without saving and close the window&#39;,
                         bind: {
                             hidden: &#39;{hideCancelButton}&#39;
+                        }
+                    },
+                    {
+                        xtype: &#39;button&#39;,
+                        itemId: &#39;closeButton&#39;,
+                        text: &#39;Close&#39;,
+                        handler: &#39;onCloseClick&#39;,
+                        tooltip: &#39;Close the window&#39;,
+                        bind: {
+                            hidden: &#39;{hideCloseButton}&#39;
                         }
                     }
                 ]

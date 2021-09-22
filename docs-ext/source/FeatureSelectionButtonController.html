@@ -96,9 +96,11 @@ Ext.define(&#39;CpsiMapview.controller.button.FeatureSelectionButtonController&#
         if (pressed) {
             // create and show selector UI
             me.addModeSelectorUi();
+            view.queryLayer.setVisible(true);
             me.map.on(&#39;click&#39;, me.onMapClick);
         } else {
             me.modeSelector.hide();
+            view.queryLayer.setVisible(false);
             me.map.un(&#39;click&#39;, me.onMapClick);
         }
 
@@ -116,7 +118,7 @@ Ext.define(&#39;CpsiMapview.controller.button.FeatureSelectionButtonController&#
                 bind: {
                     text: &#39;{addToSelectionLabel}&#39;
                 },
-                hidden: true,
+                hidden: false,
                 menu: new Ext.menu.Menu({
                     items: [
                         {
@@ -142,11 +144,9 @@ Ext.define(&#39;CpsiMapview.controller.button.FeatureSelectionButtonController&#
             });
 
             var tb = me.getView().up(&#39;toolbar&#39;);
-            var segBtn = me.getView().up(&#39;segmentedbutton&#39;);
-            if (tb &amp;&amp; segBtn) {
-                var segBtnPos = tb.items.indexOf(segBtn);
-                var afterSegBtnPos = segBtnPos + 1;
-                tb.insert(afterSegBtnPos, me.modeSelector);
+            var btnGroup = me.getView().up(&#39;buttongroup&#39;);
+            if (tb &amp;&amp; btnGroup) {
+                btnGroup.add(me.modeSelector);
             }
         }
 
@@ -160,7 +160,6 @@ Ext.define(&#39;CpsiMapview.controller.button.FeatureSelectionButtonController&#
     findWfsLayer: function () {
         var me = this;
         var view = me.getView();
-
         if (!view.queryLayer &amp;&amp; view.vectorLayerKey) {
             view.queryLayer = BasiGX.util.Layer.getLayerBy(
                 &#39;layerKey&#39;, view.vectorLayerKey
@@ -227,6 +226,7 @@ Ext.define(&#39;CpsiMapview.controller.button.FeatureSelectionButtonController&#
         // create ExtJS &quot;IN&quot; filter with unique values
         var uniqueFids = Ext.Array.unique(me.fidsToFilter);
         var extInFilter = new Ext.util.Filter({
+            type: &#39;fid&#39;,
             property: me.idProperty,
             value   : uniqueFids,
             operator: &#39;in&#39;

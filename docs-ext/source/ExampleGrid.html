@@ -67,6 +67,8 @@ Ext.define(&#39;CpsiMapview.view.grid.ExampleGridModel&#39;, {
     alias: &#39;viewmodel.example_grid&#39;,
     data: {
         vectorLayerKey: &#39;RUINS_WFS&#39;,
+        featureSelectionLayerKey: &#39;RUINS_SELECTION_WFS&#39;,
+        allowFeatureSelection: true, // allow the additional selection by point
         gridStoreType: &#39;GridExample&#39;,
         gridLayerName: &#39;GridExampleLayer&#39;, // TODO this is duplicated in layerOptions above
         helpUrl: &#39;https://github.com/compassinformatics/cpsi-mapview/blob/master/app/view/grid/ExampleGrid.js&#39;

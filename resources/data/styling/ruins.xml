@@ -1,25 +1,30 @@
 <StyledLayerDescriptor version="1.0.0" xmlns="http://www.opengis.net/sld" xmlns:gml="http://www.opengis.net/gml" xmlns:ogc="http://www.opengis.net/ogc" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.opengis.net/sld http://schemas.opengis.net/sld/1.0.0/StyledLayerDescriptor.xsd">
-<NamedLayer>
-<Name>ruins</Name>
-<UserStyle>
-<FeatureTypeStyle>
-<Rule>
-<Name>POI: Ruins</Name>
-<ogc:Filter><ogc:PropertyIsEqualTo><ogc:PropertyName>fclass</ogc:PropertyName><ogc:Literal>ruins</ogc:Literal></ogc:PropertyIsEqualTo></ogc:Filter>
-<PointSymbolizer>
-<Graphic>
-<Mark>
-<WellKnownName>cross</WellKnownName>
-<Fill>
-<CssParameter name="fill">#ffd966</CssParameter>
-</Fill>
-</Mark>
-<Size>8</Size>
-</Graphic>
-</PointSymbolizer>
-</Rule>
-</FeatureTypeStyle>
-</UserStyle>
-</NamedLayer>
+  <NamedLayer>
+    <Name>ruins</Name>
+    <UserStyle>
+      <FeatureTypeStyle>
+        <Rule>
+          <Name>POI: Ruins</Name>
+          <ogc:Filter>
+            <ogc:PropertyIsEqualTo>
+              <ogc:PropertyName>fclass</ogc:PropertyName>
+              <ogc:Literal>ruins</ogc:Literal>
+            </ogc:PropertyIsEqualTo>
+          </ogc:Filter>
+          <PointSymbolizer>
+            <Graphic>
+              <Mark>
+                <WellKnownName>circle</WellKnownName>
+                <Fill>
+                  <CssParameter name="fill">#ffd966</CssParameter>
+                </Fill>
+              </Mark>
+              <Size>12</Size>
+            </Graphic>
+          </PointSymbolizer>
+        </Rule>
+      </FeatureTypeStyle>
+    </UserStyle>
+  </NamedLayer>
 </StyledLayerDescriptor>
 
