@@ -58,8 +58,14 @@ Ext.define('CpsiMapview.plugin.FeatureAttributeGrouping', {
 
     startGrouping: function (evt) {
         var me = this;
+        var map = this.olMap;
 
-        this.olMap.forEachFeatureAtPixel(evt.pixel, function (feature, layer) {
+        // do not activate grouping if another tool is also active
+        if (map.get('defaultClickEnabled') === false) {
+            return;
+        }
+
+        map.forEachFeatureAtPixel(evt.pixel, function (feature, layer) {
             me.endGrouping();
 
             var grouping = layer.get('grouping');
