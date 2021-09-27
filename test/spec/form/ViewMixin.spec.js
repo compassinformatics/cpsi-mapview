@@ -2,6 +2,16 @@ Ext.define('CpsiMapview.form.TestWindow', {
     extend: 'Ext.window.Window',
     mixins: ['CpsiMapview.form.ViewMixin'],
     viewModel: {},
+    customButtons: [
+        {
+            index: 1,
+            button: {
+                xtype: 'button',
+                itemId: 'test',
+                text: 'Test'
+            }
+        }
+    ],
     tools: [{
         type: 'help'
     }]
