@@ -988,9 +988,10 @@ Ext.define('CpsiMapview.controller.button.DigitizeButtonController', {
             // remove all features from the current active group
             var allFeatures = me.resultLayer.getSource().getFeatures().slice(0);
             Ext.each(allFeatures, function (f) {
-                if (f.get('group') === me.activeGroupIdx) {
+                if (f.get('group') === me.activeGroupIdx || !f.get('group')) {
                     resultSource.removeFeature(f);
                 }
+                f.set('group', me.activeGroupIdx);
             });
             // add the new features for the current active group
             resultSource.addFeatures(features);
