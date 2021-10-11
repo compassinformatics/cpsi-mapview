@@ -1006,10 +1006,14 @@ Ext.define(&#39;CpsiMapview.controller.button.DigitizeButtonController&#39;, {
             var allFeatures = me.resultLayer.getSource().getFeatures().slice(0);
             Ext.each(allFeatures, function (f) {
                 if (f.get(&#39;group&#39;) === me.activeGroupIdx || !f.get(&#39;group&#39;)) {
+                    if (!f.get(&#39;group&#39;)) {
+                        // the property must be updated before removing the feature, or it is readded to the store
+                        f.set(&#39;group&#39;, me.activeGroupIdx);
+                    }
                     resultSource.removeFeature(f);
                 }
-                f.set(&#39;group&#39;, me.activeGroupIdx);
             });
+
             // add the new features for the current active group
             resultSource.addFeatures(features);
 
