@@ -110,6 +110,8 @@ Ext.define('CpsiMapview.model.FeatureStoreMixin', {
                     me.set(field.name, null, { convert: false });
                 },
                 remove: function (store) {
+                    // if there are issues here with features being added and then removed
+                    // then make sure the model ids are unique!
                     me.updateAssociatedField(store, field);
                 }
             }
