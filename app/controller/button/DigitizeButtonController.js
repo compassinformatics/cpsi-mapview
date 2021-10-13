@@ -1215,7 +1215,11 @@ Ext.define('CpsiMapview.controller.button.DigitizeButtonController', {
         };
 
         resultSource.dispatchEvent({ type: 'featuresupdated', modifications: modifications });
-        this.updateDrawSource();
+        me.updateDrawSource();
+
+        // also fire a view event
+        me.getView().fireEvent('responseFeatures', []);
+
     },
 
     init: function () {
