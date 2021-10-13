@@ -185,7 +185,9 @@ Ext.define(&#39;CpsiMapview.util.ApplicationMixin&#39;, {
                                     Ext.Msg.alert(&#39;Error&#39;, result.message);
                                     break;
                                 default:
+                                    //&lt;debug&gt;
                                     Ext.log.error(requestUrl, msg);
+                                    //&lt;/debug&gt;
                                     break;
                             }
                         }
