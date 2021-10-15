@@ -72,9 +72,13 @@ Ext.define('CpsiMapview.form.ViewMixin', {
         itemId: 'exportButton',
         text: 'Export',
         handler: 'onExportClick',
-        tooltip: 'Export the record to Excel',
+        tooltip: 'Export the record to Excel (only available for existing records)',
+        style: {
+            pointerEvents: 'all' // display tooltip even when the button is disabled
+        },
         bind: {
-            hidden: '{hideExportButton}'
+            hidden: '{hideExportButton}',
+            disabled: '{!canExport}'
         }
     },
     {
@@ -92,7 +96,7 @@ Ext.define('CpsiMapview.form.ViewMixin', {
         itemId: 'refreshButton',
         text: 'Refresh',
         handler: 'onRefreshClick',
-        tooltip: 'Reload the record with the latest data from the server (only for existing records)',
+        tooltip: 'Reload the record with the latest data from the server (only available for existing records)',
         style: {
             pointerEvents: 'all' // display tooltip even when the button is disabled
         },
