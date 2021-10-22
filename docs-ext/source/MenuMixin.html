@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+  <title>The source code</title>
+  <link href="../resources/prettify/prettify.css" type="text/css" rel="stylesheet" />
+  <script type="text/javascript" src="../resources/prettify/prettify.js"></script>
+  <style type="text/css">
+    .highlight { display: block; background-color: #ddd; }
+  </style>
+  <script type="text/javascript">
+    function highlight() {
+      document.getElementById(location.hash.replace(/#/, "")).className = "highlight";
+    }
+  </script>
+</head>
+<body onload="prettyPrint(); highlight();">
+  <pre class="prettyprint lang-js">Ext.define(&#39;CpsiMapview.util.MenuMixin&#39;, {
+    extend: &#39;Ext.Mixin&#39;,
+    requires: [
+        &#39;BasiGX.util.Layer&#39;,
+        &#39;CpsiMapview.view.menuitem.LayerGrid&#39;
+    ],
+
+    mixins: [&#39;CpsiMapview.util.EditWindowOpenerMixin&#39;],
+
+    showGridWindow: function (layerKey) {
+
+        // get a layer by layer key - if this is a switch layer only one may have been loaded to the map
+        // search for both and take the first layer found
+        var layers = BasiGX.util.Layer.getLayersBy(&#39;layerKey&#39;, layerKey);
+        var layer = layers[0];
+
+        // reuse the logic from the menuitem to find any existing grid window, or create
+        // a new one
+
+        var menuItem = Ext.create(&#39;CpsiMapview.view.menuitem.LayerGrid&#39;, { layer: layer });
+        menuItem.handlerFunc();
+        menuItem.destroy();
+    },
+
+    showEditWindow: function (windowClassName, record) {
+
+        var me = this;
+        var win = me.getEditingFormWindow(record, windowClassName);
+        var vm = win.getViewModel();
+
+        // if the window already exists then do not overwrite any
+        // changes that may have been made to the model
+        if (!vm.get(&#39;currentRecord&#39;)) {
+            // for a new window set the currentRecord to the model
+            vm.set(&#39;currentRecord&#39;, record);
+        }
+
+        win.show();
+        Ext.WindowManager.bringToFront(win);
+    }
+});</pre>
+</body>
+</html>
