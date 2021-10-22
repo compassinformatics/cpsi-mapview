@@ -5,6 +5,8 @@
         'CpsiMapview.view.menuitem.LayerGrid'
     ],
 
+    mixins: ['CpsiMapview.util.EditWindowOpenerMixin'],
+
     showGridWindow: function (layerKey) {
 
         // get a layer by layer key - if this is a switch layer only one may have been loaded to the map
@@ -21,9 +23,19 @@
     },
 
     showEditWindow: function (windowClassName, record) {
-        var win = Ext.create(windowClassName);
+
+        var me = this;
+        var win = me.getEditingFormWindow(record, windowClassName);
         var vm = win.getViewModel();
-        vm.set('currentRecord', record);
+
+        // if the window already exists then do not overwrite any
+        // changes that may have been made to the model
+        if (!vm.get('currentRecord')) {
+            // for a new window set the currentRecord to the model
+            vm.set('currentRecord', record);
+        }
+
         win.show();
+        Ext.WindowManager.bringToFront(win);
     }
 });
