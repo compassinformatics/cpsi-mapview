@@ -177,7 +177,7 @@ Ext.define(&#39;CpsiMapview.model.FeatureStoreMixin&#39;, {
 
         Ext.each(me.getFields(), function (f) {
             switch (true) {
-                case (f.type === &#39;feature&#39;):
+                case (f.type === &#39;feature&#39; || f.superclass.type == &#39;feature&#39;):
                 case (f.type === &#39;line&#39; || f.superclass.type == &#39;line&#39;):
                 case (f.type === &#39;polygon&#39; || f.superclass.type == &#39;polygon&#39;):
                 case (f.type === &#39;point&#39; || f.superclass.type == &#39;point&#39;):
