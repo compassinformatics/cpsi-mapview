@@ -16,61 +16,16 @@ Ext.define('CpsiMapview.controller.grid.Grid', {
         'CpsiMapview.util.Layer'
     ],
 
+    mixins: {
+        zoomer: 'CpsiMapview.util.ZoomerMixin'
+    },
+
     /**
      * The currently active spatial filter for the layer.
      *
      * @cfg {Ext.util.Filter} spatialFilter
      */
     spatialFilter: null,
-
-    /**
-     * Zoom the map to the selected feature with a buffer
-     *
-     * @param {ol.Feature} feature
-     * @param {ol.Map} map
-     * @private
-     */
-    zoomToFeature: function (feature, map) {
-
-        var me = this;
-
-        var geom = feature.getGeometry();
-
-        // check for null features
-        if (!geom) {
-            return;
-        }
-
-        // TODO check for feature type when zooming
-        var extent = geom.getExtent();
-        var view = me.getView();
-        // as this is a point then buffer it by the extentBuffer property
-        extent = ol.extent.buffer(extent, view.extentBuffer);
-        //map.getView().fit(extent, map.getSize());
-
-        var mapView = map.getView();
-
-        var resolution = mapView.getResolutionForExtent(extent);
-        var zoom = mapView.getZoomForResolution(resolution);
-        var center = ol.extent.getCenter(extent);
-        var duration = 2000;
-
-        mapView.animate({
-            center: center,
-            duration: duration
-        });
-
-        mapView.animate(
-            {
-                zoom: zoom - 1,
-                duration: duration / 2
-            },
-            {
-                zoom: zoom,
-                duration: duration / 2
-            }
-        );
-    },
 
     /**
      * Open a row-level context-menu with a Zoom to Feature option
