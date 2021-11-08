@@ -331,6 +331,9 @@ Ext.define('CpsiMapview.form.ControllerMixin', {
             tool = vw.down('#segmentDigitiserButton');
             toolCtrl = tool.getController();
             toolCtrl.setResultLayer(resultLayer);
+            // we can remove any draw points following a reload or save here
+            // for now we can do this in event handlers on the controller
+            //toolCtrl.drawLayer.getSource().clear();
         }
 
         if (vm.get('hideSplitByClickButton') === false) {
@@ -365,7 +368,12 @@ Ext.define('CpsiMapview.form.ControllerMixin', {
         var modelPrototype = Ext.ClassManager.get(currentRecord.$className);
 
         modelPrototype.load(currentRecord.getId(), {
-            success: me.reloadRecord,
+            success: function (serverRec) {
+                me.reloadRecord(serverRec);
+                // fire the refreshsucceeded event outside of reloadRecord function to avoid two calls
+                // as reloadRecord is also called in onSaveSucceded
+                win.fireEvent('refreshsucceeded');
+            },
             callback: function () {
                 win.unmask();
             },
