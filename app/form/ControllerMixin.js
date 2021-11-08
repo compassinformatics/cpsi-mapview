@@ -168,9 +168,12 @@ Ext.define('CpsiMapview.form.ControllerMixin', {
         record.onModelSaved();
         record.destroy();
 
+        // fire an event
+        var view = me.getView();
+        view.fireEvent('deletesucceeded');
+
         // close the window
-        var w = me.getView();
-        w.close();
+        view.close();
     },
 
     /**
