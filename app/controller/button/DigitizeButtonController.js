@@ -250,6 +250,15 @@ Ext.define('CpsiMapview.controller.button.DigitizeButtonController', {
 
             me.pointerInteraction = new ol.interaction.Pointer({
                 handleEvent: function (evt) {
+
+                    // fire an event to handle drag event ends for local drawing
+                    if (evt.type === 'pointerup') {
+                        if (!view.getApiUrl()) {
+                            var drawSource = me.drawLayer.getSource();
+                            drawSource.dispatchEvent({ type: 'localdrawend' });
+                        }
+                    }
+
                     if (deleteCondition(evt)) {
                         return me.handlePointDelete(evt);
                     }
@@ -535,6 +544,8 @@ Ext.define('CpsiMapview.controller.button.DigitizeButtonController', {
         var drawSource = me.drawLayer.getSource();
         // clear all previous features so only the last drawn feature remains
         drawSource.clear();
+        // fire an event when the drawing is complete
+        drawSource.dispatchEvent({ type: 'localdrawend' });
     },
 
     /**
