@@ -35,6 +35,7 @@ module.exports = function(config) {
         // optionally, configure the reporter
         coverageReporter: {
             dir: 'coverage/',
+            emitWarning: true, // don't fail the tests
             reporters: [
                 { type: 'html', subdir: '.' },
                 { type: 'lcovonly', subdir: '.', file: 'lcov.info' }
