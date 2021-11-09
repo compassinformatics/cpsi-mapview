@@ -130,6 +130,8 @@ Ext.define(&#39;CpsiMapview.form.ControllerMixin&#39;, {
             throw &#39;Editing windows must have a top level &quot;xtype: \&#39;form\&#39;&quot; container&#39;;
         }
 
+        // ensure validity is refreshed prior to checking it
+        f.getForm().checkValidity();
         var goAhead = f.isValid() &amp;&amp; (!this.beforeSave || this.beforeSave());
 
         if (goAhead) {
