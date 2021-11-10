@@ -106,9 +106,8 @@ Ext.define('CpsiMapview.form.ViewModelMixin', {
 
             /**
             * This is overwritten in most of the ViewModels that use this mixin
-            * @param {any} get
             */
-            valid: function (get) {
+            valid: function () {
                 return true;
             },
 
