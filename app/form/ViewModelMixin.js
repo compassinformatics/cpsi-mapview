@@ -1,4 +1,4 @@
-﻿/**
+/**
  * A mixin for an editing windows providing formulas that can be bound
  * to the window model
  *
@@ -104,9 +104,18 @@ Ext.define('CpsiMapview.form.ViewModelMixin', {
                 }
             },
 
+            /**
+            * This is overwritten in most of the ViewModels that use this mixin
+            * @param {any} get
+            */
+            valid: function (get) {
+                return true;
+            },
+
             canSave: {
                 bind: {
                     currentRecord: '{currentRecord}',
+                    isLocked: '{currentRecord.isLocked}',
                     isValid: '{valid}'
                 },
                 get: function (data) {
