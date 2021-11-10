@@ -121,9 +121,17 @@ Ext.define(&#39;CpsiMapview.form.ViewModelMixin&#39;, {
                 }
             },
 
+<span id='CpsiMapview-form-ViewModelMixin-method-valid'>            /**
+</span>            * This is overwritten in most of the ViewModels that use this mixin
+            */
+            valid: function () {
+                return true;
+            },
+
             canSave: {
                 bind: {
                     currentRecord: &#39;{currentRecord}&#39;,
+                    isLocked: &#39;{currentRecord.isLocked}&#39;,
                     isValid: &#39;{valid}&#39;
                 },
                 get: function (data) {
