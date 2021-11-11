@@ -50,6 +50,7 @@ Ext.define('CpsiMapview.view.window.MinimizableWindow', {
     listeners: {
         minimize: 'onMinimize',
         show: 'onShow',
-        close: 'onClose'
+        close: 'onClose',
+        hide: 'onHide'
     }
 });

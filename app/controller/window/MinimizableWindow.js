@@ -9,16 +9,23 @@ Ext.define('CpsiMapview.controller.window.MinimizableWindow', {
     mixins: ['CpsiMapview.form.HelpMixin'],
 
     /**
+    * Trigger the windowClosed to remove any associated toolbar
+    * button if the window is closed
+     */
+    onClose: function () {
+        var me = this;
+        var minimizeTo = me.getMinimizeToolbar();
+        if (minimizeTo) {
+            minimizeTo.fireEvent('windowClosed', me.getView());
+        }
+    },
+
+    /**
      * When closing the window in code make
      * sure that the window is restored first so
      * no orphaned toolbar window buttons are left behind
      */
-    onClose: function () {
-        var me = this;
-        // trigger the restoreFromWindow to remove any associated toolbar
-        // button if the window is minimised
-        me.onShow();
-    },
+    onHide: Ext.emptyFn,
 
     /**
      * Sets the window invisible and calls the addMinimizedWindow event
@@ -33,11 +40,13 @@ Ext.define('CpsiMapview.controller.window.MinimizableWindow', {
                 level: 'warn'
             });
         }
-        me.getView().setVisible(false);
+
+        var win = me.getView();
+        win.isMinimized = true;
+        win.setVisible(false);
         if (minimizeTo) {
-            minimizeTo.fireEvent('addMinimizedWindow', me.getView());
+            minimizeTo.fireEvent('addMinimizedWindow', win);
         }
-        me.getView().isMinimized = true;
     },
 
     /**

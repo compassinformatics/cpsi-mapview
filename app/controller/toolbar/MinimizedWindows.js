@@ -66,6 +66,14 @@ Ext.define('CpsiMapview.controller.toolbar.MinimizedWindows', {
         minimizedWindow.setVisible(true);
         minimizedWindow.isMinimized = false;
 
+        me.removeButtonFromToolbar(windowRef);
+
+    },
+
+    removeButtonFromToolbar: function (windowRef) {
+
+        var me = this;
+
         var button = me.getView().items.findBy(function (item) {
             return (item.getXType() === 'button') && (item.windowRef === windowRef);
         });
