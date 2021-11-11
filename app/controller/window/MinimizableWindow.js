@@ -21,9 +21,7 @@ Ext.define('CpsiMapview.controller.window.MinimizableWindow', {
     },
 
     /**
-     * When closing the window in code make
-     * sure that the window is restored first so
-     * no orphaned toolbar window buttons are left behind
+     * Placeholder function for adding in a hook when the window is hidden
      */
     onHide: Ext.emptyFn,
 
