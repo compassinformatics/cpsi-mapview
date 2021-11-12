@@ -26,16 +26,21 @@ Ext.define(&#39;CpsiMapview.controller.window.MinimizableWindow&#39;, {
     mixins: [&#39;CpsiMapview.form.HelpMixin&#39;],
 
 <span id='CpsiMapview-controller-window-MinimizableWindow-method-onClose'>    /**
-</span>     * When closing the window in code make
-     * sure that the window is restored first so
-     * no orphaned toolbar window buttons are left behind
+</span>    * Trigger the windowClosed to remove any associated toolbar
+    * button if the window is closed
      */
     onClose: function () {
         var me = this;
-        // trigger the restoreFromWindow to remove any associated toolbar
-        // button if the window is minimised
-        me.onShow();
+        var minimizeTo = me.getMinimizeToolbar();
+        if (minimizeTo) {
+            minimizeTo.fireEvent(&#39;windowClosed&#39;, me.getView());
+        }
     },
+
+<span id='CpsiMapview-controller-window-MinimizableWindow-method-onHide'>    /**
+</span>     * Placeholder function for adding in a hook when the window is hidden
+     */
+    onHide: Ext.emptyFn,
 
 <span id='CpsiMapview-controller-window-MinimizableWindow-method-onMinimize'>    /**
 </span>     * Sets the window invisible and calls the addMinimizedWindow event
@@ -50,11 +55,13 @@ Ext.define(&#39;CpsiMapview.controller.window.MinimizableWindow&#39;, {
                 level: &#39;warn&#39;
             });
         }
-        me.getView().setVisible(false);
+
+        var win = me.getView();
+        win.isMinimized = true;
+        win.setVisible(false);
         if (minimizeTo) {
-            minimizeTo.fireEvent(&#39;addMinimizedWindow&#39;, me.getView());
+            minimizeTo.fireEvent(&#39;addMinimizedWindow&#39;, win);
         }
-        me.getView().isMinimized = true;
     },
 
 <span id='CpsiMapview-controller-window-MinimizableWindow-method-getMinimizeToolbar'>    /**
