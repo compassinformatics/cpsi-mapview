@@ -9,7 +9,7 @@ Ext.define('CpsiMapview.form.LayersMixin', {
     requires: ['BasiGX.util.Map'],
 
     // hide/show the form layer with the form
-    syncLayerWindowVisibility: false,
+    hideLayerWhenMinimized: false,
 
     // see https://docs.sencha.com/extjs/6.7.0/classic/Ext.Mixin.html
 
@@ -20,7 +20,8 @@ Ext.define('CpsiMapview.form.LayersMixin', {
             // function with a different name or it is ignored
             // (as the mixin takes lower priority)
             onShow: 'onWindowShow',
-            hide: 'onHide'
+            onHide: 'onWindowHide',
+            onMinimize: 'onWindowMinimize'
         }
     },
 
@@ -52,19 +53,29 @@ Ext.define('CpsiMapview.form.LayersMixin', {
      * Hides the layers associated with the form when the
      * form is hidden
      */
-    onHide: function () {
-        if (this.syncLayerWindowVisibility) {
-            this.toggleLayerVisibility(false);
+    onWindowHide: function () {
+        var me = this;
+        var win = me.getView();
+
+        if (win.isMinimized === false) {
+            me.toggleLayerVisibility(false);
         }
     },
 
     /**
-     * Shows the layers associated with the form when the
-     * form is hidden
+     * Hides the layers associated with the form when the
+     * form is minimized
+     */
+    onWindowMinimize: function () {
+        if (this.hideLayerWhenMinimized) {
+            this.toggleLayerVisibility(false);
+        }
+    },
+    /**
+     * Show the layers associated with the form when the
+     * form is shown
      */
     onWindowShow: function () {
-        if (this.syncLayerWindowVisibility) {
-            this.toggleLayerVisibility(true);
-        }
+        this.toggleLayerVisibility(true);
     }
 });
