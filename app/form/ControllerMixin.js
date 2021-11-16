@@ -110,7 +110,7 @@ Ext.define('CpsiMapview.form.ControllerMixin', {
      * */
     onSaveClick: function () {
         var me = this;
-        var modelIsValid = me.getViewModel().get('currentRecord').isValid()
+        var modelIsValid = me.getViewModel().get('currentRecord').isValid();
         var goAhead = modelIsValid && (!this.beforeSave || this.beforeSave());
 
         if (goAhead) {
