@@ -104,18 +104,14 @@ Ext.define('CpsiMapview.form.ControllerMixin', {
 
     /**
      * Action when the save button is clicked
+     * Previously form.isValid() was checked in this function, but values on
+     * a tab that has not been displayed are only bound later, so this
+     * incorrectly returns that a form is invalid
      * */
     onSaveClick: function () {
         var me = this;
-        var win = me.getView();
-        var f = win.down('form');
-        if (!f) {
-            throw 'Editing windows must have a top level "xtype: \'form\'" container';
-        }
-
-        // ensure validity is refreshed prior to checking it
-        f.getForm().checkValidity();
-        var goAhead = f.isValid() && (!this.beforeSave || this.beforeSave());
+        var modelIsValid = me.getViewModel().get('currentRecord').isValid()
+        var goAhead = modelIsValid && (!this.beforeSave || this.beforeSave());
 
         if (goAhead) {
             me.saveRecord();
