@@ -230,18 +230,61 @@ Ext.define(&#39;CpsiMapview.factory.Layer&#39;, {
         return resultLayer;
     },
 
+<span id='CpsiMapview-factory-Layer-method-imageLoadFunction'>    /**
+</span>     * An image load function that can be used to load WMS tiles using POST requests
+     * rather than GET requests. When there are many attribute and spatial filters
+     * the URL of a GET request gets too long so POST is required.
+     * @param {any} image
+     * @param {any} src
+     */
+    imageLoadFunction: function (image, src) {
+        var img = image.getImage();
+        if (typeof window.btoa === &#39;function&#39;) {
+            // base64 encoding function is available in IE10+
+            var urlArray = src.split(&#39;?&#39;);
+            var url = urlArray[0];
+            var params = urlArray[1];
+
+            var xhr = new XMLHttpRequest();
+            xhr.onload = function () {
+                if (this.status === 200) {
+                    var uInt8Array = new Uint8Array(this.response); //TODO Uint8Array is only available in IE10+
+                    var i = uInt8Array.length;
+                    var binaryString = new Array(i);
+                    while (i--) {
+                        binaryString[i] = String.fromCharCode(uInt8Array[i]);
+                    }
+                    var data = binaryString.join(&#39;&#39;);
+                    var type = xhr.getResponseHeader(&#39;content-type&#39;);
+                    if (type.indexOf(&#39;image&#39;) === 0) {
+                        img.src = &#39;data:&#39; + type + &#39;;base64,&#39; + window.btoa(data);
+                    }
+                }
+            };
+            xhr.open(&#39;POST&#39;, url, true);
+            xhr.setRequestHeader(&#39;Content-type&#39;, &#39;application/x-www-form-urlencoded&#39;);
+            xhr.responseType = &#39;arraybuffer&#39;;
+            xhr.send(params);
+        } else {
+            img.src = src;
+        }
+    },
+
+
 <span id='CpsiMapview-factory-Layer-method-createWms'>    /**
 </span>     * Creates an OGC WMS layer
      *
      * @param  {Object} layerConf The configuration object for this layer
      * @return {ol.layer.Tile}    WMS layer
      */
-    createWms: function(layerConf) {
+    createWms: function (layerConf) {
+
+        var me = this;
         var layer;
         var singleTile = layerConf.openLayers.singleTile;
         // transform OL2 properties to current ones supported by OL &gt;=v3
-        var olSourceProps = this.ol2PropsToOlSourceProps(layerConf.openLayers);
-        var olLayerProps = this.ol2PropsToOlLayerProps(layerConf.openLayers);
+        var olSourceProps = me.ol2PropsToOlSourceProps(layerConf.openLayers);
+        var olLayerProps = me.ol2PropsToOlLayerProps(layerConf.openLayers);
 
         var serverOptions = {};
 
@@ -274,6 +317,15 @@ Ext.define(&#39;CpsiMapview.factory.Layer&#39;, {
             ratio: singleTile ? 1 : undefined,
             crossOrigin: &#39;anonymous&#39;
         };
+
+        // by default WMS layers are requested using GET, but can be configured
+        // to use POST to allow for filters that will not fit in the querystring
+
+        var usePost = false;
+        if (layerConf.requestMethod === &#39;POST&#39;) {
+            usePost = true;
+            olSourceConf.imageLoadFunction = me.imageLoadFunction;
+        }
 
         // apply any WMS serverOptions from the config to the params
         olSourceConf.params = Ext.apply(olSourceConf.params, serverOptions);
@@ -311,12 +363,20 @@ Ext.define(&#39;CpsiMapview.factory.Layer&#39;, {
                     currentImgElement = image.getImage();
                     if (task.id === null) {
                         // no pending task
-                        currentImgElement.src = src;
+                        if (usePost) {
+                            me.imageLoadFunction(image, src);
+                        } else {
+                            currentImgElement.src = src;
+                        }
                         currentImgElement = undefined;
                         task.delay(layerConf.debounce, function () {});
                     } else {
                         task.delay(layerConf.debounce, function () {
-                            currentImgElement.src = src;
+                            if (usePost) {
+                                me.imageLoadFunction(image, src);
+                            } else {
+                                currentImgElement.src = src;
+                            }
                             currentImgElement = undefined;
                         });
                     }
