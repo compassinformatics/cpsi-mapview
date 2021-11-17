@@ -7,6 +7,7 @@
 Ext.define('CpsiMapview.store.WfsFeatures', {
     extend: 'GeoExt.data.store.WfsFeatures',
     cacheFeatureCount: false,
+    requestMethod: 'POST',
     remoteSort: true,
     /**
      * remoteFilters causes the grids to load automatically - setting autoLoad to true
