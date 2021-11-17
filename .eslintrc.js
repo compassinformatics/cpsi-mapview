@@ -1,6 +1,7 @@
 module.exports = {
     "env": {
-        "browser": true
+        "browser": true,
+        "es6": true // to allow Uint8Array
     },
     "extends": "eslint:recommended",
     "globals": {
