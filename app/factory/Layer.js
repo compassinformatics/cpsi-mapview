@@ -214,17 +214,60 @@ Ext.define('CpsiMapview.factory.Layer', {
     },
 
     /**
+     * An image load function that can be used to load WMS tiles using POST requests
+     * rather than GET requests. When there are many attribute and spatial filters
+     * the URL of a GET request gets too long so POST is required.
+     * @param {any} image
+     * @param {any} src
+     */
+    imageLoadFunction: function (image, src) {
+        var img = image.getImage();
+        if (typeof window.btoa === 'function') {
+            // base64 encoding function is available in IE10+
+            var urlArray = src.split('?');
+            var url = urlArray[0];
+            var params = urlArray[1];
+
+            var xhr = new XMLHttpRequest();
+            xhr.onload = function () {
+                if (this.status === 200) {
+                    var uInt8Array = new Uint8Array(this.response); //TODO Uint8Array is only available in IE10+
+                    var i = uInt8Array.length;
+                    var binaryString = new Array(i);
+                    while (i--) {
+                        binaryString[i] = String.fromCharCode(uInt8Array[i]);
+                    }
+                    var data = binaryString.join('');
+                    var type = xhr.getResponseHeader('content-type');
+                    if (type.indexOf('image') === 0) {
+                        img.src = 'data:' + type + ';base64,' + window.btoa(data);
+                    }
+                }
+            };
+            xhr.open('POST', url, true);
+            xhr.setRequestHeader('Content-type', 'application/x-www-form-urlencoded');
+            xhr.responseType = 'arraybuffer';
+            xhr.send(params);
+        } else {
+            img.src = src;
+        }
+    },
+
+
+    /**
      * Creates an OGC WMS layer
      *
      * @param  {Object} layerConf The configuration object for this layer
      * @return {ol.layer.Tile}    WMS layer
      */
-    createWms: function(layerConf) {
+    createWms: function (layerConf) {
+
+        var me = this;
         var layer;
         var singleTile = layerConf.openLayers.singleTile;
         // transform OL2 properties to current ones supported by OL >=v3
-        var olSourceProps = this.ol2PropsToOlSourceProps(layerConf.openLayers);
-        var olLayerProps = this.ol2PropsToOlLayerProps(layerConf.openLayers);
+        var olSourceProps = me.ol2PropsToOlSourceProps(layerConf.openLayers);
+        var olLayerProps = me.ol2PropsToOlLayerProps(layerConf.openLayers);
 
         var serverOptions = {};
 
@@ -257,6 +300,15 @@ Ext.define('CpsiMapview.factory.Layer', {
             ratio: singleTile ? 1 : undefined,
             crossOrigin: 'anonymous'
         };
+
+        // by default WMS layers are requested using GET, but can be configured
+        // to use POST to allow for filters that will not fit in the querystring
+
+        var usePost = false;
+        if (layerConf.requestMethod === 'POST') {
+            usePost = true;
+            olSourceConf.imageLoadFunction = me.imageLoadFunction;
+        }
 
         // apply any WMS serverOptions from the config to the params
         olSourceConf.params = Ext.apply(olSourceConf.params, serverOptions);
@@ -294,12 +346,20 @@ Ext.define('CpsiMapview.factory.Layer', {
                     currentImgElement = image.getImage();
                     if (task.id === null) {
                         // no pending task
-                        currentImgElement.src = src;
+                        if (usePost) {
+                            me.imageLoadFunction(image, src);
+                        } else {
+                            currentImgElement.src = src;
+                        }
                         currentImgElement = undefined;
                         task.delay(layerConf.debounce, function () {});
                     } else {
                         task.delay(layerConf.debounce, function () {
-                            currentImgElement.src = src;
+                            if (usePost) {
+                                me.imageLoadFunction(image, src);
+                            } else {
+                                currentImgElement.src = src;
+                            }
                             currentImgElement = undefined;
                         });
                     }
