@@ -48,8 +48,13 @@ Ext.define('CpsiMapview.controller.toolbar.MapTools', {
         // update the loggedIn property on the viewmodel so any role-restricted
         // buttons or menus are activated
         var me = this;
-        Ext.GlobalEvents.on('login', function () {
-            me.getViewModel().set('loggedIn', true);
+        Ext.GlobalEvents.on({
+            login: function () {
+                me.getViewModel().set('loggedIn', true);
+            },
+            logout: function () {
+                me.getViewModel().set('loggedIn', false);
+            }
         });
 
         // as gx_geocoder_combo does not allow binding of the map property
