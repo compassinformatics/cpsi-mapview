@@ -15,97 +15,273 @@
   </script>
 </head>
 <body onload="prettyPrint(); highlight();">
-  <pre class="prettyprint lang-js"><span id='CpsiMapview-view-panel-TimeSlider'>/**
-</span> * This class is the time slider component of cpsi mapview application
+  <pre class="prettyprint lang-js"><span id='CpsiMapview-controller-panel-TimeSlider'>/**
+</span> * This is the controller for the timeslider component
  */
-Ext.define(&#39;CpsiMapview.view.panel.TimeSlider&#39;, {
-    extend: &#39;Ext.panel.Panel&#39;,
-    xtype: &#39;cmv_timeslider&#39;,
+Ext.define(&#39;CpsiMapview.controller.panel.TimeSlider&#39;, {
+    extend: &#39;Ext.app.ViewController&#39;,
+
+    alias: &#39;controller.cmv_timeslider&#39;,
 
     requires: [
-        &#39;Ext.slider.Multi&#39;,
-
-        &#39;CpsiMapview.controller.panel.TimeSlider&#39;
+        &#39;BasiGX.util.Layer&#39;,
+        &#39;BasiGX.util.WFS&#39;
     ],
 
-<span id='CpsiMapview-view-panel-TimeSlider-property-controller'>    controller: &#39;cmv_timeslider&#39;,
-</span>
-<span id='CpsiMapview-view-panel-TimeSlider-property-layout'>    layout: &#39;hbox&#39;,
-</span>
-<span id='CpsiMapview-view-panel-TimeSlider-property-viewModel'>    /**
-</span>     *
+<span id='CpsiMapview-controller-panel-TimeSlider-method-initTimeSlider'>    /**
+</span>     * Function to initialize the time slider called after render
+     * @param {Ext.slider.Multi} slider The slider to initialize
      */
-    viewModel: {
-        data: {
-            isRange: false
+    initTimeSlider: function (slider) {
+        var me = this;
+        var timeSliderCmp = slider.up(&#39;cmv_timeslider&#39;);
+        var startDate = timeSliderCmp.startDate;
+        var endDate = timeSliderCmp.endDate;
+        var selectedDate = timeSliderCmp.selectedDate;
+        var timeIncrementUnit = timeSliderCmp.timeIncrementUnit || &#39;year&#39;;
+        var isRange = me.getViewModel().get(&#39;isRange&#39;);
+
+        if (!startDate || !endDate) {
+            Ext.log.warn(&#39;Please provide valid start / end date.&#39;);
+            return;
+        }
+
+        var timeRangeObj = me.getTimeRangeForDate(startDate, endDate,
+            selectedDate, timeIncrementUnit, isRange);
+
+        slider.setMaxValue(timeRangeObj.maxValue);
+        slider.setMinValue(timeRangeObj.minValue);
+        var values = [timeRangeObj.rangeLower, timeRangeObj.rangeUpper];
+        slider.setValue(values);
+
+        // hide thumb if range is not checked
+        if (!isRange) {
+            slider.thumbs[1].disable();
         }
     },
 
-<span id='CpsiMapview-view-panel-TimeSlider-property-selectedDate'>    /**
-</span>     * The selected date (after initialization) as Date object
+<span id='CpsiMapview-controller-panel-TimeSlider-method-setTimeOnLayers'>    /**
+</span>     * Function to set the time to time dependent layers after slider initialization
+     * @param {Ext.slider.Multi} slider The time slider component
      */
-    selectedDate: null,
-<span id='CpsiMapview-view-panel-TimeSlider-property-startDate'>    /**
-</span>     * The start date of slider
-     */
-    startDate: null,
-<span id='CpsiMapview-view-panel-TimeSlider-property-endDate'>    /**
-</span>     * The end date of slider
-     */
-    endDate: null,
-<span id='CpsiMapview-view-panel-TimeSlider-property-timeIncrementUnit'>    /**
-</span>     * The unit of time increment (currently only year and month supported)
-     */
-    timeIncrementUnit: &#39;year&#39;,
-<span id='CpsiMapview-view-panel-TimeSlider-property-cls'>    /**
-</span>     * The CSS class of the slider
-     */
-    cls: &#39;cpsi-time-slider&#39;,
-<span id='CpsiMapview-view-panel-TimeSlider-property-listeners'>    /**
-</span>     * Listener to be called when all layers are added to set configured time
-     * to time dependent layers
-     */
-    listeners: {
-        allLayersAdded: &#39;setTimeOnLayers&#39;
+    setTimeOnLayers: function (slider) {
+        var me = this;
+        var isRange = me.getViewModel().get(&#39;isRange&#39;);
+        me.onTimeChanged(slider, isRange);
     },
 
-<span id='CpsiMapview-view-panel-TimeSlider-method-initComponent'>    /**
-</span>     *
+<span id='CpsiMapview-controller-panel-TimeSlider-method-onChangeComplete'>    /**
+</span>     * Time slider changeComplete handler
+     * @param {Ext.slider.Multi} slider The time slider component
      */
-    initComponent: function () {
+    onChangeComplete: function (slider) {
         var me = this;
-        me.items = [{
-            xtype: &#39;multislider&#39;,
-            labelAlign: &#39;right&#39;,
-            listeners: {
-                beforerender: &#39;initTimeSlider&#39;,
-                changecomplete: &#39;onChangeComplete&#39;
-            },
-            constrainThumbs: false,
-            tipText: &#39;getTipText&#39;,
-            fieldLabel: &#39;Time&#39;,
-            width: 400,
-            values: [25, 75],
-            increment: 1,
-            minValue: 0,
-            maxValue: 100
-        },
-        {
-            xtype: &#39;checkbox&#39;,
-            name: &#39;range&#39;,
-            fieldLabel: &#39;Time range&#39;,
-            labelAlign: &#39;right&#39;,
-            bind: {
-                value: &#39;{isRange}&#39;
-            },
-            listeners: {
-                change: &#39;onRangeClick&#39;
+        var isRange = me.getViewModel().get(&#39;isRange&#39;);
+        me.onTimeChanged(slider, isRange);
+    },
+
+<span id='CpsiMapview-controller-panel-TimeSlider-method-onTimeChanged'>    /**
+</span>     * Function called in time slider changes
+     * @param {Ext.slider.Multi} slider The slider
+     */
+    onTimeChanged: function (slider, isRange) {
+        var me = this;
+        var values = slider.getValues();
+        var timeIncrementUnit = slider.up(&#39;cmv_timeslider&#39;).timeIncrementUnit || &#39;year&#39;;
+        var timeLayers = BasiGX.util.Layer.getLayersBy(&#39;isTimeDependent&#39;, true);
+        Ext.each(timeLayers, function (layer) {
+            if (layer) {
+                var layerSource = layer.getSource();
+                var dateFormat = layer.get(&#39;dateFormat&#39;) || &#39;C&#39;;
+                if (layerSource &amp;&amp; (layerSource instanceof ol.source.TileWMS || layerSource instanceof ol.source.ImageWMS)) {
+                    layerSource.updateParams({
+                        TIME: me.formatDateString(values, isRange, timeIncrementUnit, dateFormat)
+                    });
+                }
+                if (layerSource instanceof ol.source.Vector) {
+                    if (layerSource instanceof ol.source.Cluster) {
+                        layerSource = layerSource.getSource();
+                    }
+                    var timeProperty = layer.get(&#39;timeProperty&#39;) || &#39;time&#39;;
+                    var timeString = me.formatDateString(values, isRange, timeIncrementUnit, dateFormat);
+                    var filterParts = BasiGX.util.WFS.getTimeFilterParts(layer, timeProperty, timeString);
+                    layerSource.set(&#39;timeFilters&#39;, filterParts);
+                    if (layer.getVisible()) {
+                        layerSource.clear(true);
+                    }
+                }
             }
-        }];
+        });
+    },
 
-        me.callParent();
+<span id='CpsiMapview-controller-panel-TimeSlider-method-formatDateString'>    /**
+</span>     * Function formatting the values array of multi-slider to a valid time
+     * parameter value
+     *
+     * @param {Number[]} values The slider values
+     * @param {Boolean} isRange Is range query or not
+     * @param {String} timeIncrementUnit The unit of time increment (year / month)
+     * @param {String} dateFormat The date format as listed in ExtJS documentation
+     * https://docs.sencha.com/extjs/6.2.1/classic/Ext.Date.html
+     *
+     * @returns {String} The formatted time string
+     */
+    formatDateString: function (values, isRange, timeIncrementUnit, dateFormat) {
+        var me = this;
+        // we must check for min / max here since the thumbs are not constrained
+        var startDate = me.getDateForSliderValue(Ext.Array.min(values));
+        var endDate = me.getDateForSliderValue(Ext.Array.max(values));
+
+        if (!startDate || !endDate) {
+            return;
+        }
+
+        // ceil / floor year according to selected interval if month is time increment
+        if (timeIncrementUnit === &#39;month&#39;) {
+            startDate = Ext.Date.getFirstDateOfMonth(startDate);
+            endDate = Ext.Date.getLastDateOfMonth(endDate);
+        } else {
+            // last day of year
+            endDate = new Date(!isRange ? startDate.getFullYear() : endDate.getFullYear(), 11, 31);
+        }
+
+        var startDateStr = Ext.Date.format(startDate, dateFormat);
+        var endDateStr = Ext.Date.format(endDate, dateFormat);
+        return Ext.String.format(&#39;{0}/{1}&#39;, startDateStr, endDateStr);
+    },
+
+<span id='CpsiMapview-controller-panel-TimeSlider-method-getTipText'>    /**
+</span>     * Function to generate tooltip text for slider
+     *
+     * @param {Ext.slider.Thumb} thumb The thumb that the tip is attached to
+     * @return {String} The formatted date as text
+     */
+    getTipText: function (thumb) {
+        return this.getDateStringForSliderValue(thumb.value);
+    },
+
+<span id='CpsiMapview-controller-panel-TimeSlider-method-getDateStringForSliderValue'>    /**
+</span>     * Function that returns formatted date string for passed slider value
+     *
+     * @param {Number} sliderValue The value of the slider
+     * @return {String} The formatted date as text
+     */
+    getDateStringForSliderValue: function (sliderValue) {
+        var me = this;
+        var view = me.getView();
+        var timeIncrementUnit = view.timeIncrementUnit || &#39;year&#39;;
+        var dateFormat = &#39;&#39;;
+        switch (timeIncrementUnit) {
+            case &#39;month&#39;:
+                dateFormat = &#39;m/Y&#39;;
+                break;
+            default:
+                dateFormat = &#39;Y&#39;;
+        }
+        return Ext.Date.format(
+            me.getDateForSliderValue(sliderValue),
+            dateFormat
+        );
+    },
+
+<span id='CpsiMapview-controller-panel-TimeSlider-method-getDateForSliderValue'>    /**
+</span>     * Function that returns the date vor passed slider value
+     *
+     * @param {Number} sliderValue The value of the slider
+     * @return {Date} The date
+     */
+    getDateForSliderValue: function (sliderValue) {
+        var me = this;
+        var view = me.getView();
+        var timeIncrementUnit = view.timeIncrementUnit || &#39;year&#39;;
+        switch (timeIncrementUnit) {
+            case &#39;month&#39;:
+                var month = sliderValue % 12;
+                var year = (sliderValue - month) / 12;
+                return new Date(1900 + year, month, 1);
+            default:
+                return new Date(1900 + sliderValue, 0, 1);
+        }
+    },
+
+<span id='CpsiMapview-controller-panel-TimeSlider-method-getTimeRangeForDate'>    /**
+</span>     * Map the start date, the enddate and the currently selected date to
+     * valid values for the slider component
+     *
+     * @param {Date} startDate The starting date
+     * @param {Date} endDate The date the slider value should end
+     * @param {Date} selDate The currently selected date
+     * @param {String} timeIncrementUnit The time increment (&#39;year&#39; or &#39;month&#39;)
+     * @param {Boolean} isRange Is a time range chosen
+     *
+     * @return {Object} Object containing minValue, maxValue and value to be
+     * set in viewModel, for example
+     */
+    getTimeRangeForDate: function (startDate, endDate, selDate,
+        timeIncrementUnit, isRange) {
+        // round + floor time to next time unit passed for discretization
+        // =&gt; maxValue
+        // get value for selected date =&gt; update viewModel
+        var minValue = 0;
+        var maxValue = 100;
+        switch (timeIncrementUnit) {
+            case &#39;month&#39;:
+                minValue = Ext.Date.getFirstDateOfMonth(startDate).getYear()
+                    * 12 + Ext.Date.getFirstDateOfMonth(startDate).getMonth();
+                maxValue = Ext.Date.getLastDateOfMonth(endDate).getYear()
+                    * 12 + Ext.Date.getLastDateOfMonth(endDate).getMonth();
+                break;
+            default:
+                minValue = startDate.getYear();
+                maxValue = endDate.getYear();
+                break;
+        }
+
+        // use passed starting date if selected date is not set
+        if (!selDate) {
+            selDate = startDate;
+        }
+
+        var rangeLower = 50;
+        var rangeUpper = 50;
+        switch (timeIncrementUnit) {
+            case &#39;month&#39;:
+                var value = Ext.Date.getFirstDateOfMonth(selDate).getYear()
+                    * 12 + Ext.Date.getFirstDateOfMonth(selDate).getMonth();
+                rangeLower = value;
+                rangeUpper = isRange ? value + 1 : maxValue;
+                break;
+            default:
+                value = selDate.getYear();
+                rangeLower = value;
+                rangeUpper = isRange ? value + 1 : maxValue;
+                break;
+        }
+
+        return {
+            minValue: minValue,
+            maxValue: maxValue,
+            rangeLower: rangeLower,
+            rangeUpper: rangeUpper
+        };
+    },
+
+<span id='CpsiMapview-controller-panel-TimeSlider-method-onRangeClick'>    /**
+</span>     * Change handler for range checkbox. This enables / disabled the second
+     * thumb
+     *
+     * @param {Ext.form.field.Checkbox} cb The checkbox
+     * @param {Boolean} isRange The new value
+     */
+    onRangeClick: function (cb, isRange) {
+        var timeSliderCmp = cb.up(&#39;cmv_timeslider&#39;).down(&#39;multislider&#39;);
+        if (isRange) {
+            timeSliderCmp.thumbs[1].enable();
+        } else {
+            timeSliderCmp.thumbs[1].disable();
+        }
+        this.onTimeChanged(timeSliderCmp, isRange);
     }
-
 });
 </pre>
 </body>
