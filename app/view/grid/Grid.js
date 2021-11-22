@@ -89,7 +89,6 @@ Ext.define('CpsiMapview.view.grid.Grid', {
         rowdblclick: 'onRowDblClick',
         // ensure columns are set when the store is bound to the grid
         reconfigure: 'onColumnsReconfigure',
-        show: 'onShow',
         clearfilters: 'clearFilters',
         applypresetfilters: 'applyPresetFilters'
     },
