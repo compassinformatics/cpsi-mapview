@@ -164,6 +164,32 @@ Ext.define('CpsiMapview.controller.grid.Grid', {
     },
 
     /**
+     * Create WFS filters for the store
+     * */
+    createStoreFilters: function (store) {
+
+        var me = this;
+        var wfsGetFeatureFilter = '';
+
+        var filters = Ext.clone(store.getFilters().items);
+
+        if (me.spatialFilter) {
+            filters.push(me.spatialFilter);
+        }
+
+        if (me.idFilter) {
+            filters.push(me.idFilter);
+        }
+
+        if (filters.length > 0) {
+            var ogcFilters = CpsiMapview.util.Layer.convertAndCombineFilters(filters);
+            wfsGetFeatureFilter = GeoExt.util.OGCFilter.combineFilters(ogcFilters, 'And', true, '2.0.0');
+        }
+
+        return wfsGetFeatureFilter;
+    },
+
+    /**
      * Apply any spatial filter to the store request, and convert all
      * ExtJS filters to WFS filters.
      * Also set a loading mask on the grid.
@@ -181,19 +207,9 @@ Ext.define('CpsiMapview.controller.grid.Grid', {
         view.setEmptyText('');
         view.setLoading();
 
-        var filters = Ext.clone(store.getFilters().items);
+        var wfsGetFeatureFilter = me.createStoreFilters(store);
 
-        if (me.spatialFilter) {
-            filters.push(me.spatialFilter);
-        }
-
-        if (me.idFilter) {
-            filters.push(me.idFilter);
-        }
-
-        if (filters.length > 0) {
-            var ogcFilters = CpsiMapview.util.Layer.convertAndCombineFilters(filters);
-            var wfsGetFeatureFilter = GeoExt.util.OGCFilter.combineFilters(ogcFilters, 'And', true, '2.0.0');
+        if (wfsGetFeatureFilter) {
             params.filter = wfsGetFeatureFilter;
         }
     },
@@ -416,8 +432,15 @@ Ext.define('CpsiMapview.controller.grid.Grid', {
 
         var store = grid.getStore();
         var url = store.url;
-
         var params = store.createParameters();
+
+        // apply filters to the shapefile export
+        var wfsGetFeatureFilter = me.createStoreFilters(store);
+
+        if (wfsGetFeatureFilter) {
+            params.filter = wfsGetFeatureFilter;
+        }
+
         params.outputFormat = 'shapezip';
 
         // files can't be downloaded using Ext.Ajax.request (due to browser security)
