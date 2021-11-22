@@ -180,6 +180,32 @@ Ext.define(&#39;CpsiMapview.controller.grid.Grid&#39;, {
 
     },
 
+<span id='CpsiMapview-controller-grid-Grid-method-createStoreFilters'>    /**
+</span>     * Create WFS filters for the store
+     * */
+    createStoreFilters: function (store) {
+
+        var me = this;
+        var wfsGetFeatureFilter = &#39;&#39;;
+
+        var filters = Ext.clone(store.getFilters().items);
+
+        if (me.spatialFilter) {
+            filters.push(me.spatialFilter);
+        }
+
+        if (me.idFilter) {
+            filters.push(me.idFilter);
+        }
+
+        if (filters.length &gt; 0) {
+            var ogcFilters = CpsiMapview.util.Layer.convertAndCombineFilters(filters);
+            wfsGetFeatureFilter = GeoExt.util.OGCFilter.combineFilters(ogcFilters, &#39;And&#39;, true, &#39;2.0.0&#39;);
+        }
+
+        return wfsGetFeatureFilter;
+    },
+
 <span id='CpsiMapview-controller-grid-Grid-method-onWfsStoreBeforeLoad'>    /**
 </span>     * Apply any spatial filter to the store request, and convert all
      * ExtJS filters to WFS filters.
@@ -198,19 +224,9 @@ Ext.define(&#39;CpsiMapview.controller.grid.Grid&#39;, {
         view.setEmptyText(&#39;&#39;);
         view.setLoading();
 
-        var filters = Ext.clone(store.getFilters().items);
+        var wfsGetFeatureFilter = me.createStoreFilters(store);
 
-        if (me.spatialFilter) {
-            filters.push(me.spatialFilter);
-        }
-
-        if (me.idFilter) {
-            filters.push(me.idFilter);
-        }
-
-        if (filters.length &gt; 0) {
-            var ogcFilters = CpsiMapview.util.Layer.convertAndCombineFilters(filters);
-            var wfsGetFeatureFilter = GeoExt.util.OGCFilter.combineFilters(ogcFilters, &#39;And&#39;, true, &#39;2.0.0&#39;);
+        if (wfsGetFeatureFilter) {
             params.filter = wfsGetFeatureFilter;
         }
     },
@@ -433,8 +449,15 @@ Ext.define(&#39;CpsiMapview.controller.grid.Grid&#39;, {
 
         var store = grid.getStore();
         var url = store.url;
-
         var params = store.createParameters();
+
+        // apply filters to the shapefile export
+        var wfsGetFeatureFilter = me.createStoreFilters(store);
+
+        if (wfsGetFeatureFilter) {
+            params.filter = wfsGetFeatureFilter;
+        }
+
         params.outputFormat = &#39;shapezip&#39;;
 
         // files can&#39;t be downloaded using Ext.Ajax.request (due to browser security)
