@@ -36,7 +36,7 @@ module.exports = function(config) {
         coverageReporter: {
             dir: 'coverage/',
             check: {
-                emitWarning: true, // don't fail the tests
+                emitWarning: true // don't fail the tests
             },
             reporters: [
                 { type: 'html', subdir: '.' },
