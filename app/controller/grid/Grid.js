@@ -16,6 +16,15 @@ Ext.define('CpsiMapview.controller.grid.Grid', {
         'CpsiMapview.util.Layer'
     ],
 
+    listen: {
+        component: {
+            '#': {
+                hide: 'onWindowHidden',
+                show: 'onWindowShown'
+            }
+        }
+    },
+
     mixins: {
         zoomer: 'CpsiMapview.util.ZoomerMixin'
     },
@@ -519,14 +528,13 @@ Ext.define('CpsiMapview.controller.grid.Grid', {
      * any selections which are visible
      */
     toggleLayerVisibility: function (show) {
-
         var me = this;
         var grid = me.getView();
         var store = grid.getStore();
 
         if (store.isEmptyStore !== true && store.getLayer) {
             var selectedFeaturesLayer = store.getLayer();
-            if(selectedFeaturesLayer){
+            if (selectedFeaturesLayer) {
                 selectedFeaturesLayer.setVisible(show);
             }
         }
@@ -537,7 +545,7 @@ Ext.define('CpsiMapview.controller.grid.Grid', {
      *
      * @returns {ol.layer.Base} The grid's layer
      */
-    getOlLayer: function() {
+    getOlLayer: function () {
         var me = this;
         var viewModel = me.getViewModel();
         var wmsLayerKey = viewModel.get('wmsLayerKey');
@@ -558,11 +566,17 @@ Ext.define('CpsiMapview.controller.grid.Grid', {
     },
 
     /**
-     * Template method for Ext.Component that
-     * can be overridden
+     * Show selection layer when the grid is shown
      */
-    onShow: function () {
+    onWindowShown: function () {
         this.toggleLayerVisibility(true);
+    },
+
+    /**
+     * Hide selection layer when the grid is shown
+     */
+    onWindowHidden: function () {
+        this.toggleLayerVisibility(false);
     },
 
     /**
@@ -633,7 +647,7 @@ Ext.define('CpsiMapview.controller.grid.Grid', {
         if (associatedEditModel) {
             var modelPrototype = Ext.ClassManager.get(associatedEditModel);
             Ext.util.Observable.observe(modelPrototype, {
-                modelsaved: function(){
+                modelsaved: function () {
                     var clearPaging = false;
                     me.refreshStore(clearPaging);
                     var force = true;
@@ -793,7 +807,7 @@ Ext.define('CpsiMapview.controller.grid.Grid', {
                     // gets lost
                     var newFilter = Ext.clone(column.initialConfig.filter);
 
-                    if (operator != 'in'){
+                    if (operator != 'in') {
                         Ext.log.warn('No valid operator provided.');
                         return;
                     }
@@ -818,7 +832,7 @@ Ext.define('CpsiMapview.controller.grid.Grid', {
      * @param {number} value The numerical value to compare
      * @returns {Object} The value object for the filter
      */
-    createNumberFilterValue: function(operator, value){
+    createNumberFilterValue: function (operator, value) {
         // translate user defined operators into operators
         // that are compatible with number filters
         var operatorMapping = {
