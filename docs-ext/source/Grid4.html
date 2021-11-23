@@ -33,6 +33,15 @@ Ext.define(&#39;CpsiMapview.controller.grid.Grid&#39;, {
         &#39;CpsiMapview.util.Layer&#39;
     ],
 
+<span id='CpsiMapview-controller-grid-Grid-property-listen'>    listen: {
+</span>        component: {
+            &#39;#&#39;: {
+                hide: &#39;onWindowHidden&#39;,
+                show: &#39;onWindowShown&#39;
+            }
+        }
+    },
+
     mixins: {
         zoomer: &#39;CpsiMapview.util.ZoomerMixin&#39;
     },
@@ -536,14 +545,13 @@ Ext.define(&#39;CpsiMapview.controller.grid.Grid&#39;, {
      * any selections which are visible
      */
     toggleLayerVisibility: function (show) {
-
         var me = this;
         var grid = me.getView();
         var store = grid.getStore();
 
         if (store.isEmptyStore !== true &amp;&amp; store.getLayer) {
             var selectedFeaturesLayer = store.getLayer();
-            if(selectedFeaturesLayer){
+            if (selectedFeaturesLayer) {
                 selectedFeaturesLayer.setVisible(show);
             }
         }
@@ -554,7 +562,7 @@ Ext.define(&#39;CpsiMapview.controller.grid.Grid&#39;, {
      *
      * @returns {ol.layer.Base} The grid&#39;s layer
      */
-    getOlLayer: function() {
+    getOlLayer: function () {
         var me = this;
         var viewModel = me.getViewModel();
         var wmsLayerKey = viewModel.get(&#39;wmsLayerKey&#39;);
@@ -574,12 +582,18 @@ Ext.define(&#39;CpsiMapview.controller.grid.Grid&#39;, {
         return layer;
     },
 
-<span id='CpsiMapview-controller-grid-Grid-method-onShow'>    /**
-</span>     * Template method for Ext.Component that
-     * can be overridden
+<span id='CpsiMapview-controller-grid-Grid-method-onWindowShown'>    /**
+</span>     * Show selection layer when the grid is shown
      */
-    onShow: function () {
+    onWindowShown: function () {
         this.toggleLayerVisibility(true);
+    },
+
+<span id='CpsiMapview-controller-grid-Grid-method-onWindowHidden'>    /**
+</span>     * Hide selection layer when the grid is shown
+     */
+    onWindowHidden: function () {
+        this.toggleLayerVisibility(false);
     },
 
 <span id='CpsiMapview-controller-grid-Grid-method-onClearSort'>    /**
@@ -650,7 +664,7 @@ Ext.define(&#39;CpsiMapview.controller.grid.Grid&#39;, {
         if (associatedEditModel) {
             var modelPrototype = Ext.ClassManager.get(associatedEditModel);
             Ext.util.Observable.observe(modelPrototype, {
-                modelsaved: function(){
+                modelsaved: function () {
                     var clearPaging = false;
                     me.refreshStore(clearPaging);
                     var force = true;
@@ -810,7 +824,7 @@ Ext.define(&#39;CpsiMapview.controller.grid.Grid&#39;, {
                     // gets lost
                     var newFilter = Ext.clone(column.initialConfig.filter);
 
-                    if (operator != &#39;in&#39;){
+                    if (operator != &#39;in&#39;) {
                         Ext.log.warn(&#39;No valid operator provided.&#39;);
                         return;
                     }
@@ -835,7 +849,7 @@ Ext.define(&#39;CpsiMapview.controller.grid.Grid&#39;, {
      * @param {number} value The numerical value to compare
      * @returns {Object} The value object for the filter
      */
-    createNumberFilterValue: function(operator, value){
+    createNumberFilterValue: function (operator, value) {
         // translate user defined operators into operators
         // that are compatible with number filters
         var operatorMapping = {
