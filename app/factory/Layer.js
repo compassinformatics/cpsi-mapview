@@ -458,9 +458,16 @@ Ext.define('CpsiMapview.factory.Layer', {
                     reqUrl, 'TIMESTAMP=' + ts
                 );
             }
+            // once the url is built we need to isolate the parameters element
+            // so we can send as request body and send as POST,
+            // otherwise the request url is too long.
+            var urlArray = reqUrl.split('?');
+            var urlpost = urlArray[0];
+            var params = urlArray[1];
 
             var xhr = new XMLHttpRequest();
-            xhr.open('GET', reqUrl);
+            xhr.open('POST', urlpost);
+            xhr.setRequestHeader('Content-type', 'application/x-www-form-urlencoded');
             var onError = function() {
                 vectorSource.removeLoadedExtent(extent);
                 vectorSource.dispatchEvent('vectorloaderror');
@@ -492,7 +499,7 @@ Ext.define('CpsiMapview.factory.Layer', {
                     onError();
                 }
             };
-            xhr.send();
+            xhr.send(params);
         };
 
         vectorSource.setLoader(loaderFn);
