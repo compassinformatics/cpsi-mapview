@@ -15,48 +15,53 @@
   </script>
 </head>
 <body onload="prettyPrint(); highlight();">
-  <pre class="prettyprint lang-js"><span id='CpsiMapview-view-button-LoginButton'>/**
-</span> * This class is a button to login
- *
- * @class CpsiMapview.view.button.LoginButton
+  <pre class="prettyprint lang-js"><span id='CpsiMapview-model-button-LoginButton'>/**
+</span> * This class is the view model for the LoginButton
  */
-Ext.define(&#39;CpsiMapview.view.button.LoginButton&#39;, {
-    extend: &#39;Ext.button.Button&#39;,
-    xtype: &#39;cmv_login_button&#39;,
+Ext.define(&#39;CpsiMapview.model.button.LoginButton&#39;, {
+    extend: &#39;Ext.app.ViewModel&#39;,
 
     requires: [
-        &#39;CpsiMapview.controller.button.LoginButtonController&#39;,
-        &#39;CpsiMapview.model.button.LoginButton&#39;
+        &#39;Ext.util.Cookies&#39;
     ],
 
-<span id='CpsiMapview-view-button-LoginButton-property-controller'>    /**
-</span>     * The controller for this class
-     */
-    controller: &#39;cmv_login_button&#39;,
+    alias: &#39;viewmodel.cmv_login_button&#39;,
 
-<span id='CpsiMapview-view-button-LoginButton-property-viewModel'>    /**
-</span>     * The viewmodel for this class
-     */
-    viewModel: &#39;cmv_login_button&#39;,
-
-<span id='CpsiMapview-view-button-LoginButton-property-name'>    /**
-</span>     * The name to be used e.g. in ComponentQueries
-     */
-    name: &#39;loginButton&#39;,
-
-<span id='CpsiMapview-view-button-LoginButton-property-bind'>    bind: {
-</span>        text: &#39;{text}&#39;,
-        glyph: &#39;{glyph}&#39;,
-        tooltip: &#39;{tooltip}&#39;
+<span id='CpsiMapview-model-button-LoginButton-property-data'>    data: {
+</span>        loggedIn: false
     },
 
-<span id='CpsiMapview-view-button-LoginButton-property-listeners'>    /**
-</span>     * Register the listeners and redirect them
-     * to their corresponding controller methods
-     */
-    listeners: {
-        click: &#39;onClick&#39;
+<span id='CpsiMapview-model-button-LoginButton-property-formulas'>    formulas: {
+</span>
+        tooltip: function (get) {
+
+            var tooltip = &#39;&#39;;
+            var me = this;
+
+            if (get(&#39;loggedIn&#39;)) {
+                tooltip = me.getView().getController().getLoginDetails();
+            }
+
+            return tooltip;
+        },
+
+        glyph: function (get) {
+            if (get(&#39;loggedIn&#39;)) {
+                return &#39;f08b@FontAwesome&#39;; // sign-out icon
+            } else {
+                return &#39;f090@FontAwesome&#39;; // sign-in icon
+            }
+        },
+
+        text: function (get) {
+            if (get(&#39;loggedIn&#39;)) {
+                return &#39;Logout&#39;;
+            } else {
+                return &#39;Login&#39;;
+            }
+        }
     }
+
 });
 </pre>
 </body>
