@@ -30,7 +30,7 @@ Ext.define('CpsiMapview.model.GridExample', {
 Ext.define('CpsiMapview.store.GridExample', {
     extend: 'CpsiMapview.store.WfsFeatures',
     alias: 'store.GridExample',
-    url: 'https://w08-mapserver.compass.ie/mapserver/?map=/MapServer/apps/mapview-demo/example.map&',
+    url: 'https://mapserver.compass.ie/mapserver/?map=/MapServer/apps/mapview-demo/example.map&',
     storeId: 'GridExample',
     requestMethod: 'POST',
     model: 'CpsiMapview.model.GridExample',
