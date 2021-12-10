@@ -74,7 +74,7 @@ Ext.define('CpsiMapview.model.GridFiltersExample', {
 Ext.define('CpsiMapview.store.GridFiltersExample', {
     extend: 'CpsiMapview.store.WfsFeatures',
     alias: 'store.GridFiltersExample',
-    url: 'https://w08-mapserver.compass.ie/mapserver/?map=/MapServer/apps/mapview-demo/example.map&',
+    url: 'https://mapserver.compass.ie/mapserver/?map=/MapServer/apps/mapview-demo/example.map&',
     storeId: 'GridFiltersExample',
     requestMethod: 'POST',
     //srsName: 'epsg:2157',
