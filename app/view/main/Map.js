@@ -206,7 +206,7 @@ Ext.define('CpsiMapview.view.main.Map', {
         // use app settings when available
         if (app) {
             zoom = app.zoom ? app.zoom : zoom;
-            center = app.center ? app.center : center
+            center = app.center ? app.center : center;
         }
 
         // create a default map if one has not already been created in a derived class
