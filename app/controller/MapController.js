@@ -18,7 +18,7 @@ Ext.define('CpsiMapview.controller.MapController', {
     /**
     * A configuration object to store settings relating to opening forms when clicking on a feature.
     * This should be overridden in inherited projects and should be in the following form:
-    * 
+    *
     * {
     *   layerKeyName: {
     *       keyField: 'ObjectId', // the field containing the unique feature Id to open in a form
@@ -26,7 +26,7 @@ Ext.define('CpsiMapview.controller.MapController', {
     *       editWindowClass: 'CpsiMapview.view.EditWindow' // the name of the form view class to open when clicking on a feature
     *   }
     * }
-    * 
+    *
     * Multiple configurations can be provided to support clicks on multiple layers
     */
     clickableLayerConfigs: {},
@@ -53,7 +53,7 @@ Ext.define('CpsiMapview.controller.MapController', {
         Ext.each(clickedFeatures, function (f) {
             if (f.layer) {
                 var layerKey = f.layer.get('layerKey');
-                if (me.clickableLayerConfigs.hasOwnProperty(layerKey)) {
+                if (Object.prototype.hasOwnProperty.call(me.clickableLayerConfigs, layerKey)) {
                     editableFeatures.push(f);
                 }
             }
