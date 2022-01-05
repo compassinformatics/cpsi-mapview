@@ -42,6 +42,19 @@ Ext.define('CpsiMapview.view.main.Map', {
     ],
 
     /**
+    * See blog post https://www.sencha.com/blog/declarative-listeners-in-ext-js-5/
+    * Setting in initComponent sets scope to the parent (wrong) controller
+    * */
+    listeners: {
+        'cmv-mapclick': {
+            fn: 'onMapClick',
+            options: {
+                priority: 500
+            }
+        }
+    },
+
+    /**
      * Enables a click handler on the map which fires an event
      * 'cmv-mapclick' with all clicked vector features and their corresponding
      * layers.
@@ -114,7 +127,7 @@ Ext.define('CpsiMapview.view.main.Map', {
          * @return {CpsiMapview.view.main.Map} The map panel, which is at least
          *     a GeoExt.component.Map and possibly an instance of this class.
          */
-        guess: function() {
+        guess: function () {
             return BasiGX.util.Map.getMapComponent(this.xtype);
         }
     },
@@ -124,7 +137,7 @@ Ext.define('CpsiMapview.view.main.Map', {
      * @param {*} layerConf
      * @param {*} defaults
      */
-    applyDefaultsToLayerConf : function(layerConf, defaults){
+    applyDefaultsToLayerConf: function (layerConf, defaults) {
 
         var newLayerConf = {};
 
@@ -146,12 +159,12 @@ Ext.define('CpsiMapview.view.main.Map', {
      * and applies the default values to each layer definition.
      * @param {*} layerJson
      */
-    applyDefaultsToApplicationConf: function(layerJson){
+    applyDefaultsToApplicationConf: function (layerJson) {
         var me = this;
 
         var defaults = layerJson.defaults;
 
-        var newConfiguration = {'layers':[]};
+        var newConfiguration = { 'layers': [] };
 
         // loop through layers and apply defaults
         Ext.each(layerJson.layers, function (layerConf) {
@@ -159,13 +172,13 @@ Ext.define('CpsiMapview.view.main.Map', {
             var newLayerConf = me.applyDefaultsToLayerConf(layerConf, defaults);
 
             // additionally update sublayers of switch layers
-            if(newLayerConf.layerType == 'switchlayer'){
+            if (newLayerConf.layerType == 'switchlayer') {
 
                 var updatedSubLayers = [];
                 // loop through sublayers and apply defaults
-                Ext.each(newLayerConf.layers, function(subLayerConf){
+                Ext.each(newLayerConf.layers, function (subLayerConf) {
 
-                    var newSubLayerConf = me.applyDefaultsToLayerConf( subLayerConf, defaults);
+                    var newSubLayerConf = me.applyDefaultsToLayerConf(subLayerConf, defaults);
                     updatedSubLayers.push(newSubLayerConf);
                 });
                 // replace old layers with updated layers
@@ -182,12 +195,24 @@ Ext.define('CpsiMapview.view.main.Map', {
      * @private
      */
     initComponent: function () {
+
         var me = this;
+        var app = Ext.getApplication ? Ext.getApplication() : Ext.app.Application.instance;
+
+        // defaults
+        var zoom = 10;
+        var center = ol.proj.fromLonLat([-8, 53.5]);
+
+        // use app settings when available
+        if (app) {
+            zoom = app.zoom ? app.zoom : zoom;
+            center = app.center ? app.center : center;
+        }
 
         // create a default map if one has not already been created in a derived class
         if (!me.map) {
             me.map = new ol.Map({
-                // layers will be created from config in initComponent
+                // layers will be created from default.json later
                 layers: [],
                 controls: ol.control.defaults().extend([
                     new ol.control.FullScreen()
@@ -196,8 +221,8 @@ Ext.define('CpsiMapview.view.main.Map', {
                     new ol.interaction.DragRotateAndZoom()
                 ]),
                 view: new ol.View({
-                    center: ol.proj.fromLonLat([-8, 53.5]),
-                    zoom: 8
+                    center: center,
+                    zoom: zoom
                 })
             });
         }
@@ -262,12 +287,12 @@ Ext.define('CpsiMapview.view.main.Map', {
         me.olMap = me.mapCmp.map;
 
         if (me.enableMapClick) {
-            me.olMap.on('singleclick', function(evt) {
+            me.olMap.on('singleclick', function (evt) {
                 var clickedFeatures = [];
                 me.olMap.forEachFeatureAtPixel(evt.pixel,
-                    function(feature, layer) {
+                    function (feature, layer) {
                         // collect all clicked features and their layers
-                        clickedFeatures.push({feature: feature, layer: layer});
+                        clickedFeatures.push({ feature: feature, layer: layer });
                     }
                 );
 
@@ -277,12 +302,12 @@ Ext.define('CpsiMapview.view.main.Map', {
         }
 
         if (me.enableMapHover) {
-            me.mapCmp.on('pointerrest', function(evt) {
+            me.mapCmp.on('pointerrest', function (evt) {
                 var hoveredFeatures = [];
                 me.olMap.forEachFeatureAtPixel(evt.pixel,
-                    function(feature, layer) {
+                    function (feature, layer) {
                         // collect all clicked features and their layers
-                        hoveredFeatures.push({feature: feature, layer: layer});
+                        hoveredFeatures.push({ feature: feature, layer: layer });
                     }
                 );
 
@@ -362,7 +387,7 @@ Ext.define('CpsiMapview.view.main.Map', {
 
         // restore the view state when navigating through the history, see
         // https://developer.mozilla.org/en-US/docs/Web/API/WindowEventHandlers/onpopstate
-        window.addEventListener('popstate', function(event) {
+        window.addEventListener('popstate', function (event) {
             if (event.state === null) {
                 return;
             }
