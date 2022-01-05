@@ -58,6 +58,19 @@ Ext.define(&#39;CpsiMapview.view.main.Map&#39;, {
         }
     ],
 
+<span id='CpsiMapview-view-main-Map-property-listeners'>    /**
+</span>    * See blog post https://www.sencha.com/blog/declarative-listeners-in-ext-js-5/
+    * Setting in initComponent sets scope to the parent (wrong) controller
+    * */
+    listeners: {
+        &#39;cmv-mapclick&#39;: {
+            fn: &#39;onMapClick&#39;,
+            options: {
+                priority: 500
+            }
+        }
+    },
+
 <span id='CpsiMapview-view-main-Map-property-enableMapClick'>    /**
 </span>     * Enables a click handler on the map which fires an event
      * &#39;cmv-mapclick&#39; with all clicked vector features and their corresponding
@@ -131,7 +144,7 @@ Ext.define(&#39;CpsiMapview.view.main.Map&#39;, {
          * @return {CpsiMapview.view.main.Map} The map panel, which is at least
          *     a GeoExt.component.Map and possibly an instance of this class.
          */
-        guess: function() {
+        guess: function () {
             return BasiGX.util.Map.getMapComponent(this.xtype);
         }
     },
@@ -141,7 +154,7 @@ Ext.define(&#39;CpsiMapview.view.main.Map&#39;, {
      * @param {*} layerConf
      * @param {*} defaults
      */
-    applyDefaultsToLayerConf : function(layerConf, defaults){
+    applyDefaultsToLayerConf: function (layerConf, defaults) {
 
         var newLayerConf = {};
 
@@ -163,12 +176,12 @@ Ext.define(&#39;CpsiMapview.view.main.Map&#39;, {
      * and applies the default values to each layer definition.
      * @param {*} layerJson
      */
-    applyDefaultsToApplicationConf: function(layerJson){
+    applyDefaultsToApplicationConf: function (layerJson) {
         var me = this;
 
         var defaults = layerJson.defaults;
 
-        var newConfiguration = {&#39;layers&#39;:[]};
+        var newConfiguration = { &#39;layers&#39;: [] };
 
         // loop through layers and apply defaults
         Ext.each(layerJson.layers, function (layerConf) {
@@ -176,13 +189,13 @@ Ext.define(&#39;CpsiMapview.view.main.Map&#39;, {
             var newLayerConf = me.applyDefaultsToLayerConf(layerConf, defaults);
 
             // additionally update sublayers of switch layers
-            if(newLayerConf.layerType == &#39;switchlayer&#39;){
+            if (newLayerConf.layerType == &#39;switchlayer&#39;) {
 
                 var updatedSubLayers = [];
                 // loop through sublayers and apply defaults
-                Ext.each(newLayerConf.layers, function(subLayerConf){
+                Ext.each(newLayerConf.layers, function (subLayerConf) {
 
-                    var newSubLayerConf = me.applyDefaultsToLayerConf( subLayerConf, defaults);
+                    var newSubLayerConf = me.applyDefaultsToLayerConf(subLayerConf, defaults);
                     updatedSubLayers.push(newSubLayerConf);
                 });
                 // replace old layers with updated layers
@@ -199,12 +212,24 @@ Ext.define(&#39;CpsiMapview.view.main.Map&#39;, {
 </span>     * @private
      */
     initComponent: function () {
+
         var me = this;
+        var app = Ext.getApplication ? Ext.getApplication() : Ext.app.Application.instance;
+
+        // defaults
+        var zoom = 10;
+        var center = ol.proj.fromLonLat([-8, 53.5]);
+
+        // use app settings when available
+        if (app) {
+            zoom = app.zoom ? app.zoom : zoom;
+            center = app.center ? app.center : center;
+        }
 
         // create a default map if one has not already been created in a derived class
         if (!me.map) {
             me.map = new ol.Map({
-                // layers will be created from config in initComponent
+                // layers will be created from default.json later
                 layers: [],
                 controls: ol.control.defaults().extend([
                     new ol.control.FullScreen()
@@ -213,8 +238,8 @@ Ext.define(&#39;CpsiMapview.view.main.Map&#39;, {
                     new ol.interaction.DragRotateAndZoom()
                 ]),
                 view: new ol.View({
-                    center: ol.proj.fromLonLat([-8, 53.5]),
-                    zoom: 8
+                    center: center,
+                    zoom: zoom
                 })
             });
         }
@@ -279,12 +304,12 @@ Ext.define(&#39;CpsiMapview.view.main.Map&#39;, {
         me.olMap = me.mapCmp.map;
 
         if (me.enableMapClick) {
-            me.olMap.on(&#39;singleclick&#39;, function(evt) {
+            me.olMap.on(&#39;singleclick&#39;, function (evt) {
                 var clickedFeatures = [];
                 me.olMap.forEachFeatureAtPixel(evt.pixel,
-                    function(feature, layer) {
+                    function (feature, layer) {
                         // collect all clicked features and their layers
-                        clickedFeatures.push({feature: feature, layer: layer});
+                        clickedFeatures.push({ feature: feature, layer: layer });
                     }
                 );
 
@@ -294,12 +319,12 @@ Ext.define(&#39;CpsiMapview.view.main.Map&#39;, {
         }
 
         if (me.enableMapHover) {
-            me.mapCmp.on(&#39;pointerrest&#39;, function(evt) {
+            me.mapCmp.on(&#39;pointerrest&#39;, function (evt) {
                 var hoveredFeatures = [];
                 me.olMap.forEachFeatureAtPixel(evt.pixel,
-                    function(feature, layer) {
+                    function (feature, layer) {
                         // collect all clicked features and their layers
-                        hoveredFeatures.push({feature: feature, layer: layer});
+                        hoveredFeatures.push({ feature: feature, layer: layer });
                     }
                 );
 
@@ -379,7 +404,7 @@ Ext.define(&#39;CpsiMapview.view.main.Map&#39;, {
 
         // restore the view state when navigating through the history, see
         // https://developer.mozilla.org/en-US/docs/Web/API/WindowEventHandlers/onpopstate
-        window.addEventListener(&#39;popstate&#39;, function(event) {
+        window.addEventListener(&#39;popstate&#39;, function (event) {
             if (event.state === null) {
                 return;
             }
