@@ -156,7 +156,8 @@ Ext.define(&#39;CpsiMapview.view.LayerTree&#39;, {
     },
 
 <span id='CpsiMapview-view-LayerTree-method-getNodeForLayer'>    /**
-</span>     * Gets the layer node UI for the given layer.
+</span>     * Gets the layer node UI for the given layer. Any group layers are ignored
+     * to avoid cases where a child node has the same name as the group layer name
      *
      * @param  {ol.layer.Base} layer The layer to update in the tree
      */
@@ -168,8 +169,10 @@ Ext.define(&#39;CpsiMapview.view.LayerTree&#39;, {
 
         treeStore.each(function (node) {
             if (node.getOlLayer() &amp;&amp; node.getOlLayer().get(&#39;name&#39;) === layer.get(&#39;name&#39;)) {
-                foundNode = node;
-                return false;
+                if (node.getOlLayer().isLayerGroup === false) {
+                    foundNode = node;
+                    return false;
+                }
             }
         });
 
