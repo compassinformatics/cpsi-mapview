@@ -122,7 +122,7 @@ Ext.define(&#39;CpsiMapview.view.LayerTree&#39;, {
         // decide where to render style switcher radio groups
         if (me.styleSwitcherBelowNode) {
             // add plugin to render style switcher permanently below tree nodes
-            me.columns.items[0].plugins.push({ptype: &#39;cmv_tree_column_style_switcher&#39;});
+            me.columns.items[0].plugins.push({ ptype: &#39;cmv_tree_column_style_switcher&#39; });
         } else {
             // add context menu item showing the style switcher
             Ext.each(me.columns.items[0].plugins, function (plugin) {
@@ -164,15 +164,12 @@ Ext.define(&#39;CpsiMapview.view.LayerTree&#39;, {
     getNodeForLayer: function (layer) {
         var me = this;
         var treeStore = me.getView().getStore();
-
         var foundNode = undefined;
 
         treeStore.each(function (node) {
-            if (node.getOlLayer() &amp;&amp; node.getOlLayer().get(&#39;name&#39;) === layer.get(&#39;name&#39;)) {
-                if (node.getOlLayer().isLayerGroup === false) {
-                    foundNode = node;
-                    return false;
-                }
+            if (node.getOlLayer() &amp;&amp; node.getOlLayer().get(&#39;layerKey&#39;) === layer.get(&#39;layerKey&#39;)) {
+                foundNode = node;
+                return false;
             }
         });
 
