@@ -1075,6 +1075,7 @@ Ext.define(&#39;CpsiMapview.controller.button.DigitizeButtonController&#39;, {
 
         // fire the button&#39;s toggle event so that the defaultClickEnabled property
         // is updated in CpsiMapview.util.ApplicationMixin to re-enable clicks
+        btn.pressed = false;
         btn.fireEvent(&#39;toggle&#39;);
 
         if (me.drawInteraction) {
