@@ -619,7 +619,12 @@ Ext.define('CpsiMapview.factory.Layer', {
         var olSourceConf = {
             url: layerConf.url
         };
+
         olSourceConf = Ext.apply(olSourceConf, olSourceProps);
+
+        if (olSourceConf.tileGrid) {
+            olSourceConf.tileGrid = new ol.tilegrid.TileGrid(olSourceConf.tileGrid)
+        }
 
         var olLayerConf = {
             name: layerConf.text,
@@ -888,6 +893,7 @@ Ext.define('CpsiMapview.factory.Layer', {
             projection: ol2Conf.projection,
             transition: ol2Conf.transitionEffect === null ? 0 : undefined,
             gutter: ol2Conf.gutter,
+            tileGrid: ol2Conf.tileGrid,
             tileSize: ol2Conf.tileSize
         };
 
