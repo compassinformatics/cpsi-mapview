@@ -623,7 +623,7 @@ Ext.define('CpsiMapview.factory.Layer', {
         olSourceConf = Ext.apply(olSourceConf, olSourceProps);
 
         if (olSourceConf.tileGrid) {
-            olSourceConf.tileGrid = new ol.tilegrid.TileGrid(olSourceConf.tileGrid)
+            olSourceConf.tileGrid = new ol.tilegrid.TileGrid(olSourceConf.tileGrid);
         }
 
         var olLayerConf = {
