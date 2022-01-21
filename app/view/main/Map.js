@@ -227,7 +227,7 @@ Ext.define('CpsiMapview.view.main.Map', {
         }
 
         // now apply any defaults if not set by the app
-        Ext.applyIf(viewConfig, me.mapViewConfig)
+        Ext.applyIf(viewConfig, me.mapViewConfig);
 
         var view = new ol.View(viewConfig);
 
