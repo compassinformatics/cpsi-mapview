@@ -41,6 +41,12 @@ Ext.define('CpsiMapview.view.main.Map', {
         }
     ],
 
+    mapViewConfig: {
+        projection: 'EPSG:3857',
+        zoom: 10,
+        center: [-890555.9263461886, 7076025.276180581] // ol.proj.fromLonLat([-8, 53.5])
+    },
+
     /**
     * See blog post https://www.sencha.com/blog/declarative-listeners-in-ext-js-5/
     * Setting in initComponent sets scope to the parent (wrong) controller
@@ -197,17 +203,33 @@ Ext.define('CpsiMapview.view.main.Map', {
     initComponent: function () {
 
         var me = this;
+
+        // ensure custom projections are registered prior to creating the map
+
+        proj4.defs('EPSG:4326', '+proj=longlat +datum=WGS84 +no_defs');
+        proj4.defs('EPSG:3857', '+proj=merc +a=6378137 +b=6378137 +lat_ts=0.0 +lon_0=0.0 +x_0=0.0 +y_0=0 +k=1.0 +units=m +nadgrids=@null +wktext  +no_defs');
+        proj4.defs('EPSG:2157', '+proj=tmerc +lat_0=53.5 +lon_0=-8 +k=0.99982 +x_0=600000 +y_0=750000 +ellps=GRS80 +towgs84=0,0,0,0,0,0,0 +units=m +no_defs');
+        proj4.defs('EPSG:29902', '+proj=tmerc +lat_0=53.5 +lon_0=-8 +k=1.000035 +x_0=200000 +y_0=250000 +ellps=mod_airy +towgs84=482.5,-130.6,564.6,-1.042,-0.214,-0.631,8.15 +units=m +no_defs');
+
+        ol.proj.proj4.register(proj4);
+
+        // use app settings when available for zoom and center
+        var viewConfig = {};
+
         var app = Ext.getApplication ? Ext.getApplication() : Ext.app.Application.instance;
 
-        // defaults
-        var zoom = 10;
-        var center = ol.proj.fromLonLat([-8, 53.5]);
-
-        // use app settings when available
-        if (app) {
-            zoom = app.zoom ? app.zoom : zoom;
-            center = app.center ? app.center : center;
+        if (app && app.zoom) {
+            viewConfig.zoom = app.zoom;
         }
+
+        if (app && app.center) {
+            viewConfig.center = app.center;
+        }
+
+        // now apply any defaults if not set by the app
+        Ext.applyIf(viewConfig, me.mapViewConfig)
+
+        var view = new ol.View(viewConfig);
 
         // create a default map if one has not already been created in a derived class
         if (!me.map) {
@@ -220,10 +242,7 @@ Ext.define('CpsiMapview.view.main.Map', {
                 interactions: ol.interaction.defaults().extend([
                     new ol.interaction.DragRotateAndZoom()
                 ]),
-                view: new ol.View({
-                    center: center,
-                    zoom: zoom
-                })
+                view: view
             });
         }
 
