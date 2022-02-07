@@ -548,7 +548,8 @@ Ext.define('CpsiMapview.controller.grid.Grid', {
     getOlLayer: function () {
         var me = this;
         var viewModel = me.getViewModel();
-        var wmsLayerKey = viewModel.get('wmsLayerKey');
+        // look for both wms and vector tile layers (vtwms)
+        var wmsLayerKey = viewModel.get('wmsLayerKey') ? viewModel.get('wmsLayerKey') : viewModel.get('vtwmsLayerKey');
         var vectorLayerKey = viewModel.get('vectorLayerKey');
         var layer;
 
