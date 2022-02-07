@@ -37,9 +37,7 @@ Ext.define('CpsiMapview.util.WmsFilter', {
     * Executed when this menu item is clicked.
     * Forces redraw of the connected layer.
     */
-    getWmsFilterString: function (layer) {
-
-        var wmsParams = CpsiMapview.util.WmsFilter.getWmsParams(layer);
+    getWmsFilterString: function (wmsParams) {
 
         var layers = wmsParams.LAYERS || [];
         var originalFilters = wmsParams.FILTER || [];

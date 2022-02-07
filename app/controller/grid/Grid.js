@@ -115,8 +115,6 @@ Ext.define('CpsiMapview.controller.grid.Grid', {
             wmsLayer = me.getLayerByKey(viewModel.get('vtwmsLayerKey'));
         }
 
-        var isVt = wmsLayer.get('isVt');
-
         if (me.spatialFilter) {
             filters.push(me.spatialFilter);
         }
@@ -129,14 +127,7 @@ Ext.define('CpsiMapview.controller.grid.Grid', {
 
             var wmsFilterUtil = CpsiMapview.util.WmsFilter;
             var wmsSource = wmsLayer.getSource();
-            var wmsParams = wmsFilterUtil.getWmsParams(wmsLayer)
-
-            if (wmsLayer.get('isVt') === true) {
-                var urlParts = wmsSource.getUrls()[0].split('?');
-                wmsParams = Ext.Object.fromQueryString(urlParts[1]);
-            } else {
-                wmsSource.getParams();
-            }
+            var wmsParams = wmsFilterUtil.getWmsParams(wmsLayer);
 
             // save the current filter string to see if the filter has changed
             var originalFilterString = wmsParams.FILTER || '';
@@ -150,7 +141,7 @@ Ext.define('CpsiMapview.controller.grid.Grid', {
             }
 
             // ensure there is a filter for every layer listed in the WMS request (required by MapServer)
-            var wmsFilterString = wmsFilterUtil.getWmsFilterString(wmsLayer);
+            var wmsFilterString = wmsFilterUtil.getWmsFilterString(wmsParams);
 
             // if the filters have not changed then we do not need to refresh
             // unless the underlying data has changed and force is used
@@ -162,7 +153,7 @@ Ext.define('CpsiMapview.controller.grid.Grid', {
                 };
 
                 if (wmsLayer.get('isVt') === true) {
-                    CpsiMapview.util.Layer.updateVectorTileParameters(newParams)
+                    CpsiMapview.util.Layer.updateVectorTileParameters(wmsLayer, newParams);
                 } else {
                     wmsSource.updateParams();
                 }

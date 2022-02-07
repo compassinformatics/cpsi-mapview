@@ -12,9 +12,8 @@ describe('CpsiMapview.util.Layer', function () {
         it('#layerRefresh WMS', function () {
 
             var lyr = new ol.layer.Image({
-                source: new ol.source.ImageWMS({
-                    isWms: true
-                })
+                isWms: true,
+                source: new ol.source.ImageWMS()
             });
 
             var params = lyr.getSource().getParams();
@@ -42,7 +41,7 @@ describe('CpsiMapview.util.Layer', function () {
 
             var lyr = new ol.layer.VectorTile({
                 isVt: true,
-                source: new ol.source.Vector({
+                source: new ol.source.VectorTile({
                     url: '/mapserver/?FORMAT=mvt'
                 })
             });

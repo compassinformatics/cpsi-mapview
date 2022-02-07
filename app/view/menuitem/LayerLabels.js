@@ -255,7 +255,7 @@ Ext.define('CpsiMapview.view.menuitem.LayerLabels', {
         // once the LAYERS parameter has been updated
         // ensure there is a filter for every layer listed in the WMS request (required by MapServer)
         var wmsFilterUtil = CpsiMapview.util.WmsFilter;
-        var wmsFilterString = wmsFilterUtil.getWmsFilterString(layer);
+        var wmsFilterString = wmsFilterUtil.getWmsFilterString(wmsSource.getParams());
 
         var newParams = {
             FILTER: wmsFilterString,
