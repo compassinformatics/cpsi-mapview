@@ -13,13 +13,33 @@ Ext.define('CpsiMapview.util.WmsFilter', {
     singleton: true,
 
     /**
+     * Get the parameters to be sent to the server as a JS object
+     * Supports getting parameters from WMS layers or vector tile
+     * layers which store WMS parameters in a URL template
+     * @param {any} layer
+     */
+    getWmsParams: function (layer) {
+
+        var wmsParams;
+        var wmsSource = layer.getSource();
+
+        if (layer.get('isVt') === true) {
+            var urlParts = wmsSource.getUrls()[0].split('?');
+            wmsParams = Ext.Object.fromQueryString(urlParts[1]);
+        } else {
+            wmsParams = wmsSource.getParams();
+        }
+
+        return wmsParams;
+    },
+
+    /**
     * Executed when this menu item is clicked.
     * Forces redraw of the connected layer.
     */
     getWmsFilterString: function (layer) {
 
-        var wmsSource = layer.getSource();
-        var wmsParams = wmsSource.getParams();
+        var wmsParams = CpsiMapview.util.WmsFilter.getWmsParams(layer);
 
         var layers = wmsParams.LAYERS || [];
         var originalFilters = wmsParams.FILTER || [];
