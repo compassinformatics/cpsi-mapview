@@ -120,7 +120,10 @@ Ext.define(&#39;CpsiMapview.view.grid.Grid&#39;, {
             xtype: &#39;button&#39;,
             text: &#39;Clear Filters&#39;,
             glyph: &#39;f0b0@FontAwesome&#39;,
-            handler: &#39;clearFilters&#39;
+            handler: &#39;clearFilters&#39;,
+            bind: {
+                hidden: &#39;{!clearFiltersVisible}&#39;
+            }
         },
         {
             xtype: &#39;button&#39;,
