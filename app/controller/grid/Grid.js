@@ -155,7 +155,7 @@ Ext.define('CpsiMapview.controller.grid.Grid', {
                 if (wmsLayer.get('isVt') === true) {
                     CpsiMapview.util.Layer.updateVectorTileParameters(wmsLayer, newParams);
                 } else {
-                    wmsSource.updateParams();
+                    wmsSource.updateParams(newParams);
                 }
             }
             // keep a reference to the raw filters so they can be applied to the vector layer
