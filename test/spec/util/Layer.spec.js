@@ -54,6 +54,9 @@ describe('CpsiMapview.util.Layer', function () {
 
             expect(params.TIMESTAMP).to.be(undefined);
             layerUtil.layerRefresh(lyr);
+
+            urlParts = src.getUrls()[0].split('?');
+            params = Ext.Object.fromQueryString(urlParts[1]);
             expect(params.TIMESTAMP).not.to.be(undefined);
         });
 
