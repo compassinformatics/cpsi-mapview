@@ -153,7 +153,7 @@ Ext.define(&#39;CpsiMapview.util.SwitchLayer&#39;, {
 
             // ensure there is a filter for every layer listed in the WMS request (required by MapServer)
             var wmsFilterUtil = CpsiMapview.util.WmsFilter;
-            var wmsFilterString = wmsFilterUtil.getWmsFilterString(newLayer);
+            var wmsFilterString = wmsFilterUtil.getWmsFilterString(newLayerSource.getParams());
 
             // apply new style parameter and reload layer
             var newParams = {
