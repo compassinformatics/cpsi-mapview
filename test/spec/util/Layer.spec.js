@@ -42,6 +42,7 @@ describe('CpsiMapview.util.Layer', function () {
             var lyr = new ol.layer.VectorTile({
                 isVt: true,
                 source: new ol.source.VectorTile({
+                    format: 'mvt',
                     url: '/mapserver/?FORMAT=mvt'
                 })
             });
