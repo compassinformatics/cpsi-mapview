@@ -5,8 +5,37 @@
  */
 Ext.define('CpsiMapview.util.Layer', {
     alternateClassName: 'LayerUtil',
-    requires: ['GeoExt.util.OGCFilter'],
+    requires: [
+        'GeoExt.util.OGCFilter',
+        'CpsiMapview.util.WmsFilter'
+    ],
     singleton: true,
+
+    /**
+     * Update a vector tile layer parameter to be sent to the server
+     * With MapServer MVT layers use the WMS protocol, but in OpenLayers these
+     * parameters are added to a URL template
+     * @param {any} layer
+     * @param {any} newParams
+     */
+    updateVectorTileParameters: function (layer, newParams) {
+
+        var source = layer.getSource();
+        var params = CpsiMapview.util.WmsFilter.getWmsParams(layer);
+
+        Ext.apply(params, newParams);
+
+        var urlParts = source.getUrls()[0].split('?');
+
+        // use decodeURI to the template holders in the url e.g. {width} are not encoded to %7Bwidth%7D
+        var queryString = decodeURI(Ext.Object.toQueryString(params));
+        var newUrl = Ext.String.format('{0}?{1}', urlParts[0], queryString);
+
+        // don't use setUrl as this seems to replace the setTileUrlFunction function
+        // set in CpsiMapview.factory.Layer
+        source.urls[0] = newUrl;
+        source.refresh();
+    },
 
     /**
     * Executed when this menu item is clicked.
@@ -17,11 +46,13 @@ Ext.define('CpsiMapview.util.Layer', {
         var source = layer.getSource();
 
         // mostly WMS layers
-        if (source.updateParams) {
+        if (layer.get('isWms') === true) {
             var params = source.getParams();
             params.TIMESTAMP = Ext.Date.now();
             source.updateParams(params);
             source.refresh();
+        } else if (layer.get('isVt') === true) {
+            CpsiMapview.util.Layer.updateVectorTileParameters(layer, { TIMESTAMP: Ext.Date.now() });
         } else if (layer.get('isWfs') === true) {
             if (source instanceof ol.source.Cluster) {
                 // for clustered layers we need to get the original source - see #203
@@ -52,16 +83,15 @@ Ext.define('CpsiMapview.util.Layer', {
             return;
         }
 
-        var source = layer.getSource();
         var hasFilters = false;
 
-        if (source.updateParams) {
-            // WMS layer
-            var params = source.getParams();
+        if (layer.get('isWms') || layer.get('isVt')) {
+            var params = CpsiMapview.util.WmsFilter.getWmsParams(layer);
             if (params.FILTER) {
                 hasFilters = true;
             }
         } else if (layer.get('isWfs') === true) {
+            var source = layer.getSource();
             if (source instanceof ol.source.Cluster) {
                 // for clustered layers we need to get the original source - see #203
                 source = source.getSource();
@@ -187,7 +217,6 @@ Ext.define('CpsiMapview.util.Layer', {
     * Creates custom filters for a vector source based on
     * all the components which can set filters on a source
     *
-
     *
     * @param {ol.source.Vector}  Vector layer source
     *

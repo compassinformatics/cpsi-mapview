@@ -110,6 +110,11 @@ Ext.define('CpsiMapview.controller.grid.Grid', {
         var filters = Ext.clone(store.getFilters().items); // otherwise the actual grid filters are modified
         var wmsLayer = me.getLayerByKey(viewModel.get('wmsLayerKey'));
 
+        // also check for MVT layer keys
+        if (!wmsLayer) {
+            wmsLayer = me.getLayerByKey(viewModel.get('vtwmsLayerKey'));
+        }
+
         if (me.spatialFilter) {
             filters.push(me.spatialFilter);
         }
@@ -120,8 +125,9 @@ Ext.define('CpsiMapview.controller.grid.Grid', {
 
         if (wmsLayer) {
 
+            var wmsFilterUtil = CpsiMapview.util.WmsFilter;
             var wmsSource = wmsLayer.getSource();
-            var wmsParams = wmsSource.getParams();
+            var wmsParams = wmsFilterUtil.getWmsParams(wmsLayer);
 
             // save the current filter string to see if the filter has changed
             var originalFilterString = wmsParams.FILTER || '';
@@ -135,16 +141,22 @@ Ext.define('CpsiMapview.controller.grid.Grid', {
             }
 
             // ensure there is a filter for every layer listed in the WMS request (required by MapServer)
-            var wmsFilterUtil = CpsiMapview.util.WmsFilter;
-            var wmsFilterString = wmsFilterUtil.getWmsFilterString(wmsLayer);
+            var wmsFilterString = wmsFilterUtil.getWmsFilterString(wmsParams);
 
             // if the filters have not changed then we do not need to refresh
             // unless the underlying data has changed and force is used
             if (force === true || originalFilterString !== wmsFilterString) {
-                wmsSource.updateParams({
+
+                var newParams = {
                     FILTER: wmsFilterString,
                     TIMESTAMP: Ext.Date.now()
-                });
+                };
+
+                if (wmsLayer.get('isVt') === true) {
+                    CpsiMapview.util.Layer.updateVectorTileParameters(wmsLayer, newParams);
+                } else {
+                    wmsSource.updateParams(newParams);
+                }
             }
             // keep a reference to the raw filters so they can be applied to the vector layer
             // when switching
@@ -548,7 +560,8 @@ Ext.define('CpsiMapview.controller.grid.Grid', {
     getOlLayer: function () {
         var me = this;
         var viewModel = me.getViewModel();
-        var wmsLayerKey = viewModel.get('wmsLayerKey');
+        // look for both wms and vector tile layers (vtwms)
+        var wmsLayerKey = viewModel.get('wmsLayerKey') ? viewModel.get('wmsLayerKey') : viewModel.get('vtwmsLayerKey');
         var vectorLayerKey = viewModel.get('vectorLayerKey');
         var layer;
 

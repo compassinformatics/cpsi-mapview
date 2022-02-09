@@ -12,9 +12,8 @@ describe('CpsiMapview.util.Layer', function () {
         it('#layerRefresh WMS', function () {
 
             var lyr = new ol.layer.Image({
-                source: new ol.source.ImageWMS({
-                    isWfs: true
-                })
+                isWms: true,
+                source: new ol.source.ImageWMS()
             });
 
             var params = lyr.getSource().getParams();
@@ -36,6 +35,29 @@ describe('CpsiMapview.util.Layer', function () {
             expect(src.get('timestamp')).to.be(undefined);
             layerUtil.layerRefresh(lyr);
             expect(src.get('timestamp')).not.to.be(undefined);
+        });
+
+        it('#layerRefresh MVT', function () {
+
+            var lyr = new ol.layer.VectorTile({
+                isVt: true,
+                source: new ol.source.VectorTile({
+                    format: 'mvt',
+                    url: '/mapserver/?FORMAT=mvt'
+                })
+            });
+
+            var src = lyr.getSource();
+
+            var urlParts = src.getUrls()[0].split('?');
+            params = Ext.Object.fromQueryString(urlParts[1]);
+
+            expect(params.TIMESTAMP).to.be(undefined);
+            layerUtil.layerRefresh(lyr);
+
+            urlParts = src.getUrls()[0].split('?');
+            params = Ext.Object.fromQueryString(urlParts[1]);
+            expect(params.TIMESTAMP).not.to.be(undefined);
         });
 
         it('#layerRefresh clustered WFS', function () {
