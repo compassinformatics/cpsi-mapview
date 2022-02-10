@@ -297,48 +297,27 @@ Ext.define('CpsiMapview.form.ControllerMixin', {
 
         var tool, toolCtrl;
 
-        if (vm.get('hideDigitiseLineButton') === false) {
-            tool = vw.down('#lineDigitiserButton');
-            toolCtrl = tool.getController();
-            toolCtrl.setResultLayer(resultLayer);
-            toolCtrl.setDrawLayer(resultLayer);
-        }
+        // get all digitising tools that are part of the map toggleGroup and visible
+        var toolButtons = vw.query('button[toggleGroup=map][hidden=false]');
 
-        if (vm.get('hideDigitisePointButton') === false) {
-            tool = vw.down('#pointDigitiserButton');
-            toolCtrl = tool.getController();
-            toolCtrl.setResultLayer(resultLayer);
-            toolCtrl.setDrawLayer(resultLayer);
-        }
+        // now ensure that the tool layers are updated to reflect the new layers/stores
+        Ext.each(toolButtons, function (toolBtn) {
+            toolCtrl = toolBtn.getController();
 
-        if (vm.get('hideDigitiseAreaButton') === false) {
-            tool = vw.down('#areaDigitiserButton');
-            toolCtrl = tool.getController();
-            toolCtrl.setResultLayer(resultLayer);
-            toolCtrl.setDrawLayer(polygonLayer);
-        }
+            if (toolCtrl.setResultLayer) {
+                // ensure scope is set to the controller when calling the function
+                toolCtrl.setResultLayer(resultLayer);
+            }
 
-        if (vm.get('circleDigitiserButton') === false) {
-            tool = vw.down('#circleDigitiserButton');
-            toolCtrl = tool.getController();
-            toolCtrl.setResultLayer(resultLayer);
-            toolCtrl.setDrawLayer(polygonLayer);
-        }
-
-        if (vm.get('hideDigitiseSegmentButton') === false) {
-            tool = vw.down('#segmentDigitiserButton');
-            toolCtrl = tool.getController();
-            toolCtrl.setResultLayer(resultLayer);
-            // we can remove any draw points following a reload or save here
-            // for now we can do this in event handlers on the controller
-            //toolCtrl.drawLayer.getSource().clear();
-        }
-
-        if (vm.get('hideSplitByClickButton') === false) {
-            tool = vw.down('#splitByClickButton');
-            toolCtrl = tool.getController();
-            toolCtrl.setResultLayer(resultLayer);
-        }
+            if (toolCtrl.setDrawLayer) {
+                if (polygonLayer) {
+                    // for the circleDigitiserButton and areaDigitiserButton tools
+                    toolCtrl.setDrawLayer(polygonLayer);
+                } else {
+                    toolCtrl.setDrawLayer(resultLayer);
+                }
+            }
+        });
 
         // only destroy this after the new record has been set as getting errors in checkHadValue > getChildValue
         // it seems to be an issue with checkBoxes only
