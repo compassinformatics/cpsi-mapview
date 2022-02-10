@@ -295,7 +295,7 @@ Ext.define('CpsiMapview.form.ControllerMixin', {
         var polygonLayer = vm.get('polygonLayer');
         var vw = me.getView();
 
-        var tool, toolCtrl;
+        var toolCtrl;
 
         // get all digitising tools that are part of the map toggleGroup and visible
         var toolButtons = vw.query('button[toggleGroup=map][hidden=false]');
