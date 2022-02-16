@@ -87,7 +87,8 @@ Ext.define('CpsiMapview.view.LayerTree', {
                         'cmv_menuitem_layeropacity',
                         'cmv_menuitem_layergrid',
                         'cmv_menuitem_layermetadata',
-                        'cmv_menuitem_layerfilterreset'
+                        'cmv_menuitem_layerfilterreset',
+                        'cmv_menuitem_layerhelp'
                     ]
                 }, {
                     ptype: 'cmv_tree_inresolutionrange'
