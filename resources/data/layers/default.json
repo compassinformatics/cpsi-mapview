@@ -60,7 +60,7 @@
     {
       "layerType": "osm",
       "layerKey": "OSM_BACKGROUND",
-      "helpPage": "OSM",
+      "helpUrl": "https://www.openstreetmap.org/about",
       "isDefaultBaseLayer": true,
       "legendUrl": "https://a.tile.openstreetmap.org/9/244/166.png",
       "legendHeight": 100
@@ -68,7 +68,7 @@
     {
       "layerType": "wms",
       "layerKey": "OSM_WMS",
-      "helpPage": "OSM",
+      "helpUrl": "https://www.openstreetmap.org/about",
       "url": "https://ows.terrestris.de/osm-gray/service",
       "serverOptions": {
         "layers": "OSM-WMS"
@@ -83,7 +83,7 @@
     {
       "layerType": "wms",
       "layerKey": "OSM_WMS2",
-      "helpPage": "OSM",
+      "helpUrl": "https://www.openstreetmap.org/about",
       "url": "https://ows.terrestris.de/osm-gray/service",
       "serverOptions": {
         "layers": "OSM-WMS"
@@ -98,7 +98,7 @@
     {
       "layerType": "wms",
       "layerKey": "OSM_WMS3",
-      "helpPage": "OSM",
+      "helpUrl": "https://www.openstreetmap.org/about",
       "url": "https://ows.terrestris.de/osm-gray/service",
       "serverOptions": {
         "layers": "OSM-WMS"
@@ -113,7 +113,7 @@
     {
       "layerType": "wms",
       "layerKey": "OSM_WMS4",
-      "helpPage": "OSM",
+      "helpUrl": "https://www.openstreetmap.org/about",
       "url": "https://ows.terrestris.de/osm-gray/service",
       "serverOptions": {
         "layers": "OSM-WMS"
