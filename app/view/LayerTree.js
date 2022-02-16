@@ -12,6 +12,7 @@ Ext.define('CpsiMapview.view.LayerTree', {
         'CpsiMapview.view.menuitem.LayerLabels',
         'CpsiMapview.view.menuitem.LayerOpacity',
         'CpsiMapview.view.menuitem.LayerGrid',
+        'CpsiMapview.view.menuitem.LayerHelp',
         'CpsiMapview.view.menuitem.LayerStyleSwitcher',
         'CpsiMapview.view.menuitem.LayerMetadata',
         'CpsiMapview.view.menuitem.LayerFilterReset',
