@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+  <title>The source code</title>
+  <link href="../resources/prettify/prettify.css" type="text/css" rel="stylesheet" />
+  <script type="text/javascript" src="../resources/prettify/prettify.js"></script>
+  <style type="text/css">
+    .highlight { display: block; background-color: #ddd; }
+  </style>
+  <script type="text/javascript">
+    function highlight() {
+      document.getElementById(location.hash.replace(/#/, "")).className = "highlight";
+    }
+  </script>
+</head>
+<body onload="prettyPrint(); highlight();">
+  <pre class="prettyprint lang-js"><span id='CpsiMapview-view-menuitem-LayerHelp'>/**
+</span> * MenuItem to open a help page associated with a layer
+ *
+ * @class CpsiMapview.view.menuitem.LayerHelp
+ */
+Ext.define(&#39;CpsiMapview.view.menuitem.LayerHelp&#39;, {
+    extend: &#39;Ext.menu.Item&#39;,
+    xtype: &#39;cmv_menuitem_layerhelp&#39;,
+    mixins: [&#39;CpsiMapview.form.HelpMixin&#39;],
+    requires: [
+        &#39;CpsiMapview.util.Grid&#39;
+    ],
+
+<span id='CpsiMapview-view-menuitem-LayerHelp-cfg-layer'>    /**
+</span>     * The connected layer for this item.
+     *
+     * @cfg {ol.layer.Base}
+     */
+    layer: null,
+
+<span id='CpsiMapview-view-menuitem-LayerHelp-cfg-text'>    /**
+</span>     * Text shown in this MenuItem
+     * @cfg {String}
+     */
+    text: &#39;Help&#39;,
+
+<span id='CpsiMapview-view-menuitem-LayerHelp-property-viewModel'>    /**
+</span>     * An empty view model to store a helpUrl
+    */
+    viewModel: {},
+
+<span id='CpsiMapview-view-menuitem-LayerHelp-method-initComponent'>    /**
+</span>     * @private
+     */
+    initComponent: function () {
+
+        var me = this;
+        var showHelp = false;
+
+        var helpUrl = null;
+
+        // check if there is a helpUrl added directly to the layer config
+        if (me.layer.get(&#39;helpUrl&#39;)) {
+            helpUrl = me.layer.get(&#39;helpUrl&#39;);
+        } else {
+            // also check if there is a helpUrl specified in an associated layer grid
+            var gridWindow = CpsiMapview.util.Grid.getGridWindow(me.layer);
+
+            if (gridWindow) {
+                var grid = gridWindow.down(&#39;grid&#39;);
+                helpUrl = grid.getViewModel().get(&#39;helpUrl&#39;);
+            }
+        }
+
+        if (helpUrl) {
+            var vm = me.getViewModel();
+            vm.set(&#39;helpUrl&#39;, helpUrl);
+            showHelp = true;
+        }
+
+        me.handler = me.handlerFunc;
+        me.callParent();
+        me.setHidden(!showHelp);
+    },
+
+<span id='CpsiMapview-view-menuitem-LayerHelp-method-handlerFunc'>    /**
+</span>     * Executed when this menu item is clicked.
+     * Opens the help page associated with the layer
+     */
+    handlerFunc: function () {
+        var me = this;
+        me.onHelp();
+    }
+});
+</pre>
+</body>
+</html>

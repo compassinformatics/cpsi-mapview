@@ -141,6 +141,8 @@ Ext.define(&#39;CpsiMapview.factory.Layer&#39;, {
             mapLayer.set(&#39;grouping&#39;, layerConf.grouping);
             // if layer has metadata
             mapLayer.set(&#39;hasMetadata&#39;, layerConf.hasMetadata);
+            // if a layer has its own help page
+            mapLayer.set(&#39;helpUrl&#39;, layerConf.helpUrl);
         }
 
         return mapLayer;
