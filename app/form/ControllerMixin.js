@@ -309,11 +309,11 @@ Ext.define('CpsiMapview.form.ControllerMixin', {
                 toolCtrl.setResultLayer(resultLayer);
             }
 
-            if (toolCtrl.setDrawLayer) {
-                if (polygonLayer) {
-                    // for the circleDigitiserButton and areaDigitiserButton tools
-                    toolCtrl.setDrawLayer(polygonLayer);
-                } else {
+            if (polygonLayer) {
+                toolCtrl.setDrawLayer(polygonLayer);
+            } else {
+                // the resultLayer and drawLayer are the same layer for the local editing tools
+                if (Ext.Array.contains(['lineDigitiserButton', 'pointDigitiserButton'], toolBtn.getItemId())) {
                     toolCtrl.setDrawLayer(resultLayer);
                 }
             }
