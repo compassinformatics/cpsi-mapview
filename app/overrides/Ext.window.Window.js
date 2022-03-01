@@ -5,7 +5,7 @@
  * displayed (although this "bounces" the window back within the viewport rather than constraining the header)
  */
 Ext.override(Ext.window.Window, {
-    createGhost: function (cls) {
+    createGhost: function () {
 
         // original function
         //var ghost = this.callParent(arguments);
