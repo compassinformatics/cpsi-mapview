@@ -309,7 +309,11 @@ Ext.define('CpsiMapview.form.ControllerMixin', {
                 toolCtrl.setResultLayer(resultLayer);
             }
 
-            if (polygonLayer) {
+            // set the polygonLayer for polygon tools
+            if (toolBtn.type === 'Polygon' || toolBtn.type === 'Circle') {
+                //<debug>
+                Ext.Assert.truthy(polygonLayer);
+                //</debug>
                 toolCtrl.setDrawLayer(polygonLayer);
             } else {
                 // the resultLayer and drawLayer are the same layer for the local editing tools
@@ -412,7 +416,6 @@ Ext.define('CpsiMapview.form.ControllerMixin', {
                 polygonLayer.getSource().clear();
             }
         }
-
     },
 
     /**
