@@ -285,6 +285,9 @@ Ext.define('CpsiMapview.form.ControllerMixin', {
         vm.set('currentRecord', serverRec);
         vm.notify(); // flush all bindings, otherwise the grid may still be bound to the old layer
 
+        // also reset the listener added flag as once reloaded the layers have a different source
+        me.toolListenerAdded = false;
+
         // we also need to update the featureStores for any associated tools
         // as when a model is reloaded then the featureStore and layer
         // are recreated, and the tool is pointing to the old layer
@@ -425,7 +428,6 @@ Ext.define('CpsiMapview.form.ControllerMixin', {
      * won't have been created
      */
     onDigitizingToolToggle: function () {
-
         var me = this;
         var vm = me.getViewModel();
         var resultLayer = vm.get('resultLayer');
