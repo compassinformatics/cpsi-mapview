@@ -32,7 +32,7 @@ Ext.define('CpsiMapview.field.Polygon', {
 
         // filter out any non-polygon features
         feats = feats.filter(function (f) {
-            return f.getGeometry() instanceof ol.geom.Polygon;
+            return f.getGeometry() instanceof ol.geom.Polygon || f.getGeometry() instanceof ol.geom.Circle;
         });
 
         if (feats.length >= 1) {
