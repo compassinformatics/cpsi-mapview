@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+  <title>The source code</title>
+  <link href="../resources/prettify/prettify.css" type="text/css" rel="stylesheet" />
+  <script type="text/javascript" src="../resources/prettify/prettify.js"></script>
+  <style type="text/css">
+    .highlight { display: block; background-color: #ddd; }
+  </style>
+  <script type="text/javascript">
+    function highlight() {
+      document.getElementById(location.hash.replace(/#/, "")).className = "highlight";
+    }
+  </script>
+</head>
+<body onload="prettyPrint(); highlight();">
+  <pre class="prettyprint lang-js"><span id=''>/**
+</span> * Ensure dragging a window works correctly when the initial defaultAlign is not the default &#39;c-c&#39;
+ * See https://forum.sencha.com/forum/showthread.php?469839-6-5-3-Classic-Window-quot-jumps-quot-when-dragged-with-constrainHeader-true
+ * An alternate solution is to set constrainHeader: false in the window and then set win.constrainHeader = true after the window is
+ * displayed (although this &quot;bounces&quot; the window back within the viewport rather than constraining the header)
+ */
+Ext.override(Ext.window.Window, {
+<span id='-method-createGhost'>    createGhost: function () {
+</span>
+        // original function
+        //var ghost = this.callParent(arguments);
+
+        //ghost.xtype = &#39;window&#39;;
+        //ghost.focusOnToFront = false;
+
+        //return ghost;
+
+        var ghost = this.callParent(arguments);
+        var me = this;
+        ghost.x = me.getX();
+        ghost.y = me.getY();
+
+        return ghost;
+    }
+});</pre>
+</body>
+</html>
