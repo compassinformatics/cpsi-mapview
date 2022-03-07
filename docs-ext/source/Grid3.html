@@ -308,7 +308,9 @@ Ext.define(&#39;CpsiMapview.controller.grid.Grid&#39;, {
             store.currentPage = 1;
         }
 
-        store.loadWfs();
+        if (store.loadWfs) {
+            store.loadWfs();
+        }
     },
 
 <span id='CpsiMapview-controller-grid-Grid-method-onIdFilterSet'>    /**
