@@ -531,6 +531,13 @@ Ext.define('CpsiMapview.controller.grid.Grid', {
             // query the server again to retrieve the data
             // idProperty will always be loaded so no need to reload in this case
             // if a column does not have a dataIndex (e.g. checkbox columns) then there is no need to requery the server
+
+            // reset lastOptions used to load store to avoid records disappearing
+            // this can happen if spatial filters are applied when on pages of data > 1 and
+            // then new columns are displayed
+            store.lastOptions.start = 0;
+            store.lastOptions.page = 1;
+
             store.reload();
         }
     },
