@@ -231,12 +231,14 @@ Ext.define(&#39;CpsiMapview.util.ApplicationMixin&#39;, {
 <span id='CpsiMapview-util-ApplicationMixin-method-onMapToolsToggle'>    /**
 </span>     * Whenever any tools that are part of the &#39;map&#39; toggleGroup are toggled
      * we check to see if any tools are still active.
+     * As the &#39;pan&#39; tool is simply a button with no associated tool we can exclude this
+     * from the search
      * The defaultClickEnabled value is then used to check if the
      * default CpsiMapview.plugin.FeatureInfoWindow tool should be active
      * */
     onMapToolsToggle: function () {
 
-        var buttonsInToggleGroup = Ext.ComponentQuery.query(&#39;button[toggleGroup=map]&#39;);
+        var buttonsInToggleGroup = Ext.ComponentQuery.query(&#39;button[toggleGroup=map][name!=pan]&#39;);
         var pressedStates = Ext.Array.pluck(buttonsInToggleGroup, &#39;pressed&#39;);
         var uniquePressedStates = Ext.Array.unique(pressedStates);
         var activeTools = Ext.Array.contains(uniquePressedStates, true);
