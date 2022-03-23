@@ -136,7 +136,7 @@ Ext.define('CpsiMapview.view.button.DigitizeButton', {
      * The name of the toggleGroup
      * Activates the toggle behaviour of the button
      */
-    toggleGroup: 'digitize',
+    toggleGroup: 'map',
 
     /**
      * Register the listeners and redirect them

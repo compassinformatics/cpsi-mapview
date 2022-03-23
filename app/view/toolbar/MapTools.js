@@ -39,6 +39,12 @@ Ext.define('CpsiMapview.view.toolbar.MapTools', {
                     xtype: 'basigx-button-zoomtoextent',
                     extent: [-1210762, 6688545, -600489, 7490828]
                 }, {
+                    xtype: 'button',
+                    toggleGroup: 'map',
+                    name: 'pan',
+                    tooltip: 'Pan the map',
+                    glyph: 'xf256@FontAwesome',
+                }, {
                     xtype: 'basigx-button-zoomin',
                     toggleGroup: 'map'
                 }, {
