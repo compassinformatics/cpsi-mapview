@@ -44,7 +44,12 @@ Ext.define(&#39;CpsiMapview.view.toolbar.MapFooter&#39;, {
         },
         {
             xtype: &#39;basigx-maploadingstatusbar&#39;,
-            width: 200
+            width: 200,
+            waitConf: {
+                interval: 200,
+                increment: 15,
+                duration: 300 // hide the status bar after 30 seconds to avoid hanging
+            }
         },
         {
             xtype: &#39;cmv_numericattributeslider&#39;,
