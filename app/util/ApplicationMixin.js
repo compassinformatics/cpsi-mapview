@@ -91,6 +91,7 @@ Ext.define('CpsiMapview.util.ApplicationMixin', {
         UserTokenExpired: 3,
         CookieHeaderMissing: 4,
         NoPermission: 5,
+        NoTokenProvided: 6,
         GeneralServerError: 500,
         FileNotFound: 404
     },
@@ -161,6 +162,7 @@ Ext.define('CpsiMapview.util.ApplicationMixin', {
                             switch (result.errorCode) {
                                 case me.errorCode.UserTokenExpired:
                                 case me.errorCode.CookieHeaderMissing:
+                                case me.errorCode.NoTokenProvided:
                                     // user must login again
                                     me.doLogin();
                                     break;

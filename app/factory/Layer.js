@@ -27,7 +27,7 @@ Ext.define('CpsiMapview.factory.Layer', {
      * @param  {Object} layerConf  The configuration object
      * @return {ol.layer.Base} OL layer object
      */
-    createLayer: function(layerConf) {
+    createLayer: function (layerConf) {
 
         var layerType = layerConf.layerType;
         var mapLayer;
@@ -137,11 +137,11 @@ Ext.define('CpsiMapview.factory.Layer', {
      *
      * @param {ol.Object.Event} evt The event which contains the layer.
      */
-    ensureOnlyOneBaseLayerVisible: function(evt) {
+    ensureOnlyOneBaseLayerVisible: function (evt) {
         var changedLayer = evt.target;
         if (changedLayer.get('isBaseLayer') && changedLayer.getVisible()) {
             var allLayers = BasiGX.util.Layer.getAllLayers();
-            Ext.each(allLayers, function(layer) {
+            Ext.each(allLayers, function (layer) {
                 if (!layer.get('isBaseLayer') || layer.id === changedLayer.id) {
                     return;
                 }
@@ -153,7 +153,7 @@ Ext.define('CpsiMapview.factory.Layer', {
 
     },
 
-    createEmptyLayer: function(layerConf) {
+    createEmptyLayer: function (layerConf) {
         Ext.log.info('Not implemented yet', layerConf);
     },
 
@@ -164,15 +164,15 @@ Ext.define('CpsiMapview.factory.Layer', {
      * @param  {Object} layerConf The configuration object for this layer
      * @return {ol.layer.Base}    The created sub layer
      */
-    createSwitchLayer: function(layerConf) {
+    createSwitchLayer: function (layerConf) {
         // compute switch resolution when layer is
         // initialised the first time
-        if(!layerConf.switchResolution){
+        if (!layerConf.switchResolution) {
 
             // compute resolution from scale
             var unit = BasiGX.util.Map.getMapComponent().getView().getProjection().getUnits();
             var vectorFeaturesMinScale = layerConf.vectorFeaturesMinScale;
-            var switchResolution = BasiGX.util.Map.getResolutionForScale(vectorFeaturesMinScale ,unit);
+            var switchResolution = BasiGX.util.Map.getResolutionForScale(vectorFeaturesMinScale, unit);
 
             // add computed switch resolution to layerConf
             layerConf.switchResolution = switchResolution;
@@ -233,16 +233,47 @@ Ext.define('CpsiMapview.factory.Layer', {
             var xhr = new XMLHttpRequest();
             xhr.onload = function () {
                 if (this.status === 200) {
-                    var uInt8Array = new Uint8Array(this.response); //TODO Uint8Array is only available in IE10+
-                    var i = uInt8Array.length;
-                    var binaryString = new Array(i);
-                    while (i--) {
-                        binaryString[i] = String.fromCharCode(uInt8Array[i]);
-                    }
-                    var data = binaryString.join('');
+
                     var type = xhr.getResponseHeader('content-type');
                     if (type.indexOf('image') === 0) {
+                        var uInt8Array = new Uint8Array(this.response); //TODO Uint8Array is only available in IE10+
+                        var i = uInt8Array.length;
+                        var binaryString = new Array(i);
+                        while (i--) {
+                            binaryString[i] = String.fromCharCode(uInt8Array[i]);
+                        }
+                        var data = binaryString.join('');
                         img.src = 'data:' + type + ';base64,' + window.btoa(data);
+                    } else {
+                        // trigger an error so the loading bar is reset
+                        // see https://github.com/openlayers/openlayers/issues/10868#issuecomment-608424234
+                        image.state = 3; // ImageState.ERROR;
+                        image.changed();
+
+                        // MapServer returns errors as 'text/html'
+                        if (type.indexOf('text/html') === 0) {
+                            if ('TextDecoder' in window) {
+                                Ext.Logger.warn(new TextDecoder('utf-8').decode(this.response));
+                            }
+                        }
+
+                        if (type.indexOf('application/json') === 0) {
+                            var result = JSON.parse(new TextDecoder('utf-8').decode(this.response));
+                            if (result.success !== true) {
+                                var app = Ext.getApplication();
+                                switch (result.errorCode) {
+                                    case app.errorCode.UserTokenExpired:
+                                    case app.errorCode.CookieHeaderMissing:
+                                    case app.errorCode.NoTokenProvided:
+                                        // user must login again
+                                        app.doLogin();
+                                        break;
+                                    default:
+                                        Ext.Msg.alert('Error', result.message);
+                                        break;
+                                }
+                            }
+                        }
                     }
                 }
             };
@@ -354,7 +385,7 @@ Ext.define('CpsiMapview.factory.Layer', {
                             currentImgElement.src = src;
                         }
                         currentImgElement = undefined;
-                        task.delay(layerConf.debounce, function () {});
+                        task.delay(layerConf.debounce, function () { });
                     } else {
                         task.delay(layerConf.debounce, function () {
                             if (usePost) {
@@ -386,7 +417,7 @@ Ext.define('CpsiMapview.factory.Layer', {
      * @param  {Object} layerConf The configuration object for this layer
      * @return {ol.layer.Vector}  WFS layer
      */
-    createWfs: function(layerConf) {
+    createWfs: function (layerConf) {
         var url = layerConf.url;
         var baseUrl = layerConf.url;
         // transform OL2 properties to current ones supported by OL >=v3
@@ -412,7 +443,7 @@ Ext.define('CpsiMapview.factory.Layer', {
             SRSNAME: srid
         };
 
-        Ext.iterate(serverOptions, function(key, val) {
+        Ext.iterate(serverOptions, function (key, val) {
             key = (key + '').toUpperCase();
             if (key in params && val === null) {
                 delete params[key];
@@ -431,7 +462,7 @@ Ext.define('CpsiMapview.factory.Layer', {
 
         var vectorSource = new ol.source.Vector(olSourceConf);
 
-        var loaderFn = function(extent) {
+        var loaderFn = function (extent) {
             var layerSource = this;
             vectorSource.dispatchEvent('vectorloadstart');
 
@@ -470,12 +501,12 @@ Ext.define('CpsiMapview.factory.Layer', {
             var xhr = new XMLHttpRequest();
             xhr.open('POST', urlpost);
             xhr.setRequestHeader('Content-type', 'application/x-www-form-urlencoded');
-            var onError = function() {
+            var onError = function () {
                 vectorSource.removeLoadedExtent(extent);
                 vectorSource.dispatchEvent('vectorloaderror');
             };
             xhr.onerror = onError;
-            xhr.onload = function() {
+            xhr.onload = function () {
                 if (xhr.status == 200) {
                     // check the request returns the same type as the vectorSource
                     var contentType = xhr.getResponseHeader('Content-Type');
@@ -584,7 +615,7 @@ Ext.define('CpsiMapview.factory.Layer', {
      * @param  {String} type      The Bing layer type, e.g. 'Aerial'
      * @return {ol.layer.Tile}    Bing layer
      */
-    createBing: function(layerConf, type) {
+    createBing: function (layerConf, type) {
         // transform OL2 properties to current ones supported by OL >=v3
         var olSourceProps = this.ol2PropsToOlSourceProps(layerConf.openLayers);
         var olLayerProps = this.ol2PropsToOlLayerProps(layerConf.openLayers);
@@ -613,7 +644,7 @@ Ext.define('CpsiMapview.factory.Layer', {
      * @param  {Object} layerConf  The configuration object for this layer
      * @return {ol.layer.Tile} XYZ tile layer
      */
-    createXyz: function(layerConf) {
+    createXyz: function (layerConf) {
         // transform OL2 properties to current ones supported by OL >=v3
         var olSourceProps = this.ol2PropsToOlSourceProps(layerConf.openLayers);
         var olLayerProps = this.ol2PropsToOlLayerProps(layerConf.openLayers);
@@ -645,7 +676,7 @@ Ext.define('CpsiMapview.factory.Layer', {
      * @param  {Object} layerConf  The configuration object for this layer
      * @return {ol.layer.Tile} OSM layer
      */
-    createOsm: function(layerConf) {
+    createOsm: function (layerConf) {
         // transform OL2 properties to current ones supported by OL >=v3
         var olSourceProps = this.ol2PropsToOlSourceProps(layerConf.openLayers);
         var olLayerProps = this.ol2PropsToOlLayerProps(layerConf.openLayers);
@@ -662,7 +693,7 @@ Ext.define('CpsiMapview.factory.Layer', {
         return new ol.layer.Tile(olLayerConf);
     },
 
-    createGoogle: function(layerConf, layerType) {
+    createGoogle: function (layerConf, layerType) {
 
         Ext.log.info('Not implemented yet', layerConf, layerType);
     },
@@ -673,7 +704,7 @@ Ext.define('CpsiMapview.factory.Layer', {
      * @param  {Object} layerConf  The configuration object for this layer
      * @return {ol.layer.Tile}     World Wind (BlueMarble-200412) layer
      */
-    createNasa: function(layerConf) {
+    createNasa: function (layerConf) {
         var nasaWms = this.createWms({
             url: 'https://worldwind25.arc.nasa.gov/wms?',
             serverOptions: {
@@ -685,11 +716,11 @@ Ext.define('CpsiMapview.factory.Layer', {
         return nasaWms;
     },
 
-    createOs: function(layerConf) {
+    createOs: function (layerConf) {
         Ext.log.info('Not implemented yet', layerConf);
     },
 
-    createArcGisCache: function(layerConf) {
+    createArcGisCache: function (layerConf) {
         // Maybe this helps: https://stackoverflow.com/a/41608464
         Ext.log.info('Not implemented yet', layerConf);
     },
@@ -700,7 +731,7 @@ Ext.define('CpsiMapview.factory.Layer', {
      * @param  {Object} layerConf  The configuration object for this layer
      * @return {ol.layer.Tile}     ArcGIS REST layer
      */
-    createArcGisRest: function(layerConf) {
+    createArcGisRest: function (layerConf) {
         var layer;
         var singleTile = layerConf.openLayers.singleTile;
         // transform OL2 properties to current ones supported by OL >=v3
@@ -733,7 +764,7 @@ Ext.define('CpsiMapview.factory.Layer', {
         return layer;
     },
 
-    createServerArray: function(path) {
+    createServerArray: function (path) {
         Ext.log.info('Not implemented yet', path);
     },
 
@@ -806,7 +837,7 @@ Ext.define('CpsiMapview.factory.Layer', {
         // just setting 'opacity' to the layer does not work
         // seems related to https://github.com/openlayers/openlayers/issues/4758
         if (Ext.isNumber(layerConf.opacity)) {
-            vtLayer.on('prerender', function(evt) {
+            vtLayer.on('prerender', function (evt) {
                 evt.context.globalAlpha = layerConf.opacity;
             });
         }
@@ -826,7 +857,7 @@ Ext.define('CpsiMapview.factory.Layer', {
 
         // apply a custom tileUrlFunction in order to create a valid URL
         // to retrieve the Vector Tiles via WMS facade
-        source.setTileUrlFunction(function(coord) {
+        source.setTileUrlFunction(function (coord) {
             var filters = CpsiMapview.util.Layer.filterVectorSource(source);
             var ogcFilter = null;
 
@@ -914,7 +945,7 @@ Ext.define('CpsiMapview.factory.Layer', {
         Ext.Ajax.request({
             url: sldUrl,
             method: 'GET',
-            success: function(response) {
+            success: function (response) {
                 var sldXml = response.responseText;
                 var sldParser = new GeoStylerSLDParser.SldStyleParser();
                 var olParser = new GeoStylerOpenlayersParser.OlStyleParser(ol);
@@ -922,7 +953,7 @@ Ext.define('CpsiMapview.factory.Layer', {
                 sldParser.readStyle(sldXml)
                     .then(function (gs) {
 
-                        olParser.writeStyle(gs).then(function (olStyleFunc){
+                        olParser.writeStyle(gs).then(function (olStyleFunc) {
                             var source = mapLayer.getSource();
                             if (source instanceof ol.source.Cluster) {
 
@@ -954,13 +985,13 @@ Ext.define('CpsiMapview.factory.Layer', {
                                 mapLayer.setStyle(olStyleFunc);
                             }
                         });
-                    }, function() {
+                    }, function () {
                         // rejection
                         Ext.log.warn('Could not parse SLD ' + sldUrl +
                             '! Default OL style will be applied.');
                     });
             },
-            failure: function() {
+            failure: function () {
                 Ext.log.warn('Could not load SLD ' + sldUrl +
                     '! Default OL style will be applied.');
             }
@@ -984,12 +1015,12 @@ Ext.define('CpsiMapview.factory.Layer', {
         layer.toolTip = toolTip;
 
         // show / hide on appropriate events
-        mapPanel.on('cmv-map-pointerrest', function(hoveredObjs, evt) {
+        mapPanel.on('cmv-map-pointerrest', function (hoveredObjs, evt) {
             // show tooltip with feature attribute information
             Ext.each(hoveredObjs, function (hoveredObj) {
                 if (hoveredObj.layer &&
-                      hoveredObj.layer.id === layer.id &&
-                      hoveredObj.layer.toolTip) {
+                    hoveredObj.layer.id === layer.id &&
+                    hoveredObj.layer.toolTip) {
                     hoveredObj.layer.toolTip.draw(hoveredObj.feature, evt);
                 }
             });
