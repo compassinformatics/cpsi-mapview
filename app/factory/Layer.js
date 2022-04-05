@@ -253,12 +253,12 @@ Ext.define('CpsiMapview.factory.Layer', {
                         // MapServer returns errors as 'text/html'
                         if (type.indexOf('text/html') === 0) {
                             if ('TextDecoder' in window) {
-                                Ext.Logger.warn(new TextDecoder("utf-8").decode(this.response));
+                                Ext.Logger.warn(new TextDecoder('utf-8').decode(this.response));
                             }
                         }
 
                         if (type.indexOf('application/json') === 0) {
-                            result = JSON.parse(new TextDecoder("utf-8").decode(this.response));
+                            var result = JSON.parse(new TextDecoder('utf-8').decode(this.response));
                             if (result.success !== true) {
                                 var app = Ext.getApplication();
                                 switch (result.errorCode) {
@@ -267,6 +267,7 @@ Ext.define('CpsiMapview.factory.Layer', {
                                     case app.errorCode.NoTokenProvided:
                                         // user must login again
                                         app.doLogin();
+                                        break;
                                     default:
                                         Ext.Msg.alert('Error', result.message);
                                         break;
