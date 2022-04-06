@@ -47,6 +47,12 @@ Ext.define(&#39;CpsiMapview.util.ApplicationMixin&#39;, {
      */
     requireLogin: true,
 
+<span id='CpsiMapview-util-ApplicationMixin-property-minimumRequiredRole'>    /**
+</span>     * Set the minimum role name (a string) that is required to access the browser system,
+     * in the event that users are shared between browser and other applications
+     */
+    minimumRequiredRole: null,
+
 <span id='CpsiMapview-util-ApplicationMixin-property-platformConfig'>    // when the platform is matched any properties are placed on the class
 </span>    platformConfig: {
         desktop: {
@@ -278,7 +284,8 @@ Ext.define(&#39;CpsiMapview.util.ApplicationMixin&#39;, {
                 viewModel: {
                     tokenName: this.tokenName,
                     serviceUrl: &#39;/WebServices/authorization/authenticate&#39;,
-                    validateUrl: &#39;/WebServices/authorization/validateToken&#39;
+                    validateUrl: &#39;/WebServices/authorization/validateToken&#39;,
+                    minimumRequiredRole: me.minimumRequiredRole
                 }
             });
             me.loginWindow.getController().tryAutomaticLogin();

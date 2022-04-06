@@ -40,7 +40,7 @@ Ext.define(&#39;CpsiMapview.controller.form.Login&#39;, {
 <span id='CpsiMapview-controller-form-Login-method-onLoginClick'>    onLoginClick: function (btn) {
 </span>        var form = btn.up(&#39;form&#39;);
         var valid = true;
-        Ext.each(form.down(&#39;textfield&#39;), function(field) {
+        Ext.each(form.down(&#39;textfield&#39;), function (field) {
             valid = valid &amp;&amp; !Ext.isEmpty(field.value);
         });
         if (valid) {
@@ -85,6 +85,22 @@ Ext.define(&#39;CpsiMapview.controller.form.Login&#39;, {
 
         var me = this;
         var roles = response.userRoles; // this is an array e.g. [&quot;UPL&quot;]
+
+        var minimumRequiredRole = me.getViewModel().minimumRequiredRole;
+
+        if (minimumRequiredRole) {
+            var hasRole = Ext.Array.contains(roles, minimumRequiredRole);
+            if (hasRole === false) {
+                Ext.toast({
+                    html: &#39;Your user does not have permissions to use the PMS browser application&#39;,
+                    title: &#39;Login Failed&#39;,
+                    width: 200,
+                    align: &#39;br&#39;
+                });
+                return false;
+            }
+        }
+
         var tokenName = me.getTokenName();
 
         var loginData = {
@@ -95,6 +111,7 @@ Ext.define(&#39;CpsiMapview.controller.form.Login&#39;, {
         loginData[tokenName] = response.data;
         me.updateCookie(loginData);
         Ext.GlobalEvents.fireEvent(&#39;login&#39;, loginData);
+        return true;
 
     },
 
@@ -160,8 +177,11 @@ Ext.define(&#39;CpsiMapview.controller.form.Login&#39;, {
                 }
 
                 if (response.success === true) {
-                    me.login(response);
-                    view.close();
+                    if (me.login(response) === true) {
+                        view.close();
+                    } else {
+                        view.show();
+                    }
                 }
                 else {
                     //username / password login failure
