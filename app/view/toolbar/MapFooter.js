@@ -31,7 +31,7 @@ Ext.define('CpsiMapview.view.toolbar.MapFooter', {
             waitConf: {
                 interval: 200,
                 increment: 15,
-                duration: 300 // hide the status bar after 30 seconds to avoid hanging
+                duration: 3000 // hide the status bar after 30 seconds to avoid hanging
             }
         },
         {

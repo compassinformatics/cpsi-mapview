@@ -9,7 +9,8 @@ Ext.define('CpsiMapview.view.form.Login', {
     viewModel: {
         serviceUrl: './WebServices/authorization/authenticate',
         validateUrl: './WebServices/authorization/validateToken',
-        tokenName: 'token'
+        tokenName: 'token',
+        minimumRequiredRole: null
     },
 
     controller: 'cmv_login_form',
