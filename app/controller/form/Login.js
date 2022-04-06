@@ -23,7 +23,7 @@ Ext.define('CpsiMapview.controller.form.Login', {
     onLoginClick: function (btn) {
         var form = btn.up('form');
         var valid = true;
-        Ext.each(form.down('textfield'), function(field) {
+        Ext.each(form.down('textfield'), function (field) {
             valid = valid && !Ext.isEmpty(field.value);
         });
         if (valid) {
@@ -68,6 +68,22 @@ Ext.define('CpsiMapview.controller.form.Login', {
 
         var me = this;
         var roles = response.userRoles; // this is an array e.g. ["UPL"]
+
+        var minimumRequiredRole = me.getViewModel().minimumRequiredRole;
+
+        if (minimumRequiredRole) {
+            var hasRole = Ext.Array.contains(roles, minimumRequiredRole);
+            if (hasRole === false) {
+                Ext.toast({
+                    html: 'Your user does not have permissions to use the PMS browser application',
+                    title: 'Login Failed',
+                    width: 200,
+                    align: 'br'
+                });
+                return false;
+            }
+        }
+
         var tokenName = me.getTokenName();
 
         var loginData = {
@@ -78,6 +94,7 @@ Ext.define('CpsiMapview.controller.form.Login', {
         loginData[tokenName] = response.data;
         me.updateCookie(loginData);
         Ext.GlobalEvents.fireEvent('login', loginData);
+        return true;
 
     },
 
@@ -143,8 +160,11 @@ Ext.define('CpsiMapview.controller.form.Login', {
                 }
 
                 if (response.success === true) {
-                    me.login(response);
-                    view.close();
+                    if (me.login(response) === true) {
+                        view.close();
+                    } else {
+                        view.show();
+                    }
                 }
                 else {
                     //username / password login failure
