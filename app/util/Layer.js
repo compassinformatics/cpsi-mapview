@@ -65,6 +65,14 @@ Ext.define('CpsiMapview.util.Layer', {
             // only refresh for other layers and sources (to not loose data)
             source.refresh();
         }
+
+        // also refresh the layer node, which updates any legend which may be broken
+        // if a user's access token expires
+        var treePanel = Ext.ComponentQuery.query('cmv_layertree:first')[0];
+        var node = treePanel.getNodeForLayer(layer);
+        if (node) {
+            node.triggerUIUpdate();
+        }
     },
 
     /**
