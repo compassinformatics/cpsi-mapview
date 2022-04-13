@@ -68,11 +68,7 @@ Ext.define('CpsiMapview.util.Layer', {
 
         // also refresh the layer node, which updates any legend which may be broken
         // if a user's access token expires
-        var treePanel = Ext.ComponentQuery.query('cmv_layertree:first')[0];
-        var node = treePanel.getNodeForLayer(layer);
-        if (node) {
-            node.triggerUIUpdate();
-        }
+        LayerUtil.updateLayerNodeUI(layer);
     },
 
     /**
@@ -85,6 +81,11 @@ Ext.define('CpsiMapview.util.Layer', {
         // we will only ever have one layer tree for an application
 
         var treePanel = Ext.ComponentQuery.query('cmv_layertree:first')[0];
+
+        if (!treePanel) {
+            Ext.log.warn('No cmv_layertree found in the application (updateLayerNodeUI)');
+        }
+
         var node = treePanel.getNodeForLayer(layer);
 
         if (!node) {
@@ -113,7 +114,9 @@ Ext.define('CpsiMapview.util.Layer', {
             node.set('glyph', 'f0b0@FontAwesome');
             node.addCls('cpsi-tree-node-filtered');
         } else {
-            node.set('glyph', null);
+            // revert to the original glyph if set on the layer
+            var glyph = layer.get('_origTreeConf') ? layer.get('_origTreeConf').glyph : null;
+            node.set('glyph', glyph);
             node.removeCls('cpsi-tree-node-filtered');
         }
 
