@@ -68,7 +68,8 @@ Ext.define('CpsiMapview.util.Layer', {
 
         // also refresh the layer node, which updates any legend which may be broken
         // if a user's access token expires
-        LayerUtil.updateLayerNodeUI(layer);
+        var layerUtil = CpsiMapview.util.Layer;
+        layerUtil.updateLayerNodeUI(layer);
     },
 
     /**
