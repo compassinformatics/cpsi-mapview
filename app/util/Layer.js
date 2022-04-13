@@ -85,6 +85,7 @@ Ext.define('CpsiMapview.util.Layer', {
 
         if (!treePanel) {
             Ext.log.warn('No cmv_layertree found in the application (updateLayerNodeUI)');
+            return;
         }
 
         var node = treePanel.getNodeForLayer(layer);
