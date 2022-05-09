@@ -44,16 +44,27 @@ Ext.define(&#39;CpsiMapview.form.ValidationMessagesMixin&#39;, {
 </span>
         var me = this;
         var view = me.getView();
+
+        // if a control is in a grid, or sub-component
+        // ensure the parent window is set as the view
+        if (view.isXType(&#39;window&#39;) === false) {
+            view = view.up(&#39;window&#39;);
+            if (!view) {
+                //&lt;debug&gt;
+                Ext.log.warn(&#39;No parent view found for the control&#39;);
+                //&lt;/debug&gt;
+                return;
+            }
+        }
+
         var saveButton = view.down(&#39;#saveButton&#39;);
 
-        //&lt;debug&gt;
         if (!saveButton) {
-            Ext.log.warn(&#39;No button with itmeId #saveButton found&#39;);
+            //&lt;debug&gt;
+            Ext.log.warn(&#39;No button with itemId #saveButton found&#39;);
+            //&lt;/debug&gt;
             return;
         }
-        //&lt;/debug&gt;
-
-
 
         // force re-validation - the model may not have been updated
         // but a related model e.g. a column may have been
