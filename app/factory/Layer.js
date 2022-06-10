@@ -953,7 +953,7 @@ Ext.define('CpsiMapview.factory.Layer', {
                 sldParser.readStyle(sldXml)
                     .then(function (gs) {
 
-                        olParser.writeStyle(gs).then(function (olStyleFunc) {
+                        olParser.writeStyle(gs.output).then(function (olStyleFunc) {
                             var source = mapLayer.getSource();
                             if (source instanceof ol.source.Cluster) {
 
@@ -961,7 +961,6 @@ Ext.define('CpsiMapview.factory.Layer', {
                                 // for any grouped features
 
                                 var styleCache = {}; // cache styles per featCount
-
                                 var styleFuncWrapper = function (feature, resolution) {
                                     var featCount = feature.get('features').length;
                                     var style;
@@ -969,7 +968,7 @@ Ext.define('CpsiMapview.factory.Layer', {
                                     if (featCount === 1) {
                                         // call the standard style function
                                         var feat = feature.get('features')[0];
-                                        style = olStyleFunc(feat, resolution);
+                                        style = olStyleFunc.output(feat, resolution);
                                     } else {
                                         // use a clustered style
                                         style = styleCache[featCount];
@@ -982,7 +981,7 @@ Ext.define('CpsiMapview.factory.Layer', {
                                 };
                                 mapLayer.setStyle(styleFuncWrapper);
                             } else {
-                                mapLayer.setStyle(olStyleFunc);
+                                mapLayer.setStyle(olStyleFunc.output);
                             }
                         });
                     }, function () {
