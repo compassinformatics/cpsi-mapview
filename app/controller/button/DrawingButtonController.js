@@ -1,7 +1,7 @@
 /**
  * This class is the controller for the DrawingButton.
  */
-Ext.define('CpsiMapview.view.tool.DrawingButtonController', {
+Ext.define('CpsiMapview.controller.button.DrawingButtonController', {
     extend: 'Ext.app.ViewController',
     requires: [
         'BasiGX.util.Map',
