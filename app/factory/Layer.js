@@ -954,34 +954,39 @@ Ext.define('CpsiMapview.factory.Layer', {
                     .then(function (gs) {
 
                         olParser.writeStyle(gs.output).then(function (olStyleFunc) {
-                            var source = mapLayer.getSource();
-                            if (source instanceof ol.source.Cluster) {
 
-                                // for clustered features add an additional style
-                                // for any grouped features
-
-                                var styleCache = {}; // cache styles per featCount
-                                var styleFuncWrapper = function (feature, resolution) {
-                                    var featCount = feature.get('features').length;
-                                    var style;
-
-                                    if (featCount === 1) {
-                                        // call the standard style function
-                                        var feat = feature.get('features')[0];
-                                        style = olStyleFunc.output(feat, resolution);
-                                    } else {
-                                        // use a clustered style
-                                        style = styleCache[featCount];
-                                        if (!style) {
-                                            style = CpsiMapview.util.Style.createClusterStyle(featCount);
-                                            styleCache[featCount] = style;
-                                        }
-                                    }
-                                    return style;
-                                };
-                                mapLayer.setStyle(styleFuncWrapper);
+                            if (olStyleFunc.errors) {
+                                Ext.log.warn('Errors parsing the SLD file' + olStyleFunc.errors);
                             } else {
-                                mapLayer.setStyle(olStyleFunc.output);
+                                var source = mapLayer.getSource();
+                                if (source instanceof ol.source.Cluster) {
+
+                                    // for clustered features add an additional style
+                                    // for any grouped features
+
+                                    var styleCache = {}; // cache styles per featCount
+                                    var styleFuncWrapper = function (feature, resolution) {
+                                        var featCount = feature.get('features').length;
+                                        var style;
+
+                                        if (featCount === 1) {
+                                            // call the standard style function
+                                            var feat = feature.get('features')[0];
+                                            style = olStyleFunc.output(feat, resolution);
+                                        } else {
+                                            // use a clustered style
+                                            style = styleCache[featCount];
+                                            if (!style) {
+                                                style = CpsiMapview.util.Style.createClusterStyle(featCount);
+                                                styleCache[featCount] = style;
+                                            }
+                                        }
+                                        return style;
+                                    };
+                                    mapLayer.setStyle(styleFuncWrapper);
+                                } else {
+                                    mapLayer.setStyle(olStyleFunc.output);
+                                }
                             }
                         });
                     }, function () {
