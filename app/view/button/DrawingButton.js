@@ -8,7 +8,7 @@ Ext.define('CpsiMapview.view.tool.DrawingButton', {
     xtype: 'cmv_drawing_button',
 
     requires: [
-        'CpsiMapview.view.tool.DrawingButtonController'
+        'CpsiMapview.controller.button.DrawingButtonController'
     ],
 
     /**
