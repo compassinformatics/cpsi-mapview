@@ -40,3 +40,11 @@ $tab-padding: dynamic(3px 13px 0px 10px);
     text-align: right;
     padding-right: 7px;
 }
+
+// Add legacy combo styling
+
+.#{$prefix}boundlist-item-legacy {
+    font-style: italic;
+}
+
+// end
