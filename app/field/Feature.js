@@ -33,6 +33,7 @@ Ext.define('CpsiMapview.field.Feature', {
             // to ensure the model is not marked as dirty
             rec.beginEdit();
             var layerSource = featureStore.layer.getSource();
+            layerSource.getFeaturesCollection().clear();
             layerSource.addFeatures(features);
             rec.endEdit();
         }
