@@ -138,7 +138,10 @@ Ext.define('CpsiMapview.form.ControllerMixin', {
             success: me.onSaveSucceded,
             callback: function () {
                 // do something whether the save succeeded or failed
-                win.unmask();
+                // but ensure the window has not been destroyed by any savesucceeded handlers
+                if (win.destroyed === false) {
+                    win.unmask();
+                }
             },
             scope: me
         });
