@@ -1004,6 +1004,9 @@ Ext.define(&#39;CpsiMapview.factory.Layer&#39;, {
                                 } else {
                                     mapLayer.setStyle(olStyleFunc.output);
                                 }
+                                // now force an update of the layer to apply new styling
+                                source.set(&#39;timestamp&#39;, Ext.Date.now());
+                                source.refresh();
                             }
                         });
                     }, function () {
