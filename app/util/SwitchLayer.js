@@ -82,14 +82,14 @@ Ext.define('CpsiMapview.util.SwitchLayer', {
         // complete any load events for the layer so the BasiGX.view.MapLoadingStatusBar
         // decrements correctly
 
-        var source = switchLayer.getSource();
+        var originalSource = switchLayer.getSource();
 
-        if (source instanceof ol.source.Image) {
-            source.dispatchEvent('imageloadend');
-        } else if (source instanceof ol.source.Tile) {
-            source.dispatchEvent('tileloadend');
-        } else if (source instanceof ol.source.Vector) {
-            source.dispatchEvent('vectorloadend');
+        if (originalSource instanceof ol.source.Image) {
+            originalSource.dispatchEvent('imageloadend');
+        } else if (originalSource instanceof ol.source.Tile) {
+            originalSource.dispatchEvent('tileloadend');
+        } else if (originalSource instanceof ol.source.Vector) {
+            originalSource.dispatchEvent('vectorloadend');
         }
 
         var switchConfiguration = switchLayer.get('switchConfiguration');
@@ -108,7 +108,7 @@ Ext.define('CpsiMapview.util.SwitchLayer', {
 
         var newLayerSource = newLayer.getSource();
         // store filters for either layer type so they can be retrieved when switching
-        var filters = switchLayer.getSource().get('additionalFilters');
+        var filters = originalSource.get('additionalFilters');
         newLayerSource.set('additionalFilters', filters);
 
         var activeStyle = switchLayer.get('activatedStyle');
@@ -146,7 +146,7 @@ Ext.define('CpsiMapview.util.SwitchLayer', {
             };
             newLayerSource.updateParams(newParams);
         } else if (newLayer.get('isWfs') || newLayer.get('isVt')) {
-            var wmsLayerName = switchLayer.getSource().getParams()['LAYERS'].split(',')[0];
+            var wmsLayerName = originalSource.getParams()['LAYERS'].split(',')[0];
             activeStyle = LegendUtil.getSldFileFromWmsStyle(activeStyle, wmsLayerName);
 
             // TODO following code duplicated in CpsiMapview.view.layer.StyleSwitcherRadioGroup
@@ -154,8 +154,6 @@ Ext.define('CpsiMapview.util.SwitchLayer', {
 
             // load and parse SLD and apply it to layer
             LayerFactory.loadSld(newLayer, sldUrl);
-            newLayerSource.set('timestamp', Ext.Date.now());
-            newLayerSource.refresh();
         } else {
             Ext.Logger.info('Layer type not supported in StyleSwitcherRadioGroup');
         }
