@@ -164,7 +164,7 @@ Ext.define('CpsiMapview.factory.Layer', {
      * @param  {Object} layerConf The configuration object for this layer
      * @return {ol.layer.Base}    The created sub layer
      */
-    createSwitchLayer: function (layerConf) {
+    createSwitchLayer: function (layerConf, noStyle) {
         // compute switch resolution when layer is
         // initialised the first time
         if (!layerConf.switchResolution) {
@@ -188,6 +188,7 @@ Ext.define('CpsiMapview.factory.Layer', {
 
         if (resolution < layerConf.switchResolution) {
             var confBelowSwitchResolution = layerConf.layers[1];
+            confBelowSwitchResolution.noStyle = noStyle;
             // apply overall visibility to sub layer
             Ext.Object.merge(confBelowSwitchResolution, olVisibility);
             resultLayer = LayerFactory.createLayer(confBelowSwitchResolution);
@@ -197,6 +198,7 @@ Ext.define('CpsiMapview.factory.Layer', {
             );
         } else {
             var confAboveSwitchResolution = layerConf.layers[0];
+            confAboveSwitchResolution.noStyle = noStyle;
             // apply overall visibility to sub layer
             Ext.Object.merge(confAboveSwitchResolution, olVisibility);
             resultLayer = LayerFactory.createLayer(confAboveSwitchResolution);
@@ -595,7 +597,7 @@ Ext.define('CpsiMapview.factory.Layer', {
             wfsLayer.set('activatedStyle', style);
         }
 
-        if (sldUrl) {
+        if (sldUrl && !layerConf.noStyle) {
             // load and parse style and apply it to layer
             LayerFactory.loadSld(wfsLayer, sldUrl);
         }
@@ -823,7 +825,7 @@ Ext.define('CpsiMapview.factory.Layer', {
             sldUrl = vtLayer.get('stylesBaseUrl') + style;
             vtLayer.set('activatedStyle', style);
         }
-        if (sldUrl) {
+        if (sldUrl && !layerConf.noStyle) {
             // load and parse style and apply it to layer
             LayerFactory.loadSld(vtLayer, sldUrl);
         }
