@@ -114,7 +114,8 @@ Ext.define(&#39;CpsiMapview.util.SwitchLayer&#39;, {
         switchConfiguration.visibility = switchLayer.getVisible();
         // also apply current filter and selected style
 
-        var newLayer = LayerFactory.createSwitchLayer(switchConfiguration);
+        var noStyle = true;
+        var newLayer = LayerFactory.createSwitchLayer(switchConfiguration, noStyle);
 
         // add original tree config (from tree.json) to new layer
         var origTreeNodeConf = newLayer.get(&#39;_origTreeConf&#39;);
@@ -239,6 +240,8 @@ Ext.define(&#39;CpsiMapview.util.SwitchLayer&#39;, {
                 // apply tree node text from tree config
                 var origTreeNodeConf = node.getOlLayer().get(&#39;_origTreeConf&#39;);
                 node.set(&#39;text&#39;, origTreeNodeConf.text);
+                // also set original iconCls
+                node.set(&#39;iconCls&#39;, origTreeNodeConf.iconCls);
                 // trigger UI updates (e.g. tree node plugins)
                 node.triggerUIUpdate();
             }

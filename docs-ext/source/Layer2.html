@@ -181,7 +181,7 @@ Ext.define(&#39;CpsiMapview.factory.Layer&#39;, {
      * @param  {Object} layerConf The configuration object for this layer
      * @return {ol.layer.Base}    The created sub layer
      */
-    createSwitchLayer: function (layerConf) {
+    createSwitchLayer: function (layerConf, noStyle) {
         // compute switch resolution when layer is
         // initialised the first time
         if (!layerConf.switchResolution) {
@@ -205,6 +205,7 @@ Ext.define(&#39;CpsiMapview.factory.Layer&#39;, {
 
         if (resolution &lt; layerConf.switchResolution) {
             var confBelowSwitchResolution = layerConf.layers[1];
+            confBelowSwitchResolution.noStyle = noStyle;
             // apply overall visibility to sub layer
             Ext.Object.merge(confBelowSwitchResolution, olVisibility);
             resultLayer = LayerFactory.createLayer(confBelowSwitchResolution);
@@ -214,6 +215,7 @@ Ext.define(&#39;CpsiMapview.factory.Layer&#39;, {
             );
         } else {
             var confAboveSwitchResolution = layerConf.layers[0];
+            confAboveSwitchResolution.noStyle = noStyle;
             // apply overall visibility to sub layer
             Ext.Object.merge(confAboveSwitchResolution, olVisibility);
             resultLayer = LayerFactory.createLayer(confAboveSwitchResolution);
@@ -612,7 +614,7 @@ Ext.define(&#39;CpsiMapview.factory.Layer&#39;, {
             wfsLayer.set(&#39;activatedStyle&#39;, style);
         }
 
-        if (sldUrl) {
+        if (sldUrl &amp;&amp; !layerConf.noStyle) {
             // load and parse style and apply it to layer
             LayerFactory.loadSld(wfsLayer, sldUrl);
         }
@@ -840,7 +842,7 @@ Ext.define(&#39;CpsiMapview.factory.Layer&#39;, {
             sldUrl = vtLayer.get(&#39;stylesBaseUrl&#39;) + style;
             vtLayer.set(&#39;activatedStyle&#39;, style);
         }
-        if (sldUrl) {
+        if (sldUrl &amp;&amp; !layerConf.noStyle) {
             // load and parse style and apply it to layer
             LayerFactory.loadSld(vtLayer, sldUrl);
         }
