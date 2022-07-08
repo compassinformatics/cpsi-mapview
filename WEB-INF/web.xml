@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<!--
+See https://docs.sencha.com/cmd/6.5.0/guides/advanced_cmd/cmd_reference.html#advanced_cmd-_-cmd_reference_-_sencha_app_watch
+-->
+<web-app
+  xmlns="http://java.sun.com/xml/ns/javaee"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://java.sun.com/xml/ns/javaee http://java.sun.com/xml/ns/javaee/web-app_2_5.xsd"
+  metadata-complete="true"
+  version="2.5"
+>
+
+  <!-- ==================================================================== -->
+  <!-- Reverse HTTP Proxy for the Sencha Cmd web server, e.g.               -->
+  <!-- http://localhost:1841/mapserver2/?SERVICE=WMS will point to          -->
+  <!-- http://localhost/mapserver2/?SERVICE=WMS                             -->
+  <!-- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  -->
+
+  <!-- Proxy to local .NET web services -->
+  <servlet>
+    <servlet-name>transparentReverseProxy2</servlet-name>
+    <servlet-class>org.eclipse.jetty.servlets.ProxyServlet$Transparent</servlet-class>
+    <init-param>
+      <param-name>ProxyTo</param-name>
+      <param-value>http://localhost/WebServices</param-value>
+    </init-param>
+    <init-param>
+      <param-name>Prefix</param-name>
+      <param-value>/WebServices</param-value>
+    </init-param>
+    <load-on-startup>1</load-on-startup>
+  </servlet>
+  <servlet-mapping>
+    <servlet-name>transparentReverseProxy2</servlet-name>
+    <url-pattern>/WebServices/*</url-pattern>
+  </servlet-mapping>
+
+
+  <!-- Proxy to local pmspy services -->
+  <servlet>
+    <servlet-name>transparentReverseProxy3</servlet-name>
+    <servlet-class>org.eclipse.jetty.servlets.ProxyServlet$Transparent</servlet-class>
+    <init-param>
+      <param-name>ProxyTo</param-name>
+      <param-value>http://localhost/pmspy</param-value>
+    </init-param>
+    <init-param>
+      <param-name>HostHeader</param-name>
+      <param-value>localhost</param-value>
+    </init-param>
+    <init-param>
+      <param-name>Prefix</param-name>
+      <param-value>/pmspy</param-value>
+    </init-param>
+    <load-on-startup>1</load-on-startup>
+  </servlet>
+  <servlet-mapping>
+    <servlet-name>transparentReverseProxy3</servlet-name>
+    <url-pattern>/pmspy/*</url-pattern>
+  </servlet-mapping>
+
+</web-app>

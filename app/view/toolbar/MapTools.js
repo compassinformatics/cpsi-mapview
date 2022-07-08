@@ -16,6 +16,7 @@ Ext.define('CpsiMapview.view.toolbar.MapTools', {
         'CpsiMapview.model.button.MeasureButton',
         'CpsiMapview.controller.button.MeasureButtonController',
         'CpsiMapview.controller.toolbar.MapTools',
+        'CpsiMapview.model.toolbar.MapToolsModel',
         'CpsiMapview.view.combo.Gazetteer',
         'CpsiMapview.view.button.StreetViewTool',
         'CpsiMapview.view.panel.TimeSlider',
@@ -24,6 +25,7 @@ Ext.define('CpsiMapview.view.toolbar.MapTools', {
     ],
 
     controller: 'cmv_maptools',
+    viewModel: 'cmv_maptools',
 
     dock: 'top',
 
@@ -89,7 +91,7 @@ Ext.define('CpsiMapview.view.toolbar.MapTools', {
                 toggleGroup: 'map',
                 tooltip: 'Point',
                 glyph: 'ea52@font-gis',
-                apiUrl: 'https://pmstipperarydev.compass.ie/pmspy/netsolver',
+                apiUrl: '/pmspy/netsolver',
                 groups: true,
                 pointExtentBuffer: 50,
                 listeners: {
@@ -111,7 +113,7 @@ Ext.define('CpsiMapview.view.toolbar.MapTools', {
                 type: 'Polygon',
                 tooltip: 'Polygon',
                 glyph: 'ea03@font-gis',
-                apiUrl: 'https://pmstipperarydev.compass.ie/WebServices/roadschedule/cutWithPolygon',
+                apiUrl: '/WebServices/roadschedule/cutWithPolygon',
                 listeners: {
                     responseFeatures: function () {
                         this.getController().onResponseFeatures();
@@ -123,7 +125,7 @@ Ext.define('CpsiMapview.view.toolbar.MapTools', {
                 toggleGroup: 'map',
                 type: 'Circle',
                 tooltip: 'Circle',
-                apiUrl: 'https://pmstipperarydev.compass.ie/WebServices/roadschedule/cutWithPolygon',
+                apiUrl: '/WebServices/roadschedule/cutWithPolygon',
                 listeners: {
                     responseFeatures: function () {
                         this.getController().onResponseFeatures();
@@ -155,7 +157,7 @@ Ext.define('CpsiMapview.view.toolbar.MapTools', {
                 xtype: 'gx_geocoder_combo'
             }, {
                 xtype: 'cmv_gazetteer_combo', // custom CPSI gazetteer
-                url: 'https://pmstipperarydev.compass.ie/WebServices/townland/gazetteer/',
+                url: '/WebServices/townland/gazetteer/',
                 proxyRootProperty: 'data',
                 displayValueMapping: 'name',
                 emptyText: 'Townland...'
