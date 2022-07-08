@@ -46,8 +46,7 @@ Ext.define('CpsiMapview.Application', {
 
         var me = this;
         var hostname = window.location.hostname;
-        var regex = /compassinformatics.github.io/g;
-        var regex = /localhost/g;
+        var regex = /compassinformatics.github.io/g; // /localhost/g;
         var m = regex.exec(hostname);
         var serviceUrl = options.url;
 
@@ -60,12 +59,9 @@ Ext.define('CpsiMapview.Application', {
             };
 
             if (Ext.Array.some(serviceUrls, urlTest) === true) {
-
-
-                debugger;
                 var tokenValue = Ext.util.Cookies.get(me.tokenName);
                 if (tokenValue) {
-                    var token = Ext.String.format("token={0}", tokenValue)
+                    var token = Ext.String.format('token={0}', tokenValue);
                     serviceUrl = Ext.String.urlAppend(serviceUrl, token);
                 }
                 serviceUrl = 'https://pmstipperarydev.compass.ie' + serviceUrl;
