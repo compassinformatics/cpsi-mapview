@@ -28,9 +28,22 @@ Ext.define('CpsiMapview.controller.button.LoginButtonController', {
         if (app && app.loginWindow) {
             loginWin = app.loginWindow;
         } else {
-            loginWin = Ext.create('CpsiMapview.view.form.Login');
+            var viewModel = {};
+            if (app) {
+                viewModel = {
+                    tokenName: app.tokenName,
+                    serviceUrl: app.authenticationUrl,
+                    validateUrl: app.tokenValidationUrl,
+                    minimumRequiredRole: app.minimumRequiredRole
+                }
+            }
+            loginWin = Ext.create('CpsiMapview.view.form.Login', {
+                viewModel: viewModel
+            });
+            if (app) {
+                app.loginWindow = loginWin;
+            }
         }
-
         loginWin.getController().logout();
         loginWin.show();
     },
