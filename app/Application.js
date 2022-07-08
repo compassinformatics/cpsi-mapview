@@ -44,22 +44,34 @@ Ext.define('CpsiMapview.Application', {
 
     rewriteRemoveServiceRequests: function (options) {
 
+        var me = this;
         var hostname = window.location.hostname;
         var regex = /compassinformatics.github.io/g;
-
+        var regex = /localhost/g;
         var m = regex.exec(hostname);
+        var serviceUrl = options.url;
 
         if (m) {
             var serviceUrls = ['/WebServices', '/pmspy'];
 
             var urlTest = function (url) {
                 var ignoreCase = true;
-                return Ext.String.startsWith(options.url, url, ignoreCase);
+                return Ext.String.startsWith(serviceUrl, url, ignoreCase);
             };
 
             if (Ext.Array.some(serviceUrls, urlTest) === true) {
-                options.url = 'https://pmstipperarydev.compass.ie' + options.url;
+
+
+                debugger;
+                var tokenValue = Ext.util.Cookies.get(me.tokenName);
+                if (tokenValue) {
+                    var token = Ext.String.format("token={0}", tokenValue)
+                    serviceUrl = Ext.String.urlAppend(serviceUrl, token);
+                }
+                serviceUrl = 'https://pmstipperarydev.compass.ie' + serviceUrl;
             }
+
+            options.url = serviceUrl;
         }
     },
 
