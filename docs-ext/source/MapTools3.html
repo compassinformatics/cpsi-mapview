@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+  <title>The source code</title>
+  <link href="../resources/prettify/prettify.css" type="text/css" rel="stylesheet" />
+  <script type="text/javascript" src="../resources/prettify/prettify.js"></script>
+  <style type="text/css">
+    .highlight { display: block; background-color: #ddd; }
+  </style>
+  <script type="text/javascript">
+    function highlight() {
+      document.getElementById(location.hash.replace(/#/, "")).className = "highlight";
+    }
+  </script>
+</head>
+<body onload="prettyPrint(); highlight();">
+  <pre class="prettyprint lang-js"><span id='CpsiMapview-controller-toolbar-MapTools'>/**
+</span> * This class is the controller for the map toolbar of cpsi mapview
+ *
+ */
+Ext.define(&#39;CpsiMapview.controller.toolbar.MapTools&#39;, {
+    extend: &#39;Ext.app.ViewController&#39;,
+
+    alias: &#39;controller.cmv_maptools&#39;,
+
+<span id='CpsiMapview-controller-toolbar-MapTools-method-initializeMeasureBtn'>    /**
+</span>     * Initialize measure buttons
+     * @param {Ext.button.Button} btn The measure button
+     */
+    initializeMeasureBtn: function (btn) {
+
+        // avoid showing &quot;null&quot; in IE11 by setting to an empty string
+        btn.getViewModel().set(&#39;clickToDrawText&#39;, &#39;&#39;);
+
+        btn.setBind({
+            text: &#39;{measureTooltext}&#39;,
+            tooltip: btn.measureType === &#39;line&#39; ? &#39;{lineMeasureTooltip}&#39; :
+                &#39;{polygonMeasureAreaTooltip}&#39;
+        });
+        var tTipStr = btn.measureType === &#39;line&#39; ?
+            btn.getViewModel().get(&#39;lineMeasureTooltip&#39;) :
+            btn.getViewModel().get(&#39;polygonMeasureAreaTooltip&#39;);
+        btn.tooltipStr = tTipStr;
+    },
+
+<span id='CpsiMapview-controller-toolbar-MapTools-method-setGazetteerExtent'>    /**
+</span>    * Limit a gazetteer to only return results within a certain extent
+    * This sets viewbox and bounded parameters for a Nominatim search
+    * @param {any} cmb
+    */
+    setGazetteerExtent: function (cmb) {
+
+        var map = BasiGX.util.Map.getMapComponent().map;
+
+        var app = Ext.getApplication ? Ext.getApplication() : Ext.app.Application.instance;
+        var initialExtent = app.initialExtent;
+
+        var mv = map.getView();
+        cmb.addMapExtentParams(initialExtent, mv.getProjection());
+    },
+
+<span id='CpsiMapview-controller-toolbar-MapTools-method-init'>    init: function () {
+</span>
+        // update the loggedIn property on the viewmodel so any role-restricted
+        // buttons or menus are activated
+        var me = this;
+        Ext.GlobalEvents.on({
+            login: function () {
+                me.getViewModel().set(&#39;loggedIn&#39;, true);
+            },
+            logout: function () {
+                me.getViewModel().set(&#39;loggedIn&#39;, false);
+            }
+        });
+
+        // as gx_geocoder_combo does not allow binding of the map property
+        // set this when the view is created
+        // TODO add late-binding of the map to gx_geocoder_combo
+        var map = BasiGX.util.Map.getMapComponent().map;
+        var gazetteers = me.getView().query(&#39;gx_geocoder_combo&#39;);
+
+        Ext.each(gazetteers, function (cmb) {
+            cmb.map = map;
+            cmb.map.addLayer(cmb.locationLayer);
+        });
+    }
+});
+</pre>
+</body>
+</html>

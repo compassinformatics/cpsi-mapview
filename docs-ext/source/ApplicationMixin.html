@@ -107,6 +107,16 @@ Ext.define(&#39;CpsiMapview.util.ApplicationMixin&#39;, {
      */
     tokenName: &#39;cookietoken&#39;,
 
+<span id='CpsiMapview-util-ApplicationMixin-property-authenticationUrl'>    /**
+</span>     * URL for logging into the application
+     */
+    authenticationUrl: &#39;/WebServices/authorization/authenticate&#39;,
+
+<span id='CpsiMapview-util-ApplicationMixin-property-tokenValidationUrl'>    /**
+</span>     * URL for validating application tokens
+     */
+    tokenValidationUrl: &#39;/WebServices/authorization/validateToken&#39;,
+
 <span id='CpsiMapview-util-ApplicationMixin-property-errorCode'>    errorCode: {
 </span>        None: 0,
         AccountLockedOut: 1,
@@ -282,9 +292,9 @@ Ext.define(&#39;CpsiMapview.util.ApplicationMixin&#39;, {
         if (!me.loginWindow) {
             me.loginWindow = Ext.create(&#39;CpsiMapview.view.form.Login&#39;, {
                 viewModel: {
-                    tokenName: this.tokenName,
-                    serviceUrl: &#39;/WebServices/authorization/authenticate&#39;,
-                    validateUrl: &#39;/WebServices/authorization/validateToken&#39;,
+                    tokenName: me.tokenName,
+                    serviceUrl: me.authenticationUrl,
+                    validateUrl: me.tokenValidationUrl,
                     minimumRequiredRole: me.minimumRequiredRole
                 }
             });

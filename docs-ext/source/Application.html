@@ -33,6 +33,13 @@ Ext.define(&#39;CpsiMapview.Application&#39;, {
         appmixin: &#39;CpsiMapview.util.ApplicationMixin&#39;
     },
 
+<span id='CpsiMapview-Application-property-tokenName'>    /**
+</span>     * Override the settings in CpsiMapview.util.ApplicationMixin
+     */
+    tokenName: &#39;pmstoken&#39;,
+<span id='CpsiMapview-Application-property-authenticationUrl'>    authenticationUrl: &#39;/WebServices/authorization/authenticate&#39;,
+</span><span id='CpsiMapview-Application-property-tokenValidationUrl'>    tokenValidationUrl: &#39;/WebServices/authorization/validateToken&#39;,
+</span>
 <span id='CpsiMapview-Application-property-requireLogin'>    requireLogin: false,
 </span>
 <span id='CpsiMapview-Application-property-name'>    name: &#39;CpsiMapview&#39;,
@@ -50,6 +57,34 @@ Ext.define(&#39;CpsiMapview.Application&#39;, {
 
 <span id='CpsiMapview-Application-method-launch'>    launch: function () {
 </span>        // TODO - Launch the application
+    },
+
+<span id='CpsiMapview-Application-method-rewriteRemoveServiceRequests'>    rewriteRemoveServiceRequests: function (options) {
+</span>
+        var hostname = window.location.hostname;
+        var regex = /compassinformatics.github.io/g;
+
+        var m = regex.exec(hostname);
+
+        if (m) {
+            var serviceUrls = [&#39;/WebServices&#39;, &#39;/pmspy&#39;];
+
+            var urlTest = function (url) {
+                var ignoreCase = true;
+                return Ext.String.startsWith(options.url, url, ignoreCase);
+            };
+
+            if (Ext.Array.some(serviceUrls, urlTest) === true) {
+                options.url = &#39;https://pmstipperarydev.compass.ie&#39; + options.url;
+            }
+        }
+    },
+
+<span id='CpsiMapview-Application-method-onAjaxBeforeRequest'>    onAjaxBeforeRequest: function (conn, options) {
+</span>        var me = this;
+        if (options.url) {
+            me.rewriteRemoveServiceRequests(options);
+        }
     }
 });
 </pre>
