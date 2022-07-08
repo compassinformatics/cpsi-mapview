@@ -35,7 +35,7 @@ Ext.define('CpsiMapview.controller.button.LoginButtonController', {
                     serviceUrl: app.authenticationUrl,
                     validateUrl: app.tokenValidationUrl,
                     minimumRequiredRole: app.minimumRequiredRole
-                }
+                };
             }
             loginWin = Ext.create('CpsiMapview.view.form.Login', {
                 viewModel: viewModel

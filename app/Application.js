@@ -44,7 +44,6 @@ Ext.define('CpsiMapview.Application', {
 
     rewriteRemoveServiceRequests: function (options) {
 
-        var me = this;
         var hostname = window.location.hostname;
         var regex = /compassinformatics.github.io/g;
 
