@@ -61,22 +61,30 @@ Ext.define(&#39;CpsiMapview.Application&#39;, {
 
 <span id='CpsiMapview-Application-method-rewriteRemoveServiceRequests'>    rewriteRemoveServiceRequests: function (options) {
 </span>
+        var me = this;
         var hostname = window.location.hostname;
-        var regex = /compassinformatics.github.io/g;
-
+        var regex = /compassinformatics.github.io/g; // /localhost/g;
         var m = regex.exec(hostname);
+        var serviceUrl = options.url;
 
         if (m) {
             var serviceUrls = [&#39;/WebServices&#39;, &#39;/pmspy&#39;];
 
             var urlTest = function (url) {
                 var ignoreCase = true;
-                return Ext.String.startsWith(options.url, url, ignoreCase);
+                return Ext.String.startsWith(serviceUrl, url, ignoreCase);
             };
 
             if (Ext.Array.some(serviceUrls, urlTest) === true) {
-                options.url = &#39;https://pmstipperarydev.compass.ie&#39; + options.url;
+                var tokenValue = Ext.util.Cookies.get(me.tokenName);
+                if (tokenValue) {
+                    var token = Ext.String.format(&#39;token={0}&#39;, tokenValue);
+                    serviceUrl = Ext.String.urlAppend(serviceUrl, token);
+                }
+                serviceUrl = &#39;https://pmstipperarydev.compass.ie&#39; + serviceUrl;
             }
+
+            options.url = serviceUrl;
         }
     },
 
