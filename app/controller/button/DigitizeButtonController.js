@@ -152,6 +152,7 @@ Ext.define('CpsiMapview.controller.button.DigitizeButtonController', {
         var me = this;
         var view = me.getView();
         var type = view.getType();
+        console.log('TYPE:', type);
 
         if (me.drawInteraction) {
             me.map.removeInteraction(me.drawInteraction);
@@ -314,6 +315,7 @@ Ext.define('CpsiMapview.controller.button.DigitizeButtonController', {
      * @param {boolean} pressed The toggle state of the button
      */
     onToggle: function (btn, pressed) {
+        console.log('onToggle');
         var me = this;
         var view = me.getView();
         var type = view.getType();
@@ -345,6 +347,7 @@ Ext.define('CpsiMapview.controller.button.DigitizeButtonController', {
                 if (drawStyle) {
                     me.drawLayer.setStyle(drawStyle);
                 }
+                // TODO: add style for line layer with start/end point
                 me.map.addLayer(me.drawLayer);
             }
         }

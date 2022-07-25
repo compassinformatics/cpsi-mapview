@@ -74,7 +74,24 @@ Ext.define('CpsiMapview.view.button.DigitizeButton', {
         * The default style to use for features drawn with the digitizing tools
         * e.g. the polygons and circles used for selecting features
         */
-        drawLayerStyle: null,
+        drawLayerStyle: new ol.style.Style({
+            image: new ol.style.Circle({
+                radius: 5,
+                fill: new ol.style.Fill({
+                    color: 'green'
+                }),
+                stroke: new ol.style.Stroke({
+                    color: 'green'
+                })
+            }),
+            width: 2,
+            fill: new ol.style.Fill({
+                color: 'green'
+            }),
+            stroke: new ol.style.Stroke({
+                color: 'green'
+            })
+        }),
 
         /**
          * The default style to use when features are selected
