@@ -21,7 +21,8 @@ Ext.define('CpsiMapview.view.toolbar.MapTools', {
         'CpsiMapview.view.button.StreetViewTool',
         'CpsiMapview.view.panel.TimeSlider',
         'CpsiMapview.view.panel.NumericAttributeSlider',
-        'CpsiMapview.view.lineSliceGridExample.LineSliceGridButton'
+        'CpsiMapview.view.lineSliceGridExample.LineSliceGridButton',
+        'CpsiMapview.view.snappingExample.EdgeButton'
     ],
 
     controller: 'cmv_maptools',
@@ -139,6 +140,10 @@ Ext.define('CpsiMapview.view.toolbar.MapTools', {
                 text: '',
                 tooltip: 'Linear Reference demo',
                 glyph: 'ea78@font-gis',
+            }, {
+                xtype: 'cmv_edgebutton',
+                tooltip: 'Snapping demo',
+                glyph: 'ea76@font-gis'
             }]
         },
         '->',
