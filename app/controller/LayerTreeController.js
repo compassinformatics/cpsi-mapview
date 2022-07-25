@@ -125,8 +125,7 @@ Ext.define('CpsiMapview.controller.LayerTreeController', {
 
         var treeJsonPromise = me.loadTreeStructure();
         treeJsonPromise.then(function (treeJson) {
-
-            // remove layers for which the user does not have the role to see it
+            // remove layers that shall not be shown to the user
             var modifiedTree = Ext.clone(treeJson);
             modifiedTree.treeConfig.children = CpsiMapview.util.RoleManager.updateTreeChildrenByRole(modifiedTree.treeConfig.children);
 
