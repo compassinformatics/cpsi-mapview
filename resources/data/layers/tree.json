@@ -23,6 +23,18 @@
             "qtip": "Right-click for a layer grid"
           },
           {
+            "id": "NODES_WFS",
+            "leaf": true,
+            "text": "Nodes",
+            "qtip": "Used in the snapping tool example"
+          },
+          {
+            "id": "EDGES_WFS",
+            "leaf": true,
+            "text": "Edges",
+            "qtip": "Used in the snapping tool example"
+          },
+          {
             "id": "BOREHOLE_WMS",
             "leaf": true,
             "text": "Borehole WMS"
