@@ -118,6 +118,8 @@ describe('CpsiMapview.util.RoleManager', function () {
                 return role === 'EDITOR_ROLE' || role === 'VIEWER_ROLE';
             };
 
+            // we expect that the item "EDGES_WFS" is removed from the result,
+            // because it requires the role "ADMIN_ROLE" which the user does not have
             var resultString =JSON.stringify(fn(input));
             var expectedString = JSON.stringify(expected);
             expect(resultString).to.equal(expectedString);
