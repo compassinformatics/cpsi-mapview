@@ -111,39 +111,6 @@ Ext.define('CpsiMapview.controller.LayerTreeController', {
     },
 
     /**
-     * Removes layers which the user is not allowed to see.
-     *
-     * @param {Array} children An array of layer children
-     * @return {Array} The modified children array
-     */
-    updateTreeChildrenByRole: function(children){
-        var me = this;
-        var result = [];
-        Ext.each(children, function(child){
-            var showNode = true;
-            if (child.leaf) {
-                var requiredRoles = child.requiredRoles;
-                // check if user is allowed to see layer
-                if (Ext.isArray(requiredRoles) && requiredRoles.length){
-                    showNode = false;
-                    Ext.each(requiredRoles, function(role){
-                        var userHasRole = CpsiMapview.util.RoleManager.checkRole(role);
-                        if (userHasRole){
-                            showNode = true;
-                        }
-                    });
-                }
-            } else {
-                child.children = me.updateTreeChildrenByRole(child.children);
-            }
-            if (showNode) {
-                result.push(child);
-            }
-        });
-        return result;
-    },
-
-    /**
      * This method will return an instance of the GeoExt class
      * `GeoExt.data.store.LayersTree` based on the connected OL #map. The layers
      * of the `ol.Map` are restructured and divided into groups based on the
@@ -161,7 +128,7 @@ Ext.define('CpsiMapview.controller.LayerTreeController', {
 
             // remove layers for which the user does not have the role to see it
             var modifiedTree = Ext.clone(treeJson);
-            modifiedTree.treeConfig.children = me.updateTreeChildrenByRole(modifiedTree.treeConfig.children);
+            modifiedTree.treeConfig.children = CpsiMapview.util.RoleManager.updateTreeChildrenByRole(modifiedTree.treeConfig.children);
 
             // save defaults for tree nodes from config
             me.treeConfDefaults = modifiedTree.defaults || {};
