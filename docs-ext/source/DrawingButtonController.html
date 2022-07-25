@@ -234,7 +234,11 @@ Ext.define(&#39;CpsiMapview.controller.button.DrawingButtonController&#39;, {
         // find all intersecting node points
         // https://openlayers.org/en/latest/apidoc/module-ol_source_Vector-VectorSource.html
         searchLayer.getSource().forEachFeatureIntersectingExtent(extent, function (feat) {
-            featureIds.push(feat.get(&#39;ObjectId&#39;));
+            //&lt;debug&gt;
+            // this requires all GeoJSON features used for the layer to have an id property
+            Ext.Assert.truthy(feat.getId());
+            //&lt;/debug&gt;
+            featureIds.push(feat.getId());
         });
 
         // cases where the same feature is loaded into the layer leading to duplicated Ids

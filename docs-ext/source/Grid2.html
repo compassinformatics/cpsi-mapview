@@ -15,49 +15,113 @@
   </script>
 </head>
 <body onload="prettyPrint(); highlight();">
-  <pre class="prettyprint lang-js"><span id='CpsiMapview-model-grid-Grid'>/**
-</span> * This class is the model for the cpsi mapview WFS
- * generic grid class
- *
+  <pre class="prettyprint lang-js"><span id='CpsiMapview-util-Grid'>/**
+</span> * Static util class for Grid related operations.
  */
-Ext.define(&#39;CpsiMapview.model.grid.Grid&#39;, {
-    extend: &#39;Ext.app.ViewModel&#39;,
-    alias: &#39;viewmodel.cmv_grid&#39;,
+Ext.define(&#39;CpsiMapview.util.Grid&#39;, {
 
-    requires: [
-        &#39;BasiGX.util.Map&#39;
-    ],
+    statics: {
+<span id='CpsiMapview-util-Grid-static-method-getGridWindow'>        /**
+</span>         * Gets the grid panel component for this layer if it exists.
+         * Otherwise it will be created.
+         *
+         * @param {ol.layer.Base} layer The layer for which the grid shall be retrieved
+         * @returns {CpsiMapview.view.grid.Grid} The grid panel component
+         */
+        getGridWindow: function (layer) {
+            var staticMe = CpsiMapview.util.Grid;
+            var gridWindow;
+            var gridXType = layer.get(&#39;gridXType&#39;);
+            if (!gridXType) {
+                return;
+            }
 
-<span id='CpsiMapview-model-grid-Grid-property-data'>    /**
-</span>     * The following should all be overridden in child classes
-     */
-    data: {
-        vectorLayerKey: null,
-        wmsLayerKey: null,
-        featureSelectionLayerKey: null, // used as the layer for selecting with the cmv_feature_selection_button
-        gridStoreType: null,
-        allowFeatureSelection: false,
-        // when isSpatialGrid is set to false the &#39;Select by Shape&#39; button will be hidden
-        isSpatialGrid: true,
-        usePresetFilters: false,
-        clearFiltersVisible: true,
-        exportExcelVisible: true,
-        exportShapefileVisible: true
-    },
+            // we can&#39;t keep a reference to the window in this class
+            // as a new Ext.menu.Item is created each time the menu is
+            // opened - use Ext.ComponentQuery instead
+            var existingGrids = Ext.ComponentQuery.query(gridXType);
 
-<span id='CpsiMapview-model-grid-Grid-property-formulas'>    formulas: {
-</span>        map: function () {
-            return BasiGX.util.Map.getMapComponent().map;
+            var gridWindowExists =
+                existingGrids.length &gt; 0 &amp;&amp;
+                existingGrids[0] &amp;&amp;
+                existingGrids[0].up(&#39;window&#39;);
+
+            if (gridWindowExists) {
+                // get the parent window of the grid
+                gridWindow = existingGrids[0].up(&#39;window&#39;);
+            } else {
+                gridWindow = staticMe.createGridWindow(layer);
+            }
+            return gridWindow;
         },
-        isGroupEditingVisible: function () {
-            // can be overridden in subclasses
-            return false;
-        },
-        useSimpleSelection: function () {
-            return !this.get(&#39;allowFeatureSelection&#39;) &amp;&amp; this.get(&#39;isSpatialGrid&#39;);
-        },
-        useAdvancedSelection: function () {
-            return this.get(&#39;allowFeatureSelection&#39;) &amp;&amp; this.get(&#39;isSpatialGrid&#39;);
+
+
+<span id='CpsiMapview-util-Grid-static-method-createGridWindow'>        /**
+</span>         * Creates a grid window for the layer.
+         *
+         * @param {ol.layer.Base} layer The layer for which the grid shall be created
+         * @returns {CpsiMapview.view.grid.Grid} The grid panel component
+         */
+        createGridWindow: function (layer) {
+            var gridXType = layer.get(&#39;gridXType&#39;);
+
+            // the Ext.window.Window configuration object
+            var windowConfig = {
+                minHeight: 600,
+                constrain: true,
+                layout: &#39;fit&#39;,
+                maximizable: true,
+                closeAction: &#39;hide&#39; // don&#39;t destroy the window when closed
+            };
+
+            Ext.apply(windowConfig, {
+                title: layer.get(&#39;name&#39;),
+                layout: &#39;fit&#39;,
+                items: [{
+                    xtype: gridXType,
+                    // we need to create this store, otherwise Ext will
+                    // create a default store that causes interference
+                    // between layers with grid
+                    // manually setting another store avoids problems like
+                    // that setting filters to one layers are applied to
+                    // another layer
+                    store: Ext.create(&#39;Ext.data.Store&#39;)
+                }],
+                listeners: {
+                    minimize: Ext.emptyFn,
+                    close: function () {
+                        // hide the spatial tool only when closed rather than when
+                        // minimising the window
+                        var me = this;
+                        var queryButton = me.down(&#39;cmv_spatial_query_button&#39;);
+                        if (queryButton !== null) {
+                            queryButton.fireEvent(&#39;hideAssociatedPermanentLayer&#39;);
+                            queryButton.toggle(false);
+                        }
+                        // hide the layer with the grid (to hide selections)
+                        var grid = me.down(&#39;grid&#39;);
+                        grid.fireEvent(&#39;hide&#39;);
+                    },
+                    show: function () {
+                        var me = this;
+                        var queryButton = me.down(&#39;cmv_spatial_query_button&#39;);
+                        if (queryButton !== null) {
+                            queryButton.fireEvent(&#39;showAssociatedPermanentLayer&#39;);
+                        }
+
+                        var grid = me.down(&#39;grid&#39;);
+                        grid.fireEvent(&#39;show&#39;);
+                    }
+                }
+            });
+            var gridWindow = Ext.create(&#39;CpsiMapview.view.window.MinimizableWindow&#39;, windowConfig);
+
+            // copy any ViewModel properties from the grid on to its containing window
+            // this allows helpUrl to be set at the grid level
+            var gridViewModelData = gridWindow.down(gridXType).getViewModel().getData();
+            // use apply rather than applyIf otherwise the default empty helpUrl is not overwritten
+            Ext.apply(gridWindow.getViewModel().getData(), gridViewModelData);
+            return gridWindow;
         }
     }
 });

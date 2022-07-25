@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+  <title>The source code</title>
+  <link href="../resources/prettify/prettify.css" type="text/css" rel="stylesheet" />
+  <script type="text/javascript" src="../resources/prettify/prettify.js"></script>
+  <style type="text/css">
+    .highlight { display: block; background-color: #ddd; }
+  </style>
+  <script type="text/javascript">
+    function highlight() {
+      document.getElementById(location.hash.replace(/#/, "")).className = "highlight";
+    }
+  </script>
+</head>
+<body onload="prettyPrint(); highlight();">
+  <pre class="prettyprint lang-js">Ext.define(&#39;CpsiMapview.view.snappingExample.EdgeWindowViewModel&#39;, {
+    extend: &#39;Ext.app.ViewModel&#39;,
+    alias: &#39;viewmodel.cmv_edgewindowviewmodel&#39;,
+    mixins: [
+        &#39;CpsiMapview.form.ViewModelMixin&#39;
+    ],
+    data: {
+        featureStoreName: &#39;geometry&#39;,
+        hideSaveButton: true,
+        hideDeleteButton: true
+    },
+    formulas: {
+
+        valid: function (get) {
+            get(&#39;timestamp&#39;);
+            get(&#39;currentRecord.geometry&#39;); // required so that if edges are added the form becomes valid
+
+            var ctlr = this.getView().getController();
+            if (ctlr) {
+                return ctlr.checkValid(get(&#39;currentRecord&#39;));
+            } else {
+                return false;
+            }
+        },
+
+<span id='global-property-onResultLayer'>        /**
+</span>        * Executed once result layer is available.
+        * Creates a listener if the point geometry is changed.
+        */
+        onResultLayer: {
+            bind: &#39;{resultLayer}&#39;,
+
+            get: function (resultLayer) {
+                var me = this;
+                var source = resultLayer.getSource();
+
+                source.on(&#39;localdrawend&#39;, function (event) {
+                    var rec = me.get(&#39;currentRecord&#39;);
+                    var result = event.result;
+                    rec.set(result);
+                });
+
+                source.on(&#39;clear&#39;, function () {
+                    var rec = me.get(&#39;currentRecord&#39;);
+                    rec.set({
+                        startCoord: null,
+                        endCoord: null,
+                        startNodeId: null,
+                        endNodeId: null,
+                        startEdgeId: null,
+                        endEdgeId: null
+                    });
+                });
+            }
+        }
+    }
+});
+</pre>
+</body>
+</html>

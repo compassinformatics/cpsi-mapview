@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+  <title>The source code</title>
+  <link href="../resources/prettify/prettify.css" type="text/css" rel="stylesheet" />
+  <script type="text/javascript" src="../resources/prettify/prettify.js"></script>
+  <style type="text/css">
+    .highlight { display: block; background-color: #ddd; }
+  </style>
+  <script type="text/javascript">
+    function highlight() {
+      document.getElementById(location.hash.replace(/#/, "")).className = "highlight";
+    }
+  </script>
+</head>
+<body onload="prettyPrint(); highlight();">
+  <pre class="prettyprint lang-js">Ext.define(&#39;CpsiMapview.view.snappingExample.EdgeWindowController&#39;, {
+    extend: &#39;CpsiMapview.controller.window.MinimizableWindow&#39;,
+    alias: &#39;controller.cmv_edgewindowcontroller&#39;,
+    mixins: [
+        &#39;CpsiMapview.form.ControllerMixin&#39;,
+        &#39;CpsiMapview.form.LayersMixin&#39;
+    ],
+    // we need to add listen in the controller itself rather than in a mixin
+    // or the function won&#39;t be called
+    listen: {
+        component: {
+            &#39;field&#39;: {
+                change: &#39;onFieldChanged&#39; // listen to all field change events to update button
+            },
+            &#39;cmv_edgewindow&#39;: {
+                savesucceeded: &#39;onAfterSaveSucceded&#39;
+            }
+        }
+    },
+
+<span id='global-method-beforeSave'>    /**
+</span>     * Function to call prior to saving - confirm with the user that they want to create new nodes
+     * */
+    beforeSave: function () {
+
+        var me = this;
+        var rec = me.getViewModel().get(&#39;currentRecord&#39;);
+
+        var noStartFeature = false;
+
+        if (!rec.get(&#39;startNodeId&#39;) &amp;&amp; !rec.get(&#39;startEdgeId&#39;) &amp;&amp; !rec.get(&#39;startPolygonId&#39;)) {
+            noStartFeature = true;
+            Ext.Msg.confirm(&#39;Create new Source&#39;, &#39;No feature is connected at the start of the edge. Are you sure you want to create a new source?&#39;,
+                function (buttonId) {
+                    if (buttonId == &#39;yes&#39;) {
+                        // call saveRecord directly as beforeSave returns a value instantly
+                        me.saveRecord();
+                    }
+                });
+            return false;
+        }
+
+        if (!rec.get(&#39;endNodeId&#39;) &amp;&amp; !rec.get(&#39;endEdgeId&#39;) &amp;&amp; !rec.get(&#39;endPolygonId&#39;)) {
+
+            if (noStartFeature === true) {
+                Ext.Msg.alert(&#39;No Attached Features&#39;, &#39;No features are attached at the start or end of this line!&#39;);
+            }
+
+            Ext.Msg.confirm(&#39;Create new Source&#39;, &#39;No feature is connected at the end of the edge. Are you sure you want to create a new source?&#39;,
+                function (buttonId) {
+                    if (buttonId == &#39;yes&#39;) {
+                        me.saveRecord();
+                    }
+                });
+            return false;
+        }
+
+        return true; // go ahead with the save
+    },
+
+<span id='global-method-onAfterSaveSucceded'>    /**
+</span>     * Ensure the window is closed so users don&#39;t keep reusing the same form to add new edges
+     * wiping out previous edges
+     * */
+    onAfterSaveSucceded: function () {
+        var me = this;
+        var win = me.getView();
+        win.close();
+    }
+});</pre>
+</body>
+</html>

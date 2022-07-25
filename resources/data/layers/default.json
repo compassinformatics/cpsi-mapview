@@ -357,6 +357,28 @@
     },
     {
       "layerType": "wfs",
+      "layerKey": "EDGES_WFS",
+      "featureType": "edges",
+      "noCluster": true,
+      "idProperty": "EdgeId",
+      "openLayers": {
+        "visibility": false,
+        "maxScale": 800000
+      }
+    },
+    {
+      "layerType": "wfs",
+      "layerKey": "NODES_WFS",
+      "featureType": "nodes",
+      "noCluster": true,
+      "idProperty": "NodeId",
+      "openLayers": {
+        "visibility": false,
+        "maxScale": 800000
+      }
+    },
+    {
+      "layerType": "wfs",
       "gridXType": "cmv_examplegrid",
       "gridFilters": [
         {
