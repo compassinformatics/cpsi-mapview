@@ -222,6 +222,7 @@ Ext.define('CpsiMapview.controller.LayerTreeController', {
             var requiredRoles = record.get('requiredRoles');
             if (requiredRoles && Ext.isArray(requiredRoles) && requiredRoles.length){
                 var showNode = CpsiMapview.util.RoleManager.hasAtLeastOneRequiredRole(requiredRoles);
+                // needed to ensure layer shown/hidden on both tree and map
                 record.getOlLayer().setVisible(showNode);
                 return showNode;
             }

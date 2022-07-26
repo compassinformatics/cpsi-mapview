@@ -23,13 +23,17 @@ describe('CpsiMapview.util.RoleManager', function () {
                 return role === 'EDITOR_ROLE' || role === 'VIEWER_ROLE';
             };
 
+            // if a single role is required
             expect(fn(['EDITOR_ROLE'])).to.equal(true);
             expect(fn(['VIEWER_ROLE'])).to.equal(true);
             expect(fn(['ADMIN_ROLE'])).to.equal(false);
 
+            // if one of multiple roles are required
             expect(fn(['EDITOR_ROLE','VIEWER_ROLE', 'ADMIN_ROLE'])).to.equal(true);
             expect(fn(['EDITOR_ROLE','VIEWER_ROLE'])).to.equal(true);
             expect(fn(['ADMIN_ROLE','DUMMY_ROLE'])).to.equal(false);
+
+            // if an empty Array is provided
             expect(fn([])).to.equal(false);
         });
     });
