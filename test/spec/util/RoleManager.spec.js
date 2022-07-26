@@ -28,7 +28,7 @@ describe('CpsiMapview.util.RoleManager', function () {
             expect(fn(['VIEWER_ROLE'])).to.equal(true);
             expect(fn(['ADMIN_ROLE'])).to.equal(false);
 
-            // if one of multiple roles are required
+            // if one of multiple roles is required
             expect(fn(['EDITOR_ROLE','VIEWER_ROLE', 'ADMIN_ROLE'])).to.equal(true);
             expect(fn(['EDITOR_ROLE','VIEWER_ROLE'])).to.equal(true);
             expect(fn(['ADMIN_ROLE','DUMMY_ROLE'])).to.equal(false);
