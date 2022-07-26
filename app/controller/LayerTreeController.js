@@ -118,7 +118,7 @@ Ext.define('CpsiMapview.controller.LayerTreeController', {
     },
 
     /**
-     * This method will assigns an instance of the GeoExt class
+     * This method assigns an instance of the GeoExt class
      * `GeoExt.data.store.LayersTree` based on the connected OL #map to the view. The layers
      * of the `ol.Map` are restructured and divided into groups based on the
      * JSON tree structure loaded in #loadTreeStructure. This assures that
