@@ -124,7 +124,6 @@ Ext.define('CpsiMapview.controller.LayerTreeController', {
      * JSON tree structure loaded in #loadTreeStructure. This assures that
      * the layers will appear in different folders in this TreePanel
      * (as defined in the tree structure JSON).
-     *
      */
     makeLayerStore: function () {
         var me = this;
@@ -216,6 +215,9 @@ Ext.define('CpsiMapview.controller.LayerTreeController', {
     filterLayersByRole: function () {
         var me = this;
         var store = me.getView().getStore();
+        if (!store){
+            return;
+        }
         store.filterBy(function(record){
             var requiredRoles = record.get('requiredRoles');
             if (requiredRoles && Ext.isArray(requiredRoles) && requiredRoles.length){
