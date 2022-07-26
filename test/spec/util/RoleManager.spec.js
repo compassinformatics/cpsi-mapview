@@ -13,6 +13,11 @@ describe('CpsiMapview.util.RoleManager', function () {
             var fn = cmp.checkRole;
             expect(fn).not.to.be(undefined);
         });
+
+        it('#hasAtLeastOneRequiredRole', function () {
+            var fn = cmp.hasAtLeastOneRequiredRole;
+            expect(fn).not.to.be(undefined);
+        });
     });
 }
 );

@@ -221,14 +221,7 @@ Ext.define('CpsiMapview.controller.LayerTreeController', {
         store.filterBy(function(record){
             var requiredRoles = record.get('requiredRoles');
             if (requiredRoles && Ext.isArray(requiredRoles) && requiredRoles.length){
-                // TODO: move to util
-                var showNode = false;
-                Ext.each(requiredRoles, function(role){
-                    var userHasRole = CpsiMapview.util.RoleManager.checkRole(role);
-                    if (userHasRole){
-                        showNode = true;
-                    }
-                });
+                var showNode = CpsiMapview.util.RoleManager.hasAtLeastOneRequiredRole(requiredRoles);
                 record.getOlLayer().setVisible(showNode);
                 return showNode;
             }
