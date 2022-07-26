@@ -17,6 +17,20 @@ describe('CpsiMapview.util.RoleManager', function () {
         it('#hasAtLeastOneRequiredRole', function () {
             var fn = cmp.hasAtLeastOneRequiredRole;
             expect(fn).not.to.be(undefined);
+
+            // mock that user has roles: EDITOR_ROLE and VIEWER_ROLE
+            CpsiMapview.util.RoleManager.checkRole = function (role) {
+                return role === 'EDITOR_ROLE' || role === 'VIEWER_ROLE';
+            };
+
+            expect(fn(['EDITOR_ROLE'])).to.equal(true);
+            expect(fn(['VIEWER_ROLE'])).to.equal(true);
+            expect(fn(['ADMIN_ROLE'])).to.equal(false);
+
+            expect(fn(['EDITOR_ROLE','VIEWER_ROLE', 'ADMIN_ROLE'])).to.equal(true);
+            expect(fn(['EDITOR_ROLE','VIEWER_ROLE'])).to.equal(true);
+            expect(fn(['ADMIN_ROLE','DUMMY_ROLE'])).to.equal(false);
+            expect(fn([])).to.equal(false);
         });
     });
 }
