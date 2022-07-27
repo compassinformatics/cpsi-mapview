@@ -45,6 +45,10 @@ Ext.define(&#39;CpsiMapview.view.LayerTree&#39;, {
 <span id='CpsiMapview-view-LayerTree-static-property-legendImgLookup'>        legendImgLookup: {}
 </span>    },
 
+<span id='CpsiMapview-view-LayerTree-property-listeners'>    listeners: {
+</span>        &#39;cmv-init-layertree&#39;: &#39;filterLayersByRole&#39;
+    },
+
 <span id='CpsiMapview-view-LayerTree-property-store'>    // So that instantiation works without errors, might be changed during
 </span>    // instantiation of the LayerTree.
     store: {},

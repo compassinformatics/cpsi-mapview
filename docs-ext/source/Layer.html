@@ -145,6 +145,8 @@ Ext.define(&#39;CpsiMapview.factory.Layer&#39;, {
             mapLayer.set(&#39;helpUrl&#39;, layerConf.helpUrl);
         }
 
+        mapLayer.set(&#39;_origLayerConf&#39;, layerConf);
+
         return mapLayer;
     },
 

@@ -108,6 +108,14 @@ Ext.define(&#39;CpsiMapview.controller.LayerTreeController&#39;, {
             me.initLayersAdded = true;
             me.autoConnectToMap(); // connect after all the layers have been loaded to the map
         });
+
+        Ext.GlobalEvents.on(&#39;login&#39;, function () {
+            me.filterLayersByRole();
+        });
+
+        Ext.GlobalEvents.on(&#39;logout&#39;, function () {
+            me.filterLayersByRole();
+        });
     },
 
 <span id='CpsiMapview-controller-LayerTreeController-method-autoConnectToMap'>    /**
@@ -122,20 +130,17 @@ Ext.define(&#39;CpsiMapview.controller.LayerTreeController&#39;, {
         me.map = mapComp &amp;&amp; mapComp.getMap();
 
         if (me.map) {
-            var store = me.makeLayerStore();
-            me.getView().setStore(store);
+            me.makeLayerStore();
         }
     },
 
 <span id='CpsiMapview-controller-LayerTreeController-method-makeLayerStore'>    /**
-</span>     * This method will return an instance of the GeoExt class
-     * `GeoExt.data.store.LayersTree` based on the connected OL #map. The layers
+</span>     * This method assigns an instance of the GeoExt class
+     * `GeoExt.data.store.LayersTree` based on the connected OL #map to the view. The layers
      * of the `ol.Map` are restructured and divided into groups based on the
      * JSON tree structure loaded in #loadTreeStructure. This assures that
      * the layers will appear in different folders in this TreePanel
      * (as defined in the tree structure JSON).
-     *
-     * @return {GeoExt.data.store.LayersTree} The created store.
      */
     makeLayerStore: function () {
         var me = this;
@@ -216,6 +221,37 @@ Ext.define(&#39;CpsiMapview.controller.LayerTreeController&#39;, {
                     reject(response.status);
                 }
             });
+        });
+    },
+
+
+<span id='CpsiMapview-controller-LayerTreeController-method-filterLayersByRole'>    /**
+</span>     * Ensures tree and map only contain layers for which
+     * the user has the required roles to see.
+     */
+    filterLayersByRole: function () {
+        var me = this;
+        var store = me.getView().getStore();
+        if (!store){
+            return;
+        }
+        store.filterBy(function(record){
+            var requiredRoles = record.get(&#39;requiredRoles&#39;);
+            if (requiredRoles &amp;&amp; Ext.isArray(requiredRoles) &amp;&amp; requiredRoles.length){
+                var showNode = CpsiMapview.util.RoleManager.hasAtLeastOneRequiredRole(requiredRoles);
+                // needed to ensure layer shown/hidden on both tree and map
+                // only show layer if it shall be visible initially
+                var olLayer = record.getOlLayer();
+                if (olLayer &amp;&amp; olLayer.get(&#39;_origLayerConf&#39;) &amp;&amp; olLayer.get(&#39;_origLayerConf&#39;).openLayers) {
+                    if (olLayer.get(&#39;_origLayerConf&#39;).openLayers.visibility) {
+                        olLayer.setVisible(true);
+                    } else {
+                        olLayer.setVisible(false);
+                    }
+                }
+                return showNode;
+            }
+            return true;
         });
     },
 
@@ -349,6 +385,7 @@ Ext.define(&#39;CpsiMapview.controller.LayerTreeController&#39;, {
         node.set(&#39;qshowDelay&#39;, treeNodeConf.qshowDelay);
 
         node.set(&#39;text&#39;, treeNodeConf.text);
+        node.set(&#39;requiredRoles&#39;, treeNodeConf.requiredRoles);
 
         // expand configured folders in this tree
         node.set(&#39;expanded&#39;, treeNodeConf.expanded);
