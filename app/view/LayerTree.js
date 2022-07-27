@@ -28,6 +28,10 @@ Ext.define('CpsiMapview.view.LayerTree', {
         legendImgLookup: {}
     },
 
+    listeners: {
+        'cmv-init-layertree': 'filterLayersByRole'
+    },
+
     // So that instantiation works without errors, might be changed during
     // instantiation of the LayerTree.
     store: {},
