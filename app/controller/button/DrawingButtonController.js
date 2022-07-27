@@ -45,12 +45,18 @@ Ext.define('CpsiMapview.controller.button.DrawingButtonController', {
     snapInteraction: null,
 
     /**
+     * If user has started to edit a line i.d. the first point of a line is already set
+     */
+    editingIsActive: false,
+
+    /**
      * Determines if event handling is blocked.
      */
     //blockedEventHandling: false,
 
     constructor: function () {
         var me = this;
+        me.handleDrawStart = me.handleDrawStart.bind(me);
         me.handleDrawEnd = me.handleDrawEnd.bind(me);
         me.handleModifyEnd = me.handleModifyEnd.bind(me);
         me.handleKeyPress = me.handleKeyPress.bind(me);
@@ -97,17 +103,106 @@ Ext.define('CpsiMapview.controller.button.DrawingButtonController', {
             return ol.events.condition.primaryAction(evt) && ol.events.condition.noModifierKeys(evt);
         };
 
+        me.prepareDrawingStyles();
+
+        var source = layer.getSource();
+        var collection = source.getFeaturesCollection();
         var drawInteractionConfig = {
             type: 'LineString',
-            features: layer.getSource().getFeaturesCollection(),
+            features: collection,
             condition: drawCondition,
+            style: me.getDrawStyleFunction(),
             snapTolerance: 2 // Pixel distance for snapping to the drawing finish (default 12)
         };
 
         me.drawInteraction = new ol.interaction.Draw(drawInteractionConfig);
+        me.drawInteraction.on('drawstart',me.handleDrawStart);
         me.drawInteraction.on('drawend', me.handleDrawEnd);
 
         me.map.addInteraction(me.drawInteraction);
+    },
+
+    /**
+     * Prepare the styles retrieved from config.
+     */
+    prepareDrawingStyles: function() {
+        var me = this;
+        var view = me.getView();
+
+        // ensure styles are applied at right conditions
+        view.getDrawBeforeEditingPoint().setGeometry(function (feature) {
+            var geom = feature.getGeometry();
+            if (!me.editingIsActive) {
+                return geom;
+            }
+        });
+        view.getDrawStyleStartPoint().setGeometry(function (feature) {
+            var geom = feature.getGeometry();
+            var coords = geom.getCoordinates();
+            if (me.editingIsActive) {
+                var firstCoord = coords[0];
+                return new ol.geom.Point(firstCoord);
+            }
+        });
+        view.getDrawStyleEndPoint().setGeometry(function (feature) {
+            var coords = feature.getGeometry().getCoordinates();
+            if (coords.length > 1){
+                var lastCoord = coords[coords.length - 1];
+                return new ol.geom.Point(lastCoord);
+            }
+        });
+
+        // ensure styles are always on top
+        view.getSnappedNodeStyle().setZIndex(Infinity);
+        view.getSnappedEdgeStyle().setZIndex(Infinity);
+    },
+
+    /**
+     * Creates the draw function for the drawn line.
+     *
+     * @returns {Function} The style function for the drawn line.
+     */
+    getDrawStyleFunction: function() {
+        var me = this;
+        var view = me.getView();
+
+        var drawStyle = [
+            view.getDrawBeforeEditingPoint(),
+            view.getDrawStyleStartPoint(),
+            view.getDrawStyleLine(),
+            view.getDrawStyleEndPoint(),
+        ];
+
+        return function (feature) {
+            var coordinate = feature.getGeometry().getCoordinates();
+            var pixel = me.map.getPixelFromCoordinate(coordinate);
+            var nodeLayerHit = false;
+            var edgeLayerHit = false;
+            var selfHit = false;
+            me.map.forEachFeatureAtPixel(pixel, function (feature, layer) {
+                if (layer) {
+                    var key = layer.get('layerKey');
+                    if (key === view.getNodeLayerKey()) {
+                        nodeLayerHit = true;
+                    } else if (key === view.getEdgeLayerKey()) {
+                        edgeLayerHit = true;
+                    } else if (me.drawLayer === layer) {
+                        // snapping to self drawn feature
+                        selfHit = true;
+                    }
+                    // TODO: handle polygons
+                }
+            });
+            if (nodeLayerHit) {
+                return view.getSnappedNodeStyle();
+            } else if (edgeLayerHit) {
+                return view.getSnappedEdgeStyle();
+            } else if (selfHit) {
+                return view.getModifySnapPointStyle();
+            } else {
+                return drawStyle;
+            }
+        };
     },
 
     /**
@@ -134,7 +229,10 @@ Ext.define('CpsiMapview.controller.button.DrawingButtonController', {
         // create the modify interaction
         var modifyInteractionConfig = {
             features: layer.getSource().getFeaturesCollection(),
-            condition: condition
+            condition: condition,
+            // intentionally pass empty style, because modify style is
+            // done in the draw interaction
+            style: new ol.style.Style({})
         };
         me.modifyInteraction = new ol.interaction.Modify(modifyInteractionConfig);
         me.map.addInteraction(me.modifyInteraction);
@@ -262,6 +360,14 @@ Ext.define('CpsiMapview.controller.button.DrawingButtonController', {
     },
 
     /**
+     * Handles the drawstart event
+     */
+    handleDrawStart: function (){
+        var me = this;
+        me.editingIsActive = true;
+    },
+
+    /**
     * Handles the drawend event
     * @param {ol.interaction.Draw.Event} evt The OpenLayers draw event containing the features
     */
@@ -283,6 +389,8 @@ Ext.define('CpsiMapview.controller.button.DrawingButtonController', {
 
         // clear all previous features so only the last drawn feature remains
         drawSource.getFeaturesCollection().clear();
+
+        me.editingIsActive = false;
     },
 
     /**

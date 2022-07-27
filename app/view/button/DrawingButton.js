@@ -60,7 +60,124 @@ Ext.define('CpsiMapview.view.tool.DrawingButton', {
          * The vector layer key of a polygon layer to snap the start and ends
          * of newly drawn lines to, and return the polygon ids
          */
-        polygonLayerKey: null
+        polygonLayerKey: null,
+
+        /**
+         * Style of the editing cursor, before first point is set.
+         */
+        drawBeforeEditingPoint: new ol.style.Style({
+            image: new ol.style.Circle({
+                radius: 5,
+                fill: new ol.style.Fill({
+                    color: 'black'
+                })
+            })
+        }),
+
+        /**
+         * Style of the first point of the drawn line.
+         */
+        drawStyleStartPoint: new ol.style.Style({
+            image: new ol.style.RegularShape({
+                fill: new ol.style.Fill({
+                    color: 'green'
+                }),
+                stroke: new ol.style.Stroke({
+                    color: 'green',
+                    width: 3
+                }),
+                points: 3,
+                radius: 5,
+                rotation: 0,
+                angle: 0,
+            })
+        }),
+
+        /**
+         * Style of the last point of the currently drawn line.
+         */
+        drawStyleEndPoint: new ol.style.Style({
+            image: new ol.style.RegularShape({
+                fill: new ol.style.Fill({
+                    color: 'red'
+                }),
+                stroke: new ol.style.Stroke({
+                    color: 'red',
+                    width: 3
+                }),
+                points: 4,
+                radius: 5,
+                angle: Math.PI / 4,
+            })
+        }),
+
+        /**
+         * The style of the point to modify.
+         */
+        modifySnapPointStyle: new ol.style.Style({
+            image: new ol.style.RegularShape({
+                fill: new ol.style.Fill({
+                    color: 'yellow'
+                }),
+                stroke: new ol.style.Stroke({
+                    color: 'black',
+                    width: 3
+                }),
+                points: 4,
+                radius: 10,
+                angle: Math.PI / 4,
+            })
+        }),
+
+        /**
+         * The style of the line to draw (without start and endpoint)
+         */
+        drawStyleLine: new ol.style.Style({
+            stroke: new ol.style.Stroke({
+                color: 'orange',
+                width: 2
+            })
+        }),
+
+        /**
+         * The style of the point when snapped to the referenced
+         * node layer.
+         */
+        snappedNodeStyle: new ol.style.Style({
+            image: new ol.style.RegularShape({
+                fill: new ol.style.Fill({
+                    color: 'black'
+                }),
+                stroke: new ol.style.Stroke({
+                    color: 'black',
+                    width: 3
+                }),
+                points: 4,
+                radius: 10,
+                radius2: 0,
+                angle: 0,
+            })
+        }),
+
+        /**
+         * The style of the point when snapped to the referenced
+         * edge layer.
+         */
+        snappedEdgeStyle: new ol.style.Style({
+            image: new ol.style.RegularShape({
+                fill: new ol.style.Fill({
+                    color: 'black'
+                }),
+                stroke: new ol.style.Stroke({
+                    color: 'black',
+                    width: 3
+                }),
+                points: 4,
+                radius: 10,
+                radius2: 0,
+                angle: Math.PI / 4
+            })
+        })
     },
 
     /**
