@@ -29,7 +29,7 @@ Ext.define('CpsiMapview.util.RoleManager', {
      * Checks if user has at least one of the required roles.
      *
      * @param {String[]} requiredRoles The required roles.
-     * @return {Boolean} If user has at least one of the required roles.
+     * @return {Boolean} True, if user has at least one of the required roles. False, otherwise.
      */
     hasAtLeastOneRequiredRole: function (requiredRoles) {
         var result = false;
