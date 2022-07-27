@@ -23,7 +23,8 @@ module.exports = {
         "ISO19139_GSS_20060504": false,
         "ISO19139_GSR_20060504": false,
         "GML_3_2_0": false,
-        "Jsonix": false
+        "Jsonix": false,
+        "turf": false
     },
     "parserOptions": {
         "ecmaVersion": 5
