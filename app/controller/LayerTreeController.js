@@ -209,7 +209,7 @@ Ext.define('CpsiMapview.controller.LayerTreeController', {
 
 
     /**
-     * Ensures tree and map only contains layers for which
+     * Ensures tree and map only contain layers for which
      * the user has the required roles to see.
      */
     filterLayersByRole: function () {
