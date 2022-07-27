@@ -8,7 +8,8 @@ Ext.define('CpsiMapview.view.toolbar.ParallelLine', {
 
     requires: [
         'Ext.form.field.Number',
-        'BasiGX.view.component.Map'
+        'BasiGX.view.component.Map',
+        'CpsiMapview.util.Turf'
     ],
 
     cls: 'cmv_parallel_line_toolbar',
@@ -148,17 +149,8 @@ Ext.define('CpsiMapview.view.toolbar.ParallelLine', {
         }
 
         var offsetUnit = this.getOffsetUnit();
-        var map = BasiGX.view.component.Map.guess().getMap();
-        var mapProj = map.getView().getProjection().getCode();
-        var format = new ol.format.GeoJSON({
-            featureProjection: mapProj,
-            dataProjection: 'EPSG:4326'
-        });
-        var geojsonFeature = format.writeFeatureObject(feature);
-        var parallelGeojsonFeature = turf.lineOffset(
-            geojsonFeature.geometry, offset, {units: offsetUnit}
-        );
-        var parallelFeature = format.readFeature(parallelGeojsonFeature);
+        var turfUtil = CpsiMapview.util.Turf;
+        var parallelFeature = turfUtil.createParallelFeature(feature, offset, offsetUnit);
         vm.set('parallelFeature', parallelFeature);
         this.fireEvent('parallelLineCreated', parallelFeature);
     }
