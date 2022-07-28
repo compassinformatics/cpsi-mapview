@@ -78,6 +78,7 @@ Ext.define('CpsiMapview.view.tool.DrawingButton', {
          * Style of the first point of the drawn line.
          */
         drawStyleStartPoint: new ol.style.Style({
+            // triangle
             image: new ol.style.RegularShape({
                 fill: new ol.style.Fill({
                     color: 'green'
@@ -97,6 +98,7 @@ Ext.define('CpsiMapview.view.tool.DrawingButton', {
          * Style of the last point of the currently drawn line.
          */
         drawStyleEndPoint: new ol.style.Style({
+            // square
             image: new ol.style.RegularShape({
                 fill: new ol.style.Fill({
                     color: 'red'
@@ -115,6 +117,7 @@ Ext.define('CpsiMapview.view.tool.DrawingButton', {
          * The style of the point to modify.
          */
         modifySnapPointStyle: new ol.style.Style({
+            // square
             image: new ol.style.RegularShape({
                 fill: new ol.style.Fill({
                     color: 'yellow'
@@ -144,6 +147,7 @@ Ext.define('CpsiMapview.view.tool.DrawingButton', {
          * node layer.
          */
         snappedNodeStyle: new ol.style.Style({
+            // cross
             image: new ol.style.RegularShape({
                 fill: new ol.style.Fill({
                     color: 'black'
@@ -164,6 +168,7 @@ Ext.define('CpsiMapview.view.tool.DrawingButton', {
          * edge layer.
          */
         snappedEdgeStyle: new ol.style.Style({
+            // cross (45° rotation)
             image: new ol.style.RegularShape({
                 fill: new ol.style.Fill({
                     color: 'black'
