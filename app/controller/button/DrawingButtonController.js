@@ -114,7 +114,7 @@ Ext.define('CpsiMapview.controller.button.DrawingButtonController', {
         };
 
         me.drawInteraction = new ol.interaction.Draw(drawInteractionConfig);
-        me.drawInteraction.on('drawstart',me.handleDrawStart);
+        me.drawInteraction.on('drawstart', me.handleDrawStart);
         me.drawInteraction.on('drawend', me.handleDrawEnd);
 
         me.map.addInteraction(me.drawInteraction);
