@@ -169,19 +169,20 @@ Ext.define('CpsiMapview.controller.button.DrawingButtonController', {
             // remember if we have hit a referenced layer
             var nodeLayerHit = false;
             var edgeLayerHit = false;
+            var polygonLayerHit = false;
             var selfHit = false;
 
             var snappedEdgeFeature;
             me.map.forEachFeatureAtPixel(pixel, function (foundFeature, layer) {
+                snappedEdgeFeature = foundFeature;
                 if (layer) {
                     var key = layer.get('layerKey');
                     if (key === view.getNodeLayerKey()) {
                         nodeLayerHit = true;
                     } else if (key === view.getEdgeLayerKey()) {
                         edgeLayerHit = true;
-                        snappedEdgeFeature = foundFeature;
                     } else if (key === view.getPolygonLayerKey()) {
-                        // TODO: handle polygon hit
+                        polygonLayerHit = true;
                     } else if (me.drawLayer === layer) {
                         // snapping to self drawn feature
                         selfHit = true;
@@ -213,6 +214,8 @@ Ext.define('CpsiMapview.controller.button.DrawingButtonController', {
                 } else {
                     return view.getSnappedEdgeStyle();
                 }
+            } else if (polygonLayerHit) {
+                return view.getSnappedEdgeStyle();
             } else if (selfHit) {
                 return view.getModifySnapPointStyle();
             } else {
