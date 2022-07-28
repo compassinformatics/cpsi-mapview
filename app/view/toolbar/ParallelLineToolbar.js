@@ -87,13 +87,13 @@ Ext.define('CpsiMapview.view.toolbar.ParallelLine', {
         }
         var geometry = feature.getGeometry();
         if (!geometry) {
-            console.warn('Feature has no geometry.');
+            Ext.log.warn('Feature has no geometry.');
             return;
         }
 
         var geomType = geometry.getType();
         if (geomType !== 'LineString' && geomType !== 'MultiLineString') {
-            console.warn('Unsupported feature geometry. Geometry must be of type "LineString" or "MultiLineString".');
+            Ext.log.warn('Unsupported feature geometry. Geometry must be of type "LineString" or "MultiLineString".');
             return;
         }
         return feature;
@@ -110,7 +110,7 @@ Ext.define('CpsiMapview.view.toolbar.ParallelLine', {
 
     applyOffsetUnit: function (offsetUnit) {
         if (!offsetUnit) {
-            console.warn('offsetUnit is empty or undefined');
+            Ext.log.warn('offsetUnit is empty or undefined');
             return;
         }
         var supportedUnits = [
@@ -118,7 +118,7 @@ Ext.define('CpsiMapview.view.toolbar.ParallelLine', {
             'yards', 'meters'
         ];
         if (supportedUnits.indexOf(offsetUnit) === -1) {
-            console.warn(
+            Ext.log.warn(
                 'Provided offsetUnit not supported. Must be one of: ' + supportedUnits
             );
             return;
