@@ -22,7 +22,8 @@ Ext.define('CpsiMapview.view.toolbar.MapTools', {
         'CpsiMapview.view.panel.TimeSlider',
         'CpsiMapview.view.panel.NumericAttributeSlider',
         'CpsiMapview.view.lineSliceGridExample.LineSliceGridButton',
-        'CpsiMapview.view.snappingExample.EdgeButton'
+        'CpsiMapview.view.snappingExample.EdgeButton',
+        'CpsiMapview.view.window.ParallelLine'
     ],
 
     controller: 'cmv_maptools',
@@ -144,6 +145,27 @@ Ext.define('CpsiMapview.view.toolbar.MapTools', {
                 xtype: 'cmv_edgebutton',
                 tooltip: 'Snapping demo',
                 glyph: 'ea76@font-gis'
+            }, {
+                glyph: 'ea50@font-gis',
+                tooltip: 'Draw Parallel Lines',
+                toggleGroup: 'map',
+                listeners: {
+                    toggle: function (btn, toggled) {
+                        var parallelLineWindow;
+                        if (toggled) {
+                            parallelLineWindow = Ext.create({
+                                xtype: 'cmv_parallel_line_window',
+                            });
+                            parallelLineWindow.show();
+                        } else {
+                            parallelLineWindow = Ext.ComponentQuery.query(
+                                'cmv_parallel_line_window')[0];
+                            if (parallelLineWindow) {
+                                parallelLineWindow.destroy();
+                            }
+                        }
+                    }
+                }
             }]
         },
         '->',

@@ -11,7 +11,8 @@
     "test": "npm run lint && npm run jsonlint && karma start --single-run",
     "test:watch": "karma start karma-watch.conf.js",
     "test:coverage": "karma start karma.conf.js --single-run --reporters coverage",
-    "generate:docs": "jsduck --config=jsduck.json --output=docs-ext --title=\"MapView Documentation\" && cp -r docs-ext build/production/CpsiMapview/docs-ext"
+    "generate:docs": "jsduck --config=jsduck.json --output=docs-ext --title=\"MapView Documentation\" && cp -r docs-ext build/production/CpsiMapview/docs-ext",
+    "build:turf": "browserify turf-builder.js -s turf > lib/turf.js"
   },
   "repository": {
     "type": "git",
@@ -26,6 +27,7 @@
   "dependencies": {
     "@geoext/openlayers-legacy": "^6.5.4",
     "@ogc-schemas/ogc-schemas": "^3.0.0",
+    "@turf/line-offset": "^6.5.0",
     "eslint": "^7.29.0",
     "font-gis": "^1.0.4",
     "geostyler-openlayers-parser": "3.0.2",
@@ -35,6 +37,7 @@
     "proj4": "^2.7.4"
   },
   "devDependencies": {
+    "browserify": "^17.0.0",
     "karma": "^6.3.9",
     "karma-chrome-launcher": "^3.1.0",
     "karma-cli": "^2.0.0",

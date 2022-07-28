@@ -1,4 +1,4 @@
-# cpsi-mapview 
+# cpsi-mapview
 
 [![Build Status](https://travis-ci.org/compassinformatics/cpsi-mapview.svg?branch=master)](https://travis-ci.org/compassinformatics/cpsi-mapview)
 [![Coverage Status](https://coveralls.io/repos/compassinformatics/cpsi-mapview/badge.svg?branch=master&service=github)](https://coveralls.io/github/compassinformatics/cpsi-mapview?branch=master)
@@ -47,6 +47,15 @@ mklink /D ext D:\Tools\Sencha\ext-6.2.0
 new-item -itemtype symboliclink -path . -name ext -value D:\Tools\Sencha\ext-6.2.0
 ```
 
+Build required turf library:
+
+```
+npm i
+npm run build:turf
+```
+
+This will create the required library turf.js (only the needed subset of functions) and put it in `lib/`.
+
 Start dev-server
 
 ```
@@ -90,7 +99,7 @@ npm run test:watch
 ```
 
 To open in a browser and leave the browser open (to review UI components, debug, etc.).
-`--auto-watch` prevents application JS files being cached. 
+`--auto-watch` prevents application JS files being cached.
 
 ```
 karma start --browsers Chrome --single-run=False --debug --auto-watch
