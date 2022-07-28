@@ -45,7 +45,7 @@ Ext.define('CpsiMapview.controller.button.DrawingButtonController', {
     snapInteraction: null,
 
     /**
-     * If user has started to edit a line i.d. the first point of a line is already set
+     * If user has started to edit a line, this means the first point of a line is already set
      */
     editingIsActive: false,
 
