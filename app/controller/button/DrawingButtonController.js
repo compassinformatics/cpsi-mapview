@@ -103,8 +103,6 @@ Ext.define('CpsiMapview.controller.button.DrawingButtonController', {
             return ol.events.condition.primaryAction(evt) && ol.events.condition.noModifierKeys(evt);
         };
 
-        me.prepareDrawingStyles();
-
         var source = layer.getSource();
         var collection = source.getFeaturesCollection();
         var drawInteractionConfig = {
@@ -139,10 +137,8 @@ Ext.define('CpsiMapview.controller.button.DrawingButtonController', {
         view.getDrawStyleStartPoint().setGeometry(function (feature) {
             var geom = feature.getGeometry();
             var coords = geom.getCoordinates();
-            if (me.editingIsActive) {
-                var firstCoord = coords[0];
-                return new ol.geom.Point(firstCoord);
-            }
+            var firstCoord = coords[0];
+            return new ol.geom.Point(firstCoord);
         });
         view.getDrawStyleEndPoint().setGeometry(function (feature) {
             var coords = feature.getGeometry().getCoordinates();
@@ -165,13 +161,6 @@ Ext.define('CpsiMapview.controller.button.DrawingButtonController', {
     getDrawStyleFunction: function() {
         var me = this;
         var view = me.getView();
-
-        var drawStyle = [
-            view.getDrawBeforeEditingPoint(),
-            view.getDrawStyleStartPoint(),
-            view.getDrawStyleLine(),
-            view.getDrawStyleEndPoint(),
-        ];
 
         return function (feature) {
             var coordinate = feature.getGeometry().getCoordinates();
@@ -218,7 +207,7 @@ Ext.define('CpsiMapview.controller.button.DrawingButtonController', {
             } else if (selfHit) {
                 return view.getModifySnapPointStyle();
             } else {
-                return drawStyle;
+                return me.defaultdrawStyle;
             }
         };
     },
@@ -558,6 +547,17 @@ Ext.define('CpsiMapview.controller.button.DrawingButtonController', {
                 me.drawLayer = view.drawLayer;
             }
         }
+
+        me.prepareDrawingStyles();
+
+        // set initial style for drawing features
+        me.defaultdrawStyle = [
+            view.getDrawBeforeEditingPoint(),
+            view.getDrawStyleStartPoint(),
+            view.getDrawStyleLine(),
+            view.getDrawStyleEndPoint(),
+        ];
+        me.drawLayer.setStyle(me.defaultdrawStyle);
 
         me.setDrawInteraction(me.drawLayer);
         me.setModifyInteraction(me.drawLayer);
