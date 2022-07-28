@@ -179,24 +179,42 @@ Ext.define('CpsiMapview.controller.button.DrawingButtonController', {
             var nodeLayerHit = false;
             var edgeLayerHit = false;
             var selfHit = false;
-            me.map.forEachFeatureAtPixel(pixel, function (feature, layer) {
+            var snappedEdgeFeature;
+            me.map.forEachFeatureAtPixel(pixel, function (foundFeature, layer) {
                 if (layer) {
                     var key = layer.get('layerKey');
                     if (key === view.getNodeLayerKey()) {
                         nodeLayerHit = true;
                     } else if (key === view.getEdgeLayerKey()) {
                         edgeLayerHit = true;
+                        snappedEdgeFeature = foundFeature;
+                    } else if (key === view.getPolygonLayerKey()) {
+                        // TODO: handle polygon hit
                     } else if (me.drawLayer === layer) {
                         // snapping to self drawn feature
                         selfHit = true;
                     }
-                    // TODO: handle polygons
                 }
             });
             if (nodeLayerHit) {
                 return view.getSnappedNodeStyle();
             } else if (edgeLayerHit) {
-                return view.getSnappedEdgeStyle();
+                if (!snappedEdgeFeature) {
+                    return;
+                }
+
+                // Prepare style for vertices of snapped edge
+                var geom = snappedEdgeFeature.getGeometry();
+                var coords = geom.getCoordinates();
+                var verticesMultiPoint = new ol.geom.MultiPoint(coords);
+                var vertexStyle = view.getSnappedEdgeVertexStyle();
+                vertexStyle.setGeometry(verticesMultiPoint);
+
+                // combine style for snapped point and vertices of snapped edge
+                return [
+                    vertexStyle,
+                    view.getSnappedEdgeStyle()
+                ];
             } else if (selfHit) {
                 return view.getModifySnapPointStyle();
             } else {

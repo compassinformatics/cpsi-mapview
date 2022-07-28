@@ -177,6 +177,22 @@ Ext.define('CpsiMapview.view.tool.DrawingButton', {
                 radius2: 0,
                 angle: Math.PI / 4
             })
+        }),
+
+        /**
+         * The style snapped edge's vertices.
+         */
+        snappedEdgeVertexStyle: new ol.style.Style({
+            image: new ol.style.Circle({
+                radius: 3,
+                fill: new ol.style.Fill({
+                    color: 'white',
+                }),
+                stroke: new ol.style.Stroke({
+                    color: 'black',
+                    width: 1
+                }),
+            })
         })
     },
 
