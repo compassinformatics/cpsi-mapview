@@ -362,7 +362,7 @@
       "noCluster": true,
       "idProperty": "EdgeId",
       "openLayers": {
-        "visibility": false,
+        "visibility": true,
         "maxScale": 800000
       }
     },

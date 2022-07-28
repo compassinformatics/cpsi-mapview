@@ -148,15 +148,15 @@ Ext.define('CpsiMapview.controller.button.DrawingButtonController', {
             }
         });
 
-        // ensure styles are always on top
+        // ensure snap styles are always on top
         view.getSnappedNodeStyle().setZIndex(Infinity);
         view.getSnappedEdgeStyle().setZIndex(Infinity);
     },
 
     /**
-     * Creates the draw function for the drawn line.
+     * Creates the style function for the drawn feature.
      *
-     * @returns {Function} The style function for the drawn line.
+     * @returns {Function} The style function for the drawn feature.
      */
     getDrawStyleFunction: function() {
         var me = this;
@@ -165,9 +165,12 @@ Ext.define('CpsiMapview.controller.button.DrawingButtonController', {
         return function (feature) {
             var coordinate = feature.getGeometry().getCoordinates();
             var pixel = me.map.getPixelFromCoordinate(coordinate);
+
+            // remember if we have hit a referenced layer
             var nodeLayerHit = false;
             var edgeLayerHit = false;
             var selfHit = false;
+
             var snappedEdgeFeature;
             me.map.forEachFeatureAtPixel(pixel, function (foundFeature, layer) {
                 if (layer) {
@@ -185,23 +188,26 @@ Ext.define('CpsiMapview.controller.button.DrawingButtonController', {
                     }
                 }
             });
+
             if (nodeLayerHit) {
                 return view.getSnappedNodeStyle();
             } else if (edgeLayerHit) {
                 if (view.getShowVerticesOfSnappedEdge()) {
-                    // Prepare style for vertices of snapped edge
                     if (!snappedEdgeFeature) {
                         return;
                     }
+                    // Prepare style for vertices of snapped edge
+                    // we create a MultiPoint from the edge's vertices
+                    // and set it as geometry in our style function
                     var geom = snappedEdgeFeature.getGeometry();
                     var coords = geom.getCoordinates();
                     var verticesMultiPoint = new ol.geom.MultiPoint(coords);
-                    var vertexStyle = view.getSnappedEdgeVertexStyle();
-                    vertexStyle.setGeometry(verticesMultiPoint);
+                    var snappedEdgeVertexStyle = view.getSnappedEdgeVertexStyle();
+                    snappedEdgeVertexStyle.setGeometry(verticesMultiPoint);
 
                     // combine style for snapped point and vertices of snapped edge
                     return [
-                        vertexStyle,
+                        snappedEdgeVertexStyle,
                         view.getSnappedEdgeStyle()
                     ];
                 } else {
