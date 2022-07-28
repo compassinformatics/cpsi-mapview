@@ -203,7 +203,7 @@ Ext.define('CpsiMapview.controller.button.DrawingButtonController', {
                     var geom = snappedEdgeFeature.getGeometry();
                     var coords = geom.getCoordinates();
                     var verticesMultiPoint = new ol.geom.MultiPoint(coords);
-                    var snappedEdgeVertexStyle = view.getSnappedEdgeVertexStyle();
+                    var snappedEdgeVertexStyle = view.getSnappedEdgeVertexStyle().clone();
                     snappedEdgeVertexStyle.setGeometry(verticesMultiPoint);
 
                     // combine style for snapped point and vertices of snapped edge
