@@ -188,22 +188,25 @@ Ext.define('CpsiMapview.controller.button.DrawingButtonController', {
             if (nodeLayerHit) {
                 return view.getSnappedNodeStyle();
             } else if (edgeLayerHit) {
-                if (!snappedEdgeFeature) {
-                    return;
+                if (view.getShowVerticesOfSnappedEdge()) {
+                    // Prepare style for vertices of snapped edge
+                    if (!snappedEdgeFeature) {
+                        return;
+                    }
+                    var geom = snappedEdgeFeature.getGeometry();
+                    var coords = geom.getCoordinates();
+                    var verticesMultiPoint = new ol.geom.MultiPoint(coords);
+                    var vertexStyle = view.getSnappedEdgeVertexStyle();
+                    vertexStyle.setGeometry(verticesMultiPoint);
+
+                    // combine style for snapped point and vertices of snapped edge
+                    return [
+                        vertexStyle,
+                        view.getSnappedEdgeStyle()
+                    ];
+                } else {
+                    return view.getSnappedEdgeStyle();
                 }
-
-                // Prepare style for vertices of snapped edge
-                var geom = snappedEdgeFeature.getGeometry();
-                var coords = geom.getCoordinates();
-                var verticesMultiPoint = new ol.geom.MultiPoint(coords);
-                var vertexStyle = view.getSnappedEdgeVertexStyle();
-                vertexStyle.setGeometry(verticesMultiPoint);
-
-                // combine style for snapped point and vertices of snapped edge
-                return [
-                    vertexStyle,
-                    view.getSnappedEdgeStyle()
-                ];
             } else if (selfHit) {
                 return view.getModifySnapPointStyle();
             } else {

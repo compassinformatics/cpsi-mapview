@@ -63,6 +63,11 @@ Ext.define('CpsiMapview.view.tool.DrawingButton', {
         polygonLayerKey: null,
 
         /**
+         * If the vertices of the snapped edge shall be shown.
+         */
+        showVerticesOfSnappedEdge: true,
+
+        /**
          * Style of the editing cursor, before first point is set.
          */
         drawBeforeEditingPoint: new ol.style.Style({
