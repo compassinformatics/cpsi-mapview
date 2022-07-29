@@ -59,9 +59,10 @@
                 bind: {
                     drawLayer: &#39;{resultLayer}&#39; // bind the draw layer to the model&#39;s featurestore / layer
                 },
-                snappingLayerKeys: [&#39;EDGES_WFS&#39;, &#39;NODES_WFS&#39;],
+                snappingLayerKeys: [&#39;EDGES_WFS&#39;, &#39;NODES_WFS&#39;, &#39;POLYGONS_WFS&#39;],
                 nodeLayerKey: &#39;NODES_WFS&#39;,
-                edgeLayerKey: &#39;EDGES_WFS&#39;
+                edgeLayerKey: &#39;EDGES_WFS&#39;,
+                polygonLayerKey: &#39;POLYGONS_WFS&#39;
             }
         }
     ],
@@ -146,6 +147,36 @@
                                 infoIconTooltip: &#39;Database Identifier&#39;,
                                 bind: {
                                     value: &#39;{currentRecord.endEdgeId}&#39;
+                                }
+                            }
+                        },
+                        {
+                            xtype: &#39;cmv_rightinfofield&#39;,
+                            colspan: 1,
+                            width: 300,
+                            field: {
+                                xtype: &#39;displayfield&#39;,
+                                labelWidth: 100,
+                                width: 200,
+                                fieldLabel: &#39;Start Polygon ID&#39;,
+                                infoIconTooltip: &#39;Database Identifier&#39;,
+                                bind: {
+                                    value: &#39;{currentRecord.startPolygonId}&#39;
+                                }
+                            }
+                        },
+                        {
+                            xtype: &#39;cmv_rightinfofield&#39;,
+                            colspan: 1,
+                            width: 300,
+                            field: {
+                                xtype: &#39;displayfield&#39;,
+                                labelWidth: 100,
+                                width: 200,
+                                fieldLabel: &#39;End Polygon ID&#39;,
+                                infoIconTooltip: &#39;Database Identifier&#39;,
+                                bind: {
+                                    value: &#39;{currentRecord.endPolygonId}&#39;
                                 }
                             }
                         },
