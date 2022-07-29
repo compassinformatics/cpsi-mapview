@@ -17,7 +17,8 @@ Ext.define('CpsiMapview.view.main.Main', {
         'CpsiMapview.view.header.Panel',
         'CpsiMapview.view.LayerTree',
         'CpsiMapview.view.grid.ExampleGrid',
-        'CpsiMapview.view.grid.GridFiltersExample'
+        'CpsiMapview.view.grid.GridFiltersExample',
+        'CpsiMapview.view.form.LayerTreeFilter'
     ],
 
     layout: 'border',
@@ -35,10 +36,15 @@ Ext.define('CpsiMapview.view.main.Main', {
             type: 'vbox',
             align: 'stretch'
         },
-        items: {
-            xtype: 'cmv_layertree',
-            structureMode: 'BASELAYER_OVERLAY'
-        }
+        items: [
+            {
+                xtype: 'cmv_layertreefilter'
+            },
+            {
+                xtype: 'cmv_layertree',
+                structureMode: 'BASELAYER_OVERLAY'
+            }
+        ]
     }, {
         xtype: 'cmv_header'
     }]
