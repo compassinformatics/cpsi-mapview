@@ -35,6 +35,12 @@
             "qtip": "Used in the snapping tool example"
           },
           {
+            "id": "POLYGONS_WFS",
+            "leaf": true,
+            "text": "Polygons",
+            "qtip": "Used in the snapping tool example"
+          },
+          {
             "id": "BOREHOLE_WMS",
             "leaf": true,
             "text": "Borehole WMS"

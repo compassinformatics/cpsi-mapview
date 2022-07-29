@@ -1,4 +1,4 @@
-﻿Ext.define('CpsiMapview.view.snappingExample.EdgeWindow', {
+Ext.define('CpsiMapview.view.snappingExample.EdgeWindow', {
     extend: 'CpsiMapview.view.window.MinimizableWindow',
     xtype: ['cmv_edgewindow'],
     requires: [
@@ -42,9 +42,10 @@
                 bind: {
                     drawLayer: '{resultLayer}' // bind the draw layer to the model's featurestore / layer
                 },
-                snappingLayerKeys: ['EDGES_WFS', 'NODES_WFS'],
+                snappingLayerKeys: ['EDGES_WFS', 'NODES_WFS', 'POLYGONS_WFS'],
                 nodeLayerKey: 'NODES_WFS',
-                edgeLayerKey: 'EDGES_WFS'
+                edgeLayerKey: 'EDGES_WFS',
+                polygonLayerKey: 'POLYGONS_WFS'
             }
         }
     ],
@@ -129,6 +130,36 @@
                                 infoIconTooltip: 'Database Identifier',
                                 bind: {
                                     value: '{currentRecord.endEdgeId}'
+                                }
+                            }
+                        },
+                        {
+                            xtype: 'cmv_rightinfofield',
+                            colspan: 1,
+                            width: 300,
+                            field: {
+                                xtype: 'displayfield',
+                                labelWidth: 100,
+                                width: 200,
+                                fieldLabel: 'Start Polygon ID',
+                                infoIconTooltip: 'Database Identifier',
+                                bind: {
+                                    value: '{currentRecord.startPolygonId}'
+                                }
+                            }
+                        },
+                        {
+                            xtype: 'cmv_rightinfofield',
+                            colspan: 1,
+                            width: 300,
+                            field: {
+                                xtype: 'displayfield',
+                                labelWidth: 100,
+                                width: 200,
+                                fieldLabel: 'End Polygon ID',
+                                infoIconTooltip: 'Database Identifier',
+                                bind: {
+                                    value: '{currentRecord.endPolygonId}'
                                 }
                             }
                         },

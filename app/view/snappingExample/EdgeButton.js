@@ -40,6 +40,18 @@ Ext.define('CpsiMapview.view.snappingExample.EdgeModel', {
             defaultValue: null
         },
         {
+            name: 'startPolygonId',
+            type: 'int',
+            allowNull: true,
+            defaultValue: null
+        },
+        {
+            name: 'endPolygonId',
+            type: 'int',
+            allowNull: true,
+            defaultValue: null
+        },
+        {
             name: 'startCoord',
             type: 'auto',
             allowNull: true,
