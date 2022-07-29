@@ -357,6 +357,17 @@
     },
     {
       "layerType": "wfs",
+      "layerKey": "POLYGONS_WFS",
+      "featureType": "polygons",
+      "noCluster": true,
+      "idProperty": "PolygonId",
+      "openLayers": {
+        "visibility": true,
+        "maxScale": 800000
+      }
+    },
+    {
+      "layerType": "wfs",
       "layerKey": "EDGES_WFS",
       "featureType": "edges",
       "noCluster": true,

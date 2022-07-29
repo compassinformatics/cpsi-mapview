@@ -280,6 +280,9 @@
       "remote": true
     },
     {
+      "path": "./lib/turf.js"
+    },
+    {
       "path": "app.js",
       "bundle": true
     }

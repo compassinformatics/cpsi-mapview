@@ -1,4 +1,4 @@
-name: Build and publish application 
+name: Build and publish application
 
 on:
   push:
@@ -70,6 +70,9 @@ jobs:
 
     - name: Install dependencies ⏬
       run: npm install
+
+    - name: Build turf.js
+      run: npm run build:turf
 
     - name: Testing 🔎
       run: npm test
