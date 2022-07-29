@@ -132,37 +132,37 @@ Ext.define('CpsiMapview.view.snappingExample.EdgeWindow', {
                                     value: '{currentRecord.endEdgeId}'
                                 }
                             }
-                            },
-                            {
-                                xtype: 'cmv_rightinfofield',
-                                colspan: 1,
-                                width: 300,
-                                field: {
-                                    xtype: 'displayfield',
-                                    labelWidth: 100,
-                                    width: 200,
-                                    fieldLabel: 'Start Polygon ID',
-                                    infoIconTooltip: 'Database Identifier',
-                                    bind: {
-                                        value: '{currentRecord.startPolygonId}'
-                                    }
+                        },
+                        {
+                            xtype: 'cmv_rightinfofield',
+                            colspan: 1,
+                            width: 300,
+                            field: {
+                                xtype: 'displayfield',
+                                labelWidth: 100,
+                                width: 200,
+                                fieldLabel: 'Start Polygon ID',
+                                infoIconTooltip: 'Database Identifier',
+                                bind: {
+                                    value: '{currentRecord.startPolygonId}'
                                 }
-                            },
-                            {
-                                xtype: 'cmv_rightinfofield',
-                                colspan: 1,
-                                width: 300,
-                                field: {
-                                    xtype: 'displayfield',
-                                    labelWidth: 100,
-                                    width: 200,
-                                    fieldLabel: 'End Polygon ID',
-                                    infoIconTooltip: 'Database Identifier',
-                                    bind: {
-                                        value: '{currentRecord.endPolygonId}'
-                                    }
+                            }
+                        },
+                        {
+                            xtype: 'cmv_rightinfofield',
+                            colspan: 1,
+                            width: 300,
+                            field: {
+                                xtype: 'displayfield',
+                                labelWidth: 100,
+                                width: 200,
+                                fieldLabel: 'End Polygon ID',
+                                infoIconTooltip: 'Database Identifier',
+                                bind: {
+                                    value: '{currentRecord.endPolygonId}'
                                 }
-                            },
+                            }
+                        },
                         {
                             xtype: 'displayfield',
                             colspan: 2,
