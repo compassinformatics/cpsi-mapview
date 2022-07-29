@@ -174,12 +174,12 @@ Ext.define('CpsiMapview.controller.button.DrawingButtonController', {
 
             var snappedEdgeFeature;
             me.map.forEachFeatureAtPixel(pixel, function (foundFeature, layer) {
-                snappedEdgeFeature = foundFeature;
                 if (layer) {
                     var key = layer.get('layerKey');
                     if (key === view.getNodeLayerKey()) {
                         nodeLayerHit = true;
                     } else if (key === view.getEdgeLayerKey()) {
+                        snappedEdgeFeature = foundFeature;
                         edgeLayerHit = true;
                     } else if (key === view.getPolygonLayerKey()) {
                         polygonLayerHit = true;
@@ -205,6 +205,7 @@ Ext.define('CpsiMapview.controller.button.DrawingButtonController', {
                     var verticesMultiPoint = new ol.geom.MultiPoint(coords);
                     var snappedEdgeVertexStyle = view.getSnappedEdgeVertexStyle().clone();
                     snappedEdgeVertexStyle.setGeometry(verticesMultiPoint);
+                    snappedEdgeVertexStyle.setZIndex(-Infinity);
 
                     // combine style for snapped point and vertices of snapped edge
                     return [
@@ -215,7 +216,7 @@ Ext.define('CpsiMapview.controller.button.DrawingButtonController', {
                     return view.getSnappedEdgeStyle();
                 }
             } else if (polygonLayerHit) {
-                return view.getSnappedEdgeStyle();
+                return view.getSnappedPolygonStyle();
             } else if (selfHit) {
                 return view.getModifySnapPointStyle();
             } else {

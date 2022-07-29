@@ -199,7 +199,7 @@
     {
       "layerType": "switchlayer",
       "layerKey": "WATERBODY_SWITCH_LAYER",
-      "visibility": true,
+      "visibility": false,
       "layers": [
         {
           "layerType": "wms",
@@ -252,7 +252,7 @@
     {
       "layerType": "switchlayer",
       "layerKey": "BOREHOLE_SWITCH_LAYER",
-      "visibility": true,
+      "visibility": false,
       "layers": [
         {
           "layerType": "wms",
@@ -384,7 +384,7 @@
       "noCluster": true,
       "idProperty": "NodeId",
       "openLayers": {
-        "visibility": false,
+        "visibility": true,
         "maxScale": 800000
       }
     },
@@ -411,7 +411,7 @@
       "sldUrl": "resources/data/styling/ruins.xml",
       "idProperty": "osm_id",
       "openLayers": {
-        "visibility": true,
+        "visibility": false,
         "maxScale": 800000
       },
       "tooltipsConfig": [
@@ -459,7 +459,7 @@
       },
       "openLayers": {
         "opacity": 0.7,
-        "visibility": true
+        "visibility": false
       }
     }
   ]

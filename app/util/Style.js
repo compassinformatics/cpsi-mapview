@@ -84,14 +84,25 @@ Ext.define('CpsiMapview.util.Style', {
     createBlackCross: function () {
         return new ol.style.Style({
             image: new ol.style.RegularShape({
-                fill: new ol.style.Fill({
-                    color: 'black'
-                }),
                 stroke: new ol.style.Stroke({
                     color: 'black',
-                    width: 3
+                    width: 1
                 }),
                 points: 4,
+                radius: 10,
+                radius2: 0,
+                angle: 0,
+            })
+        });
+    },
+    createBlackStar: function () {
+        return new ol.style.Style({
+            image: new ol.style.RegularShape({
+                stroke: new ol.style.Stroke({
+                    color: 'black',
+                    width: 1
+                }),
+                points: 5,
                 radius: 10,
                 radius2: 0,
                 angle: 0,
@@ -102,12 +113,9 @@ Ext.define('CpsiMapview.util.Style', {
     createBlackRotatedCross: function () {
         return new ol.style.Style({
             image: new ol.style.RegularShape({
-                fill: new ol.style.Fill({
-                    color: 'black'
-                }),
                 stroke: new ol.style.Stroke({
                     color: 'black',
-                    width: 3
+                    width: 1
                 }),
                 points: 4,
                 radius: 10,

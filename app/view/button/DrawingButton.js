@@ -105,6 +105,12 @@ Ext.define('CpsiMapview.view.tool.DrawingButton', {
         snappedEdgeStyle: CpsiMapview.util.Style.createBlackRotatedCross(),
 
         /**
+         * The style of the point when snapped to the referenced
+         * polygon layer.
+         */
+        snappedPolygonStyle: CpsiMapview.util.Style.createBlackStar(),
+
+        /**
          * The style of the snapped edge's vertices.
          */
         snappedEdgeVertexStyle: CpsiMapview.util.Style.createWhiteCircle()
