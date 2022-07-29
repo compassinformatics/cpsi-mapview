@@ -167,40 +167,33 @@ Ext.define('CpsiMapview.controller.button.DrawingButtonController', {
             var pixel = me.map.getPixelFromCoordinate(coordinate);
 
             // remember if we have hit a referenced layer
-            var nodeLayerHit = false;
-            var edgeLayerHit = false;
-            var polygonLayerHit = false;
-            var selfHit = false;
 
-            var snappedEdgeFeature;
+            var node, edge, polygon, self;
+
             me.map.forEachFeatureAtPixel(pixel, function (foundFeature, layer) {
                 if (layer) {
                     var key = layer.get('layerKey');
                     if (key === view.getNodeLayerKey()) {
-                        nodeLayerHit = true;
+                        node = foundFeature;
                     } else if (key === view.getEdgeLayerKey()) {
-                        snappedEdgeFeature = foundFeature;
-                        edgeLayerHit = true;
+                        edge = foundFeature;
                     } else if (key === view.getPolygonLayerKey()) {
-                        polygonLayerHit = true;
+                        polygon = foundFeature;
                     } else if (me.drawLayer === layer) {
                         // snapping to self drawn feature
-                        selfHit = true;
+                        self = foundFeature;
                     }
                 }
             });
 
-            if (nodeLayerHit) {
+            if (node) {
                 return view.getSnappedNodeStyle();
-            } else if (edgeLayerHit) {
+            } else if (edge) {
                 if (view.getShowVerticesOfSnappedEdge()) {
-                    if (!snappedEdgeFeature) {
-                        return;
-                    }
                     // Prepare style for vertices of snapped edge
                     // we create a MultiPoint from the edge's vertices
                     // and set it as geometry in our style function
-                    var geom = snappedEdgeFeature.getGeometry();
+                    var geom = edge.getGeometry();
                     var coords = geom.getCoordinates();
                     var verticesMultiPoint = new ol.geom.MultiPoint(coords);
                     var snappedEdgeVertexStyle = view.getSnappedEdgeVertexStyle().clone();
@@ -215,9 +208,9 @@ Ext.define('CpsiMapview.controller.button.DrawingButtonController', {
                 } else {
                     return view.getSnappedEdgeStyle();
                 }
-            } else if (polygonLayerHit) {
+            } else if (polygon) {
                 return view.getSnappedPolygonStyle();
-            } else if (selfHit) {
+            } else if (self) {
                 return view.getModifySnapPointStyle();
             } else {
                 return me.defaultdrawStyle;
