@@ -29,7 +29,7 @@ Ext.define('CpsiMapview.view.form.LayerTreeFilter', {
     /**
      * The ID of the filter created by the checkbox.
      */
-    VISIBLE_LAYER_FILTER_ID: 'cpsi-tree-visible-layer',
+    VISIBLE_LAYER_FILTER_ID: 'cpsi-tree-visible-layer-filter',
 
     items: [{
         xtype: 'textfield',
