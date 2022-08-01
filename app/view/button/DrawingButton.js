@@ -60,7 +60,60 @@ Ext.define('CpsiMapview.view.tool.DrawingButton', {
          * The vector layer key of a polygon layer to snap the start and ends
          * of newly drawn lines to, and return the polygon ids
          */
-        polygonLayerKey: null
+        polygonLayerKey: null,
+
+        /**
+         * If the vertices of the snapped edge shall be shown.
+         */
+        showVerticesOfSnappedEdge: true,
+
+        /**
+         * Style of the editing cursor, before first point is set.
+         */
+        drawBeforeEditingPoint: CpsiMapview.util.Style.createBlackCircle(),
+
+        /**
+         * Style of the first point of the drawn line.
+         */
+        drawStyleStartPoint: CpsiMapview.util.Style.createGreenTriangle(),
+
+        /**
+         * Style of the last point of the currently drawn line.
+         */
+        drawStyleEndPoint: CpsiMapview.util.Style.createRedSquare(),
+
+        /**
+         * The style of the point to modify.
+         */
+        modifySnapPointStyle: CpsiMapview.util.Style.createYellowSquare(),
+
+        /**
+         * The style of the line to draw (without start and endpoint)
+         */
+        drawStyleLine: CpsiMapview.util.Style.createOrangeLine(),
+
+        /**
+         * The style of the point when snapped to the referenced
+         * node layer.
+         */
+        snappedNodeStyle: CpsiMapview.util.Style.createBlackCross(),
+
+        /**
+         * The style of the point when snapped to the referenced
+         * edge layer.
+         */
+        snappedEdgeStyle: CpsiMapview.util.Style.createBlackRotatedCross(),
+
+        /**
+         * The style of the point when snapped to the referenced
+         * polygon layer.
+         */
+        snappedPolygonStyle: CpsiMapview.util.Style.createBlackStar(),
+
+        /**
+         * The style of the snapped edge's vertices.
+         */
+        snappedEdgeVertexStyle: CpsiMapview.util.Style.createWhiteCircle()
     },
 
     /**
