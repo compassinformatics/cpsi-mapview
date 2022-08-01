@@ -77,7 +77,60 @@ Ext.define(&#39;CpsiMapview.view.tool.DrawingButton&#39;, {
 </span>         * The vector layer key of a polygon layer to snap the start and ends
          * of newly drawn lines to, and return the polygon ids
          */
-        polygonLayerKey: null
+        polygonLayerKey: null,
+
+<span id='CpsiMapview-view-tool-DrawingButton-cfg-showVerticesOfSnappedEdge'>        /**
+</span>         * If the vertices of the snapped edge shall be shown.
+         */
+        showVerticesOfSnappedEdge: true,
+
+<span id='CpsiMapview-view-tool-DrawingButton-cfg-drawBeforeEditingPoint'>        /**
+</span>         * Style of the editing cursor, before first point is set.
+         */
+        drawBeforeEditingPoint: CpsiMapview.util.Style.createBlackCircle(),
+
+<span id='CpsiMapview-view-tool-DrawingButton-cfg-drawStyleStartPoint'>        /**
+</span>         * Style of the first point of the drawn line.
+         */
+        drawStyleStartPoint: CpsiMapview.util.Style.createGreenTriangle(),
+
+<span id='CpsiMapview-view-tool-DrawingButton-cfg-drawStyleEndPoint'>        /**
+</span>         * Style of the last point of the currently drawn line.
+         */
+        drawStyleEndPoint: CpsiMapview.util.Style.createRedSquare(),
+
+<span id='CpsiMapview-view-tool-DrawingButton-cfg-modifySnapPointStyle'>        /**
+</span>         * The style of the point to modify.
+         */
+        modifySnapPointStyle: CpsiMapview.util.Style.createYellowSquare(),
+
+<span id='CpsiMapview-view-tool-DrawingButton-cfg-drawStyleLine'>        /**
+</span>         * The style of the line to draw (without start and endpoint)
+         */
+        drawStyleLine: CpsiMapview.util.Style.createOrangeLine(),
+
+<span id='CpsiMapview-view-tool-DrawingButton-cfg-snappedNodeStyle'>        /**
+</span>         * The style of the point when snapped to the referenced
+         * node layer.
+         */
+        snappedNodeStyle: CpsiMapview.util.Style.createBlackCross(),
+
+<span id='CpsiMapview-view-tool-DrawingButton-cfg-snappedEdgeStyle'>        /**
+</span>         * The style of the point when snapped to the referenced
+         * edge layer.
+         */
+        snappedEdgeStyle: CpsiMapview.util.Style.createBlackRotatedCross(),
+
+<span id='CpsiMapview-view-tool-DrawingButton-cfg-snappedPolygonStyle'>        /**
+</span>         * The style of the point when snapped to the referenced
+         * polygon layer.
+         */
+        snappedPolygonStyle: CpsiMapview.util.Style.createBlackStar(),
+
+<span id='CpsiMapview-view-tool-DrawingButton-cfg-snappedEdgeVertexStyle'>        /**
+</span>         * The style of the snapped edge&#39;s vertices.
+         */
+        snappedEdgeVertexStyle: CpsiMapview.util.Style.createWhiteCircle()
     },
 
 <span id='CpsiMapview-view-tool-DrawingButton-property-name'>    /**
