@@ -276,6 +276,9 @@
       "path": "node_modules/@ogc-schemas/ogc-schemas/lib/WCS_1_1.js"
     },
     {
+      "path": "node_modules/url-polyfill/url-polyfill.min.js"
+    },
+    {
       "path": "https://maps.googleapis.com/maps/api/js?v=quarterly&key=AIzaSyCmQRf1m6EISENeiijFjza18iIyrIQiArQ",
       "remote": true
     },
