@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+  <title>The source code</title>
+  <link href="../resources/prettify/prettify.css" type="text/css" rel="stylesheet" />
+  <script type="text/javascript" src="../resources/prettify/prettify.js"></script>
+  <style type="text/css">
+    .highlight { display: block; background-color: #ddd; }
+  </style>
+  <script type="text/javascript">
+    function highlight() {
+      document.getElementById(location.hash.replace(/#/, "")).className = "highlight";
+    }
+  </script>
+</head>
+<body onload="prettyPrint(); highlight();">
+  <pre class="prettyprint lang-js">Ext.define(&#39;CpsiMapview.controller.addArcGISRest.AddArcGISRestFormController&#39;, {
+    extend: &#39;Ext.app.ViewController&#39;,
+
+    requires: [
+        &#39;BasiGX.util.Map&#39;
+    ],
+
+    alias: &#39;controller.cmv_add_arcgisrest_form&#39;,
+
+    onArcGISRestAdd: function (olLayer) {
+        var me = this;
+        var map = BasiGX.util.Map.getMapComponent().getMap();
+
+        if (me.layerGroup === undefined) {
+
+            // create a new layer group to hold the external layers
+            me.layerGroup = new ol.layer.Group({
+                name: me.getView().layerGroupName,
+                collapsed: false
+            });
+
+            // add the external group layer to the layerTreeRoot
+            // so it appears in the layer tree
+            var layerTreeRoot = map.get(&#39;layerTreeRoot&#39;);
+            layerTreeRoot.getLayers().push(me.layerGroup);
+
+            setTimeout(function () {
+                var layerTrees = Ext.ComponentQuery.query(&#39;cmv_layertree&#39;);
+                layerTrees.forEach(function (layerTree) {
+                    var node = layerTree.getNodeForLayer(me.layerGroup);
+                    node.expand();
+                });
+            }, 0);
+        }
+
+        olLayer.set(&#39;refreshLayerOption&#39;, true);
+        olLayer.set(&#39;opacitySlider&#39;, true);
+
+        // now add the external layer to the external layers group
+        map.removeLayer(olLayer);
+        me.layerGroup.getLayers().push(olLayer);
+    }
+});
+</pre>
+</body>
+</html>

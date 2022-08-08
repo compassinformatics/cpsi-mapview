@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+  <title>The source code</title>
+  <link href="../resources/prettify/prettify.css" type="text/css" rel="stylesheet" />
+  <script type="text/javascript" src="../resources/prettify/prettify.js"></script>
+  <style type="text/css">
+    .highlight { display: block; background-color: #ddd; }
+  </style>
+  <script type="text/javascript">
+    function highlight() {
+      document.getElementById(location.hash.replace(/#/, "")).className = "highlight";
+    }
+  </script>
+</head>
+<body onload="prettyPrint(); highlight();">
+  <pre class="prettyprint lang-js">Ext.define(&#39;CpsiMapview.view.addArcGISRest.AddArcGISRestForm&#39;, {
+    extend: &#39;BasiGX.view.form.AddArcGISRest&#39;,
+
+    xtype: &#39;cmv_add_arcgisrest_form&#39;,
+
+    requires: [&#39;CpsiMapview.controller.addArcGISRest.AddArcGISRestFormController&#39;],
+
+    viewModel: {
+        data: {
+            queryParamsFieldSetTitle: &#39;Request parameters&#39;,
+            arcGISUrlTextFieldLabel: &#39;ArcGIS Service URL&#39;,
+            availableLayersFieldSetTitle: &#39;Available layers&#39;,
+            resetBtnText: &#39;Reset&#39;,
+            requestLayersBtnText: &#39;Request available layers&#39;,
+            checkAllLayersBtnText: &#39;Check all&#39;,
+            uncheckAllLayersBtnText: &#39;Uncheck all&#39;,
+            addCheckedLayersBtnText: &#39;Add chosen layers&#39;,
+            errorRequestFailed: &#39;The given URL could not be requested.&#39;,
+            msgRequestTimedOut: &#39;The request was not answered in time and was aborted.&#39;,
+            msgCorsMisconfiguration: &#39;HTTP access control (CORS) on the target server is probably not &#39; +
+                &#39;configured correctly.&#39;,
+            msgUnauthorized: &#39;The client is not authenticated against the target server.&#39;,
+            msgForbidden: &#39;The client has no access to the requested resource.&#39;,
+            msgFileNotFound: &#39;The requested resource does not exist.&#39;,
+            msgTooManyRequests: &#39;The client sent to many requests.&#39;,
+            msgServiceUnavailable: &#39;The server is currently not available (too many or request or maintenance mode).&#39;,
+            msgGatewayTimeOut: &#39;The server acted as a gateway and the original target did not respond in time&#39;,
+            msgClientError: &#39;An unspecified client error has occurred.&#39;,
+            msgServerError: &#39;An unspecified server error has occurred.&#39;,
+            msgInvalidUrl: &#39;The provided URL is not a valid ArcGIS REST URL&#39;,
+            documentation: &#39;&lt;h2&gt;Add ArcGIS REST layer&lt;/h2&gt;• In this dialog you can add any desired map service to the map with the &#39; +
+                &#39;help of an ArcGIS REST URL.&#39;
+        }
+    },
+
+    controller: &#39;cmv_add_arcgisrest_form&#39;,
+
+    listeners: {
+        arcgisrestadd: &#39;onArcGISRestAdd&#39;
+    },
+
+    bodyPadding: &#39;5px&#39;,
+
+    layerGroupName: &#39;External Layers&#39;
+});
+</pre>
+</body>
+</html>

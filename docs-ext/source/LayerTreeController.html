@@ -434,6 +434,28 @@ Ext.define(&#39;CpsiMapview.controller.LayerTreeController&#39;, {
         }
     },
 
+<span id='CpsiMapview-controller-LayerTreeController-method-onAddArcGISRestToggle'>    /**
+</span>     * This reacts on toggling the add arcgisrest Button in the layertree. It shows a window with an AddArcGISRestForm.
+     * @param {Ext.button.Button} button
+     * @param {boolean} pressed
+     */
+    onAddArcGISRestToggle: function (button, pressed) {
+        var me = this;
+
+        if (pressed) {
+            if (!this.addArcGISRestWindow) {
+                this.addArcGISRestWindow = Ext.create(me.getView().addArcGISRestWindowConfig);
+                this.addArcGISRestWindow.on(&#39;close&#39;, function () {
+                    button.setPressed(false);
+                });
+            }
+            this.addArcGISRestWindow.show();
+
+        } else if (this.addArcGISRestWindow) {
+            this.addArcGISRestWindow.close();
+        }
+    },
+
 <span id='CpsiMapview-controller-LayerTreeController-method-onBeforeDestroy'>    /**
 </span>    * Destroy any associated windows when this component gets destroyed
     */
@@ -441,6 +463,10 @@ Ext.define(&#39;CpsiMapview.controller.LayerTreeController&#39;, {
         if (this.addWmsWindow) {
             this.addWmsWindow.destroy();
             this.addWmsWindow = null;
+        }
+        if (this.addArcGISRestWindow) {
+            this.addArcGISRestWindow.destroy();
+            this.addArcGISRestWindow = null;
         }
     }
 });

@@ -36,7 +36,8 @@ Ext.define(&#39;CpsiMapview.view.LayerTree&#39;, {
         &#39;CpsiMapview.plugin.TreeColumnStyleSwitcher&#39;,
         &#39;CpsiMapview.controller.LayerTreeController&#39;,
         &#39;CpsiMapview.view.window.MinimizableWindow&#39;,
-        &#39;CpsiMapview.view.addWms.AddWmsForm&#39;
+        &#39;CpsiMapview.view.addWms.AddWmsForm&#39;,
+        &#39;CpsiMapview.view.addArcGISRest.AddArcGISRestForm&#39;
     ],
 
 <span id='CpsiMapview-view-LayerTree-property-controller'>    controller: &#39;cmv_layertree&#39;,
@@ -70,6 +71,20 @@ Ext.define(&#39;CpsiMapview.view.LayerTree&#39;, {
             }]
         },
 
+<span id='CpsiMapview-view-LayerTree-cfg-addArcGISRestWindowConfig'>        /**
+</span>         * The window configuration used for the Add ArcGISRest button
+         * Any xtypes used should be added to the requires property
+         */
+        addArcGISRestWindowConfig: {
+            xtype: &#39;cmv_minimizable_window&#39;,
+            title: &#39;Add ArcGIS REST Map Layer&#39;,
+            layout: &#39;anchor&#39;,
+            closeAction: &#39;hide&#39;,
+            items: [{
+                xtype: &#39;cmv_add_arcgisrest_form&#39;
+            }]
+        },
+
 <span id='CpsiMapview-view-LayerTree-cfg-styleSwitcherBelowNode'>        /**
 </span>         * Steers if the style switcher radio groups are directly rendered under
          * the corresponding layer tree node (`true`) or if they are provided in
@@ -90,6 +105,13 @@ Ext.define(&#39;CpsiMapview.view.LayerTree&#39;, {
         enableToggle: true,
         listeners: {
             toggle: &#39;onAddWmsToggle&#39;
+        }
+    }, {
+        xtype: &#39;button&#39;,
+        text: &#39;Add ArcGIS REST Layer&#39;,
+        enableToggle: true,
+        listeners: {
+            toggle: &#39;onAddArcGISRestToggle&#39;
         }
     }],
 <span id='CpsiMapview-view-LayerTree-property-columns'>    columns: {
