@@ -48,11 +48,11 @@ Ext.define('CpsiMapview.controller.form.LayerTreeFilter', {
                 if (!view.getDoFilterBaseLayers() && node.getOlLayerProp('isBaseLayer')){
                     return true;
                 }
-                // enforce case insensitive matches
-                var name = node.getOlLayerProp('name');
+                var name = node.get('text');
                 if (!name) {
                     return;
                 }
+                // enforce case insensitive matches
                 var text = name.toLowerCase();
                 var compare = newVal.toLowerCase();
                 return text.includes(compare);
