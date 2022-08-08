@@ -38,7 +38,7 @@ Ext.define('CpsiMapview.view.form.LayerTreeFilter', {
         anchor: '100%',
         maxWidth: 250,
         triggers: {
-            clearText: {
+            clearTreeFilterText: {
                 cls: 'x-form-clear-trigger',
                 handler: function () {
                     this.setValue('');
