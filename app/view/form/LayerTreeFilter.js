@@ -84,7 +84,7 @@ Ext.define('CpsiMapview.view.form.LayerTreeFilter', {
         });
 
         // we have to add this filter after the store of the layer tree is created.
-        // this needs two steps:
+        // this needs following steps:
         // 1. wait for the event that layers are added to the map
         // 2. get the the layer tree component
         // 3. wait for the event once the layer tree has been initialized
