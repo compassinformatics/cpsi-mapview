@@ -9,7 +9,7 @@ Ext.define('CpsiMapview.view.addArcGISRest.AddArcGISRestForm', {
         data: {
             queryParamsFieldSetTitle: 'Request parameters',
             arcGISUrlTextFieldLabel: 'ArcGIS Service URL',
-            availableLayesFieldSetTitle: 'Available layers',
+            availableLayersFieldSetTitle: 'Available layers',
             resetBtnText: 'Reset',
             requestLayersBtnText: 'Request available layers',
             checkAllLayersBtnText: 'Check all',
@@ -27,9 +27,9 @@ Ext.define('CpsiMapview.view.addArcGISRest.AddArcGISRestForm', {
             msgGatewayTimeOut: 'The server acted as a gateway and the original target did not respond in time',
             msgClientError: 'An unspecified client error has occurred.',
             msgServerError: 'An unspecified server error has occurred.',
-            msgInvalidUrl: 'The provided URL is not a valid ArcGISRest URL',
-            documentation: '<h2>Add ArcGISRest layer</h2>• In this dialog you can add any desired map service to the map with the ' +
-                'help of an ArcGISRest URL.'
+            msgInvalidUrl: 'The provided URL is not a valid ArcGIS REST URL',
+            documentation: '<h2>Add ArcGIS REST layer</h2>• In this dialog you can add any desired map service to the map with the ' +
+                'help of an ArcGIS REST URL.'
         }
     },
 

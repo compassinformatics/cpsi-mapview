@@ -55,9 +55,9 @@ Ext.define('CpsiMapview.view.LayerTree', {
         },
 
         /**
-        * The window configuration used for the Add ArcGISRest button
-        * Any xtypes used should be added to the requires property
-        */
+         * The window configuration used for the Add ArcGISRest button
+         * Any xtypes used should be added to the requires property
+         */
         addArcGISRestWindowConfig: {
             xtype: 'cmv_minimizable_window',
             title: 'Add ArcGIS REST Map Layer',
