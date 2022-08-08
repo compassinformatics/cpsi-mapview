@@ -39,5 +39,7 @@ Ext.define('CpsiMapview.view.addArcGISRest.AddArcGISRestForm', {
         arcgisrestadd: 'onArcGISRestAdd'
     },
 
+    bodyPadding: '5px',
+
     layerGroupName: 'External Layers'
 });

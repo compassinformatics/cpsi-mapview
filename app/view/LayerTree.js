@@ -60,10 +60,11 @@ Ext.define('CpsiMapview.view.LayerTree', {
         */
         addArcGISRestWindowConfig: {
             xtype: 'cmv_minimizable_window',
-            title: 'Add ArcGIS Rest Map Layer',
+            title: 'Add ArcGIS REST Map Layer',
+            layout: 'anchor',
             closeAction: 'hide',
             items: [{
-                xtype: 'cmv_add_arcgisrest_form',
+                xtype: 'cmv_add_arcgisrest_form'
             }]
         },
 
@@ -90,7 +91,7 @@ Ext.define('CpsiMapview.view.LayerTree', {
         }
     }, {
         xtype: 'button',
-        text: 'Add ArcGIS Rest Layer',
+        text: 'Add ArcGIS REST Layer',
         enableToggle: true,
         listeners: {
             toggle: 'onAddArcGISRestToggle'
