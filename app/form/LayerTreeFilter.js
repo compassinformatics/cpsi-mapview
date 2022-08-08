@@ -9,6 +9,30 @@ Ext.define('CpsiMapview.controller.form.LayerTreeFilter', {
     alias: 'controller.cmv_layertreefilter',
 
     /**
+     * Clears the textfield for filtering the layer tree.
+     *
+     * @param {Ext.form.field.Text } textField
+     */
+    clearText: function (textField) {
+        var me = this;
+        var view = me.getView();
+
+        textField.setValue('');
+
+        var tree = Ext.ComponentQuery.query('cmv_layertree')[0];
+        if (!tree) {
+            return;
+        }
+        var store = tree.getStore();
+        if (!store) {
+            return;
+        }
+
+        // remove previous filter if exists
+        store.removeFilter(view.TEXT_FILTER_ID);
+    },
+
+    /**
      * Filters the tree by matching the layer's names with the input text.
      *
      * @param {Ext.form.field.Text} textField The textfield
@@ -26,15 +50,14 @@ Ext.define('CpsiMapview.controller.form.LayerTreeFilter', {
         }
 
         var tree = Ext.ComponentQuery.query('cmv_layertree')[0];
-        if (!tree){
+        if (!tree) {
             return;
         }
         var store = tree.getStore();
-        if(!store){
+        if (!store) {
             return;
         }
 
-        // remove previous filter if exists
         store.removeFilter(view.TEXT_FILTER_ID);
 
         var textFilter = new Ext.util.Filter({
@@ -45,7 +68,7 @@ Ext.define('CpsiMapview.controller.form.LayerTreeFilter', {
                     return true;
                 }
                 // check if baselayers should be filtered
-                if (!view.getDoFilterBaseLayers() && node.getOlLayerProp('isBaseLayer')){
+                if (!view.getDoFilterBaseLayers() && node.getOlLayerProp('isBaseLayer')) {
                     return true;
                 }
                 var name = node.get('text');
@@ -87,7 +110,7 @@ Ext.define('CpsiMapview.controller.form.LayerTreeFilter', {
                         return true;
                     }
                     // check if baselayers should be filtered
-                    if (!view.getDoFilterBaseLayers() && node.getOlLayerProp('isBaseLayer')){
+                    if (!view.getDoFilterBaseLayers() && node.getOlLayerProp('isBaseLayer')) {
                         return true;
                     }
                     var checked = node.get('checked');
