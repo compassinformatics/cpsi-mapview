@@ -151,10 +151,9 @@ Ext.define('CpsiMapview.controller.button.TracingMixin', {
     initTracing: function (tracingLayerKeys) {
         var me = this;
 
-        console.log('INIT TRACING');
+        // bind scope to listener functions
         me.onTracingPointerMove = me.onTracingPointerMove.bind(me);
         me.onTracingMapClick = me.onTracingMapClick.bind(me);
-
 
         // get tracing layers
         me.tracingLayers = [];
@@ -165,17 +164,10 @@ Ext.define('CpsiMapview.controller.button.TracingMixin', {
             }
         });
 
+        // the visible tracing line while editing
         me.previewLine = new ol.Feature({
             geometry: new ol.geom.LineString([]),
         });
-
-        // the options for the eachFeature functions
-        me.forEachFeatureOptions = {
-            hitTolerance: 10,
-            layerFilter: function (layer) {
-                return Ext.Array.contains(me.tracingLayers, layer);
-            },
-        };
 
         // TODO: make style configurable
         var previewVector = new ol.layer.Vector({
@@ -190,19 +182,33 @@ Ext.define('CpsiMapview.controller.button.TracingMixin', {
             }),
         });
 
+        // the options for the eachFeature functions
+        me.forEachFeatureOptions = {
+            hitTolerance: 10,
+            layerFilter: function (layer) {
+                return Ext.Array.contains(me.tracingLayers, layer);
+            },
+        };
+
         me.map.addLayer(previewVector);
 
+        // TODO: maybe move as mixin prop
         me.tracingFeature = null;
         me.tracingFeatureArray = [];
         me.tracingStartPoint = null;
         me.tracingEndPoint = null;
-        // the click event is used to start/end tracing around a feature
+
+        // TODO: maybe single click
         me.map.on('click', me.onTracingMapClick);
 
-        // the pointermove event is used to show a preview of the result of the tracing
         me.map.on('pointermove', me.onTracingPointerMove);
     },
 
+    /**
+     * Listen to click to start and end the tracing.
+     *
+     * @param {Event} event The OpenLayers click event.
+     */
     onTracingMapClick: function (event) {
         var me = this;
 
@@ -222,7 +228,7 @@ Ext.define('CpsiMapview.controller.button.TracingMixin', {
                 var coord = me.map.getCoordinateFromPixel(event.pixel);
 
                 // second click on the tracing feature: append the ring coordinates
-                if (me.tracingFeatureArray.includes(feature)) {
+                if (me.tracingFeature && me.tracingFeatureArray.includes(feature)) {
                     me.tracingEndPoint = me.tracingFeature.getGeometry().getClosestPoint(coord);
                     var appendCoords = me.getPartialSegmentCoords(
                         me.tracingFeature,
@@ -246,10 +252,15 @@ Ext.define('CpsiMapview.controller.button.TracingMixin', {
             // clear current tracing feature & preview
             me.previewLine.getGeometry().setCoordinates([]);
             me.tracingFeature = null;
+            me.tracingFeatureArray = [];
         }
     },
 
-    // TODO: docs
+    /**
+     * Create the tracing geometry when pointer is moved.
+     *
+     * @param {Event} event The OpenLayers move event
+     */
     onTracingPointerMove: function (event) {
         var me = this;
 
@@ -257,6 +268,7 @@ Ext.define('CpsiMapview.controller.button.TracingMixin', {
             var coord = null;
             me.map.forEachFeatureAtPixel(
                 event.pixel,
+                // TODO: maybe separate function
                 function (feature) {
 
                     if (me.tracingFeatureArray.includes(feature)) {
