@@ -45,6 +45,12 @@ Ext.define('CpsiMapview.view.tool.DrawingButton', {
         snappingLayerKeys: [],
 
         /**
+         * The layerKey values for any vector layers the newly drawn lines should
+         * trace on e.g. ['CHANNELNETWORKVECTOR_WFS', 'NETWORKJUNCTIONS_WFS', 'NETWORKEDGES_WFS']
+         */
+        tracingLayerKeys: [],
+
+        /**
          * The vector layer key of a point layer to snap the start and ends
          * of newly drawn lines to, and return the node ids
          */

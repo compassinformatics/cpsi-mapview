@@ -9,9 +9,14 @@ Ext.define('CpsiMapview.controller.button.DrawingButtonController', {
         'Ext.menu.Menu',
         'GeoExt.component.FeatureRenderer',
         'GeoExt.data.store.Features',
+        'CpsiMapview.controller.button.TracingMixin'
     ],
 
     alias: 'controller.cmv_drawing_button',
+
+    mixins: [
+        'CpsiMapview.controller.button.TracingMixin'
+    ],
 
     /**
      * The OpenLayers map. If not given, will be auto-detected
@@ -123,7 +128,7 @@ Ext.define('CpsiMapview.controller.button.DrawingButtonController', {
     /**
      * Prepare the styles retrieved from config.
      */
-    prepareDrawingStyles: function() {
+    prepareDrawingStyles: function () {
         var me = this;
         var view = me.getView();
 
@@ -142,7 +147,7 @@ Ext.define('CpsiMapview.controller.button.DrawingButtonController', {
         });
         view.getDrawStyleEndPoint().setGeometry(function (feature) {
             var coords = feature.getGeometry().getCoordinates();
-            if (coords.length > 1){
+            if (coords.length > 1) {
                 var lastCoord = coords[coords.length - 1];
                 return new ol.geom.Point(lastCoord);
             }
@@ -158,7 +163,7 @@ Ext.define('CpsiMapview.controller.button.DrawingButtonController', {
      *
      * @returns {Function} The style function for the drawn feature.
      */
-    getDrawStyleFunction: function() {
+    getDrawStyleFunction: function () {
         var me = this;
         var view = me.getView();
 
@@ -213,7 +218,7 @@ Ext.define('CpsiMapview.controller.button.DrawingButtonController', {
             } else if (self) {
                 return view.getModifySnapPointStyle();
             } else {
-                return me.defaultdrawStyle;
+                return me.defaultDrawStyle;
             }
         };
     },
@@ -375,7 +380,7 @@ Ext.define('CpsiMapview.controller.button.DrawingButtonController', {
     /**
      * Handles the drawstart event
      */
-    handleDrawStart: function (){
+    handleDrawStart: function () {
         var me = this;
         me.editingIsActive = true;
     },
@@ -557,13 +562,13 @@ Ext.define('CpsiMapview.controller.button.DrawingButtonController', {
         me.prepareDrawingStyles();
 
         // set initial style for drawing features
-        me.defaultdrawStyle = [
+        me.defaultDrawStyle = [
             view.getDrawBeforeEditingPoint(),
             view.getDrawStyleStartPoint(),
             view.getDrawStyleLine(),
             view.getDrawStyleEndPoint(),
         ];
-        me.drawLayer.setStyle(me.defaultdrawStyle);
+        me.drawLayer.setStyle(me.defaultDrawStyle);
 
         me.setDrawInteraction(me.drawLayer);
         me.setModifyInteraction(me.drawLayer);
@@ -578,6 +583,8 @@ Ext.define('CpsiMapview.controller.button.DrawingButtonController', {
             viewPort.addEventListener('contextmenu', me.contextHandler);
             document.addEventListener('keydown', me.handleKeyPress);
 
+            var tracingLayerKeys = view.getTracingLayerKeys();
+            me.initTracing(tracingLayerKeys);
         } else {
             me.drawInteraction.setActive(false);
             me.modifyInteraction.setActive(false);
