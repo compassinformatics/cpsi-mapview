@@ -18,7 +18,12 @@ Ext.define('CpsiMapview.view.form.LayerTreeFilter', {
         /**
          * If baselayers shall be filtered by text filter.
          */
-        doFilterBaseLayers: true
+        doFilterBaseLayers: true,
+
+        /**
+         * If groups with no visible layer shall be hidden.
+         */
+        hideGroupsWithNoVisibleLayer: true
     },
 
     /**
@@ -60,50 +65,53 @@ Ext.define('CpsiMapview.view.form.LayerTreeFilter', {
         }
     }],
 
-    initComponent: function() {
+    initComponent: function () {
         var me = this;
         me.callParent(arguments);
 
-        // we need to set a filter that hides groups that do not have visible children
-        var emptyGroupFilter = Ext.util.Filter({
-            id: me.HIDE_EMPTY_GROUPS_FILTER_ID,
-            filterFn: function (node) {
-                if (node.hasChildNodes()) {
-                    var keep = false;
-                    node.cascade(function (cascadeNode) {
-                        // search for any descending node that is checked
-                        if (!cascadeNode.hasChildNodes() && cascadeNode.get('checked')) {
-                            keep = true;
-                        }
-                    });
-                    return keep;
-                } else {
-                    return true;
+        if (me.hideGroupsWithNoVisibleLayer) {
+            // we need to set a filter that hides groups that do not have visible children
+            var filterGroupsNoVisibleChildren = Ext.util.Filter({
+                id: me.HIDE_EMPTY_GROUPS_FILTER_ID,
+                filterFn: function (node) {
+                    if (node.hasChildNodes()) {
+                        var keep = false;
+                        node.cascade(function (cascadeNode) {
+                            // search for any descending node that is checked
+                            if (!cascadeNode.hasChildNodes() && cascadeNode.get('checked')) {
+                                keep = true;
+                            }
+                        });
+                        return keep;
+                    } else {
+                        return true;
+                    }
                 }
-            }
-        });
+            });
 
-        // we have to add this filter after the store of the layer tree is created.
-        // this needs following steps:
-        // 1. wait for the event that layers are added to the map
-        // 2. get the the layer tree component
-        // 3. wait for the event once the layer tree has been initialized
-        // 4. add filter to the store
+            // we have to add this filter after the store of the layer tree is created.
+            // this needs following steps:
+            // 1. wait for the event that layers are added to the map
+            // 2. get the the layer tree component
+            // 3. wait for the event once the layer tree has been initialized
+            // 4. add filter to the store
 
-        var mapPanel = CpsiMapview.view.main.Map.guess();
-        mapPanel.on('cmv-init-layersadded', function () {
-            var tree = Ext.ComponentQuery.query('cmv_layertree')[0];
-            if (!tree) {
-                return;
-            }
-
-            tree.on('cmv-init-layertree', function() {
-                var store = tree.getStore();
-                if (!store) {
+            var mapPanel = CpsiMapview.view.main.Map.guess();
+            mapPanel.on('cmv-init-layersadded', function () {
+                var tree = Ext.ComponentQuery.query('cmv_layertree')[0];
+                if (!tree) {
                     return;
                 }
-                store.addFilter(emptyGroupFilter);
+
+                tree.on('cmv-init-layertree', function () {
+                    var store = tree.getStore();
+                    if (!store) {
+                        return;
+                    }
+                    store.addFilter(filterGroupsNoVisibleChildren);
+                });
             });
-        });
+        }
+
     }
 });
