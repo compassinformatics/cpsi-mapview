@@ -390,6 +390,54 @@
     },
     {
       "layerType": "wfs",
+      "layerKey": "FOOTWAYS_WFS",
+      "featureType": "footways",
+      "noCluster": true,
+      "idProperty": "EdgeId",
+      "styles": [
+        {
+          "name": "Footways.xml",
+          "title": "Default"
+        }
+      ],
+      "openLayers": {
+        "maxScale": 800000
+      }
+    },
+    {
+      "layerType": "wfs",
+      "layerKey": "SERVICES_WFS",
+      "featureType": "services",
+      "noCluster": true,
+      "idProperty": "EdgeId",
+      "styles": [
+        {
+          "name": "Services.xml",
+          "title": "Default"
+        }
+      ],
+      "openLayers": {
+        "maxScale": 800000
+      }
+    },
+    {
+      "layerType": "wfs",
+      "layerKey": "CYCLEWAYS_WFS",
+      "featureType": "cycleways",
+      "noCluster": true,
+      "idProperty": "EdgeId",
+      "styles": [
+        {
+          "name": "Cycleways.xml",
+          "title": "Default"
+        }
+      ],
+      "openLayers": {
+        "maxScale": 800000
+      }
+    },
+    {
+      "layerType": "wfs",
       "gridXType": "cmv_examplegrid",
       "gridFilters": [
         {
