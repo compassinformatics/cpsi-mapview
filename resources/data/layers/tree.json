@@ -23,22 +23,47 @@
             "qtip": "Right-click for a layer grid"
           },
           {
-            "id": "NODES_WFS",
-            "leaf": true,
-            "text": "Nodes",
-            "qtip": "Used in the snapping tool example"
-          },
-          {
-            "id": "EDGES_WFS",
-            "leaf": true,
-            "text": "Edges",
-            "qtip": "Used in the snapping tool example"
-          },
-          {
-            "id": "POLYGONS_WFS",
-            "leaf": true,
-            "text": "Polygons",
-            "qtip": "Used in the snapping tool example"
+            "id": "vector-editing",
+            "title": "Vector Editing",
+            "expanded": true,
+            "children": [
+              {
+                "id": "FOOTWAYS_WFS",
+                "leaf": true,
+                "text": "Footways",
+                "qtip": "Footways data from OSM"
+              },
+              {
+                "id": "SERVICES_WFS",
+                "leaf": true,
+                "text": "Services",
+                "qtip": "Services data from OSM"
+              },
+              {
+                "id": "CYCLEWAYS_WFS",
+                "leaf": true,
+                "text": "Cycleways",
+                "qtip": "Cycleways data from OSM"
+              },
+              {
+                "id": "NODES_WFS",
+                "leaf": true,
+                "text": "Nodes",
+                "qtip": "Used in the snapping tool example"
+              },
+              {
+                "id": "EDGES_WFS",
+                "leaf": true,
+                "text": "Edges",
+                "qtip": "Used in the snapping tool example"
+              },
+              {
+                "id": "POLYGONS_WFS",
+                "leaf": true,
+                "text": "Polygons",
+                "qtip": "Used in the snapping tool example"
+              }
+            ]
           },
           {
             "id": "BOREHOLE_WMS",
