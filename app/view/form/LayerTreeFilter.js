@@ -14,6 +14,15 @@ Ext.define('CpsiMapview.view.form.LayerTreeFilter', {
 
     controller: 'cmv_layertreefilter',
 
+    viewModel: {
+        data: {
+            hideInvisibleLayersLabel: 'Show visible only',
+            searchTextPlaceholder: 'Search for layers',
+            hideInvisibleLayers: false,
+            searchText: undefined
+        }
+    },
+
     config: {
         /**
          * If baselayers shall be filtered by text filter.
@@ -27,26 +36,18 @@ Ext.define('CpsiMapview.view.form.LayerTreeFilter', {
     },
 
     /**
-     * The ID of the filter created by the text field.
+     * The ID of the filter.
      */
-    TEXT_FILTER_ID: 'cpsi-tree-layer-text-filter',
-
-    /**
-     * The ID of the filter created by the checkbox.
-     */
-    VISIBLE_LAYER_FILTER_ID: 'cpsi-tree-visible-layer-filter',
-
-    /**
-     * The ID of the filter to hide empty groups.
-     */
-    HIDE_EMPTY_GROUPS_FILTER_ID: 'cpsi-tree-hide-empty-groups',
+    FILTER_ID: 'cpsi-tree-layer-filter',
 
     items: [{
         xtype: 'textfield',
-        emptyText: 'Search for layers',
         hideTrigger: true,
         anchor: '100%',
         maxWidth: 250,
+        bind: {
+            emptyText: '{searchTextPlaceholder}',
+        },
         triggers: {
             clearTreeFilterText: {
                 cls: 'x-form-clear-trigger',
@@ -54,14 +55,16 @@ Ext.define('CpsiMapview.view.form.LayerTreeFilter', {
             }
         },
         listeners: {
-            change: 'onSearch'
+            change: 'onSearchTextChange'
         }
     },
     {
         xtype: 'checkboxfield',
-        boxLabel: 'Show Visible',
+        bind: {
+            boxLabel: '{hideInvisibleLayersLabel}',
+        },
         listeners: {
-            change: 'filterVisibleLayers'
+            change: 'onCheckboxChange'
         }
     }],
 
@@ -69,49 +72,17 @@ Ext.define('CpsiMapview.view.form.LayerTreeFilter', {
         var me = this;
         me.callParent(arguments);
 
-        if (me.hideGroupsWithNoVisibleLayer) {
-            // we need to set a filter that hides groups that do not have visible children
-            var filterGroupsNoVisibleChildren = Ext.util.Filter({
-                id: me.HIDE_EMPTY_GROUPS_FILTER_ID,
-                filterFn: function (node) {
-                    if (node.hasChildNodes()) {
-                        var keep = false;
-                        node.cascade(function (cascadeNode) {
-                            // search for any descending node that is checked
-                            if (!cascadeNode.hasChildNodes() && cascadeNode.get('checked')) {
-                                keep = true;
-                            }
-                        });
-                        return keep;
-                    } else {
-                        return true;
-                    }
-                }
+        var mapPanel = CpsiMapview.view.main.Map.guess();
+        mapPanel.on('cmv-init-layersadded', function () {
+            var tree = Ext.ComponentQuery.query('cmv_layertree')[0];
+            if (!tree) {
+                return;
+            }
+
+            tree.on('cmv-init-layertree', function () {
+                me.getController().updateFilter();
             });
-
-            // we have to add this filter after the store of the layer tree is created.
-            // this needs following steps:
-            // 1. wait for the event that layers are added to the map
-            // 2. get the the layer tree component
-            // 3. wait for the event once the layer tree has been initialized
-            // 4. add filter to the store
-
-            var mapPanel = CpsiMapview.view.main.Map.guess();
-            mapPanel.on('cmv-init-layersadded', function () {
-                var tree = Ext.ComponentQuery.query('cmv_layertree')[0];
-                if (!tree) {
-                    return;
-                }
-
-                tree.on('cmv-init-layertree', function () {
-                    var store = tree.getStore();
-                    if (!store) {
-                        return;
-                    }
-                    store.addFilter(filterGroupsNoVisibleChildren);
-                });
-            });
-        }
+        });
 
     }
 });

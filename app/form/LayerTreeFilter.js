@@ -8,16 +8,21 @@ Ext.define('CpsiMapview.controller.form.LayerTreeFilter', {
 
     alias: 'controller.cmv_layertreefilter',
 
+    requires: [
+        'CpsiMapview.util.LayerTreeFilter'
+    ],
+
     /**
-     * Clears the textfield for filtering the layer tree.
+     * Updates the filter with the latest input values.
      *
-     * @param {Ext.form.field.Text } textField
+     * @return {void}
      */
-    clearText: function (textField) {
+    updateFilter: function() {
         var me = this;
         var view = me.getView();
-
-        textField.setValue('');
+        var vm = view.getViewModel();
+        var LayerTreeFilterUtil = CpsiMapview.util.LayerTreeFilter;
+        var filterBaseLayers = view.getDoFilterBaseLayers();
 
         var tree = Ext.ComponentQuery.query('cmv_layertree')[0];
         if (!tree) {
@@ -28,99 +33,67 @@ Ext.define('CpsiMapview.controller.form.LayerTreeFilter', {
             return;
         }
 
-        // remove previous filter if exists
-        store.removeFilter(view.TEXT_FILTER_ID);
-    },
-
-    /**
-     * Filters the tree by matching the layer's names with the input text.
-     *
-     * @param {Ext.form.field.Text} textField The textfield
-     * @param {String} newVal The new value
-     */
-    onSearch: function (textField, newVal) {
-        var me = this;
-        var view = me.getView();
-
-        // show/hide clear trigger button
-        if (textField.getValue()) {
-            textField.setHideTrigger(false);
-        } else {
-            textField.setHideTrigger(true);
-        }
-
-        var tree = Ext.ComponentQuery.query('cmv_layertree')[0];
-        if (!tree) {
-            return;
-        }
-        var store = tree.getStore();
-        if (!store) {
-            return;
-        }
-
-        store.removeFilter(view.TEXT_FILTER_ID);
-
-        var textFilter = new Ext.util.Filter({
-            id: view.TEXT_FILTER_ID,
-            filterFn: function (node) {
-                // always show group layers
-                if (node.hasChildNodes()) {
-                    return true;
+        store.removeFilter(view.FILTER_ID);
+        var filter = Ext.util.Filter({
+            id: view.FILTER_ID,
+            filterFn: function(node) {
+                if (vm.get('searchText')) {
+                    var isMatch = LayerTreeFilterUtil.isSearchTextInLayerName(node, vm.get('searchText'), filterBaseLayers);
+                    if (!isMatch) {
+                        return false;
+                    }
                 }
-                // check if baselayers should be filtered
-                if (!view.getDoFilterBaseLayers() && node.getOlLayerProp('isBaseLayer')) {
-                    return true;
+                if (vm.get('hideInvisibleLayers')) {
+                    var isVisible = LayerTreeFilterUtil.isLayerVisible(node, filterBaseLayers);
+                    if (!isVisible) {
+                        return false;
+                    }
                 }
-                var name = node.get('text');
-                if (!name) {
-                    return;
+                if (view.hideGroupsWithNoVisibleLayer) {
+                    var keepGroup = LayerTreeFilterUtil.groupHasVisibleLayer(node);
+                    if (!keepGroup) {
+                        return false;
+                    }
                 }
-                // enforce case insensitive matches
-                var text = name.toLowerCase();
-                var compare = newVal.toLowerCase();
-                return text.includes(compare);
+                return true;
             }
         });
-        store.addFilter(textFilter);
+        store.addFilter(filter);
     },
 
     /**
-     * Filters the tree by checking the visibility of the layers.
+     * Handler for the input field change event.
      *
-     * @param {Ext.form.field.Field} checkBox The checkbox
-     * @param {Boolean} showOnlyVisible If only visible layers should be shown in the tree
+     * @param {Ext.form.field.Text} textfield The textfield.
+     * @param {string} searchText The search text.
+     * @return  {void}
      */
-    filterVisibleLayers: function (checkBox, showOnlyVisible) {
-        var me = this;
-        var view = me.getView();
-
-        var tree = Ext.ComponentQuery.query('cmv_layertree')[0];
-        if (!tree) {
+    onSearchTextChange: function(textfield, searchText) {
+        var treeFilter = textfield.up('cmv_layertreefilter');
+        var vm = treeFilter.getViewModel();
+        var ctrl = treeFilter.getController();
+        if (!vm || !ctrl) {
             return;
         }
-        var store = tree.getStore();
-        if (!store) {
+        vm.set('searchText', searchText);
+        ctrl.updateFilter();
+    },
+
+    /**
+     * Handler for the checkbox change event.
+     *
+     * @param {Ext.form.field.Checkbox} cb The checkbox.
+     * @param {boolean} checked True, if checked. False otherwise.
+     * @return {void}
+     */
+    onCheckboxChange: function(cb, checked) {
+        var treeFilter = cb.up('cmv_layertreefilter');
+        var vm = treeFilter.getViewModel();
+        var ctrl = treeFilter.getController();
+        if (!vm || !ctrl) {
             return;
         }
-        if (showOnlyVisible) {
-            var visibleLayerFilter = new Ext.util.Filter({
-                id: view.VISIBLE_LAYER_FILTER_ID,
-                filterFn: function (node) {
-                    if (node.hasChildNodes()) {
-                        return true;
-                    }
-                    // check if baselayers should be filtered
-                    if (!view.getDoFilterBaseLayers() && node.getOlLayerProp('isBaseLayer')) {
-                        return true;
-                    }
-                    var checked = node.get('checked');
-                    return checked;
-                }
-            });
-
-            store.addFilter(visibleLayerFilter);
-        } else {
-            store.removeFilter(view.VISIBLE_LAYER_FILTER_ID);
-        }
+        vm.set('hideInvisibleLayers', checked);
+        ctrl.updateFilter();
     }
 });
