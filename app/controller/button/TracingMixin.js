@@ -14,6 +14,16 @@ Ext.define('CpsiMapview.controller.button.TracingMixin', {
     ],
 
     /**
+     * The style of the preview line during tracing.
+     */
+    previewStyle: new ol.style.Style({
+        stroke: new ol.style.Stroke({
+            color: 'rgba(255, 0, 0, 1)',
+            width: 10,
+        })
+    }),
+
+    /**
      * Compute the length of the [a, b] segment.
      *
      * @param {ol.coordinate.Coordinate} a The start coordinate of the segment
@@ -147,6 +157,8 @@ Ext.define('CpsiMapview.controller.button.TracingMixin', {
 
     // TODO: on close remove tracing
 
+    // TODO: handle linestring touch interior point
+
     // TODO: docs
     initTracing: function (tracingLayerKeys) {
         var me = this;
@@ -164,24 +176,6 @@ Ext.define('CpsiMapview.controller.button.TracingMixin', {
             }
         });
 
-        // the visible tracing line while editing
-        me.previewLine = new ol.Feature({
-            geometry: new ol.geom.LineString([]),
-        });
-
-        // TODO: make style configurable
-        var previewVector = new ol.layer.Vector({
-            source: new ol.source.Vector({
-                features: [me.previewLine],
-            }),
-            style: new ol.style.Style({
-                stroke: new ol.style.Stroke({
-                    color: 'rgba(255, 0, 0, 1)',
-                    width: 10,
-                }),
-            }),
-        });
-
         // the options for the eachFeature functions
         me.forEachFeatureOptions = {
             hitTolerance: 10,
@@ -190,18 +184,65 @@ Ext.define('CpsiMapview.controller.button.TracingMixin', {
             },
         };
 
-        me.map.addLayer(previewVector);
-
         // TODO: maybe move as mixin prop
-        me.tracingFeature = null;
+        me.tracingFeature = new ol.Feature({
+            geometry: new ol.geom.LineString([]),
+        });
         me.tracingFeatureArray = [];
         me.tracingStartPoint = null;
         me.tracingEndPoint = null;
 
-        // TODO: maybe single click
+
+        // DEBUG
+        var debug = false;
+        if (debug) {
+            var tracingVector = new ol.layer.Vector({
+                source: new ol.source.Vector({
+                    features: [me.tracingFeature],
+                }),
+                style: new ol.style.Style({
+                    stroke: new ol.style.Stroke({
+                        color: [255, 255, 0, 0.5],
+                        width: 25
+                    })
+                })
+            });
+            me.map.addLayer(tracingVector);
+        }
+        // DEBUG
+
+
+        // the visible tracing line while editing
+        me.previewLine = new ol.Feature({
+            geometry: new ol.geom.LineString([]),
+        });
+
+        var previewVector = new ol.layer.Vector({
+            source: new ol.source.Vector({
+                features: [me.previewLine],
+            }),
+            style: me.previewStyle
+        });
+
+
+
+        me.map.addLayer(previewVector);
+
         me.map.on('click', me.onTracingMapClick);
 
         me.map.on('pointermove', me.onTracingPointerMove);
+    },
+
+    /**
+     * Checks if a LineString is not empty.
+     *
+     * @param {ol.Feature} feature The feature to check
+     * @returns {Boolean} If LineString is not empty
+     */
+    lineStringNotEmpty: function (feature) {
+        var geom = feature.getGeometry();
+        var coords = geom.getCoordinates();
+        return coords.length > 0;
     },
 
     /**
@@ -220,7 +261,7 @@ Ext.define('CpsiMapview.controller.button.TracingMixin', {
         me.map.forEachFeatureAtPixel(
             event.pixel,
             function (feature) {
-                if (me.tracingFeature && !me.tracingFeatureArray.includes(feature)) {
+                if (me.lineStringNotEmpty(me.tracingFeature) && !me.tracingFeatureArray.includes(feature)) {
                     return;
                 }
 
@@ -228,7 +269,7 @@ Ext.define('CpsiMapview.controller.button.TracingMixin', {
                 var coord = me.map.getCoordinateFromPixel(event.pixel);
 
                 // second click on the tracing feature: append the ring coordinates
-                if (me.tracingFeature && me.tracingFeatureArray.includes(feature)) {
+                if (me.lineStringNotEmpty(me.tracingFeature) && me.tracingFeatureArray.includes(feature)) {
                     me.tracingEndPoint = me.tracingFeature.getGeometry().getClosestPoint(coord);
                     var appendCoords = me.getPartialSegmentCoords(
                         me.tracingFeature,
@@ -237,11 +278,15 @@ Ext.define('CpsiMapview.controller.button.TracingMixin', {
                     );
                     me.drawInteraction.removeLastPoint();
                     me.drawInteraction.appendCoordinates(appendCoords);
-                    me.tracingFeature = null;
+                    me.tracingFeature.getGeometry().setCoordinates([]);
+                    me.tracingFeatureArray = [];
+                    me.previewLine.getGeometry().setCoordinates([]);
                 }
 
                 // start tracing on the feature ring
-                me.tracingFeature = feature.clone();
+                me.tracingFeature.getGeometry().setCoordinates(
+                    feature.clone().getGeometry().getCoordinates()
+                );
                 me.tracingFeatureArray.push(feature);
                 me.tracingStartPoint = me.tracingFeature.getGeometry().getClosestPoint(coord);
             },
@@ -251,7 +296,7 @@ Ext.define('CpsiMapview.controller.button.TracingMixin', {
         if (!hit) {
             // clear current tracing feature & preview
             me.previewLine.getGeometry().setCoordinates([]);
-            me.tracingFeature = null;
+            me.tracingFeature.getGeometry().setCoordinates([]);
             me.tracingFeatureArray = [];
         }
     },
@@ -264,7 +309,9 @@ Ext.define('CpsiMapview.controller.button.TracingMixin', {
     onTracingPointerMove: function (event) {
         var me = this;
 
-        if (me.tracingFeature && me.editingIsActive) {
+        // TODO: attach new features only at end
+
+        if (me.lineStringNotEmpty(me.tracingFeature) && me.editingIsActive) {
             var coord = null;
             me.map.forEachFeatureAtPixel(
                 event.pixel,
@@ -273,26 +320,30 @@ Ext.define('CpsiMapview.controller.button.TracingMixin', {
 
                     if (me.tracingFeatureArray.includes(feature)) {
                         coord = me.map.getCoordinateFromPixel(event.pixel);
-                        // TODO: if any feature in the array is hovered,
-                        // all features after it are deleted and the tracingfeature
-                        // is computed again
-                        // if (me.tracingFeatureArray.length > 1) {
-                        //     var i = me.tracingFeatureArray.indexOf(feature);
-                        //     if(i !== (me.tracingFeatureArray.length -1)){
-                        //         console.log('new array', i);
-                        //         // debugger
-                        //         me.tracingFeatureArray = me.tracingFeatureArray.slice(0, i + 1);
-                        //         var newCoords = [];
-                        //         // TODO: order of coords is important
-                        //         Ext.each(me.tracingFeatureArray, function (f) {
-                        //             newCoords.push(f.getGeometry().getCoordinates());
-                        //         });
-                        //         me.tracingFeature.getGeometry().setCoordinates(newCoords);
-                        //     }
-                        // }
-                    } else {
 
+                        var i = me.tracingFeatureArray.indexOf(feature);
+                        var notLastFeature = (i !== (me.tracingFeatureArray.length - 1));
+                        if (notLastFeature) {
+
+                            // remove all features after hovered feature
+                            me.tracingFeatureArray = me.tracingFeatureArray.slice(0, i + 1);
+                            var updatedCoords = [];
+                            Ext.each(me.tracingFeatureArray, function (f) {
+                                var geom = f.getGeometry();
+                                var coords = geom.clone().getCoordinates();
+                                if (updatedCoords.length === 0) {
+                                    updatedCoords = coords;
+                                } else {
+                                    updatedCoords = me.concatLineCoords(updatedCoords, coords);
+                                }
+                            });
+
+                            me.tracingFeature.getGeometry().setCoordinates(updatedCoords);
+                        }
+                    } else {
                         var geom = feature.getGeometry().clone();
+
+                        // TODO: maybe separate function
                         var first = geom.getFirstCoordinate();
                         var last = geom.getLastCoordinate();
 
@@ -300,39 +351,18 @@ Ext.define('CpsiMapview.controller.button.TracingMixin', {
                         var tracingFirst = tracingGeom.getFirstCoordinate();
                         var tracingLast = tracingGeom.getLastCoordinate();
 
-                        var touching = tracingGeom.intersectsCoordinate(first) || tracingGeom.intersectsCoordinate(last);
+                        var endStart = Ext.Array.equals(tracingLast, first);
+                        var endEnd = Ext.Array.equals(tracingLast, last);
+                        var startStart = Ext.Array.equals(tracingFirst, first);
+                        var startEnd = Ext.Array.equals(tracingFirst, last);
+                        var touching = endStart || endEnd || startStart || startEnd;
+                        // TODO: maybe separate function
+
                         if (touching) {
-                            var endStart = Ext.Array.equals(tracingLast, first);
-                            var endEnd = Ext.Array.equals(tracingLast, last);
-                            var startStart = Ext.Array.equals(tracingFirst, first);
-                            var startEnd = Ext.Array.equals(tracingFirst, last);
-                            var currentCoords = tracingGeom.getCoordinates();
-                            var newCoords = geom.getCoordinates();
-                            var resultCoords;
-                            // TODO: remove intersection coords
-                            if (endStart) {
-                                console.log('end start');
-                                resultCoords = currentCoords.concat(newCoords);
-
-                            } else if (endEnd) {
-                                console.log('end end - reverse feature');
-                                newCoords.reverse();
-                                resultCoords = currentCoords.concat(newCoords);
-
-                            } else if (startStart) {
-                                console.log('start start- reverse tracing feature');
-                                currentCoords.reverse();
-                                resultCoords = currentCoords.concat(newCoords);
-
-                            } else if (startEnd) {
-                                console.log('start end ');
-                                currentCoords.reverse();
-                                newCoords.reverse();
-
-                                resultCoords = currentCoords.concat(newCoords);
-                            } else {
-                                console.log('NOT HANDLED - RETURN');
-                            }
+                            var resultCoords = me.concatLineCoords(
+                                tracingGeom.getCoordinates(),
+                                geom.getCoordinates()
+                            );
 
                             if (resultCoords) {
                                 me.tracingFeature.getGeometry().setCoordinates(resultCoords);
@@ -355,6 +385,56 @@ Ext.define('CpsiMapview.controller.button.TracingMixin', {
             }
             me.previewLine.getGeometry().setCoordinates(previewCoords);
         }
+    },
+
+
+    /**
+     * Concatenate two coordinate arrays if they are touching at the startpoint or endpoint.
+     * It takes the direction of the arrays into account.
+     *
+     * Return empty array otherwise.
+     *
+     * @param {ol.coordinate.Coordinate[]} aLineCoords The first coordinate array
+     * @param {ol.coordinate.Coordinate[]} bLineCoords The second coordinate array
+     * @returns {ol.coordinate.Coordinate[]} The combined coordinate array if input arrays are touching, empty array otherwise
+     */
+    concatLineCoords: function (aLineCoords, bLineCoords) {
+        var aFirst = aLineCoords[0] || [];
+        var aLast = aLineCoords[aLineCoords.length - 1] || [];
+
+        var bFirst = bLineCoords[0] || [];
+        var bLast = bLineCoords[bLineCoords.length - 1] || [];
+
+        var lastFirst = Ext.Array.equals(aLast, bFirst);
+        var lastLast = Ext.Array.equals(aLast, bLast);
+        var firstFirst = Ext.Array.equals(aFirst, bFirst);
+        var firstLast = Ext.Array.equals(aFirst, bLast);
+
+        if (lastFirst) {
+            // optimal order, do nothing
+
+        } else if (lastLast) {
+            // reverse second array
+            bLineCoords.reverse();
+
+        } else if (firstFirst) {
+            // reverse first array
+            aLineCoords.reverse();
+
+        } else if (firstLast) {
+            // reverse both arrays
+            aLineCoords.reverse();
+            bLineCoords.reverse();
+
+        } else {
+            // lines do not touch
+            Ext.Logger.warn('Cannot concat lines, because they do not touch.');
+            return [];
+        }
+        // remove intersecting vertex
+        aLineCoords.pop();
+        var resultCoords = aLineCoords.concat(bLineCoords);
+        return resultCoords;
     }
 }
 
