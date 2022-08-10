@@ -76,6 +76,9 @@ Ext.define('CpsiMapview.controller.form.LayerTreeFilter', {
             return;
         }
         vm.set('searchText', searchText);
+        // Making sure we work on the latest state,
+        // when updating the filter.
+        vm.notify();
         ctrl.updateFilter();
     },
 
@@ -94,6 +97,9 @@ Ext.define('CpsiMapview.controller.form.LayerTreeFilter', {
             return;
         }
         vm.set('hideInvisibleLayers', checked);
+        // Making sure we work on the latest state,
+        // when updating the filter.
+        vm.notify();
         ctrl.updateFilter();
     }
 });
