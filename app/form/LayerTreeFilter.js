@@ -37,25 +37,24 @@ Ext.define('CpsiMapview.controller.form.LayerTreeFilter', {
         var filter = Ext.util.Filter({
             id: view.FILTER_ID,
             filterFn: function(node) {
-                if (vm.get('searchText')) {
-                    var isMatch = LayerTreeFilterUtil.isSearchTextInLayerName(node, vm.get('searchText'), filterBaseLayers);
-                    if (!isMatch) {
-                        return false;
+                var isLeaf = !node.hasChildNodes();
+                if (isLeaf) {
+                    if (vm.get('hideInvisibleLayers')) {
+                        var isVisible = LayerTreeFilterUtil.isLayerVisible(node, filterBaseLayers);
+                        if (!isVisible) {
+                            return false;
+                        }
                     }
-                }
-                if (vm.get('hideInvisibleLayers')) {
-                    var isVisible = LayerTreeFilterUtil.isLayerVisible(node, filterBaseLayers);
-                    if (!isVisible) {
-                        return false;
+                    if (vm.get('searchText')) {
+                        var isMatch = LayerTreeFilterUtil.isSearchTextInLayerName(node, vm.get('searchText'), filterBaseLayers);
+                        if (!isMatch) {
+                            return false;
+                        }
                     }
+                    return true;
+                } else {
+                    return false;
                 }
-                if (view.hideGroupsWithNoVisibleLayer) {
-                    var keepGroup = LayerTreeFilterUtil.groupHasVisibleLayer(node);
-                    if (!keepGroup) {
-                        return false;
-                    }
-                }
-                return true;
             }
         });
         store.addFilter(filter);
@@ -76,9 +75,6 @@ Ext.define('CpsiMapview.controller.form.LayerTreeFilter', {
             return;
         }
         vm.set('searchText', searchText);
-        // Making sure we work on the latest state,
-        // when updating the filter.
-        vm.notify();
         ctrl.updateFilter();
     },
 
@@ -97,9 +93,6 @@ Ext.define('CpsiMapview.controller.form.LayerTreeFilter', {
             return;
         }
         vm.set('hideInvisibleLayers', checked);
-        // Making sure we work on the latest state,
-        // when updating the filter.
-        vm.notify();
         ctrl.updateFilter();
     }
 });

@@ -7,26 +7,6 @@ Ext.define('CpsiMapview.util.LayerTreeFilter', {
     alternateClassName: 'LayerTreeFilterUtil',
 
     statics: {
-        /**
-         * Checks if a group has at least one visible layer.
-         *
-         * @param {GeoExt.data.model.LayerTreeNode} node The node to check.
-         * @return {boolean} True, if group has visible layer. False otherwise.
-         */
-        groupHasVisibleLayer: function(node) {
-            if (node.hasChildNodes()) {
-                var hasVisibleLayer = false;
-                node.cascade(function (cascadeNode) {
-                    // search for any descending node that is checked
-                    if (!cascadeNode.hasChildNodes() && cascadeNode.get('checked')) {
-                        hasVisibleLayer = true;
-                    }
-                });
-                return hasVisibleLayer;
-            } else {
-                return true;
-            }
-        },
 
         /**
          * Checks if layer is visible.
