@@ -21,6 +21,16 @@ Ext.define('CpsiMapview.view.toolbar.MapFooter', {
             xtype: 'basigx-combo-scale'
         }, {
             xtype: 'basigx-panel-coordinatemouseposition',
+            showMarker: true,
+            markerStyle: new ol.style.Style({
+                text: new ol.style.Text({
+                    font: 'normal 2em "font-gis"',
+                    text: '\uea16',
+                    fill: new ol.style.Fill({
+                        color: 'red'
+                    })
+                })
+            }),
             epsgCodeArray: ['EPSG:4326', 'EPSG:29902', 'EPSG:2157'],
             activeEpsgCode: 'EPSG:29902',
             segmentedButtonLimit: 3
