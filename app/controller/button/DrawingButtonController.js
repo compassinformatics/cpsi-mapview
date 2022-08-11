@@ -586,15 +586,16 @@ Ext.define('CpsiMapview.controller.button.DrawingButtonController', {
         var viewPort = me.map.getViewport();
 
         var tracingLayerKeys = view.getTracingLayerKeys();
-        me.initTracing(tracingLayerKeys);
 
         if (pressed) {
+            me.initTracing(tracingLayerKeys);
             me.drawInteraction.setActive(true);
             me.modifyInteraction.setActive(true);
             me.snapInteraction.setActive(true);
             viewPort.addEventListener('contextmenu', me.contextHandler);
             document.addEventListener('keydown', me.handleKeyPress);
         } else {
+            me.cleanupTracing();
             me.drawInteraction.setActive(false);
             me.modifyInteraction.setActive(false);
             me.snapInteraction.setActive(false);
@@ -604,7 +605,7 @@ Ext.define('CpsiMapview.controller.button.DrawingButtonController', {
     },
 
     /**
-     * Called by TracingMixin when new tracing coordinates are available.
+     * Called when new tracing coordinates are available.
      *
      * @param {ol.coordinate.Coordinate[]} appendCoords The new coordinates
      */
@@ -680,8 +681,6 @@ Ext.define('CpsiMapview.controller.button.DrawingButtonController', {
         if (me.drawLayer) {
             me.map.removeLayer(me.drawLayer);
         }
-
-        me.cleanupTracing();
     },
 
     init: function () {

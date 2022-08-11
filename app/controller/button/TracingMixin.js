@@ -61,8 +61,8 @@ Ext.define('CpsiMapview.controller.button.TracingMixin', {
         me.tracingEndPoint = null;
 
 
-        // DEBUG
-        var debug = true;
+        // For debugging this layer can be displayed.
+        var debug = false;
         if (debug) {
             var tracingVector = new ol.layer.Vector({
                 source: new ol.source.Vector({
@@ -77,10 +77,9 @@ Ext.define('CpsiMapview.controller.button.TracingMixin', {
             });
             me.map.addLayer(tracingVector);
         }
-        // DEBUG
 
+        // the tracing util
         me.util = CpsiMapview.util.Tracing;
-
 
         // the visible tracing line while editing
         me.previewLine = new ol.Feature({
@@ -106,9 +105,7 @@ Ext.define('CpsiMapview.controller.button.TracingMixin', {
     /**
      * Remove listeners and layers
      */
-    // TODO: maybe within mixin event
     cleanupTracing: function () {
-        // TODO: check if it actually works
         var me = this;
         me.map.removeLayer(me.previewVector);
         me.map.un('click', me.onTracingMapClick);
