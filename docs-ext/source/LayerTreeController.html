@@ -176,6 +176,17 @@ Ext.define(&#39;CpsiMapview.controller.LayerTreeController&#39;, {
                 if (node.getOlLayer()) {
                     var origTreeNodeConf = node.getOlLayer().get(&#39;_origTreeConf&#39;) || {};
                     me.applyTreeConfigsToNode(node, origTreeNodeConf);
+
+                    // We are creating the gridWindow here already, to ensure that
+                    // any preset filter will be applied directly, without having to
+                    // open the gridWindow first.
+                    var gridWindow = CpsiMapview.util.Grid.getGridWindow(node.getOlLayer());
+                    if (gridWindow) {
+                        var grid = gridWindow.down(&#39;grid&#39;);
+                        if (grid) {
+                            grid.fireEvent(&#39;applypresetfilters&#39;);
+                        }
+                    }
                 }
             });
 
