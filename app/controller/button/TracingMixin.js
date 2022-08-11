@@ -183,8 +183,6 @@ Ext.define('CpsiMapview.controller.button.TracingMixin', {
     onTracingPointerMove: function (event) {
         var me = this;
 
-        // TODO: attach new features only at end
-
         if (me.util.lineStringNotEmpty(me.tracingFeature) && me.editingIsActive) {
             var coordOnFoundFeature = null;
             me.map.forEachFeatureAtPixel(
