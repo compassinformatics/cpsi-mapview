@@ -594,9 +594,6 @@ Ext.define('CpsiMapview.controller.button.DrawingButtonController', {
             me.snapInteraction.setActive(true);
             viewPort.addEventListener('contextmenu', me.contextHandler);
             document.addEventListener('keydown', me.handleKeyPress);
-
-            var tracingLayerKeys = view.getTracingLayerKeys();
-            me.initTracing(tracingLayerKeys);
         } else {
             me.drawInteraction.setActive(false);
             me.modifyInteraction.setActive(false);
