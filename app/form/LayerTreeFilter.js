@@ -22,7 +22,6 @@ Ext.define('CpsiMapview.controller.form.LayerTreeFilter', {
         var view = me.getView();
         var vm = view.getViewModel();
         var LayerTreeFilterUtil = CpsiMapview.util.LayerTreeFilter;
-        var filterBaseLayers = view.getDoFilterBaseLayers();
 
         var tree = Ext.ComponentQuery.query('cmv_layertree')[0];
         if (!tree) {
@@ -34,29 +33,12 @@ Ext.define('CpsiMapview.controller.form.LayerTreeFilter', {
         }
 
         store.removeFilter(view.FILTER_ID);
-        var filter = Ext.util.Filter({
-            id: view.FILTER_ID,
-            filterFn: function(node) {
-                var isLeaf = !node.hasChildNodes();
-                if (isLeaf) {
-                    if (vm.get('hideInvisibleLayers')) {
-                        var isVisible = LayerTreeFilterUtil.isLayerVisible(node, filterBaseLayers);
-                        if (!isVisible) {
-                            return false;
-                        }
-                    }
-                    if (vm.get('searchText')) {
-                        var isMatch = LayerTreeFilterUtil.isSearchTextInLayerName(node, vm.get('searchText'), filterBaseLayers);
-                        if (!isMatch) {
-                            return false;
-                        }
-                    }
-                    return true;
-                } else {
-                    return false;
-                }
-            }
-        });
+        var filter = LayerTreeFilterUtil.createLayerTreeFilter(
+            view.FILTER_ID,
+            vm.get('hideInvisibleLayers'),
+            vm.get('searchText'),
+            view.getDoFilterBaseLayers()
+        );
         store.addFilter(filter);
     },
 
