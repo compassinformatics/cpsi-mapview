@@ -27,6 +27,8 @@ Ext.define('CpsiMapview.controller.button.TracingMixin', {
     /**
      * Enhances drawing functionality by adding tracing to it.
      *
+     * Needs to have access to the variable 'editingIsActive' of the parent component.
+     *
      * @param {String[]} tracingLayerKeys The keys of the layers to trace
      */
     initTracing: function (tracingLayerKeys) {
@@ -61,7 +63,7 @@ Ext.define('CpsiMapview.controller.button.TracingMixin', {
         me.tracingEndPoint = null;
 
 
-        // For debugging this layer can be displayed.
+        // For debugging the line where the user can trace to can be displayed.
         var debug = false;
         if (debug) {
             var tracingVector = new ol.layer.Vector({
