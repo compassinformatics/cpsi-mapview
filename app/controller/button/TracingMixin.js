@@ -229,10 +229,13 @@ Ext.define('CpsiMapview.controller.button.TracingMixin', {
 
                         var touchingStartEnd = me.util.linesTouchAtStartEndPoint(foundGeom, tracingGeom);
 
+                        // TODO: the cases where lines touch at interior points only work in some cases
+                        //       it might fail in some edge cases, also tracing consecutively on many
+                        //       features does not work
                         var tracingInteriorTouchesFoundFeatureStartEnd = me.util.lineInteriorTouchesLineStartEnd(tracingGeom, foundGeom);
-
                         var tracingStartEndTouchesFoundInterior = me.util.lineStartEndTouchesLineInterior(tracingGeom, foundGeom);
 
+                        var touchingIndex, partUntilIntersection, newTracingCoords, foundSplitPoint;
                         if (touchingStartEnd) {
                             var coords = foundGeom.getCoordinates();
 
@@ -246,10 +249,49 @@ Ext.define('CpsiMapview.controller.button.TracingMixin', {
                                 me.tracingFeatureArray.push(foundFeature);
                             }
                         } else if (tracingInteriorTouchesFoundFeatureStartEnd) {
-                            // TODO: must be implemented
+                            // cut tracing feature at coordinate
+                            touchingIndex = me.util.getCoordIndex(tracingCoords, tracingInteriorTouchesFoundFeatureStartEnd);
+
+                            foundSplitPoint = me.util.getClosestCoordinateToPoint(tracingCoords, me.tracingStartPoint);
+
+                            var startingPointIndex = me.util.getCoordIndex(tracingCoords, foundSplitPoint);
+                            console.log(startingPointIndex);
+
+                            if (touchingIndex < startingPointIndex) {
+                                partUntilIntersection = tracingCoords.slice(touchingIndex, tracingCoords.length);
+
+                            } else {
+                                partUntilIntersection = tracingCoords.slice(0, touchingIndex + 1);
+
+                            }
+
+                            newTracingCoords = me.util.concatLineCoords(partUntilIntersection, foundFeature.getGeometry().getCoordinates());
+
+                            me.tracingFeature.getGeometry().setCoordinates(newTracingCoords);
+                            me.tracingFeatureArray.push(foundFeature);
 
                         } else if (tracingStartEndTouchesFoundInterior) {
-                            // TODO: must be implemented
+
+                            touchingIndex = me.util.getCoordIndex(foundGeom.getCoordinates(), tracingStartEndTouchesFoundInterior);
+
+                            var hoverCoord = me.map.getCoordinateFromPixel(event.pixel);
+
+                            foundSplitPoint = me.util.getClosestCoordinateToPoint(foundGeom.getCoordinates(), hoverCoord);
+                            me.util.getCoordIndex(foundGeom.getCoordinates(), foundSplitPoint);
+
+                            var hoverIndex = me.util.getCoordIndex(foundGeom.getCoordinates(), foundSplitPoint);
+
+                            var foundCoords = foundGeom.getCoordinates();
+                            if (hoverIndex >= touchingIndex) {
+                                partUntilIntersection = foundCoords.slice(touchingIndex, foundCoords.length);
+                            } else {
+                                partUntilIntersection = foundCoords.slice(0, touchingIndex + 1);
+                            }
+
+                            newTracingCoords = me.util.concatLineCoords(partUntilIntersection, tracingCoords);
+
+                            me.tracingFeature.getGeometry().setCoordinates(newTracingCoords);
+                            me.tracingFeatureArray.push(foundFeature);
                         }
                     }
                 },
