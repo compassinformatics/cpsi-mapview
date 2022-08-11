@@ -250,19 +250,18 @@ Ext.define('CpsiMapview.controller.button.TracingMixin', {
                             }
                         } else if (tracingInteriorTouchesFoundFeatureStartEnd) {
                             // cut tracing feature at coordinate
+
                             touchingIndex = me.util.getCoordIndex(tracingCoords, tracingInteriorTouchesFoundFeatureStartEnd);
 
                             foundSplitPoint = me.util.getClosestCoordinateToPoint(tracingCoords, me.tracingStartPoint);
-
                             var startingPointIndex = me.util.getCoordIndex(tracingCoords, foundSplitPoint);
-                            console.log(startingPointIndex);
 
+                            // we cut the tracing feature by the split point
+                            // we have to take the order into account
                             if (touchingIndex < startingPointIndex) {
                                 partUntilIntersection = tracingCoords.slice(touchingIndex, tracingCoords.length);
-
                             } else {
                                 partUntilIntersection = tracingCoords.slice(0, touchingIndex + 1);
-
                             }
 
                             newTracingCoords = me.util.concatLineCoords(partUntilIntersection, foundFeature.getGeometry().getCoordinates());
@@ -275,12 +274,11 @@ Ext.define('CpsiMapview.controller.button.TracingMixin', {
                             touchingIndex = me.util.getCoordIndex(foundGeom.getCoordinates(), tracingStartEndTouchesFoundInterior);
 
                             var hoverCoord = me.map.getCoordinateFromPixel(event.pixel);
-
                             foundSplitPoint = me.util.getClosestCoordinateToPoint(foundGeom.getCoordinates(), hoverCoord);
-                            me.util.getCoordIndex(foundGeom.getCoordinates(), foundSplitPoint);
-
                             var hoverIndex = me.util.getCoordIndex(foundGeom.getCoordinates(), foundSplitPoint);
 
+                            // we cut the tracing feature by the split point
+                            // we have to take the order into account
                             var foundCoords = foundGeom.getCoordinates();
                             if (hoverIndex >= touchingIndex) {
                                 partUntilIntersection = foundCoords.slice(touchingIndex, foundCoords.length);
