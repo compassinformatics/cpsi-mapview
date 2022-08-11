@@ -1,4 +1,4 @@
-﻿/**
+/**
  * A digitize button used for drawing and modifying network features
  *
  * @class CpsiMapview.view.tool.DrawingButton
@@ -139,6 +139,7 @@ Ext.define('CpsiMapview.view.tool.DrawingButton', {
      */
     listeners: {
         toggle: 'onToggle',
-        beforedestroy: 'onBeforeDestroy'
+        beforedestroy: 'onBeforeDestroy',
+        tracingend: 'handleTracingResult'
     }
 });

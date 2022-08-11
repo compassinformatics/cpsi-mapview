@@ -199,11 +199,20 @@ Ext.define('CpsiMapview.controller.button.DrawingButtonController', {
                     // we create a MultiPoint from the edge's vertices
                     // and set it as geometry in our style function
                     var geom = edge.getGeometry();
-                    var coords = geom.getCoordinates();
+                    var coords = [];
+                    if (geom.getType() === 'MultiLineString'){
+                        // use all vertices of containing LineStrings
+                        var lineStrings = geom.getLineStrings();
+                        Ext.each(lineStrings, function(lineString){
+                            var lineStringCoords = lineString.getCoordinates();
+                            coords = coords.concat(lineStringCoords);
+                        });
+                    } else {
+                        coords = geom.getCoordinates();
+                    }
                     var verticesMultiPoint = new ol.geom.MultiPoint(coords);
                     var snappedEdgeVertexStyle = view.getSnappedEdgeVertexStyle().clone();
                     snappedEdgeVertexStyle.setGeometry(verticesMultiPoint);
-                    snappedEdgeVertexStyle.setZIndex(-Infinity);
 
                     // combine style for snapped point and vertices of snapped edge
                     return [
@@ -576,6 +585,9 @@ Ext.define('CpsiMapview.controller.button.DrawingButtonController', {
 
         var viewPort = me.map.getViewport();
 
+        var tracingLayerKeys = view.getTracingLayerKeys();
+        me.initTracing(tracingLayerKeys);
+
         if (pressed) {
             me.drawInteraction.setActive(true);
             me.modifyInteraction.setActive(true);
@@ -592,6 +604,17 @@ Ext.define('CpsiMapview.controller.button.DrawingButtonController', {
             viewPort.removeEventListener('contextmenu', me.contextHandler);
             document.removeEventListener('keydown', me.handleKeyPress);
         }
+    },
+
+    /**
+     * Called by TracingMixin when new tracing coordinates are available.
+     *
+     * @param {ol.coordinate.Coordinate[]} appendCoords The new coordinates
+     */
+    handleTracingResult: function(appendCoords){
+        var me = this;
+        me.drawInteraction.removeLastPoint();
+        me.drawInteraction.appendCoordinates(appendCoords);
     },
 
     /**
@@ -660,6 +683,8 @@ Ext.define('CpsiMapview.controller.button.DrawingButtonController', {
         if (me.drawLayer) {
             me.map.removeLayer(me.drawLayer);
         }
+
+        me.cleanupTracing();
     },
 
     init: function () {
