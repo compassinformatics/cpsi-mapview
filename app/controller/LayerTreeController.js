@@ -142,7 +142,10 @@ Ext.define('CpsiMapview.controller.LayerTreeController', {
             // create a new LayerStore from the grouped layers
             var groupedLayerTreeStore = Ext.create('GeoExt.data.store.LayersTree', {
                 model: 'CpsiMapview.data.model.LayerTreeNode',
-                layerGroup: rootLayerGroup
+                layerGroup: rootLayerGroup,
+                // filters are applied from bottom to top
+                // necessary for filtering empty layer groups
+                filterer: 'bottomup'
             });
             me.getView().setStore(groupedLayerTreeStore);
 
@@ -159,6 +162,17 @@ Ext.define('CpsiMapview.controller.LayerTreeController', {
                 if (node.getOlLayer()) {
                     var origTreeNodeConf = node.getOlLayer().get('_origTreeConf') || {};
                     me.applyTreeConfigsToNode(node, origTreeNodeConf);
+
+                    // We are creating the gridWindow here already, to ensure that
+                    // any preset filter will be applied directly, without having to
+                    // open the gridWindow first.
+                    var gridWindow = CpsiMapview.util.Grid.getGridWindow(node.getOlLayer());
+                    if (gridWindow) {
+                        var grid = gridWindow.down('grid');
+                        if (grid) {
+                            grid.fireEvent('applypresetfilters');
+                        }
+                    }
                 }
             });
 
