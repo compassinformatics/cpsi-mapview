@@ -159,7 +159,10 @@ Ext.define(&#39;CpsiMapview.controller.LayerTreeController&#39;, {
             // create a new LayerStore from the grouped layers
             var groupedLayerTreeStore = Ext.create(&#39;GeoExt.data.store.LayersTree&#39;, {
                 model: &#39;CpsiMapview.data.model.LayerTreeNode&#39;,
-                layerGroup: rootLayerGroup
+                layerGroup: rootLayerGroup,
+                // filters are applied from bottom to top
+                // necessary for filtering empty layer groups
+                filterer: &#39;bottomup&#39;
             });
             me.getView().setStore(groupedLayerTreeStore);
 
