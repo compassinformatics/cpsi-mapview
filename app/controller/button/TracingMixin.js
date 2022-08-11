@@ -187,7 +187,6 @@ Ext.define('CpsiMapview.controller.button.TracingMixin', {
             var coordOnFoundFeature = null;
             me.map.forEachFeatureAtPixel(
                 event.pixel,
-                // TODO: maybe separate function
                 function (foundFeature) {
 
                     // find coordinate on found feature
