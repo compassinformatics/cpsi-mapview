@@ -52,7 +52,6 @@ describe('CpsiMapview.util.Turf', function () {
             var parallelCoords = parallelFeature.getGeometry().getCoordinates();
             var expectedCoord = coords[0][0] + 1;
 
-            console.log(parallelCoords);
             // we have to consider rounding errors
             // but the precise number does not matter for our tests
             var roundingError = 2;
