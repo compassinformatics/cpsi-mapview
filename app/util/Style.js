@@ -140,6 +140,18 @@ Ext.define('CpsiMapview.util.Style', {
         });
     },
 
+    createRedPoiMarker: function () {
+        return new ol.style.Style({
+            text: new ol.style.Text({
+                font: 'normal 2em "font-gis"',
+                text: '\uea16',
+                fill: new ol.style.Fill({
+                    color: 'red'
+                })
+            })
+        });
+    },
+
     /**
      * Returns the human readable label for the given layer style.
      * If WFS or VT we remove the '_' and the .xml file ending. For other layer
