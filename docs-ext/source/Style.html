@@ -157,6 +157,18 @@ Ext.define(&#39;CpsiMapview.util.Style&#39;, {
         });
     },
 
+<span id='CpsiMapview-util-Style-method-createRedPoiMarker'>    createRedPoiMarker: function () {
+</span>        return new ol.style.Style({
+            text: new ol.style.Text({
+                font: &#39;normal 2em &quot;font-gis&quot;&#39;,
+                text: &#39;\uea16&#39;,
+                fill: new ol.style.Fill({
+                    color: &#39;red&#39;
+                })
+            })
+        });
+    },
+
 <span id='CpsiMapview-util-Style-method-getLayerStyleLabel'>    /**
 </span>     * Returns the human readable label for the given layer style.
      * If WFS or VT we remove the &#39;_&#39; and the .xml file ending. For other layer

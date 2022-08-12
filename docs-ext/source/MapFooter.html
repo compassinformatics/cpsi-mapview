@@ -27,7 +27,8 @@ Ext.define(&#39;CpsiMapview.view.toolbar.MapFooter&#39;, {
         &#39;BasiGX.view.MapLoadingStatusBar&#39;,
         &#39;BasiGX.view.panel.CoordinateMousePositionPanel&#39;,
         &#39;CpsiMapview.view.button.LoginButton&#39;,
-        &#39;CpsiMapview.view.button.MinimizeAllButton&#39;
+        &#39;CpsiMapview.view.button.MinimizeAllButton&#39;,
+        &#39;CpsiMapview.util.Style&#39;
     ],
 
 <span id='CpsiMapview-view-toolbar-MapFooter-property-items'>    items: [
@@ -38,6 +39,8 @@ Ext.define(&#39;CpsiMapview.view.toolbar.MapFooter&#39;, {
             xtype: &#39;basigx-combo-scale&#39;
         }, {
             xtype: &#39;basigx-panel-coordinatemouseposition&#39;,
+            showMarker: true,
+            markerStyle: CpsiMapview.util.Style.createRedPoiMarker(),
             epsgCodeArray: [&#39;EPSG:4326&#39;, &#39;EPSG:29902&#39;, &#39;EPSG:2157&#39;],
             activeEpsgCode: &#39;EPSG:29902&#39;,
             segmentedButtonLimit: 3

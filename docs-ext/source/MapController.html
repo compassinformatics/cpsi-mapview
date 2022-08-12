@@ -58,6 +58,17 @@ Ext.define(&#39;CpsiMapview.controller.MapController&#39;, {
         var feat, recId;
         var me = this;
 
+        // Prevent triggering other map events, if we click on the coordinate marker
+        var coordinateMousePanel = Ext.ComponentQuery.query(&#39;basigx-panel-coordinatemouseposition&#39;)[0];
+        if (coordinateMousePanel) {
+            var coordinateMarker = Ext.Array.findBy(clickedFeatures, function(clickedFeature) {
+                return coordinateMousePanel.fireEvent(&#39;isMapMarker&#39;, clickedFeature.feature);
+            });
+            if (coordinateMarker) {
+                coordinateMousePanel.fireEvent(&#39;removeMarker&#39;);
+                return false;
+            }
+        }
         // avoid opening the form if another tool is active (see CpsiMapview.util.ApplicationMixin)
         var map = me.getView().map;
         if (map.get(&#39;defaultClickEnabled&#39;) === false) {
