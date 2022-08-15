@@ -237,6 +237,7 @@ Ext.define('CpsiMapview.controller.button.TracingMixin', {
 
                         var foundGeom = foundFeature.getGeometry();
                         var tracingGeom = me.tracingFeature.getGeometry();
+                        var tracingCoords = tracingGeom.getCoordinates();
 
                         var touchingStartEnd = me.tracingUtil.linesTouchAtStartEndPoint(foundGeom, tracingGeom);
 
