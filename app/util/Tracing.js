@@ -53,6 +53,7 @@ Ext.define('CpsiMapview.util.Tracing', {
          * @param {ol.coordinate.Coordinate} coordToFind The coordinate to find
          * @returns {Number} The index of the coordinate, or -1 if not found
          */
+        // TODO: use Ext.Array.reduce instead of Ext.Array.findBy you can omit the second loop
         getCoordIndex: function (coordinateArray, coordToFind) {
             var found = Ext.Array.findBy(coordinateArray, function (c) {
                 return Ext.Array.equals(c, coordToFind);
