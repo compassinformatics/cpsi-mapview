@@ -196,32 +196,9 @@ Ext.define('CpsiMapview.controller.button.TracingMixin', {
                         coordOnFoundFeature = me.map.getCoordinateFromPixel(event.pixel);
                     }
 
-                    // update tracing feature and array
                     if (me.tracingFeatureArray.includes(foundFeature)) {
+                        me.updateTraceableFeature(foundFeature);
 
-                        // check if found feature is last of array
-                        var i = me.tracingFeatureArray.indexOf(foundFeature);
-                        var notLastFeature = (i !== (me.tracingFeatureArray.length - 1));
-
-                        if (notLastFeature) {
-
-                            // remove all features after hovered feature
-                            me.tracingFeatureArray = me.tracingFeatureArray.slice(0, i + 1);
-                            // update coordinates of tracingFeature
-                            var updatedCoords = [];
-                            Ext.each(me.tracingFeatureArray, function (f) {
-                                var geom = f.getGeometry();
-                                var coords = geom.getCoordinates();
-
-                                if (updatedCoords.length === 0) {
-                                    updatedCoords = coords;
-                                } else {
-                                    updatedCoords = me.tracingUtil.concatLineCoords(updatedCoords, coords);
-                                }
-                            });
-
-                            me.tracingFeature.getGeometry().setCoordinates(updatedCoords);
-                        }
                     } else {
                         // new feature found that needs to be added to tracingfeature
 
@@ -268,6 +245,43 @@ Ext.define('CpsiMapview.controller.button.TracingMixin', {
                 );
             }
             me.previewLine.getGeometry().setCoordinates(previewCoords);
+        }
+    },
+
+    /**
+     * Updates the currently active traceable feature.
+     *
+     * @param {ol.Feature} foundFeature The hovered feature found in the tracing feature array.
+     */
+    updateTraceableFeature: function (foundFeature) {
+        var me = this;
+
+        // check if found feature is last of array
+        var index = me.tracingFeatureArray.indexOf(foundFeature);
+        if (index !== 0 && (!index || index === -1)) {
+            Ext.Logger.error('The found feature must be in the found features array.');
+            return;
+        }
+        var notLastFeature = (index !== (me.tracingFeatureArray.length - 1));
+
+        if (notLastFeature) {
+
+            // remove all features after hovered feature
+            me.tracingFeatureArray = me.tracingFeatureArray.slice(0, index + 1);
+            // update coordinates of tracingFeature
+            var updatedCoords = [];
+            Ext.each(me.tracingFeatureArray, function (f) {
+                var geom = f.getGeometry();
+                var coords = geom.getCoordinates();
+
+                if (updatedCoords.length === 0) {
+                    updatedCoords = coords;
+                } else {
+                    updatedCoords = me.tracingUtil.concatLineCoords(updatedCoords, coords);
+                }
+            });
+
+            me.tracingFeature.getGeometry().setCoordinates(updatedCoords);
         }
     }
 }
