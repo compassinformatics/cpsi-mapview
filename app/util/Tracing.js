@@ -25,12 +25,12 @@ Ext.define('CpsiMapview.util.Tracing', {
         },
 
         /**
-         * Checks if a LineString is not empty.
+         * Checks if a LineString is is populated i.e. is not empty.
          *
          * @param {ol.Feature} feature The feature to check
-         * @returns {Boolean} true/false if LineString is not empty, undefined if something unexpected happened
+         * @returns {Boolean} true/false if LineString is populated, undefined if something unexpected happened
          */
-        lineStringNotEmpty: function (feature) {
+        lineStringPopulated: function (feature) {
             if (!feature) {
                 return;
             }

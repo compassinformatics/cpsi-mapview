@@ -14,8 +14,8 @@ describe('CpsiMapview.util.Tracing', function () {
             expect(fn).not.to.be(undefined);
         });
 
-        it('#lineStringNotEmpty', function () {
-            var fn = util.lineStringNotEmpty;
+        it('#lineStringPopulated', function () {
+            var fn = util.lineStringPopulated;
             expect(fn).not.to.be(undefined);
         });
 
@@ -55,8 +55,8 @@ describe('CpsiMapview.util.Tracing', function () {
         });
     });
 
-    describe('#lineStringNotEmpty', function () {
-        var fn = util.lineStringNotEmpty;
+    describe('#lineStringPopulated', function () {
+        var fn = util.lineStringPopulated;
         var feature = new ol.Feature({});
         it('returns undefined on empty feature', function () {
             expect(fn(feature)).to.be(undefined);

@@ -130,7 +130,7 @@ Ext.define('CpsiMapview.controller.button.TracingMixin', {
         me.map.forEachFeatureAtPixel(
             event.pixel,
             function (feature) {
-                if (me.tracingUtil.lineStringNotEmpty(me.tracingFeature) && !me.tracingFeatureArray.includes(feature)) {
+                if (me.tracingUtil.lineStringPopulated(me.tracingFeature) && !me.tracingFeatureArray.includes(feature)) {
                     return;
                 }
 
@@ -138,7 +138,7 @@ Ext.define('CpsiMapview.controller.button.TracingMixin', {
                 var coord = me.map.getCoordinateFromPixel(event.pixel);
 
                 // second click on the tracing feature: append the ring coordinates
-                if (me.tracingUtil.lineStringNotEmpty(me.tracingFeature) && me.tracingFeatureArray.includes(feature)) {
+                if (me.tracingUtil.lineStringPopulated(me.tracingFeature) && me.tracingFeatureArray.includes(feature)) {
                     me.tracingEndPoint = me.tracingFeature.getGeometry().getClosestPoint(coord);
                     var appendCoords = me.tracingUtil.getPartialSegmentCoords(
                         me.tracingFeature,
@@ -185,7 +185,7 @@ Ext.define('CpsiMapview.controller.button.TracingMixin', {
     onTracingPointerMove: function (event) {
         var me = this;
 
-        if (me.tracingUtil.lineStringNotEmpty(me.tracingFeature) && me.editingIsActive) {
+        if (me.tracingUtil.lineStringPopulated(me.tracingFeature) && me.editingIsActive) {
             var coordOnFoundFeature = null;
             me.map.forEachFeatureAtPixel(
                 event.pixel,
