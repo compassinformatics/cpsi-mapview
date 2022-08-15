@@ -159,28 +159,34 @@ Ext.define('CpsiMapview.util.Tracing', {
          * Concatenate two coordinate arrays if they are touching at the startpoint or endpoint.
          * It takes the direction of the arrays into account.
          *
-         * Return empty array otherwise.
-         *
          * @param {ol.coordinate.Coordinate[]} aLineCoords The first coordinate array
          * @param {ol.coordinate.Coordinate[]} bLineCoords The second coordinate array
          * @returns {ol.coordinate.Coordinate[]} The combined coordinate array if input arrays are touching, empty array otherwise
          */
         concatLineCoords: function (aLineCoords, bLineCoords) {
-            var aFirst = aLineCoords[0] || [];
-            var aLast = aLineCoords[aLineCoords.length - 1] || [];
 
-            var bFirst = bLineCoords[0] || [];
-            var bLast = bLineCoords[bLineCoords.length - 1] || [];
+            var inputValid =
+                Ext.isArray(aLineCoords) &&
+                aLineCoords.length >= 2 &&
+                Ext.isArray(bLineCoords) &&
+                bLineCoords.length >= 2;
+
+            if (!inputValid) {
+                return;
+            }
+
+            var aFirst = aLineCoords[0];
+            var aLast = aLineCoords[aLineCoords.length - 1];
+
+            var bFirst = bLineCoords[0];
+            var bLast = bLineCoords[bLineCoords.length - 1];
 
             var lastFirst = Ext.Array.equals(aLast, bFirst);
             var lastLast = Ext.Array.equals(aLast, bLast);
             var firstFirst = Ext.Array.equals(aFirst, bFirst);
             var firstLast = Ext.Array.equals(aFirst, bLast);
 
-            if (lastFirst) {
-                // optimal order, do nothing
-
-            } else if (lastLast) {
+            if (lastLast) {
                 // reverse second array
                 bLineCoords.reverse();
 
@@ -193,10 +199,10 @@ Ext.define('CpsiMapview.util.Tracing', {
                 aLineCoords.reverse();
                 bLineCoords.reverse();
 
-            } else {
+            } else if (!lastFirst) {
                 // lines do not touch
                 Ext.Logger.warn('Cannot concat lines, because they do not touch.');
-                return [];
+                return undefined;
             }
             // remove intersecting vertex
             aLineCoords.pop();
