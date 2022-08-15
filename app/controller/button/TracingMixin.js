@@ -27,18 +27,33 @@ Ext.define('CpsiMapview.controller.button.TracingMixin', {
     /**
      * Enhances drawing functionality by adding tracing to it.
      *
-     * Needs to have access to the variable 'editingIsActive' of the parent component.
-     *
      * @param {String[]} tracingLayerKeys The keys of the layers to trace
+     * @param {ol.interaction.Draw} drawInteraction draw interaction to attach the tracing on
      * @param {Boolean} [showTraceableEdges=false] If the traceable edges shall be shown (useful for debugging)
      */
-    initTracing: function (tracingLayerKeys, showTraceableEdges) {
+    initTracing: function (tracingLayerKeys, drawInteraction, showTraceableEdges) {
         var me = this;
 
         if (me.getView()) {
             me.getView().fireEvent('tracingstart');
         }
 
+        if (!drawInteraction) {
+            return;
+        }
+
+        me.tracingDrawInteraction = drawInteraction;
+
+        me.onTracingDrawStart = me.onTracingDrawStart.bind(this);
+        me.onTracingDrawEnd = me.onTracingDrawEnd.bind(this);
+
+        me.tracingActive = false;
+        me.tracingDrawInteraction.on('drawstart', me.onTracingDrawStart);
+        me.tracingDrawInteraction.on('drawend', me.onTracingDrawEnd);
+
+        if (!tracingLayerKeys) {
+            return;
+        }
         // get tracing layers
         me.tracingLayers = [];
         Ext.each(tracingLayerKeys, function (key) {
@@ -104,6 +119,22 @@ Ext.define('CpsiMapview.controller.button.TracingMixin', {
     },
 
     /**
+     * Sets the variable 'me.tracingActive' to true.
+     */
+    onTracingDrawStart: function () {
+        var me = this;
+        me.tracingActive = true;
+    },
+
+    /**
+     * Sets the variable 'me.tracingActive' to false.
+     */
+    onTracingDrawEnd: function () {
+        var me = this;
+        me.tracingActive = false;
+    },
+
+    /**
      * Remove listeners and layers
      */
     cleanupTracing: function () {
@@ -112,6 +143,8 @@ Ext.define('CpsiMapview.controller.button.TracingMixin', {
         me.map.removeLayer(me.tracingVector);
         me.map.un('click', me.onTracingMapClick);
         me.map.un('pointermove', me.onTracingPointerMove);
+        me.tracingDrawInteraction.un('drawstart', me.onTracingDrawStart);
+        me.tracingDrawInteraction.un('drawend', me.onTracingDrawEnd);
     },
 
     /**
@@ -121,10 +154,6 @@ Ext.define('CpsiMapview.controller.button.TracingMixin', {
      */
     onTracingMapClick: function (event) {
         var me = this;
-
-        if (!me.editingIsActive) {
-            return;
-        }
 
         var hit = false;
         me.map.forEachFeatureAtPixel(
@@ -148,6 +177,10 @@ Ext.define('CpsiMapview.controller.button.TracingMixin', {
 
                     // send coordinates to parent component
                     if (me.getView()) {
+                        // NOTE: we transfer the coordinates via an event,
+                        //       but this mixin has access to the drawInteraction as well,
+                        //       hence we could directly apply the coordinates to the drawInteraction
+                        //       without an event
                         me.getView().fireEvent('tracingend', appendCoords);
                     }
 
@@ -185,7 +218,7 @@ Ext.define('CpsiMapview.controller.button.TracingMixin', {
     onTracingPointerMove: function (event) {
         var me = this;
 
-        if (me.tracingUtil.lineStringPopulated(me.tracingFeature) && me.editingIsActive) {
+        if (me.tracingUtil.lineStringPopulated(me.tracingFeature) && me.tracingActive) {
             var coordOnFoundFeature = null;
             me.map.forEachFeatureAtPixel(
                 event.pixel,

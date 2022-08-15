@@ -52,7 +52,7 @@ Ext.define('CpsiMapview.controller.button.DrawingButtonController', {
     /**
      * If user has started to edit a line, this means the first point of a line is already set
      */
-    editingIsActive: false,
+    currentlyDrawing: false,
 
     /**
      * Determines if event handling is blocked.
@@ -135,7 +135,7 @@ Ext.define('CpsiMapview.controller.button.DrawingButtonController', {
         // ensure styles are applied at right conditions
         view.getDrawBeforeEditingPoint().setGeometry(function (feature) {
             var geom = feature.getGeometry();
-            if (!me.editingIsActive) {
+            if (!me.currentlyDrawing) {
                 return geom;
             }
         });
@@ -200,10 +200,10 @@ Ext.define('CpsiMapview.controller.button.DrawingButtonController', {
                     // and set it as geometry in our style function
                     var geom = edge.getGeometry();
                     var coords = [];
-                    if (geom.getType() === 'MultiLineString'){
+                    if (geom.getType() === 'MultiLineString') {
                         // use all vertices of containing LineStrings
                         var lineStrings = geom.getLineStrings();
-                        Ext.each(lineStrings, function(lineString){
+                        Ext.each(lineStrings, function (lineString) {
                             var lineStringCoords = lineString.getCoordinates();
                             coords = coords.concat(lineStringCoords);
                         });
@@ -391,13 +391,13 @@ Ext.define('CpsiMapview.controller.button.DrawingButtonController', {
      */
     handleDrawStart: function () {
         var me = this;
-        me.editingIsActive = true;
+        me.currentlyDrawing = true;
     },
 
     /**
-    * Handles the drawend event
-    * @param {ol.interaction.Draw.Event} evt The OpenLayers draw event containing the features
-    */
+     * Handles the drawend event
+     * @param {ol.interaction.Draw.Event} evt The OpenLayers draw event containing the features
+     */
     handleDrawEnd: function (evt) {
         var me = this;
         var feature = evt.feature;
@@ -417,7 +417,7 @@ Ext.define('CpsiMapview.controller.button.DrawingButtonController', {
         // clear all previous features so only the last drawn feature remains
         drawSource.getFeaturesCollection().clear();
 
-        me.editingIsActive = false;
+        me.currentlyDrawing = false;
     },
 
     /**
@@ -588,7 +588,11 @@ Ext.define('CpsiMapview.controller.button.DrawingButtonController', {
         var tracingLayerKeys = view.getTracingLayerKeys();
 
         if (pressed) {
-            me.initTracing(tracingLayerKeys, true);
+
+            me.initTracing(
+                tracingLayerKeys,
+                me.drawInteraction
+            );
             me.drawInteraction.setActive(true);
             me.modifyInteraction.setActive(true);
             me.snapInteraction.setActive(true);
@@ -609,7 +613,7 @@ Ext.define('CpsiMapview.controller.button.DrawingButtonController', {
      *
      * @param {ol.coordinate.Coordinate[]} appendCoords The new coordinates
      */
-    handleTracingResult: function(appendCoords){
+    handleTracingResult: function (appendCoords) {
         var me = this;
         me.drawInteraction.removeLastPoint();
         me.drawInteraction.appendCoordinates(appendCoords);
