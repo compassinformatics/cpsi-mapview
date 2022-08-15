@@ -27,18 +27,33 @@ Ext.define('CpsiMapview.controller.button.TracingMixin', {
     /**
      * Enhances drawing functionality by adding tracing to it.
      *
-     * Needs to have access to the variable 'editingIsActive' of the parent component.
-     *
      * @param {String[]} tracingLayerKeys The keys of the layers to trace
+     * @param {ol.interaction.Draw} drawInteraction draw interaction to attach the tracing on
      * @param {Boolean} [showTraceableEdges=false] If the traceable edges shall be shown (useful for debugging)
      */
-    initTracing: function (tracingLayerKeys, showTraceableEdges) {
+    initTracing: function (tracingLayerKeys, drawInteraction, showTraceableEdges) {
         var me = this;
 
         if (me.getView()) {
             me.getView().fireEvent('tracingstart');
         }
 
+        if (!drawInteraction) {
+            return;
+        }
+
+        me.tracingDrawInteraction = drawInteraction;
+
+        me.onTracingDrawStart = me.onTracingDrawStart.bind(this);
+        me.onTracingDrawEnd = me.onTracingDrawEnd.bind(this);
+
+        me.tracingActive = false;
+        me.tracingDrawInteraction.on('drawstart', me.onTracingDrawStart);
+        me.tracingDrawInteraction.on('drawend', me.onTracingDrawEnd);
+
+        if (!tracingLayerKeys) {
+            return;
+        }
         // get tracing layers
         me.tracingLayers = [];
         Ext.each(tracingLayerKeys, function (key) {
@@ -104,6 +119,22 @@ Ext.define('CpsiMapview.controller.button.TracingMixin', {
     },
 
     /**
+     * Sets the variable 'me.tracingActive' to true.
+     */
+    onTracingDrawStart: function () {
+        var me = this;
+        me.tracingActive = true;
+    },
+
+    /**
+     * Sets the variable 'me.tracingActive' to false.
+     */
+    onTracingDrawEnd: function () {
+        var me = this;
+        me.tracingActive = false;
+    },
+
+    /**
      * Remove listeners and layers
      */
     cleanupTracing: function () {
@@ -112,6 +143,8 @@ Ext.define('CpsiMapview.controller.button.TracingMixin', {
         me.map.removeLayer(me.tracingVector);
         me.map.un('click', me.onTracingMapClick);
         me.map.un('pointermove', me.onTracingPointerMove);
+        me.tracingDrawInteraction.un('drawstart', me.onTracingDrawStart);
+        me.tracingDrawInteraction.un('drawend', me.onTracingDrawEnd);
     },
 
     /**
@@ -121,10 +154,6 @@ Ext.define('CpsiMapview.controller.button.TracingMixin', {
      */
     onTracingMapClick: function (event) {
         var me = this;
-
-        if (!me.editingIsActive) {
-            return;
-        }
 
         var hit = false;
         me.map.forEachFeatureAtPixel(
@@ -148,6 +177,10 @@ Ext.define('CpsiMapview.controller.button.TracingMixin', {
 
                     // send coordinates to parent component
                     if (me.getView()) {
+                        // NOTE: we transfer the coordinates via an event,
+                        //       but this mixin has access to the drawInteraction as well,
+                        //       hence we could directly apply the coordinates to the drawInteraction
+                        //       without an event
                         me.getView().fireEvent('tracingend', appendCoords);
                     }
 
@@ -185,7 +218,7 @@ Ext.define('CpsiMapview.controller.button.TracingMixin', {
     onTracingPointerMove: function (event) {
         var me = this;
 
-        if (me.tracingUtil.lineStringPopulated(me.tracingFeature) && me.editingIsActive) {
+        if (me.tracingUtil.lineStringPopulated(me.tracingFeature) && me.tracingActive) {
             var coordOnFoundFeature = null;
             me.map.forEachFeatureAtPixel(
                 event.pixel,
@@ -196,38 +229,14 @@ Ext.define('CpsiMapview.controller.button.TracingMixin', {
                         coordOnFoundFeature = me.map.getCoordinateFromPixel(event.pixel);
                     }
 
-                    // update tracing feature and array
                     if (me.tracingFeatureArray.includes(foundFeature)) {
+                        me.updateTraceableFeature(foundFeature);
 
-                        // check if found feature is last of array
-                        var i = me.tracingFeatureArray.indexOf(foundFeature);
-                        var notLastFeature = (i !== (me.tracingFeatureArray.length - 1));
-
-                        if (notLastFeature) {
-
-                            // remove all features after hovered feature
-                            me.tracingFeatureArray = me.tracingFeatureArray.slice(0, i + 1);
-                            // update coordinates of tracingFeature
-                            var updatedCoords = [];
-                            Ext.each(me.tracingFeatureArray, function (f) {
-                                var geom = f.getGeometry();
-                                var coords = geom.getCoordinates();
-
-                                if (updatedCoords.length === 0) {
-                                    updatedCoords = coords;
-                                } else {
-                                    updatedCoords = me.tracingUtil.concatLineCoords(updatedCoords, coords);
-                                }
-                            });
-
-                            me.tracingFeature.getGeometry().setCoordinates(updatedCoords);
-                        }
                     } else {
                         // new feature found that needs to be added to tracingfeature
 
                         var foundGeom = foundFeature.getGeometry();
                         var tracingGeom = me.tracingFeature.getGeometry();
-                        var tracingCoords = tracingGeom.getCoordinates();
 
                         var touchingStartEnd = me.tracingUtil.linesTouchAtStartEndPoint(foundGeom, tracingGeom);
 
@@ -239,17 +248,7 @@ Ext.define('CpsiMapview.controller.button.TracingMixin', {
 
                         var touchingIndex, partUntilIntersection, newTracingCoords, foundSplitPoint;
                         if (touchingStartEnd) {
-                            var coords = foundGeom.getCoordinates();
-
-                            var resultCoords = me.tracingUtil.concatLineCoords(
-                                tracingCoords,
-                                coords
-                            );
-
-                            if (resultCoords) {
-                                me.tracingFeature.getGeometry().setCoordinates(resultCoords);
-                                me.tracingFeatureArray.push(foundFeature);
-                            }
+                            me.setNewTracingOnStartEndTouch(foundFeature);
                         } else if (tracingInteriorTouchesFoundFeatureStartEnd) {
                             // cut tracing feature at coordinate
 
@@ -309,7 +308,66 @@ Ext.define('CpsiMapview.controller.button.TracingMixin', {
             }
             me.previewLine.getGeometry().setCoordinates(previewCoords);
         }
-    }
-}
+    },
 
-);
+    /**
+     * Updates the currently active traceable feature.
+     *
+     * @param {ol.Feature} foundFeature The hovered feature found in the tracing feature array
+     */
+    updateTraceableFeature: function (foundFeature) {
+        var me = this;
+
+        // check if found feature is last of array
+        var index = me.tracingFeatureArray.indexOf(foundFeature);
+        if (index !== 0 && (!index || index === -1)) {
+            Ext.Logger.error('The found feature must be in the found features array.');
+            return;
+        }
+        var notLastFeature = (index !== (me.tracingFeatureArray.length - 1));
+
+        if (notLastFeature) {
+
+            // remove all features after hovered feature
+            me.tracingFeatureArray = me.tracingFeatureArray.slice(0, index + 1);
+            // update coordinates of tracingFeature
+            var updatedCoords = [];
+            Ext.each(me.tracingFeatureArray, function (f) {
+                var geom = f.getGeometry();
+                var coords = geom.getCoordinates();
+
+                if (updatedCoords.length === 0) {
+                    updatedCoords = coords;
+                } else {
+                    updatedCoords = me.tracingUtil.concatLineCoords(updatedCoords, coords);
+                }
+            });
+
+            me.tracingFeature.getGeometry().setCoordinates(updatedCoords);
+        }
+    },
+
+    /**
+     * Sets the new tracing feature if it is touching via startpoint or endpoint.
+     *
+     * @param {ol.Feature} foundFeature The hovered feature to set as new tracing feature
+     */
+    setNewTracingOnStartEndTouch: function (foundFeature) {
+        var me = this;
+        var foundGeom = foundFeature.getGeometry();
+        var tracingGeom = me.tracingFeature.getGeometry();
+        var tracingCoords = tracingGeom.getCoordinates();
+
+        var coords = foundGeom.getCoordinates();
+
+        var resultCoords = me.tracingUtil.concatLineCoords(
+            tracingCoords,
+            coords
+        );
+
+        if (resultCoords) {
+            me.tracingFeature.getGeometry().setCoordinates(resultCoords);
+            me.tracingFeatureArray.push(foundFeature);
+        }
+    }
+});
