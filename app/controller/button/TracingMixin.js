@@ -234,8 +234,8 @@ Ext.define('CpsiMapview.controller.button.TracingMixin', {
                         // TODO: the cases where lines touch at interior points only work in some cases
                         //       it might fail in some edge cases, also tracing consecutively on many
                         //       features does not work
-                        var tracingInteriorTouchesFoundFeatureStartEnd = me.util.lineInteriorTouchesLineStartEnd(tracingGeom, foundGeom);
-                        var tracingStartEndTouchesFoundInterior = me.util.lineStartEndTouchesLineInterior(tracingGeom, foundGeom);
+                        var tracingInteriorTouchesFoundFeatureStartEnd = me.tracingUtil.lineInteriorTouchesLineStartEnd(tracingGeom, foundGeom);
+                        var tracingStartEndTouchesFoundInterior = me.tracingUtil.lineStartEndTouchesLineInterior(tracingGeom, foundGeom);
 
                         var touchingIndex, partUntilIntersection, newTracingCoords, foundSplitPoint;
                         if (touchingStartEnd) {
@@ -253,10 +253,10 @@ Ext.define('CpsiMapview.controller.button.TracingMixin', {
                         } else if (tracingInteriorTouchesFoundFeatureStartEnd) {
                             // cut tracing feature at coordinate
 
-                            touchingIndex = me.util.getCoordIndex(tracingCoords, tracingInteriorTouchesFoundFeatureStartEnd);
+                            touchingIndex = me.tracingUtil.getCoordIndex(tracingCoords, tracingInteriorTouchesFoundFeatureStartEnd);
 
-                            foundSplitPoint = me.util.getClosestCoordinateToPoint(tracingCoords, me.tracingStartPoint);
-                            var startingPointIndex = me.util.getCoordIndex(tracingCoords, foundSplitPoint);
+                            foundSplitPoint = me.tracingUtil.getClosestCoordinateToPoint(tracingCoords, me.tracingStartPoint);
+                            var startingPointIndex = me.tracingUtil.getCoordIndex(tracingCoords, foundSplitPoint);
 
                             // we cut the tracing feature by the split point
                             // we have to take the order into account
@@ -266,18 +266,18 @@ Ext.define('CpsiMapview.controller.button.TracingMixin', {
                                 partUntilIntersection = tracingCoords.slice(0, touchingIndex + 1);
                             }
 
-                            newTracingCoords = me.util.concatLineCoords(partUntilIntersection, foundFeature.getGeometry().getCoordinates());
+                            newTracingCoords = me.tracingUtil.concatLineCoords(partUntilIntersection, foundFeature.getGeometry().getCoordinates());
 
                             me.tracingFeature.getGeometry().setCoordinates(newTracingCoords);
                             me.tracingFeatureArray.push(foundFeature);
 
                         } else if (tracingStartEndTouchesFoundInterior) {
 
-                            touchingIndex = me.util.getCoordIndex(foundGeom.getCoordinates(), tracingStartEndTouchesFoundInterior);
+                            touchingIndex = me.tracingUtil.getCoordIndex(foundGeom.getCoordinates(), tracingStartEndTouchesFoundInterior);
 
                             var hoverCoord = me.map.getCoordinateFromPixel(event.pixel);
-                            foundSplitPoint = me.util.getClosestCoordinateToPoint(foundGeom.getCoordinates(), hoverCoord);
-                            var hoverIndex = me.util.getCoordIndex(foundGeom.getCoordinates(), foundSplitPoint);
+                            foundSplitPoint = me.tracingUtil.getClosestCoordinateToPoint(foundGeom.getCoordinates(), hoverCoord);
+                            var hoverIndex = me.tracingUtil.getCoordIndex(foundGeom.getCoordinates(), foundSplitPoint);
 
                             // we cut the tracing feature by the split point
                             // we have to take the order into account
@@ -288,7 +288,7 @@ Ext.define('CpsiMapview.controller.button.TracingMixin', {
                                 partUntilIntersection = foundCoords.slice(0, touchingIndex + 1);
                             }
 
-                            newTracingCoords = me.util.concatLineCoords(partUntilIntersection, tracingCoords);
+                            newTracingCoords = me.tracingUtil.concatLineCoords(partUntilIntersection, tracingCoords);
 
                             me.tracingFeature.getGeometry().setCoordinates(newTracingCoords);
                             me.tracingFeatureArray.push(foundFeature);

@@ -150,6 +150,28 @@ Ext.define('CpsiMapview.util.Tracing', {
         },
 
         /**
+         * Finds the closest coordinate to a point.
+         *
+         * @param {ol.coordinate.Coordinate[]} coordinateArray An array of coordinates
+         * @param {ol.coordinate.Coordinate} pointCoordinate The point coordinate
+         *
+         * @returns {ol.coordinate.Coordinate} The found coordinate
+         */
+        getClosestCoordinateToPoint: function (coordinateArray, pointCoordinate) {
+            var staticMe = CpsiMapview.util.Tracing;
+
+            var found, length;
+            Ext.each(coordinateArray, function (c) {
+                var tmpLength = staticMe.computeLength(c, pointCoordinate);
+                if (!length || tmpLength < length) {
+                    length = tmpLength;
+                    found = c;
+                }
+            });
+            return found;
+        },
+
+        /**
          * Checks if coordinate c is on the [a, b] segment.
          *
          * Taken from the official OpenLayers example:
