@@ -30,8 +30,9 @@ Ext.define('CpsiMapview.controller.button.TracingMixin', {
      * Needs to have access to the variable 'editingIsActive' of the parent component.
      *
      * @param {String[]} tracingLayerKeys The keys of the layers to trace
+     * @param {Boolean} [showTraceableEdges=false] If the traceable edges shall be shown (useful for debugging)
      */
-    initTracing: function (tracingLayerKeys) {
+    initTracing: function (tracingLayerKeys, showTraceableEdges) {
         var me = this;
 
         if (me.getView()) {
@@ -62,22 +63,20 @@ Ext.define('CpsiMapview.controller.button.TracingMixin', {
         me.tracingStartPoint = null;
         me.tracingEndPoint = null;
 
-
-        // For debugging the line where the user can trace to can be displayed.
-        var debug = false;
-        if (debug) {
-            var tracingVector = new ol.layer.Vector({
-                source: new ol.source.Vector({
-                    features: [me.tracingFeature],
-                }),
-                style: new ol.style.Style({
-                    stroke: new ol.style.Stroke({
-                        color: [255, 255, 0, 0.5],
-                        width: 25
-                    })
+        // For debugging the traceable edges can be displayed
+        me.tracingVector = new ol.layer.Vector({
+            source: new ol.source.Vector({
+                features: [me.tracingFeature],
+            }),
+            style: new ol.style.Style({
+                stroke: new ol.style.Stroke({
+                    color: [255, 255, 0, 0.5],
+                    width: 25
                 })
-            });
-            me.map.addLayer(tracingVector);
+            })
+        });
+        if (showTraceableEdges) {
+            me.map.addLayer(me.tracingVector);
         }
 
         // the tracing util
@@ -110,6 +109,7 @@ Ext.define('CpsiMapview.controller.button.TracingMixin', {
     cleanupTracing: function () {
         var me = this;
         me.map.removeLayer(me.previewVector);
+        me.map.removeLayer(me.tracingVector);
         me.map.un('click', me.onTracingMapClick);
         me.map.un('pointermove', me.onTracingPointerMove);
     },

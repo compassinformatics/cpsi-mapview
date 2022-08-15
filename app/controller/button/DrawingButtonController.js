@@ -588,7 +588,7 @@ Ext.define('CpsiMapview.controller.button.DrawingButtonController', {
         var tracingLayerKeys = view.getTracingLayerKeys();
 
         if (pressed) {
-            me.initTracing(tracingLayerKeys);
+            me.initTracing(tracingLayerKeys, true);
             me.drawInteraction.setActive(true);
             me.modifyInteraction.setActive(true);
             me.snapInteraction.setActive(true);
