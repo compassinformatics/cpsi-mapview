@@ -27,6 +27,7 @@ module.exports = function(config) {
         'https://cdn.jsdelivr.net/npm/proj4@2.5.0/dist/proj4-src.min.js',
         'https://maps.googleapis.com/maps/api/js?v=3.42&key=AIzaSyAj6xrC0L3G0YquO1q6Qsma1ZEfYgGQotU',
         'lib/BasiGX/src/**/*.js',
+        'lib/turf.js',
         {
             pattern: 'app/**/*.js',
             included: true

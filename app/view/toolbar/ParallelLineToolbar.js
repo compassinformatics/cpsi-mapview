@@ -148,9 +148,14 @@ Ext.define('CpsiMapview.view.toolbar.ParallelLine', {
             return;
         }
 
+        var map = BasiGX.view.component.Map.guess().getMap();
+        if (!map) {
+            return;
+        }
+
         var offsetUnit = this.getOffsetUnit();
         var turfUtil = CpsiMapview.util.Turf;
-        var parallelFeature = turfUtil.createParallelFeature(feature, offset, offsetUnit);
+        var parallelFeature = turfUtil.createParallelFeature(map, feature, offset, offsetUnit);
         vm.set('parallelFeature', parallelFeature);
         this.fireEvent('parallelLineCreated', parallelFeature);
     }

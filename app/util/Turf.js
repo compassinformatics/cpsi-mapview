@@ -11,16 +11,13 @@ Ext.define('CpsiMapview.util.Turf', {
     /**
      * Creates a parallel feature with given offset.
      *
+     * @param {ol.Map} map The map.
      * @param {ol.Feature} feature The base feature.
      * @param {number} offset The intended offset.
      * @param {string} offsetUnit The unit of the offset.
      * @returns {ol.Feature} The parallel feature.
      */
-    createParallelFeature: function(feature, offset, offsetUnit) {
-        var map = BasiGX.view.component.Map.guess().getMap();
-        if (!map) {
-            return;
-        }
+    createParallelFeature: function(map, feature, offset, offsetUnit) {
         var mapProj = map.getView().getProjection().getCode();
         var format = new ol.format.GeoJSON({
             featureProjection: mapProj,
