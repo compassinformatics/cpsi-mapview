@@ -204,7 +204,6 @@ Ext.define('CpsiMapview.controller.button.TracingMixin', {
 
                         var foundGeom = foundFeature.getGeometry();
                         var tracingGeom = me.tracingFeature.getGeometry();
-                        var tracingCoords = tracingGeom.getCoordinates();
 
                         var touchingStartEnd = me.tracingUtil.linesTouchAtStartEndPoint(foundGeom, tracingGeom);
 
@@ -213,17 +212,7 @@ Ext.define('CpsiMapview.controller.button.TracingMixin', {
                         var tracingStartEndTouchesFoundInterior = me.tracingUtil.lineStartEndTouchesLineInterior(tracingGeom, foundGeom);
 
                         if (touchingStartEnd) {
-                            var coords = foundGeom.getCoordinates();
-
-                            var resultCoords = me.tracingUtil.concatLineCoords(
-                                tracingCoords,
-                                coords
-                            );
-
-                            if (resultCoords) {
-                                me.tracingFeature.getGeometry().setCoordinates(resultCoords);
-                                me.tracingFeatureArray.push(foundFeature);
-                            }
+                            me.setNewTracingOnStartEndTouch(foundFeature);
                         } else if (tracingInteriorTouchesFoundFeatureStartEnd) {
                             // TODO: must be implemented
 
@@ -251,7 +240,7 @@ Ext.define('CpsiMapview.controller.button.TracingMixin', {
     /**
      * Updates the currently active traceable feature.
      *
-     * @param {ol.Feature} foundFeature The hovered feature found in the tracing feature array.
+     * @param {ol.Feature} foundFeature The hovered feature found in the tracing feature array
      */
     updateTraceableFeature: function (foundFeature) {
         var me = this;
@@ -283,7 +272,29 @@ Ext.define('CpsiMapview.controller.button.TracingMixin', {
 
             me.tracingFeature.getGeometry().setCoordinates(updatedCoords);
         }
-    }
-}
+    },
 
-);
+    /**
+     * Sets the new tracing feature if it is touching via startpoint or endpoint.
+     *
+     * @param {ol.Feature} foundFeature The hovered feature to set as new tracing feature
+     */
+    setNewTracingOnStartEndTouch: function (foundFeature) {
+        var me = this;
+        var foundGeom = foundFeature.getGeometry();
+        var tracingGeom = me.tracingFeature.getGeometry();
+        var tracingCoords = tracingGeom.getCoordinates();
+
+        var coords = foundGeom.getCoordinates();
+
+        var resultCoords = me.tracingUtil.concatLineCoords(
+            tracingCoords,
+            coords
+        );
+
+        if (resultCoords) {
+            me.tracingFeature.getGeometry().setCoordinates(resultCoords);
+            me.tracingFeatureArray.push(foundFeature);
+        }
+    }
+});
