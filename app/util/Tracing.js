@@ -46,21 +46,6 @@ Ext.define('CpsiMapview.util.Tracing', {
         },
 
         /**
-         * Finds the index of a coordinate in a coordinate array
-         * by only comparing its value.
-         *
-         * @param {ol.coordinate.Coordinate[]} coordinateArray The coordinate array
-         * @param {ol.coordinate.Coordinate} coordToFind The coordinate to find
-         * @returns {Number} The index of the coordinate, or -1 if not found
-         */
-        getCoordIndex: function (coordinateArray, coordToFind) {
-            var found = Ext.Array.findBy(coordinateArray, function (c) {
-                return Ext.Array.equals(c, coordToFind);
-            });
-            return coordinateArray.indexOf(found);
-        },
-
-        /**
          * Checks if two LineString geometries are touching at only startpoint and/or endpoint.
          * @param {ol.geom.LineString} lineA The first LineString
          * @param {ol.geom.LineString} lineB The second LineString
@@ -140,28 +125,6 @@ Ext.define('CpsiMapview.util.Tracing', {
             return Math.sqrt(
                 (b[0] - a[0]) * (b[0] - a[0]) + (b[1] - a[1]) * (b[1] - a[1])
             );
-        },
-
-        /**
-         * Finds the closest coordinate to a point.
-         *
-         * @param {ol.coordinate.Coordinate[]} coordinateArray An array of coordinates
-         * @param {ol.coordinate.Coordinate} pointCoordinate The point coordinate
-         *
-         * @returns {ol.coordinate.Coordinate} The found coordinate
-         */
-        getClosestCoordinateToPoint: function (coordinateArray, pointCoordinate) {
-            var staticMe = CpsiMapview.util.Tracing;
-
-            var found, length;
-            Ext.each(coordinateArray, function (c) {
-                var tmpLength = staticMe.computeLength(c, pointCoordinate);
-                if (!length || tmpLength < length) {
-                    length = tmpLength;
-                    found = c;
-                }
-            });
-            return found;
         },
 
         /**

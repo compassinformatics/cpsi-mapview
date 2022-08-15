@@ -19,11 +19,6 @@ describe('CpsiMapview.util.Tracing', function () {
             expect(fn).not.to.be(undefined);
         });
 
-        it('#getCoordIndex', function () {
-            var fn = util.getCoordIndex;
-            expect(fn).not.to.be(undefined);
-        });
-
         it('#linesTouchAtStartEndPoint', function () {
             var fn = util.linesTouchAtStartEndPoint;
             expect(fn).not.to.be(undefined);
@@ -41,11 +36,6 @@ describe('CpsiMapview.util.Tracing', function () {
 
         it('#computeLength', function () {
             var fn = util.computeLength;
-            expect(fn).not.to.be(undefined);
-        });
-
-        it('#getClosestCoordinateToPoint', function () {
-            var fn = util.getClosestCoordinateToPoint;
             expect(fn).not.to.be(undefined);
         });
 
