@@ -52,6 +52,7 @@ Ext.define('CpsiMapview.util.Tracing', {
 
         /**
          * Checks if two LineString geometries are touching at only startpoint and/or endpoint.
+         *
          * @param {ol.geom.LineString} lineA The first LineString
          * @param {ol.geom.LineString} lineB The second LineString
          *
