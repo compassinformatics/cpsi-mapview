@@ -25,12 +25,12 @@ Ext.define('CpsiMapview.util.Tracing', {
         },
 
         /**
-         * Checks if a LineString is not empty.
+         * Checks if a LineString is is populated i.e. is not empty.
          *
          * @param {ol.Feature} feature The feature to check
-         * @returns {Boolean} If LineString is not empty
+         * @returns {Boolean} true/false if LineString is populated, undefined if something unexpected happened
          */
-        lineStringNotEmpty: function (feature) {
+        lineStringPopulated: function (feature) {
             if (!feature) {
                 return;
             }
@@ -38,11 +38,16 @@ Ext.define('CpsiMapview.util.Tracing', {
             if (!geom) {
                 return;
             }
+
+            var type = geom.getType();
+            if (type != 'LineString') {
+                return;
+            }
             var coords = geom.getCoordinates();
             if (!coords) {
                 return;
             }
-            return coords.length > 0;
+            return coords.length >= 2;
         },
 
         /**
@@ -63,6 +68,7 @@ Ext.define('CpsiMapview.util.Tracing', {
 
         /**
          * Checks if two LineString geometries are touching at only startpoint and/or endpoint.
+         *
          * @param {ol.geom.LineString} lineA The first LineString
          * @param {ol.geom.LineString} lineB The second LineString
          *
@@ -141,28 +147,6 @@ Ext.define('CpsiMapview.util.Tracing', {
             return Math.sqrt(
                 (b[0] - a[0]) * (b[0] - a[0]) + (b[1] - a[1]) * (b[1] - a[1])
             );
-        },
-
-        /**
-         * Finds the closest coordinate to a point.
-         *
-         * @param {ol.coordinate.Coordinate[]} coordinateArray An array of coordinates
-         * @param {ol.coordinate.Coordinate} pointCoordinate The point coordinate
-         *
-         * @returns {ol.coordinate.Coordinate} The found coordinate
-         */
-        getClosestCoordinateToPoint: function (coordinateArray, pointCoordinate) {
-            var staticMe = CpsiMapview.util.Tracing;
-
-            var found, length;
-            Ext.each(coordinateArray, function (c) {
-                var tmpLength = staticMe.computeLength(c, pointCoordinate);
-                if (!length || tmpLength < length) {
-                    length = tmpLength;
-                    found = c;
-                }
-            });
-            return found;
         },
 
         /**

@@ -27,9 +27,12 @@ Ext.define('CpsiMapview.controller.button.TracingMixin', {
     /**
      * Enhances drawing functionality by adding tracing to it.
      *
+     * Needs to have access to the variable 'editingIsActive' of the parent component.
+     *
      * @param {String[]} tracingLayerKeys The keys of the layers to trace
+     * @param {Boolean} [showTraceableEdges=false] If the traceable edges shall be shown (useful for debugging)
      */
-    initTracing: function (tracingLayerKeys) {
+    initTracing: function (tracingLayerKeys, showTraceableEdges) {
         var me = this;
 
         if (me.getView()) {
@@ -40,7 +43,7 @@ Ext.define('CpsiMapview.controller.button.TracingMixin', {
         me.tracingLayers = [];
         Ext.each(tracingLayerKeys, function (key) {
             var foundLayers = BasiGX.util.Layer.getLayersBy('layerKey', key);
-            if (foundLayers.length === 1) {
+            if (foundLayers.length > 0) {
                 me.tracingLayers.push(foundLayers[0]);
             }
         });
@@ -60,26 +63,24 @@ Ext.define('CpsiMapview.controller.button.TracingMixin', {
         me.tracingStartPoint = null;
         me.tracingEndPoint = null;
 
-
-        // For debugging this layer can be displayed.
-        var debug = false;
-        if (debug) {
-            var tracingVector = new ol.layer.Vector({
-                source: new ol.source.Vector({
-                    features: [me.tracingFeature],
-                }),
-                style: new ol.style.Style({
-                    stroke: new ol.style.Stroke({
-                        color: [255, 255, 0, 0.5],
-                        width: 25
-                    })
+        // For debugging the traceable edges can be displayed
+        me.tracingVector = new ol.layer.Vector({
+            source: new ol.source.Vector({
+                features: [me.tracingFeature],
+            }),
+            style: new ol.style.Style({
+                stroke: new ol.style.Stroke({
+                    color: [255, 255, 0, 0.5],
+                    width: 25
                 })
-            });
-            me.map.addLayer(tracingVector);
+            })
+        });
+        if (showTraceableEdges) {
+            me.map.addLayer(me.tracingVector);
         }
 
         // the tracing util
-        me.util = CpsiMapview.util.Tracing;
+        me.tracingUtil = CpsiMapview.util.Tracing;
 
         // the visible tracing line while editing
         me.previewLine = new ol.Feature({
@@ -108,6 +109,7 @@ Ext.define('CpsiMapview.controller.button.TracingMixin', {
     cleanupTracing: function () {
         var me = this;
         me.map.removeLayer(me.previewVector);
+        me.map.removeLayer(me.tracingVector);
         me.map.un('click', me.onTracingMapClick);
         me.map.un('pointermove', me.onTracingPointerMove);
     },
@@ -128,7 +130,7 @@ Ext.define('CpsiMapview.controller.button.TracingMixin', {
         me.map.forEachFeatureAtPixel(
             event.pixel,
             function (feature) {
-                if (me.util.lineStringNotEmpty(me.tracingFeature) && !me.tracingFeatureArray.includes(feature)) {
+                if (me.tracingUtil.lineStringPopulated(me.tracingFeature) && !me.tracingFeatureArray.includes(feature)) {
                     return;
                 }
 
@@ -136,9 +138,9 @@ Ext.define('CpsiMapview.controller.button.TracingMixin', {
                 var coord = me.map.getCoordinateFromPixel(event.pixel);
 
                 // second click on the tracing feature: append the ring coordinates
-                if (me.util.lineStringNotEmpty(me.tracingFeature) && me.tracingFeatureArray.includes(feature)) {
+                if (me.tracingUtil.lineStringPopulated(me.tracingFeature) && me.tracingFeatureArray.includes(feature)) {
                     me.tracingEndPoint = me.tracingFeature.getGeometry().getClosestPoint(coord);
-                    var appendCoords = me.util.getPartialSegmentCoords(
+                    var appendCoords = me.tracingUtil.getPartialSegmentCoords(
                         me.tracingFeature,
                         me.tracingStartPoint,
                         me.tracingEndPoint
@@ -183,7 +185,7 @@ Ext.define('CpsiMapview.controller.button.TracingMixin', {
     onTracingPointerMove: function (event) {
         var me = this;
 
-        if (me.util.lineStringNotEmpty(me.tracingFeature) && me.editingIsActive) {
+        if (me.tracingUtil.lineStringPopulated(me.tracingFeature) && me.editingIsActive) {
             var coordOnFoundFeature = null;
             me.map.forEachFeatureAtPixel(
                 event.pixel,
@@ -214,7 +216,7 @@ Ext.define('CpsiMapview.controller.button.TracingMixin', {
                                 if (updatedCoords.length === 0) {
                                     updatedCoords = coords;
                                 } else {
-                                    updatedCoords = me.util.concatLineCoords(updatedCoords, coords);
+                                    updatedCoords = me.tracingUtil.concatLineCoords(updatedCoords, coords);
                                 }
                             });
 
@@ -227,7 +229,7 @@ Ext.define('CpsiMapview.controller.button.TracingMixin', {
                         var tracingGeom = me.tracingFeature.getGeometry();
                         var tracingCoords = tracingGeom.getCoordinates();
 
-                        var touchingStartEnd = me.util.linesTouchAtStartEndPoint(foundGeom, tracingGeom);
+                        var touchingStartEnd = me.tracingUtil.linesTouchAtStartEndPoint(foundGeom, tracingGeom);
 
                         // TODO: the cases where lines touch at interior points only work in some cases
                         //       it might fail in some edge cases, also tracing consecutively on many
@@ -239,7 +241,7 @@ Ext.define('CpsiMapview.controller.button.TracingMixin', {
                         if (touchingStartEnd) {
                             var coords = foundGeom.getCoordinates();
 
-                            var resultCoords = me.util.concatLineCoords(
+                            var resultCoords = me.tracingUtil.concatLineCoords(
                                 tracingCoords,
                                 coords
                             );
@@ -299,7 +301,7 @@ Ext.define('CpsiMapview.controller.button.TracingMixin', {
             var previewCoords = [];
             if (coordOnFoundFeature) {
                 me.tracingEndPoint = me.tracingFeature.getGeometry().getClosestPoint(coordOnFoundFeature);
-                previewCoords = me.util.getPartialSegmentCoords(
+                previewCoords = me.tracingUtil.getPartialSegmentCoords(
                     me.tracingFeature,
                     me.tracingStartPoint,
                     me.tracingEndPoint
