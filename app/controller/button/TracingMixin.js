@@ -42,7 +42,7 @@ Ext.define('CpsiMapview.controller.button.TracingMixin', {
         me.tracingLayers = [];
         Ext.each(tracingLayerKeys, function (key) {
             var foundLayers = BasiGX.util.Layer.getLayersBy('layerKey', key);
-            if (foundLayers.length === 1) {
+            if (foundLayers.length > 0) {
                 me.tracingLayers.push(foundLayers[0]);
             }
         });
