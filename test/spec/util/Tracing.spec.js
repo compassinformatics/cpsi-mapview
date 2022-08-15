@@ -7,7 +7,7 @@ describe('CpsiMapview.util.Tracing', function () {
         });
     });
 
-    describe('Functions', function () {
+    describe('Functions Basics', function () {
 
         it('#computeModulo', function () {
             var fn = util.computeModulo;
@@ -21,7 +21,7 @@ describe('CpsiMapview.util.Tracing', function () {
 
         it('#linesTouchAtStartEndPoint', function () {
             var fn = util.linesTouchAtStartEndPoint;
-            expect(fn).not.to.be(undefined);
+            expect(fn).not.to.be(false);
         });
 
         it('#lineInteriorTouchesLineStartEnd', function () {
@@ -54,4 +54,34 @@ describe('CpsiMapview.util.Tracing', function () {
             expect(fn).not.to.be(undefined);
         });
     });
+
+    describe('#lineStringNotEmpty', function () {
+        var fn = util.lineStringNotEmpty;
+        var feature = new ol.Feature({});
+        it('returns undefined on empty feature', function () {
+            expect(fn(feature)).to.be(undefined);
+        });
+
+        it('returns false on empty String', function () {
+            feature.setGeometry(new ol.geom.LineString([]));
+            expect(fn(feature)).to.be(false);
+        });
+
+        it('returns false on invalid LineString', function () {
+            feature.setGeometry(new ol.geom.LineString([[1, 2]]));
+            expect(fn(feature)).to.be(false);
+        });
+
+        it('returns true on valid LineString', function () {
+            feature.setGeometry(new ol.geom.LineString([[1, 2], [3, 4]]));
+            console.log(fn(feature));
+            expect(fn(feature)).to.be(true);
+        });
+
+        it('returns undefined on valid Polygon', function () {
+            feature.setGeometry(new ol.geom.Polygon([[1, 2], [3, 4], [5, 6], [1, 2]]));
+            expect(fn(feature)).to.be(undefined);
+        });
+    });
+
 });

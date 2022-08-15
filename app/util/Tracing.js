@@ -28,7 +28,7 @@ Ext.define('CpsiMapview.util.Tracing', {
          * Checks if a LineString is not empty.
          *
          * @param {ol.Feature} feature The feature to check
-         * @returns {Boolean} If LineString is not empty
+         * @returns {Boolean} true/false if LineString is not empty, undefined if something unexpected happened
          */
         lineStringNotEmpty: function (feature) {
             if (!feature) {
@@ -38,11 +38,16 @@ Ext.define('CpsiMapview.util.Tracing', {
             if (!geom) {
                 return;
             }
+
+            var type = geom.getType();
+            if (type != 'LineString') {
+                return;
+            }
             var coords = geom.getCoordinates();
             if (!coords) {
                 return;
             }
-            return coords.length > 0;
+            return coords.length >= 2;
         },
 
         /**
