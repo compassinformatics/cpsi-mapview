@@ -77,14 +77,13 @@ jobs:
     - name: Testing 🔎
       run: npm test
 
-    # disabled until coverage decrease can be marked as a warning rather than a failure
-    #- name: Generate coverage 🧪
-    #  run: npm run test:coverage
+    - name: Generate coverage 🧪
+      run: npm run test:coverage
 
-    #- name: Publish to coveralls ⭐
-    #  uses: coverallsapp/github-action@master
-    #  with:
-    #    github-token: ${{ secrets.GITHUB_TOKEN }}
+    - name: Publish to coveralls ⭐
+      uses: coverallsapp/github-action@master
+      with:
+        github-token: ${{ secrets.GITHUB_TOKEN }}
 
     - name: Build sencha app
       run: |
