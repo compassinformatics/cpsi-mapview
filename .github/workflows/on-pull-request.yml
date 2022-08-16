@@ -39,11 +39,10 @@ jobs:
     - name: Testing 🔎
       run: npm test
 
-    # disable until errors can become warnings
-    #- name: Generate coverage 🧪
-    #  run: npm run test:coverage
+    - name: Generate coverage 🧪
+      run: npm run test:coverage
 
-    #- name: Publish to coveralls ⭐
-    #  uses: coverallsapp/github-action@master
-    #  with:
-    #    github-token: ${{ secrets.GITHUB_TOKEN }}
+    - name: Publish to coveralls ⭐
+      uses: coverallsapp/github-action@master
+      with:
+        github-token: ${{ secrets.GITHUB_TOKEN }}

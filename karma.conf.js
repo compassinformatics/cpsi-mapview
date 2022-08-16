@@ -37,6 +37,9 @@ module.exports = function(config) {
             dir: 'coverage/',
             check: {
                 emitWarning: true // don't fail the tests
+                global: {
+                    statements: 15 // minimum coverage of 15%
+                }
             },
             reporters: [
                 { type: 'html', subdir: '.' },
