@@ -362,7 +362,7 @@
       "noCluster": true,
       "idProperty": "PolygonId",
       "openLayers": {
-        "visibility": false,
+        "visibility": true,
         "maxScale": 800000
       }
     },
@@ -373,7 +373,7 @@
       "noCluster": true,
       "idProperty": "EdgeId",
       "openLayers": {
-        "visibility": false,
+        "visibility": true,
         "maxScale": 800000
       }
     },
@@ -384,7 +384,7 @@
       "noCluster": true,
       "idProperty": "NodeId",
       "openLayers": {
-        "visibility": false,
+        "visibility": true,
         "maxScale": 800000
       }
     },
@@ -417,7 +417,6 @@
         }
       ],
       "openLayers": {
-        "visibility": true,
         "maxScale": 800000
       }
     },
