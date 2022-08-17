@@ -61,6 +61,12 @@ Ext.define(&#39;CpsiMapview.view.tool.DrawingButton&#39;, {
          */
         snappingLayerKeys: [],
 
+<span id='CpsiMapview-view-tool-DrawingButton-cfg-tracingLayerKeys'>        /**
+</span>         * The layerKey values for any vector layers the newly drawn lines should
+         * trace on e.g. [&#39;CHANNELNETWORKVECTOR_WFS&#39;, &#39;NETWORKJUNCTIONS_WFS&#39;, &#39;NETWORKEDGES_WFS&#39;]
+         */
+        tracingLayerKeys: [],
+
 <span id='CpsiMapview-view-tool-DrawingButton-cfg-nodeLayerKey'>        /**
 </span>         * The vector layer key of a point layer to snap the start and ends
          * of newly drawn lines to, and return the node ids
@@ -150,7 +156,8 @@ Ext.define(&#39;CpsiMapview.view.tool.DrawingButton&#39;, {
      */
     listeners: {
         toggle: &#39;onToggle&#39;,
-        beforedestroy: &#39;onBeforeDestroy&#39;
+        beforedestroy: &#39;onBeforeDestroy&#39;,
+        tracingend: &#39;handleTracingResult&#39;
     }
 });
 </pre>

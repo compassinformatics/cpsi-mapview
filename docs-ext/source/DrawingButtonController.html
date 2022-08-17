@@ -26,9 +26,14 @@ Ext.define(&#39;CpsiMapview.controller.button.DrawingButtonController&#39;, {
         &#39;Ext.menu.Menu&#39;,
         &#39;GeoExt.component.FeatureRenderer&#39;,
         &#39;GeoExt.data.store.Features&#39;,
+        &#39;CpsiMapview.controller.button.TracingMixin&#39;
     ],
 
     alias: &#39;controller.cmv_drawing_button&#39;,
+
+    mixins: [
+        &#39;CpsiMapview.controller.button.TracingMixin&#39;
+    ],
 
 <span id='CpsiMapview-controller-button-DrawingButtonController-property-map'>    /**
 </span>     * The OpenLayers map. If not given, will be auto-detected
@@ -61,10 +66,10 @@ Ext.define(&#39;CpsiMapview.controller.button.DrawingButtonController&#39;, {
      */
     snapInteraction: null,
 
-<span id='CpsiMapview-controller-button-DrawingButtonController-property-editingIsActive'>    /**
+<span id='CpsiMapview-controller-button-DrawingButtonController-property-currentlyDrawing'>    /**
 </span>     * If user has started to edit a line, this means the first point of a line is already set
      */
-    editingIsActive: false,
+    currentlyDrawing: false,
 
 <span id='CpsiMapview-controller-button-DrawingButtonController-property-'>    /**
 </span>     * Determines if event handling is blocked.
@@ -140,14 +145,14 @@ Ext.define(&#39;CpsiMapview.controller.button.DrawingButtonController&#39;, {
 <span id='CpsiMapview-controller-button-DrawingButtonController-method-prepareDrawingStyles'>    /**
 </span>     * Prepare the styles retrieved from config.
      */
-    prepareDrawingStyles: function() {
+    prepareDrawingStyles: function () {
         var me = this;
         var view = me.getView();
 
         // ensure styles are applied at right conditions
         view.getDrawBeforeEditingPoint().setGeometry(function (feature) {
             var geom = feature.getGeometry();
-            if (!me.editingIsActive) {
+            if (!me.currentlyDrawing) {
                 return geom;
             }
         });
@@ -159,7 +164,7 @@ Ext.define(&#39;CpsiMapview.controller.button.DrawingButtonController&#39;, {
         });
         view.getDrawStyleEndPoint().setGeometry(function (feature) {
             var coords = feature.getGeometry().getCoordinates();
-            if (coords.length &gt; 1){
+            if (coords.length &gt; 1) {
                 var lastCoord = coords[coords.length - 1];
                 return new ol.geom.Point(lastCoord);
             }
@@ -175,7 +180,7 @@ Ext.define(&#39;CpsiMapview.controller.button.DrawingButtonController&#39;, {
      *
      * @returns {Function} The style function for the drawn feature.
      */
-    getDrawStyleFunction: function() {
+    getDrawStyleFunction: function () {
         var me = this;
         var view = me.getView();
 
@@ -211,11 +216,20 @@ Ext.define(&#39;CpsiMapview.controller.button.DrawingButtonController&#39;, {
                     // we create a MultiPoint from the edge&#39;s vertices
                     // and set it as geometry in our style function
                     var geom = edge.getGeometry();
-                    var coords = geom.getCoordinates();
+                    var coords = [];
+                    if (geom.getType() === &#39;MultiLineString&#39;) {
+                        // use all vertices of containing LineStrings
+                        var lineStrings = geom.getLineStrings();
+                        Ext.each(lineStrings, function (lineString) {
+                            var lineStringCoords = lineString.getCoordinates();
+                            coords = coords.concat(lineStringCoords);
+                        });
+                    } else {
+                        coords = geom.getCoordinates();
+                    }
                     var verticesMultiPoint = new ol.geom.MultiPoint(coords);
                     var snappedEdgeVertexStyle = view.getSnappedEdgeVertexStyle().clone();
                     snappedEdgeVertexStyle.setGeometry(verticesMultiPoint);
-                    snappedEdgeVertexStyle.setZIndex(-Infinity);
 
                     // combine style for snapped point and vertices of snapped edge
                     return [
@@ -230,7 +244,7 @@ Ext.define(&#39;CpsiMapview.controller.button.DrawingButtonController&#39;, {
             } else if (self) {
                 return view.getModifySnapPointStyle();
             } else {
-                return me.defaultdrawStyle;
+                return me.defaultDrawStyle;
             }
         };
     },
@@ -392,15 +406,15 @@ Ext.define(&#39;CpsiMapview.controller.button.DrawingButtonController&#39;, {
 <span id='CpsiMapview-controller-button-DrawingButtonController-method-handleDrawStart'>    /**
 </span>     * Handles the drawstart event
      */
-    handleDrawStart: function (){
+    handleDrawStart: function () {
         var me = this;
-        me.editingIsActive = true;
+        me.currentlyDrawing = true;
     },
 
 <span id='CpsiMapview-controller-button-DrawingButtonController-method-handleDrawEnd'>    /**
-</span>    * Handles the drawend event
-    * @param {ol.interaction.Draw.Event} evt The OpenLayers draw event containing the features
-    */
+</span>     * Handles the drawend event
+     * @param {ol.interaction.Draw.Event} evt The OpenLayers draw event containing the features
+     */
     handleDrawEnd: function (evt) {
         var me = this;
         var feature = evt.feature;
@@ -420,7 +434,7 @@ Ext.define(&#39;CpsiMapview.controller.button.DrawingButtonController&#39;, {
         // clear all previous features so only the last drawn feature remains
         drawSource.getFeaturesCollection().clear();
 
-        me.editingIsActive = false;
+        me.currentlyDrawing = false;
     },
 
 <span id='CpsiMapview-controller-button-DrawingButtonController-method-handleModifyEnd'>    /**
@@ -574,13 +588,13 @@ Ext.define(&#39;CpsiMapview.controller.button.DrawingButtonController&#39;, {
         me.prepareDrawingStyles();
 
         // set initial style for drawing features
-        me.defaultdrawStyle = [
+        me.defaultDrawStyle = [
             view.getDrawBeforeEditingPoint(),
             view.getDrawStyleStartPoint(),
             view.getDrawStyleLine(),
             view.getDrawStyleEndPoint(),
         ];
-        me.drawLayer.setStyle(me.defaultdrawStyle);
+        me.drawLayer.setStyle(me.defaultDrawStyle);
 
         me.setDrawInteraction(me.drawLayer);
         me.setModifyInteraction(me.drawLayer);
@@ -588,20 +602,38 @@ Ext.define(&#39;CpsiMapview.controller.button.DrawingButtonController&#39;, {
 
         var viewPort = me.map.getViewport();
 
+        var tracingLayerKeys = view.getTracingLayerKeys();
+
         if (pressed) {
+
+            me.initTracing(
+                tracingLayerKeys,
+                me.drawInteraction
+            );
             me.drawInteraction.setActive(true);
             me.modifyInteraction.setActive(true);
             me.snapInteraction.setActive(true);
             viewPort.addEventListener(&#39;contextmenu&#39;, me.contextHandler);
             document.addEventListener(&#39;keydown&#39;, me.handleKeyPress);
-
         } else {
+            me.cleanupTracing();
             me.drawInteraction.setActive(false);
             me.modifyInteraction.setActive(false);
             me.snapInteraction.setActive(false);
             viewPort.removeEventListener(&#39;contextmenu&#39;, me.contextHandler);
             document.removeEventListener(&#39;keydown&#39;, me.handleKeyPress);
         }
+    },
+
+<span id='CpsiMapview-controller-button-DrawingButtonController-method-handleTracingResult'>    /**
+</span>     * Called when new tracing coordinates are available.
+     *
+     * @param {ol.coordinate.Coordinate[]} appendCoords The new coordinates
+     */
+    handleTracingResult: function (appendCoords) {
+        var me = this;
+        me.drawInteraction.removeLastPoint();
+        me.drawInteraction.appendCoordinates(appendCoords);
     },
 
 <span id='CpsiMapview-controller-button-DrawingButtonController-method-showContextMenu'>    /**
