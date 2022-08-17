@@ -702,6 +702,8 @@ Ext.define(&#39;CpsiMapview.controller.button.DrawingButtonController&#39;, {
         if (me.drawLayer) {
             me.map.removeLayer(me.drawLayer);
         }
+
+        me.cleanupTracing();
     },
 
 <span id='CpsiMapview-controller-button-DrawingButtonController-method-init'>    init: function () {

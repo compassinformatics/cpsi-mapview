@@ -67,6 +67,22 @@ Ext.define(&#39;CpsiMapview.util.Tracing&#39;, {
             return coords.length &gt;= 2;
         },
 
+<span id='CpsiMapview-util-Tracing-method-'>        /**
+</span>         * Finds the index of a coordinate in a coordinate array
+         * by only comparing its value.
+         *
+         * @param {ol.coordinate.Coordinate[]} coordinateArray The coordinate array
+         * @param {ol.coordinate.Coordinate} coordToFind The coordinate to find
+         * @returns {Number} The index of the coordinate, or -1 if not found
+         */
+<span id='CpsiMapview-util-Tracing-static-method-getCoordIndex'>        // TODO: use Ext.Array.reduce instead of Ext.Array.findBy you can omit the second loop
+</span>        getCoordIndex: function (coordinateArray, coordToFind) {
+            var found = Ext.Array.findBy(coordinateArray, function (c) {
+                return Ext.Array.equals(c, coordToFind);
+            });
+            return coordinateArray.indexOf(found);
+        },
+
 <span id='CpsiMapview-util-Tracing-static-method-linesTouchAtStartEndPoint'>        /**
 </span>         * Checks if two LineString geometries are touching at only startpoint and/or endpoint.
          *
@@ -148,6 +164,28 @@ Ext.define(&#39;CpsiMapview.util.Tracing&#39;, {
             return Math.sqrt(
                 (b[0] - a[0]) * (b[0] - a[0]) + (b[1] - a[1]) * (b[1] - a[1])
             );
+        },
+
+<span id='CpsiMapview-util-Tracing-static-method-getClosestCoordinateToPoint'>        /**
+</span>         * Finds the closest coordinate to a point.
+         *
+         * @param {ol.coordinate.Coordinate[]} coordinateArray An array of coordinates
+         * @param {ol.coordinate.Coordinate} pointCoordinate The point coordinate
+         *
+         * @returns {ol.coordinate.Coordinate} The found coordinate
+         */
+        getClosestCoordinateToPoint: function (coordinateArray, pointCoordinate) {
+            var staticMe = CpsiMapview.util.Tracing;
+
+            var found, length;
+            Ext.each(coordinateArray, function (c) {
+                var tmpLength = staticMe.computeLength(c, pointCoordinate);
+                if (!length || tmpLength &lt; length) {
+                    length = tmpLength;
+                    found = c;
+                }
+            });
+            return found;
         },
 
 <span id='CpsiMapview-util-Tracing-static-method-coordIsOnSegment'>        /**

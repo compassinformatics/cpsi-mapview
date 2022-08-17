@@ -234,16 +234,17 @@ Ext.define(&#39;CpsiMapview.controller.button.TracingMixin&#39;, {
      */
     onTracingPointerMove: function (event) {
         var me = this;
+        var pixel = event.pixel;
 
         if (me.tracingUtil.lineStringPopulated(me.tracingFeature) &amp;&amp; me.tracingActive) {
             var coordOnFoundFeature = null;
             me.map.forEachFeatureAtPixel(
-                event.pixel,
+                pixel,
                 function (foundFeature) {
 
                     // find coordinate on found feature
                     if (me.tracingFeatureArray.includes(foundFeature)) {
-                        coordOnFoundFeature = me.map.getCoordinateFromPixel(event.pixel);
+                        coordOnFoundFeature = me.map.getCoordinateFromPixel(pixel);
                     }
 
                     if (me.tracingFeatureArray.includes(foundFeature)) {
@@ -257,17 +258,18 @@ Ext.define(&#39;CpsiMapview.controller.button.TracingMixin&#39;, {
 
                         var touchingStartEnd = me.tracingUtil.linesTouchAtStartEndPoint(foundGeom, tracingGeom);
 
+                        // TODO: the cases where lines touch at interior points only work in some cases
+                        //       it might fail in some edge cases, also tracing consecutively on many
+                        //       features does not work
                         var tracingInteriorTouchesFoundFeatureStartEnd = me.tracingUtil.lineInteriorTouchesLineStartEnd(tracingGeom, foundGeom);
-
                         var tracingStartEndTouchesFoundInterior = me.tracingUtil.lineStartEndTouchesLineInterior(tracingGeom, foundGeom);
 
                         if (touchingStartEnd) {
                             me.setNewTracingOnStartEndTouch(foundFeature);
                         } else if (tracingInteriorTouchesFoundFeatureStartEnd) {
-                            // TODO: must be implemented
-
+                            me.setNewTracingOnInteriorStartEndTouch(foundFeature, tracingInteriorTouchesFoundFeatureStartEnd);
                         } else if (tracingStartEndTouchesFoundInterior) {
-                            // TODO: must be implemented
+                            me.setNewTracingOnStartEndInteriorTouch(foundFeature, tracingStartEndTouchesFoundInterior, pixel);
                         }
                     }
                 },
@@ -346,6 +348,72 @@ Ext.define(&#39;CpsiMapview.controller.button.TracingMixin&#39;, {
             me.tracingFeature.getGeometry().setCoordinates(resultCoords);
             me.tracingFeatureArray.push(foundFeature);
         }
+    },
+
+<span id='CpsiMapview-controller-button-TracingMixin-method-setNewTracingOnInteriorStartEndTouch'>    /**
+</span>     * Sets the new tracing feature if interior of line touches the startpoint or the endpoint of another line.
+     *
+     * @param {ol.Feature} foundFeature The hovered feature to set as new tracing feature
+     * @param {ol.coordinate.Coordinate} touchCoordinate The coordinate of the touching point
+     */
+    setNewTracingOnInteriorStartEndTouch: function (foundFeature, touchCoordinate) {
+        var me = this;
+        var tracingGeom = me.tracingFeature.getGeometry();
+        var tracingCoords = tracingGeom.getCoordinates();
+
+        var touchingIndex = me.tracingUtil.getCoordIndex(tracingCoords, touchCoordinate);
+
+        var foundSplitPoint = me.tracingUtil.getClosestCoordinateToPoint(tracingCoords, me.tracingStartPoint);
+        var startingPointIndex = me.tracingUtil.getCoordIndex(tracingCoords, foundSplitPoint);
+
+        // we cut the tracing feature by the split point
+        // we have to take the order into account
+        var partUntilIntersection;
+        if (touchingIndex &lt; startingPointIndex) {
+            partUntilIntersection = tracingCoords.slice(touchingIndex, tracingCoords.length);
+        } else {
+            partUntilIntersection = tracingCoords.slice(0, touchingIndex + 1);
+        }
+
+        var newTracingCoords = me.tracingUtil.concatLineCoords(partUntilIntersection, foundFeature.getGeometry().getCoordinates());
+
+        me.tracingFeature.getGeometry().setCoordinates(newTracingCoords);
+        me.tracingFeatureArray.push(foundFeature);
+    },
+
+<span id='CpsiMapview-controller-button-TracingMixin-method-setNewTracingOnStartEndInteriorTouch'>    /**
+</span>     * Sets the new tracing feature if startpoint or endpoint touches the interior of another line.
+     *
+     * @param {ol.Feature} foundFeature The hovered feature to set as new tracing feature
+     * @param {ol.coordinate.Coordinate} touchCoordinate The coordinate of the touching point
+     * @param {ol.pixel} pixel The pixel the user hovered on
+     */
+    setNewTracingOnStartEndInteriorTouch: function (foundFeature, touchCoordinate, pixel){
+        var me = this;
+        var foundGeom = foundFeature.getGeometry();
+        var tracingGeom = me.tracingFeature.getGeometry();
+        var tracingCoords = tracingGeom.getCoordinates();
+
+        var touchingIndex = me.tracingUtil.getCoordIndex(foundGeom.getCoordinates(), touchCoordinate);
+
+        var hoverCoord = me.map.getCoordinateFromPixel(pixel);
+        var foundSplitPoint = me.tracingUtil.getClosestCoordinateToPoint(foundGeom.getCoordinates(), hoverCoord);
+        var hoverIndex = me.tracingUtil.getCoordIndex(foundGeom.getCoordinates(), foundSplitPoint);
+
+        // we cut the tracing feature by the split point
+        // we have to take the order into account
+        var foundCoords = foundGeom.getCoordinates();
+        var partUntilIntersection;
+        if (hoverIndex &gt;= touchingIndex) {
+            partUntilIntersection = foundCoords.slice(touchingIndex, foundCoords.length);
+        } else {
+            partUntilIntersection = foundCoords.slice(0, touchingIndex + 1);
+        }
+
+        var newTracingCoords = me.tracingUtil.concatLineCoords(partUntilIntersection, tracingCoords);
+
+        me.tracingFeature.getGeometry().setCoordinates(newTracingCoords);
+        me.tracingFeatureArray.push(foundFeature);
     }
 });
 </pre>
