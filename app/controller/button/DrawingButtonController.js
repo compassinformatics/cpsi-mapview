@@ -9,9 +9,14 @@ Ext.define('CpsiMapview.controller.button.DrawingButtonController', {
         'Ext.menu.Menu',
         'GeoExt.component.FeatureRenderer',
         'GeoExt.data.store.Features',
+        'CpsiMapview.controller.button.TracingMixin'
     ],
 
     alias: 'controller.cmv_drawing_button',
+
+    mixins: [
+        'CpsiMapview.controller.button.TracingMixin'
+    ],
 
     /**
      * The OpenLayers map. If not given, will be auto-detected
@@ -47,7 +52,7 @@ Ext.define('CpsiMapview.controller.button.DrawingButtonController', {
     /**
      * If user has started to edit a line, this means the first point of a line is already set
      */
-    editingIsActive: false,
+    currentlyDrawing: false,
 
     /**
      * Determines if event handling is blocked.
@@ -123,14 +128,14 @@ Ext.define('CpsiMapview.controller.button.DrawingButtonController', {
     /**
      * Prepare the styles retrieved from config.
      */
-    prepareDrawingStyles: function() {
+    prepareDrawingStyles: function () {
         var me = this;
         var view = me.getView();
 
         // ensure styles are applied at right conditions
         view.getDrawBeforeEditingPoint().setGeometry(function (feature) {
             var geom = feature.getGeometry();
-            if (!me.editingIsActive) {
+            if (!me.currentlyDrawing) {
                 return geom;
             }
         });
@@ -142,7 +147,7 @@ Ext.define('CpsiMapview.controller.button.DrawingButtonController', {
         });
         view.getDrawStyleEndPoint().setGeometry(function (feature) {
             var coords = feature.getGeometry().getCoordinates();
-            if (coords.length > 1){
+            if (coords.length > 1) {
                 var lastCoord = coords[coords.length - 1];
                 return new ol.geom.Point(lastCoord);
             }
@@ -158,7 +163,7 @@ Ext.define('CpsiMapview.controller.button.DrawingButtonController', {
      *
      * @returns {Function} The style function for the drawn feature.
      */
-    getDrawStyleFunction: function() {
+    getDrawStyleFunction: function () {
         var me = this;
         var view = me.getView();
 
@@ -194,11 +199,20 @@ Ext.define('CpsiMapview.controller.button.DrawingButtonController', {
                     // we create a MultiPoint from the edge's vertices
                     // and set it as geometry in our style function
                     var geom = edge.getGeometry();
-                    var coords = geom.getCoordinates();
+                    var coords = [];
+                    if (geom.getType() === 'MultiLineString') {
+                        // use all vertices of containing LineStrings
+                        var lineStrings = geom.getLineStrings();
+                        Ext.each(lineStrings, function (lineString) {
+                            var lineStringCoords = lineString.getCoordinates();
+                            coords = coords.concat(lineStringCoords);
+                        });
+                    } else {
+                        coords = geom.getCoordinates();
+                    }
                     var verticesMultiPoint = new ol.geom.MultiPoint(coords);
                     var snappedEdgeVertexStyle = view.getSnappedEdgeVertexStyle().clone();
                     snappedEdgeVertexStyle.setGeometry(verticesMultiPoint);
-                    snappedEdgeVertexStyle.setZIndex(-Infinity);
 
                     // combine style for snapped point and vertices of snapped edge
                     return [
@@ -213,7 +227,7 @@ Ext.define('CpsiMapview.controller.button.DrawingButtonController', {
             } else if (self) {
                 return view.getModifySnapPointStyle();
             } else {
-                return me.defaultdrawStyle;
+                return me.defaultDrawStyle;
             }
         };
     },
@@ -375,15 +389,15 @@ Ext.define('CpsiMapview.controller.button.DrawingButtonController', {
     /**
      * Handles the drawstart event
      */
-    handleDrawStart: function (){
+    handleDrawStart: function () {
         var me = this;
-        me.editingIsActive = true;
+        me.currentlyDrawing = true;
     },
 
     /**
-    * Handles the drawend event
-    * @param {ol.interaction.Draw.Event} evt The OpenLayers draw event containing the features
-    */
+     * Handles the drawend event
+     * @param {ol.interaction.Draw.Event} evt The OpenLayers draw event containing the features
+     */
     handleDrawEnd: function (evt) {
         var me = this;
         var feature = evt.feature;
@@ -403,7 +417,7 @@ Ext.define('CpsiMapview.controller.button.DrawingButtonController', {
         // clear all previous features so only the last drawn feature remains
         drawSource.getFeaturesCollection().clear();
 
-        me.editingIsActive = false;
+        me.currentlyDrawing = false;
     },
 
     /**
@@ -557,13 +571,13 @@ Ext.define('CpsiMapview.controller.button.DrawingButtonController', {
         me.prepareDrawingStyles();
 
         // set initial style for drawing features
-        me.defaultdrawStyle = [
+        me.defaultDrawStyle = [
             view.getDrawBeforeEditingPoint(),
             view.getDrawStyleStartPoint(),
             view.getDrawStyleLine(),
             view.getDrawStyleEndPoint(),
         ];
-        me.drawLayer.setStyle(me.defaultdrawStyle);
+        me.drawLayer.setStyle(me.defaultDrawStyle);
 
         me.setDrawInteraction(me.drawLayer);
         me.setModifyInteraction(me.drawLayer);
@@ -571,20 +585,38 @@ Ext.define('CpsiMapview.controller.button.DrawingButtonController', {
 
         var viewPort = me.map.getViewport();
 
+        var tracingLayerKeys = view.getTracingLayerKeys();
+
         if (pressed) {
+
+            me.initTracing(
+                tracingLayerKeys,
+                me.drawInteraction
+            );
             me.drawInteraction.setActive(true);
             me.modifyInteraction.setActive(true);
             me.snapInteraction.setActive(true);
             viewPort.addEventListener('contextmenu', me.contextHandler);
             document.addEventListener('keydown', me.handleKeyPress);
-
         } else {
+            me.cleanupTracing();
             me.drawInteraction.setActive(false);
             me.modifyInteraction.setActive(false);
             me.snapInteraction.setActive(false);
             viewPort.removeEventListener('contextmenu', me.contextHandler);
             document.removeEventListener('keydown', me.handleKeyPress);
         }
+    },
+
+    /**
+     * Called when new tracing coordinates are available.
+     *
+     * @param {ol.coordinate.Coordinate[]} appendCoords The new coordinates
+     */
+    handleTracingResult: function (appendCoords) {
+        var me = this;
+        me.drawInteraction.removeLastPoint();
+        me.drawInteraction.appendCoordinates(appendCoords);
     },
 
     /**

@@ -1,4 +1,4 @@
-﻿/**
+/**
  * A digitize button used for drawing and modifying network features
  *
  * @class CpsiMapview.view.tool.DrawingButton
@@ -43,6 +43,12 @@ Ext.define('CpsiMapview.view.tool.DrawingButton', {
          * snap to e.g. ['NETWORKEDGES_WFS']
          */
         snappingLayerKeys: [],
+
+        /**
+         * The layerKey values for any vector layers the newly drawn lines should
+         * trace on e.g. ['CHANNELNETWORKVECTOR_WFS', 'NETWORKJUNCTIONS_WFS', 'NETWORKEDGES_WFS']
+         */
+        tracingLayerKeys: [],
 
         /**
          * The vector layer key of a point layer to snap the start and ends
@@ -133,6 +139,7 @@ Ext.define('CpsiMapview.view.tool.DrawingButton', {
      */
     listeners: {
         toggle: 'onToggle',
-        beforedestroy: 'onBeforeDestroy'
+        beforedestroy: 'onBeforeDestroy',
+        tracingend: 'handleTracingResult'
     }
 });
