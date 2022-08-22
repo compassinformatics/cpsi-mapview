@@ -156,6 +156,12 @@ Ext.define(&#39;CpsiMapview.controller.button.TracingMixin&#39;, {
      */
     cleanupTracing: function () {
         var me = this;
+
+        // nothing to cleanup if tracing has not been initialised
+        if (!me.tracingDrawInteraction) {
+            return;
+        }
+
         me.map.removeLayer(me.previewVector);
         me.map.removeLayer(me.tracingVector);
         me.map.un(&#39;click&#39;, me.onTracingMapClick);
