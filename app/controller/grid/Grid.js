@@ -313,6 +313,21 @@ Ext.define('CpsiMapview.controller.grid.Grid', {
         me.updateAssociatedLayers(force);
     },
 
+    /**
+    * Gets associatedEditWindow, associatedEditModel and record Id
+    * from a ViewModel and record Model. It is a separate function
+    * so that it might be overridden in a subclass to return custom values
+    * @param {Ext.app.ViewModel} vm
+    * @param {Ext.data.Model} record
+    * @returns {Object} Object containing the config properties
+    */
+    getRecordEditConfig: function (vm, record) {
+        return {
+            associatedEditWindow: vm.get('associatedEditWindow'),
+            associatedEditModel: vm.get('associatedEditModel'),
+            id: record.getId()
+        };
+    },
 
     /**
      * If there is an edit / view window for individual records
@@ -326,8 +341,10 @@ Ext.define('CpsiMapview.controller.grid.Grid', {
 
         var me = this;
         var vm = me.getViewModel();
-        var associatedEditWindow = vm.get('associatedEditWindow');
-        var associatedEditModel = vm.get('associatedEditModel');
+        var config = me.getRecordEditConfig(vm, record);
+        var associatedEditWindow = config.associatedEditWindow;
+        var associatedEditModel = config.associatedEditModel;
+        var recId = config.id;
 
         // get a reference to the model class so we can use the
         // static .load function without creating a new empty model
@@ -336,7 +353,6 @@ Ext.define('CpsiMapview.controller.grid.Grid', {
         if (associatedEditWindow && modelPrototype) {
 
             // if the record is already open in a window then simply bring that window to the front
-            var recId = record.getId();
             var windowXType = Ext.ClassManager.get(associatedEditWindow).prototype.getXType();
             var existingWindows = Ext.ComponentQuery.query(windowXType);
             var rec, recordWindow;
