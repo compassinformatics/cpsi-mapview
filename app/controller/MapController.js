@@ -27,6 +27,19 @@ Ext.define('CpsiMapview.controller.MapController', {
     *   }
     * }
     *
+    * You also use a function to return a configuration object which returns an Id instead of a
+    * keyField which allows custom logic to be applied. The function receives a single argument which
+    * is the clicked ol.Feature
+    * {
+    *   layerKeyName: function (feat) {
+    *       return {
+    *           id: Math.abs(feat.get('ObjectId')), // the unique feature Id to open in a form
+    *           modelClass: 'CpsiMapview.model.ModelName', // the name of the class used to load a model
+    *           editWindowClass: 'CpsiMapview.view.EditWindow' // the name of the form view class to open when clicking on a feature
+    *       }
+    *   }
+    * }
+    *
     * Multiple configurations can be provided to support clicks on multiple layers
     */
     clickableLayerConfigs: {},
@@ -83,13 +96,26 @@ Ext.define('CpsiMapview.controller.MapController', {
             }
 
             // get the window and model types
-            var keyField = me.clickableLayerConfigs[selectedLayerKey].keyField;
-            var modelClass = me.clickableLayerConfigs[selectedLayerKey].modelClass;
-            var editWindowClass = me.clickableLayerConfigs[selectedLayerKey].editWindowClass;
+            var selectedLayerConfig = me.clickableLayerConfigs[selectedLayerKey];
+            var modelClass, editWindowClass, configObject;
+
+            if (typeof selectedLayerConfig === 'function') {
+                configObject = selectedLayerConfig(feat) || {};
+                recId = configObject.id;
+            } else {
+                configObject = selectedLayerConfig;
+                recId = feat.get(configObject.keyField);
+            }
+
+            if (!recId) {
+                // return early and stop other map handlers
+                return false;
+            }
+
+            modelClass = configObject.modelClass;
+            editWindowClass = configObject.editWindowClass;
 
             var modelPrototype = Ext.ClassManager.get(modelClass);
-
-            recId = feat.get(keyField);
 
             // now load the full record in the appropriate form
             modelPrototype.load(recId, {
