@@ -25,10 +25,10 @@ Ext.define('CpsiMapview.plugin.FeatureInfoWindow', {
         var me = this;
 
         var mapComp = me.getCmp();
-        var mapPanel = mapComp.up('cmv_map');
         var map = mapComp.getMap();
 
-        mapPanel.on('cmv-mapclick', function (clickedFeatures, evt) {
+        //var mapPanel = mapComp.up('map'); // gx_map
+        mapComp.on('cmv-mapclick', function (clickedFeatures, evt) {
             if (map.get('defaultClickEnabled')) {
                 me.requestFeatureInfos(clickedFeatures, evt);
             }
@@ -51,10 +51,31 @@ Ext.define('CpsiMapview.plugin.FeatureInfoWindow', {
         var projection = map.getView().getProjection();
         var format = new ol.format.GeoJSON();
 
-        this.highlightClick(evt);
+        me.highlightClick(evt);
 
         map.forEachLayerAtPixel(evt.pixel, function (layer) {
-            layers.push(layer);
+            var params = layer.getSource().getParams();
+
+            var layerNames = params.LAYERS.split(',');
+            if (layerNames.length > 0) {
+
+                Ext.Array.each(layerNames, function (layerName) {
+
+                    var newParams = Ext.clone(params);
+                    newParams.LAYERS = layerName;
+
+                    var wmsLayer = new ol.layer.Image({
+                        name: layerName,
+                        source: new ol.source.ImageWMS({
+                            url: layer.getSource().getUrl(),
+                            params: newParams
+                        })
+                    });
+                    layers.push(wmsLayer);
+                });
+            } else {
+                layers.push(layer);
+            }
         }, {
             layerFilter: function (layer) {
                 return layer.get('featureInfoWindow');
@@ -169,7 +190,7 @@ Ext.define('CpsiMapview.plugin.FeatureInfoWindow', {
      * @param {ol.Feature[]} features
      * @returns {BasiGX.view.grid.FeaturePropertyGrid[]}
      */
-    createFeaturePanels: function ( layer, features) {
+    createFeaturePanels: function (layer, features) {
         return features.map(function (feature) {
             return Ext.create('BasiGX.view.grid.FeaturePropertyGrid', {
                 title: layer.get('name'),
