@@ -23,13 +23,12 @@ Ext.define('CpsiMapview.plugin.FeatureInfoWindow', {
 
     init: function () {
         var me = this;
+        var cmp = me.getCmp();
 
-        var mapComp = me.getCmp();
-        var mapPanel = mapComp.up('cmv_map');
-        var map = mapComp.getMap();
+        me.map = cmp.map ? cmp.map : BasiGX.util.Map.getMapComponent().map;
 
-        mapPanel.on('cmv-mapclick', function (clickedFeatures, evt) {
-            if (map.get('defaultClickEnabled')) {
+        cmp.on('cmv-mapclick', function (clickedFeatures, evt) {
+            if (me.map.get('defaultClickEnabled')) {
                 me.requestFeatureInfos(clickedFeatures, evt);
             }
         });
@@ -43,18 +42,43 @@ Ext.define('CpsiMapview.plugin.FeatureInfoWindow', {
     requestFeatureInfos: function (clickedFeatures, evt) {
         var me = this;
 
-        var mapComp = me.getCmp();
-        var map = mapComp.getMap();
-
         var layers = [];
-        var resolution = map.getView().getResolution();
-        var projection = map.getView().getProjection();
+        var mapView = me.map.getView();
+
+        var resolution = mapView.getResolution();
+        var projection = mapView.getProjection();
         var format = new ol.format.GeoJSON();
 
-        this.highlightClick(evt);
+        me.highlightClick(evt);
 
-        map.forEachLayerAtPixel(evt.pixel, function (layer) {
-            layers.push(layer);
+        me.map.forEachLayerAtPixel(evt.pixel, function (layer) {
+            var params = layer.getSource().getParams();
+
+            // Map layers combining multiple WMS layers e.g. roads,rivers
+            // will cause errors in the back-end MapServer as the JSON properties
+            // will be different for different layers
+            // Split the layers and create temporary layers for the GetFeatureInfo requests
+
+            var layerNames = params.LAYERS.split(',');
+            if (layerNames.length > 0) {
+
+                Ext.Array.each(layerNames, function (layerName) {
+
+                    var newParams = Ext.clone(params);
+                    newParams.LAYERS = layerName;
+
+                    var wmsLayer = new ol.layer.Image({
+                        name: layerName,
+                        source: new ol.source.ImageWMS({
+                            url: layer.getSource().getUrl(),
+                            params: newParams
+                        })
+                    });
+                    layers.push(wmsLayer);
+                });
+            } else {
+                layers.push(layer);
+            }
         }, {
             layerFilter: function (layer) {
                 return layer.get('featureInfoWindow');
@@ -100,8 +124,8 @@ Ext.define('CpsiMapview.plugin.FeatureInfoWindow', {
      * @param {ol.MapBrowserEvent} evt
      */
     highlightClick: function (evt) {
+
         var me = this;
-        var map = me.getCmp().getMap();
 
         if (!this.highlightSource) {
             this.highlightSource = new ol.source.Vector();
@@ -116,7 +140,7 @@ Ext.define('CpsiMapview.plugin.FeatureInfoWindow', {
                         })
                     })
                 }),
-                map: map
+                map: me.map
             });
         } else {
             this.highlightSource.clear();
@@ -169,7 +193,7 @@ Ext.define('CpsiMapview.plugin.FeatureInfoWindow', {
      * @param {ol.Feature[]} features
      * @returns {BasiGX.view.grid.FeaturePropertyGrid[]}
      */
-    createFeaturePanels: function ( layer, features) {
+    createFeaturePanels: function (layer, features) {
         return features.map(function (feature) {
             return Ext.create('BasiGX.view.grid.FeaturePropertyGrid', {
                 title: layer.get('name'),
