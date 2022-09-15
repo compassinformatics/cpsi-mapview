@@ -55,6 +55,9 @@ Ext.define(&#39;CpsiMapview.view.main.Map&#39;, {
             ptype: &#39;cmv_feature_attribute_grouping&#39;,
             startGroupingEvent: &#39;click&#39;,
             endGroupingEvent: &#39;context&#39;
+        },
+        {
+            ptype: &#39;cmv_feature_info_window&#39;
         }
     ],
 
@@ -272,11 +275,6 @@ Ext.define(&#39;CpsiMapview.view.main.Map&#39;, {
                 stateful: true,
                 stateId: &#39;cmv_mapstate&#39;,
                 map: me.map,
-                plugins: [
-                    {
-                        ptype: &#39;cmv_feature_info_window&#39;
-                    }
-                ],
                 listeners: {
                     afterrender: &#39;afterMapRender&#39;
                 }
