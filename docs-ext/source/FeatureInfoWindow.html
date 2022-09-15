@@ -38,6 +38,22 @@ Ext.define(&#39;CpsiMapview.plugin.FeatureInfoWindow&#39;, {
      */
     highlightSource: null,
 
+<span id='CpsiMapview-plugin-FeatureInfoWindow-method-percentageHeight'>    /**
+</span>     * Feature Window height as a percentage of the viewport
+     * @param {number} percentage as deciaml
+     */
+    percentageHeight: 0.8,
+
+<span id='CpsiMapview-plugin-FeatureInfoWindow-method-onBeforeRequest'>    /**
+</span>     * @method
+     *
+     * Template function called before doing the GetFeatureInfo request
+     * Return false if you don&#39;t want to make the GetFeatureInfo request.
+     *
+     * @param {Object} layer
+     */
+    onBeforeRequest: Ext.emptyFn,
+
 <span id='CpsiMapview-plugin-FeatureInfoWindow-method-init'>    init: function () {
 </span>        var me = this;
         var cmp = me.getCmp();
@@ -120,15 +136,38 @@ Ext.define(&#39;CpsiMapview.plugin.FeatureInfoWindow&#39;, {
             }));
         } else {
             layers.forEach(function (layer) {
+
+                var infoFormat = &#39;geojson&#39;;
                 var url = layer.getSource().getFeatureInfoUrl(evt.coordinate, resolution, projection, {
-                    INFO_FORMAT: &#39;geojson&#39;
+                    INFO_FORMAT: infoFormat
                 });
+
+                // call the template function onBeforeRequest to
+                // see if this layer should be queried
+                if (Ext.isFunction(me.onBeforeRequest)) {
+                    var ret = me.onBeforeRequest(layer);
+                    if (ret === false) {
+                        // skip to next layer
+                        return;
+                    }
+                }
 
                 Ext.Ajax.request({
                     url: url
                 }).then(function (response) {
-                    var features = format.readFeatures(response.responseText);
-                    win.add(me.createFeaturePanels(layer, features));
+                    var responseType = response.responseType ? response.responseType :
+                        response.getResponseHeader ? response.getResponseHeader(&#39;content-type&#39;) : null;
+
+                    // check if the response is geojson as expected, if not then the server
+                    // may have returned an error as XML
+                    if (responseType.toLowerCase().indexOf(infoFormat) !== -1) {
+                        var features = format.readFeatures(response.responseText);
+                        win.add(me.createFeaturePanels(layer, features));
+                    } else {
+                        //&lt;debug&gt;
+                        Ext.log.warn(response.responseText);
+                        //&lt;/debug&gt;
+                    }
                 }).then(undefined, function (error) {
                     Ext.log.error(error);
                 });
@@ -176,7 +215,7 @@ Ext.define(&#39;CpsiMapview.plugin.FeatureInfoWindow&#39;, {
 
         // set the initial height of the window to 80% of the viewport height
         // a user is then free to resize as they wish
-        var height = Ext.getBody().getViewSize().height * 0.8;
+        var height = Ext.getBody().getViewSize().height * me.percentageHeight;
 
         if (this.window) {
             this.window.removeAll(true);
