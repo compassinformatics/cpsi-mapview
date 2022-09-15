@@ -21,6 +21,22 @@ Ext.define('CpsiMapview.plugin.FeatureInfoWindow', {
      */
     highlightSource: null,
 
+    /**
+     * Feature Window height as a percentage of the viewport
+     * @param {number} percentage as deciaml
+     */
+    percentageHeight: 0.8,
+
+    /**
+     * @method
+     *
+     * Template function called before doing the GetFeatureInfo request
+     * Return false if you don't want to make the GetFeatureInfo request.
+     *
+     * @param {Object} layer
+     */
+    onBeforeRequest: Ext.emptyFn,
+
     init: function () {
         var me = this;
         var cmp = me.getCmp();
@@ -103,15 +119,38 @@ Ext.define('CpsiMapview.plugin.FeatureInfoWindow', {
             }));
         } else {
             layers.forEach(function (layer) {
+
+                var infoFormat = 'geojson';
                 var url = layer.getSource().getFeatureInfoUrl(evt.coordinate, resolution, projection, {
-                    INFO_FORMAT: 'geojson'
+                    INFO_FORMAT: infoFormat
                 });
+
+                // call the template function onBeforeRequest to
+                // see if this layer should be queried
+                if (Ext.isFunction(me.onBeforeRequest)) {
+                    var ret = me.onBeforeRequest(layer);
+                    if (ret === false) {
+                        // skip to next layer
+                        return;
+                    }
+                }
 
                 Ext.Ajax.request({
                     url: url
                 }).then(function (response) {
-                    var features = format.readFeatures(response.responseText);
-                    win.add(me.createFeaturePanels(layer, features));
+                    var responseType = response.responseType ? response.responseType :
+                        response.getResponseHeader ? response.getResponseHeader('content-type') : null;
+
+                    // check if the response is geojson as expected, if not then the server
+                    // may have returned an error as XML
+                    if (responseType.toLowerCase().indexOf(infoFormat) !== -1) {
+                        var features = format.readFeatures(response.responseText);
+                        win.add(me.createFeaturePanels(layer, features));
+                    } else {
+                        //<debug>
+                        Ext.log.warn(response.responseText);
+                        //</debug>
+                    }
                 }).then(undefined, function (error) {
                     Ext.log.error(error);
                 });
@@ -159,7 +198,7 @@ Ext.define('CpsiMapview.plugin.FeatureInfoWindow', {
 
         // set the initial height of the window to 80% of the viewport height
         // a user is then free to resize as they wish
-        var height = Ext.getBody().getViewSize().height * 0.8;
+        var height = Ext.getBody().getViewSize().height * me.percentageHeight;
 
         if (this.window) {
             this.window.removeAll(true);
