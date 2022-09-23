@@ -1,7 +1,7 @@
 /**
  * This class is the controller for the ParallelLine.
  */
-Ext.define('CpsiMapview.controller.window.ParallelLine', {
+Ext.define('CpsiMapview.controller.window.ParallelLineWindow', {
     extend: 'Ext.app.ViewController',
 
     alias: 'controller.cmv_parallel_line_window',

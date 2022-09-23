@@ -3,17 +3,17 @@
  * A new layer will be added to the map, that contains the latest created
  * feature.
  *
- * @class CpsiMapview.view.window.ParallelLine
+ * @class CpsiMapview.view.window.ParallelLineWindow
  */
-Ext.define('CpsiMapview.view.window.ParallelLine', {
+Ext.define('CpsiMapview.view.window.ParallelLineWindow', {
     extend: 'Ext.window.Window',
     xtype: 'cmv_parallel_line_window',
 
     requires: [
         'Ext.button.Button',
-        'CpsiMapview.view.toolbar.ParallelLine',
-        'CpsiMapview.controller.window.ParallelLine',
-        'CpsiMapview.model.window.ParallelLine'
+        'CpsiMapview.view.toolbar.ParallelLineToolbar',
+        'CpsiMapview.controller.window.ParallelLineWindow',
+        'CpsiMapview.model.window.ParallelLineWindow'
     ],
 
     controller: 'cmv_parallel_line_window',
