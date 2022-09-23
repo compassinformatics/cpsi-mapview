@@ -1,8 +1,8 @@
 /**
  * This class is the toolbar for creating parallel lines.
- * @class CpsiMapview.view.toolbar.ParallelLine
+ * @class CpsiMapview.view.toolbar.ParallelLineToolbar
  */
-Ext.define('CpsiMapview.view.toolbar.ParallelLine', {
+Ext.define('CpsiMapview.view.toolbar.ParallelLineToolbar', {
     extend: 'Ext.toolbar.Toolbar',
     xtype: 'cmv_parallel_line_toolbar',
 

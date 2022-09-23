@@ -23,7 +23,7 @@ Ext.define('CpsiMapview.view.toolbar.MapTools', {
         'CpsiMapview.view.panel.NumericAttributeSlider',
         'CpsiMapview.view.lineSliceGridExample.LineSliceGridButton',
         'CpsiMapview.view.snappingExample.EdgeButton',
-        'CpsiMapview.view.window.ParallelLine'
+        'CpsiMapview.view.window.ParallelLineWindow'
     ],
 
     controller: 'cmv_maptools',
