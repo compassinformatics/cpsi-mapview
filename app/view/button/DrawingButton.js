@@ -119,7 +119,12 @@ Ext.define('CpsiMapview.view.tool.DrawingButton', {
         /**
          * The style of the snapped edge's vertices.
          */
-        snappedEdgeVertexStyle: CpsiMapview.util.Style.createWhiteCircle()
+        snappedEdgeVertexStyle: CpsiMapview.util.Style.createWhiteCircle(),
+
+        /**
+         * Pixel distance for snapping to the drawing finish (default 12)
+         */
+        drawInteractionSnapTolerance: 2
     },
 
     /**

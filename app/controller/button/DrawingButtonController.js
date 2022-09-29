@@ -98,6 +98,7 @@ Ext.define('CpsiMapview.controller.button.DrawingButtonController', {
     setDrawInteraction: function (layer) {
 
         var me = this;
+        var view = me.getView();
 
         if (me.drawInteraction) {
             me.map.removeInteraction(me.drawInteraction);
@@ -115,7 +116,7 @@ Ext.define('CpsiMapview.controller.button.DrawingButtonController', {
             features: collection,
             condition: drawCondition,
             style: me.getDrawStyleFunction(),
-            snapTolerance: 2 // Pixel distance for snapping to the drawing finish (default 12)
+            snapTolerance: view.getDrawInteractionSnapTolerance()
         };
 
         me.drawInteraction = new ol.interaction.Draw(drawInteractionConfig);
