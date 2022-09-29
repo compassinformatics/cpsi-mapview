@@ -55,6 +55,11 @@ Ext.define('CpsiMapview.controller.button.DrawingButtonController', {
     currentlyDrawing: false,
 
     /**
+     * Stores event listener keys to be un-listened to on destroy or button toggle
+     */
+    listenerKeys: [],
+
+    /**
      * Determines if event handling is blocked.
      */
     //blockedEventHandling: false,
@@ -280,6 +285,9 @@ Ext.define('CpsiMapview.controller.button.DrawingButtonController', {
             me.map.removeInteraction(me.snapInteraction);
         }
 
+        // unbind any previous layer event listeners
+        me.unBindLayerListeners();
+
         var snapCollection = new ol.Collection([], {
             unique: true
         });
@@ -294,29 +302,60 @@ Ext.define('CpsiMapview.controller.button.DrawingButtonController', {
             snapCollection.remove(evt.element);
         });
 
+        // Adds Features to a Collection, catches and ignores exceptions thrown
+        // by the Collection if trying to add a duplicate feature, but still maintains
+        // a unique collection of features. Used as an alternative to .extend but ensures
+        // any potential errors related to unique features are handled / suppressed.
+        var addUniqueFeaturesToCollection = function (collection, features) {
+            Ext.Array.each(features, function (f) {
+                // eslint-disable-next-line
+                try { collection.push(f); } catch (e) { }
+            });
+        };
+
         // get the layers to snap to
         var view = me.getView();
         var layerKeys = view.getSnappingLayerKeys();
-        var layer, feats;
+        var allowSnapToHiddenFeatures = view.getAllowSnapToHiddenFeatures();
 
         Ext.Array.each(layerKeys, function (key) {
+            var layer = BasiGX.util.Layer.getLayersBy('layerKey', key)[0];
 
-            layer = BasiGX.util.Layer.getLayersBy('layerKey', key)[0];
-            feats = layer.getSource().getFeatures(); // these are standard WFS layers so we use getSource without getFeaturesCollection here
-
-            if (feats.length > 0) {
-                snapCollection.extend(feats);
+            var feats = layer.getSource().getFeatures(); // these are standard WFS layers so we use getSource without getFeaturesCollection here
+            // add inital features to the snap collection, if the layer is visible
+            // or if allowSnapToHiddenFeatures is enabled
+            if (layer.getVisible() || allowSnapToHiddenFeatures) {
+                addUniqueFeaturesToCollection(snapCollection, feats);
             }
 
-            layer.getSource().on('addfeature', function (evt) {
-                snapCollection.push(evt.feature);
+            // Update the snapCollection on addfeature or removefeature
+            var addFeatureKey = layer.getSource().on('addfeature', function (evt) {
+                if (layer.getVisible() || allowSnapToHiddenFeatures) {
+                    addUniqueFeaturesToCollection(snapCollection, [evt.feature]);
+                }
             });
 
-            layer.getSource().on('removefeature', function (evt) {
+            var removefeatureKey = layer.getSource().on('removefeature', function (evt) {
                 snapCollection.remove(evt.feature);
             });
-        });
 
+            // Update the snapCollection on layer visibility change
+            // only handle layer visible change event if snapping to hidden features is disabled
+            if (!allowSnapToHiddenFeatures) {
+                var changeVisibleKey = layer.on('change:visible', function () {
+                    var features = layer.getSource().getFeatures();
+                    if (layer.getVisible()) {
+                        addUniqueFeaturesToCollection(snapCollection, features);
+                    } else {
+                        Ext.Array.each(features, function (f) {
+                            snapCollection.remove(f);
+                        });
+                    }
+                });
+            }
+
+            me.listenerKeys.push(addFeatureKey, removefeatureKey, changeVisibleKey);
+        });
 
         // vector tile sources cannot be used for snapping as they
         // do not provide a getFeatures function
@@ -687,7 +726,18 @@ Ext.define('CpsiMapview.controller.button.DrawingButtonController', {
             me.map.removeLayer(me.drawLayer);
         }
 
+        me.unBindLayerListeners();
         me.cleanupTracing();
+    },
+
+    /**
+     * Remove the interaction when this component gets destroyed
+     */
+    unBindLayerListeners: function () {
+        Ext.Array.each(this.listenerKeys, function(key) {
+            ol.Observable.unByKey(key);
+        });
+        this.listenerKeys = [];
     },
 
     init: function () {

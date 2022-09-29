@@ -124,7 +124,14 @@ Ext.define('CpsiMapview.view.tool.DrawingButton', {
         /**
          * Pixel distance for snapping to the drawing finish (default 12)
          */
-        drawInteractionSnapTolerance: 2
+        drawInteractionSnapTolerance: 2,
+
+        /**
+         * Allows consumer of component choice of snapping to only visible layer features
+         * defined in snappingLayerKeys, or snapping to layer features even if they
+         * are invisible. Defaults to true for backward compatibility.
+         */
+        allowSnapToHiddenFeatures: true
     },
 
     /**
