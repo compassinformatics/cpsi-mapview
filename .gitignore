@@ -1,6 +1,6 @@
 build/*
 coverage/*
-ext/
+ext
 node_modules/
 
 bootstrap.css
