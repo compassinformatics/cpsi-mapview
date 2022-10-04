@@ -136,7 +136,19 @@ Ext.define(&#39;CpsiMapview.view.tool.DrawingButton&#39;, {
 <span id='CpsiMapview-view-tool-DrawingButton-cfg-snappedEdgeVertexStyle'>        /**
 </span>         * The style of the snapped edge&#39;s vertices.
          */
-        snappedEdgeVertexStyle: CpsiMapview.util.Style.createWhiteCircle()
+        snappedEdgeVertexStyle: CpsiMapview.util.Style.createWhiteCircle(),
+
+<span id='CpsiMapview-view-tool-DrawingButton-cfg-drawInteractionSnapTolerance'>        /**
+</span>         * Pixel distance for snapping to the drawing finish (default 12)
+         */
+        drawInteractionSnapTolerance: 2,
+
+<span id='CpsiMapview-view-tool-DrawingButton-cfg-allowSnapToHiddenFeatures'>        /**
+</span>         * Allows consumer of component choice of snapping to only visible layer features
+         * defined in snappingLayerKeys, or snapping to layer features even if they
+         * are invisible.
+         */
+        allowSnapToHiddenFeatures: false
     },
 
 <span id='CpsiMapview-view-tool-DrawingButton-property-name'>    /**

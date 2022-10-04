@@ -149,6 +149,10 @@ Ext.define(&#39;CpsiMapview.controller.button.TracingMixin&#39;, {
     onTracingDrawEnd: function () {
         var me = this;
         me.tracingActive = false;
+        // Clear previous tracingFeature data
+        me.tracingFeature.getGeometry().setCoordinates([]);
+        me.tracingFeatureArray = [];
+        me.previewLine.getGeometry().setCoordinates([]);
     },
 
 <span id='CpsiMapview-controller-button-TracingMixin-method-cleanupTracing'>    /**
@@ -177,6 +181,11 @@ Ext.define(&#39;CpsiMapview.controller.button.TracingMixin&#39;, {
      */
     onTracingMapClick: function (event) {
         var me = this;
+
+        // Ignore the event if drawing is finished
+        if (!me.tracingActive) {
+            return;
+        }
 
         var hit = false;
         me.map.forEachFeatureAtPixel(
@@ -321,14 +330,17 @@ Ext.define(&#39;CpsiMapview.controller.button.TracingMixin&#39;, {
                 var geom = f.getGeometry();
                 var coords = geom.getCoordinates();
 
-                if (updatedCoords.length === 0) {
+                if (updatedCoords &amp;&amp; updatedCoords.length === 0) {
                     updatedCoords = coords;
                 } else {
                     updatedCoords = me.tracingUtil.concatLineCoords(updatedCoords, coords);
                 }
             });
 
-            me.tracingFeature.getGeometry().setCoordinates(updatedCoords);
+            // concatLineCoords can return undefined if lines do not touch
+            if (updatedCoords) {
+                me.tracingFeature.getGeometry().setCoordinates(updatedCoords);
+            }
         }
     },
 
