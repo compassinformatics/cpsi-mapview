@@ -731,7 +731,8 @@ Ext.define('CpsiMapview.controller.button.DrawingButtonController', {
     },
 
     /**
-     * Remove the interaction when this component gets destroyed
+     * Remove event listeners by key, for each key in the listenerKeys array
+     *
      */
     unBindLayerListeners: function () {
         Ext.Array.each(this.listenerKeys, function(key) {
