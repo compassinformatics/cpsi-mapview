@@ -112,8 +112,8 @@ describe('CpsiMapview.controller.button.DrawingButtonController', function () {
             ctrl.setSnapInteraction(drawLayer);
 
             // layer1 and layer2 have 3 unique features
-            // layer1 is hidden to expected number of features
-            // in the snap interaction there should be 2 features
+            // layer1 is hidden so the expected number of features
+            // in the snap interaction should be 2
             expect(ctrl.snapInteraction.getFeatures_().getLength()).to.be(expectedUniqueFeaturesCount - 1);
         });
 
