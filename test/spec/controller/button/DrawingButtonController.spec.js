@@ -90,7 +90,7 @@ describe('CpsiMapview.controller.button.DrawingButtonController', function () {
             expect(filterSnapInteractions(map).length).to.be(1);
         });
 
-        it('should remove the previous Snap Interaction before if called again', function () {
+        it('should remove the previous Snap Interaction if method is called again', function () {
             expect(filterSnapInteractions(map).length).to.be(0);
             ctrl.setSnapInteraction(drawLayer);
             expect(filterSnapInteractions(map).length).to.be(1);
