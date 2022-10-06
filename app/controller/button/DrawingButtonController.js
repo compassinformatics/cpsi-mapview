@@ -313,14 +313,28 @@ Ext.define('CpsiMapview.controller.button.DrawingButtonController', {
             });
         };
 
+        // Checks if a feature exists in layers other than the current layer
+        var isFeatureInOtherLayers = function (allLayers, currentLayer, feature) {
+            var found = false;
+            Ext.Array.each(allLayers, function(layer) {
+                if(layer !== currentLayer) {
+                    if(layer.getSource().hasFeature(feature)) {
+                        found = true;
+                    }
+                }
+            });
+            return found;
+        };
+
         // get the layers to snap to
         var view = me.getView();
         var layerKeys = view.getSnappingLayerKeys();
         var allowSnapToHiddenFeatures = view.getAllowSnapToHiddenFeatures();
+        var layers = Ext.Array.map(layerKeys, function (key) {
+            return BasiGX.util.Layer.getLayersBy('layerKey', key)[0];
+        });
 
-        Ext.Array.each(layerKeys, function (key) {
-            var layer = BasiGX.util.Layer.getLayersBy('layerKey', key)[0];
-
+        Ext.Array.each(layers, function (layer) {
             var feats = layer.getSource().getFeatures(); // these are standard WFS layers so we use getSource without getFeaturesCollection here
             // add inital features to the snap collection, if the layer is visible
             // or if allowSnapToHiddenFeatures is enabled
@@ -336,7 +350,9 @@ Ext.define('CpsiMapview.controller.button.DrawingButtonController', {
             });
 
             var removefeatureKey = layer.getSource().on('removefeature', function (evt) {
-                snapCollection.remove(evt.feature);
+                if (!isFeatureInOtherLayers(layers, layer, evt.feature)) {
+                    snapCollection.remove(evt.feature);
+                }
             });
 
             // Update the snapCollection on layer visibility change
@@ -348,7 +364,9 @@ Ext.define('CpsiMapview.controller.button.DrawingButtonController', {
                         addUniqueFeaturesToCollection(snapCollection, features);
                     } else {
                         Ext.Array.each(features, function (f) {
-                            snapCollection.remove(f);
+                            if (!isFeatureInOtherLayers(layers, layer, f)) {
+                                snapCollection.remove(f);
+                            }
                         });
                     }
                 });
@@ -735,7 +753,7 @@ Ext.define('CpsiMapview.controller.button.DrawingButtonController', {
      *
      */
     unBindLayerListeners: function () {
-        Ext.Array.each(this.listenerKeys, function(key) {
+        Ext.Array.each(this.listenerKeys, function (key) {
             ol.Observable.unByKey(key);
         });
         this.listenerKeys = [];
