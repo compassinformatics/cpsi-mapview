@@ -50,7 +50,18 @@ Ext.define('CpsiMapview.model.FeatureEventsMixin', {
                 layerUtil.layerRefresh(layer);
             } else {
                 //<debug>
-                Ext.log.error('layerKey "' + k + '" in syncLayerKeys invalid for ' + me.$className);
+                // if a switch layer is used then it may not yet have been created
+                // so we check for its twin layer
+                var switchLayerFound = false;
+                var type = k.endsWith('_WMS') ? '_WMS' : '_WFS';
+                var altType = k.endsWith('_WMS') ? '_WFS' : '_WMS';
+                var altLayerKey = k.replace(type, altType);
+
+                switchLayerFound = !Ext.isEmpty(BasiGX.util.Layer.getLayersBy('layerKey', altLayerKey));
+
+                if (switchLayerFound === false) {
+                    Ext.log.error('layerKey "' + k + '" in syncLayerKeys invalid for ' + me.$className);
+                }
                 //</debug>
             }
         });
