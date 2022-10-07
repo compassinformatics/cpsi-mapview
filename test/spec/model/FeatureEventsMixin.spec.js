@@ -46,8 +46,13 @@ describe('CpsiMapview.model.FeatureEventsMixin', function () {
 
     it('run model saved', function () {
 
-        var mixin = CpsiMapview.model.FeatureEventsMixin;
-        mixin.syncLayerKeys = ['MYKEY', 'MYKEY_WFS', 'MYKEY_WMS'];
+        var mixin = Ext.create('CpsiMapview.model.FeatureEventsMixin', {
+            syncLayerKeys: ['MYKEY', 'MYKEY_WFS', 'MYKEY_WMS']
+        });
+
+        // avoid throwing an error as fireEvent needs to be triggered when the mixin is part of a class
+        mixin.hasListeners = {};
+
         mixin.onModelSaved();
 
         // the above function has no return value for testing
