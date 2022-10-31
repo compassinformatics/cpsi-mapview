@@ -28,6 +28,7 @@ Ext.define(&#39;CpsiMapview.plugin.FeatureInfoWindow&#39;, {
     requires: [
         &#39;Ext.panel.Panel&#39;,
         &#39;CpsiMapview.view.window.MinimizableWindow&#39;,
+        &#39;CpsiMapview.util.WmsFilter&#39;,
         &#39;BasiGX.view.grid.FeaturePropertyGrid&#39;,
         &#39;BasiGX.util.Map&#39;
     ],
@@ -92,13 +93,24 @@ Ext.define(&#39;CpsiMapview.plugin.FeatureInfoWindow&#39;, {
             // will be different for different layers
             // Split the layers and create temporary layers for the GetFeatureInfo requests
 
-            var layerNames = params.LAYERS.split(&#39;,&#39;);
-            if (layerNames.length &gt; 0) {
+            // we only check for unique layer names - if labels are used then duplicate layer names
+            // are used in requests, but we only want one set of FeatureInfo results
+            var layerNames = Ext.Array.unique(params.LAYERS.split(&#39;,&#39;));
+
+            if (layerNames.length &gt; 1) {
+
+                // if there are multiple layers then attempt to also split out styles and filters
+                var idx = 0;
+                var styleNames = params.STYLES.split(&#39;,&#39;);
+                var wmsFilterUtil = CpsiMapview.util.WmsFilter;
+                var filters = wmsFilterUtil.getWmsFilters(params);
 
                 Ext.Array.each(layerNames, function (layerName) {
 
                     var newParams = Ext.clone(params);
                     newParams.LAYERS = layerName;
+                    newParams.STYLES = styleNames[idx] ? styleNames[idx] : &#39;&#39;;
+                    newParams.FILTER = filters[idx] ? filters[idx] : &#39;&#39;;
 
                     var wmsLayer = new ol.layer.Image({
                         name: layerName,
@@ -108,6 +120,7 @@ Ext.define(&#39;CpsiMapview.plugin.FeatureInfoWindow&#39;, {
                         })
                     });
                     layers.push(wmsLayer);
+                    idx += 1;
                 });
             } else {
                 layers.push(layer);
