@@ -34,18 +34,27 @@ Ext.define('CpsiMapview.util.WmsFilter', {
     },
 
     /**
+     * Return an array of filter objects from a WMS Params object
+     * @param {any} wmsParams
+     */
+    getWmsFilters: function (wmsParams) {
+
+        var filters = wmsParams.FILTER || [];
+        // split the list based on filters in brackets e.g. (filter1)(filter2)
+        return Ext.isArray(filters) ? filters : filters.split(/(\(.*?\))/).filter(Boolean);
+    },
+
+    /**
     * Executed when this menu item is clicked.
     * Forces redraw of the connected layer.
     */
     getWmsFilterString: function (wmsParams) {
 
         var layers = wmsParams.LAYERS || [];
-        var originalFilters = wmsParams.FILTER || [];
-
         var layerList = Ext.isArray(layers) ? layers : layers.split(',');
 
-        // split the list based on filters in brackets e.g. (filter1)(filter2)
-        originalFilters = Ext.isArray(originalFilters) ? originalFilters : originalFilters.split(/(\(.*?\))/).filter(Boolean);
+        var wmsFilterUtil = CpsiMapview.util.WmsFilter;
+        var originalFilters = wmsFilterUtil.getWmsFilters(wmsParams);
 
         // every layer item requires a filter - duplicate the first filter
         // for the layer labels

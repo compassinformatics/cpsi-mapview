@@ -11,6 +11,7 @@ Ext.define('CpsiMapview.plugin.FeatureInfoWindow', {
     requires: [
         'Ext.panel.Panel',
         'CpsiMapview.view.window.MinimizableWindow',
+        'CpsiMapview.util.WmsFilter',
         'BasiGX.view.grid.FeaturePropertyGrid',
         'BasiGX.util.Map'
     ],
@@ -75,13 +76,24 @@ Ext.define('CpsiMapview.plugin.FeatureInfoWindow', {
             // will be different for different layers
             // Split the layers and create temporary layers for the GetFeatureInfo requests
 
-            var layerNames = params.LAYERS.split(',');
-            if (layerNames.length > 0) {
+            // we only check for unique layer names - if labels are used then duplicate layer names
+            // are used in requests, but we only want one set of FeatureInfo results
+            var layerNames = Ext.Array.unique(params.LAYERS.split(','));
+
+            if (layerNames.length > 1) {
+
+                // if there are multiple layers then attempt to also split out styles and filters
+                var idx = 0;
+                var styleNames = params.STYLES.split(',');
+                var wmsFilterUtil = CpsiMapview.util.WmsFilter;
+                var filters = wmsFilterUtil.getWmsFilters(params);
 
                 Ext.Array.each(layerNames, function (layerName) {
 
                     var newParams = Ext.clone(params);
                     newParams.LAYERS = layerName;
+                    newParams.STYLES = styleNames[idx] ? styleNames[idx] : '';
+                    newParams.FILTER = filters[idx] ? filters[idx] : '';
 
                     var wmsLayer = new ol.layer.Image({
                         name: layerName,
@@ -91,6 +103,7 @@ Ext.define('CpsiMapview.plugin.FeatureInfoWindow', {
                         })
                     });
                     layers.push(wmsLayer);
+                    idx += 1;
                 });
             } else {
                 layers.push(layer);
