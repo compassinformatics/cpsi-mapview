@@ -41,6 +41,16 @@ Ext.define(&#39;CpsiMapview.controller.button.TracingMixin&#39;, {
         })
     }),
 
+<span id='CpsiMapview-controller-button-TracingMixin-property-lastSnappedCoord'>    /**
+</span>     * Used to store the position of the last mouse coord, taking into account snapping
+     */
+    lastSnappedCoord: null,
+
+<span id='CpsiMapview-controller-button-TracingMixin-property-getSnapCoordinateInteraction'>    /**
+</span>     * Interaction to track and populate lastSnappedCoord
+     */
+    getSnapCoordinateInteraction: null,
+
 <span id='CpsiMapview-controller-button-TracingMixin-method-initTracing'>    /**
 </span>     * Enhances drawing functionality by adding tracing to it.
      *
@@ -67,6 +77,7 @@ Ext.define(&#39;CpsiMapview.controller.button.TracingMixin&#39;, {
         me.tracingActive = false;
         me.tracingDrawInteraction.on(&#39;drawstart&#39;, me.onTracingDrawStart);
         me.tracingDrawInteraction.on(&#39;drawend&#39;, me.onTracingDrawEnd);
+        me.trackSnappedCoords();
 
         if (!tracingLayerKeys) {
             return;
@@ -172,6 +183,35 @@ Ext.define(&#39;CpsiMapview.controller.button.TracingMixin&#39;, {
         me.map.un(&#39;pointermove&#39;, me.onTracingPointerMove);
         me.tracingDrawInteraction.un(&#39;drawstart&#39;, me.onTracingDrawStart);
         me.tracingDrawInteraction.un(&#39;drawend&#39;, me.onTracingDrawEnd);
+        me.map.removeInteraction(me.getSnapCoordinateInteraction);
+    },
+
+<span id='CpsiMapview-controller-button-TracingMixin-method-trackSnappedCoords'>    /**
+</span>     * Add a generic Interaction to the map before the last Snap interaction
+     * So that we can collected the coordinates of the latest snapped edge/vertex/node
+     * The new Interaction needs to be before the last Snap interaction so that the
+     * Snap interaction modifies the coordinates to the snapped edge/vertex/node
+     * And passes them down to the next interaction
+     */
+    trackSnappedCoords: function () {
+        var me = this;
+        var interactions = me.map.getInteractions();
+        var lastSnapInteractionIndex;
+
+        me.getSnapCoordinateInteraction = new ol.interaction.Interaction({
+            handleEvent: function (e) {
+                me.lastSnappedCoord = e.coordinate;
+                return true;
+            }
+        });
+
+        interactions.forEach(function (interaction, i) {
+            if (interaction instanceof ol.interaction.Snap) {
+                lastSnapInteractionIndex = i;
+            }
+        });
+
+        interactions.insertAt(lastSnapInteractionIndex, me.getSnapCoordinateInteraction);
     },
 
 <span id='CpsiMapview-controller-button-TracingMixin-method-onTracingMapClick'>    /**
@@ -196,11 +236,10 @@ Ext.define(&#39;CpsiMapview.controller.button.TracingMixin&#39;, {
                 }
 
                 hit = true;
-                var coord = me.map.getCoordinateFromPixel(event.pixel);
 
                 // second click on the tracing feature: append the ring coordinates
                 if (me.tracingUtil.lineStringPopulated(me.tracingFeature) &amp;&amp; me.tracingFeatureArray.includes(feature)) {
-                    me.tracingEndPoint = me.tracingFeature.getGeometry().getClosestPoint(coord);
+                    me.tracingEndPoint = me.lastSnappedCoord;
                     var appendCoords = me.tracingUtil.getPartialSegmentCoords(
                         me.tracingFeature,
                         me.tracingStartPoint,
@@ -229,7 +268,7 @@ Ext.define(&#39;CpsiMapview.controller.button.TracingMixin&#39;, {
                     coords
                 );
                 me.tracingFeatureArray.push(feature);
-                me.tracingStartPoint = me.tracingFeature.getGeometry().getClosestPoint(coord);
+                me.tracingStartPoint = me.lastSnappedCoord;
             },
             me.forEachFeatureOptions
         );
