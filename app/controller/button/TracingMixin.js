@@ -25,6 +25,16 @@ Ext.define('CpsiMapview.controller.button.TracingMixin', {
     }),
 
     /**
+     * Used to store the position of the last mouse coord, taking into account snapping
+     */
+    lastSnappedCoord: null,
+
+    /**
+     * Interaction to track and populate lastSnappedCoord
+     */
+    getSnapCoordinateInteraction: null,
+
+    /**
      * Enhances drawing functionality by adding tracing to it.
      *
      * @param {String[]} tracingLayerKeys The keys of the layers to trace
@@ -50,6 +60,7 @@ Ext.define('CpsiMapview.controller.button.TracingMixin', {
         me.tracingActive = false;
         me.tracingDrawInteraction.on('drawstart', me.onTracingDrawStart);
         me.tracingDrawInteraction.on('drawend', me.onTracingDrawEnd);
+        me.trackSnappedCoords();
 
         if (!tracingLayerKeys) {
             return;
@@ -155,6 +166,35 @@ Ext.define('CpsiMapview.controller.button.TracingMixin', {
         me.map.un('pointermove', me.onTracingPointerMove);
         me.tracingDrawInteraction.un('drawstart', me.onTracingDrawStart);
         me.tracingDrawInteraction.un('drawend', me.onTracingDrawEnd);
+        me.map.removeInteraction(me.getSnapCoordinateInteraction);
+    },
+
+    /**
+     * Add a generic Interaction to the map before the last Snap interaction
+     * So that we can collected the coordinates of the latest snapped edge/vertex/node
+     * The new Interaction needs to be before the last Snap interaction so that the
+     * Snap interaction modifies the coordinates to the snapped edge/vertex/node
+     * And passes them down to the next interaction
+     */
+    trackSnappedCoords: function () {
+        var me = this;
+        var interactions = me.map.getInteractions();
+        var lastSnapInteractionIndex;
+
+        me.getSnapCoordinateInteraction = new ol.interaction.Interaction({
+            handleEvent: function (e) {
+                me.lastSnappedCoord = e.coordinate;
+                return true;
+            }
+        });
+
+        interactions.forEach(function (interaction, i) {
+            if (interaction instanceof ol.interaction.Snap) {
+                lastSnapInteractionIndex = i;
+            }
+        });
+
+        interactions.insertAt(lastSnapInteractionIndex, me.getSnapCoordinateInteraction);
     },
 
     /**
@@ -179,11 +219,10 @@ Ext.define('CpsiMapview.controller.button.TracingMixin', {
                 }
 
                 hit = true;
-                var coord = me.map.getCoordinateFromPixel(event.pixel);
 
                 // second click on the tracing feature: append the ring coordinates
                 if (me.tracingUtil.lineStringPopulated(me.tracingFeature) && me.tracingFeatureArray.includes(feature)) {
-                    me.tracingEndPoint = me.tracingFeature.getGeometry().getClosestPoint(coord);
+                    me.tracingEndPoint = me.lastSnappedCoord;
                     var appendCoords = me.tracingUtil.getPartialSegmentCoords(
                         me.tracingFeature,
                         me.tracingStartPoint,
@@ -212,7 +251,7 @@ Ext.define('CpsiMapview.controller.button.TracingMixin', {
                     coords
                 );
                 me.tracingFeatureArray.push(feature);
-                me.tracingStartPoint = me.tracingFeature.getGeometry().getClosestPoint(coord);
+                me.tracingStartPoint = me.lastSnappedCoord;
             },
             me.forEachFeatureOptions
         );
