@@ -430,15 +430,24 @@ Ext.define('CpsiMapview.controller.button.DrawingButtonController', {
      * @param {any} newGeom
      */
     mergeLineStrings: function (origGeom, newGeom) {
+        var newGeomFirstCoord = newGeom.getFirstCoordinate();
+        var matchesFirstCoord = Ext.Array.equals(origGeom.getFirstCoordinate(), newGeomFirstCoord);
+        var matchesLastCoord = Ext.Array.equals(origGeom.getLastCoordinate(), newGeomFirstCoord);
 
-        if (Ext.Array.equals(origGeom.getLastCoordinate(), newGeom.getFirstCoordinate()) === true) {
+        if (matchesFirstCoord || matchesLastCoord) {
             var origCoords = origGeom.getCoordinates();
+            // if drawing in continued from the start point of the original,
+            // the original needs to be reversed to we end up with correct
+            // start and end points
+            if (matchesFirstCoord) {
+                origCoords.reverse();
+            }
             var newCoords = newGeom.getCoordinates();
             newGeom.setCoordinates(origCoords.concat(newCoords));
         } else {
-            Ext.log('End coordinates differ');
-            Ext.log('End coord: ', origGeom.getLastCoordinate());
-            Ext.log('Start coord: ', newGeom.getFirstCoordinate());
+            Ext.log('Start / End coordinates differ');
+            Ext.log('origGeom start/end coords: ', origGeom.getFirstCoordinate(), origGeom.getLastCoordinate());
+            Ext.log('newGeom start coord: ', newGeom.getFirstCoordinate());
         }
 
         return newGeom;
