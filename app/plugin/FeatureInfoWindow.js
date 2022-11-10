@@ -46,7 +46,7 @@ Ext.define('CpsiMapview.plugin.FeatureInfoWindow', {
 
         cmp.on('cmv-mapclick', function (clickedFeatures, evt) {
             if (me.map.get('defaultClickEnabled')) {
-                me.requestFeatureInfos(clickedFeatures, evt);
+                me.requestFeatureInfos(clickedFeatures, evt, me.map.get('showFeatureInfoWindowOnlyIfContent'));
             }
         });
     },
@@ -55,8 +55,9 @@ Ext.define('CpsiMapview.plugin.FeatureInfoWindow', {
      * This method queries all configured layers for feature information. It calls the methods to highlight the click,
      * open a window and display the information
      * @param {ol.MapBrowserEvent} evt
+     * @param {Boolean} showFeatureInfoWindowOnlyIfContent
      */
-    requestFeatureInfos: function (clickedFeatures, evt) {
+    requestFeatureInfos: function (clickedFeatures, evt, showFeatureInfoWindowOnlyIfContent) {
         var me = this;
 
         var layers = [];
@@ -116,6 +117,11 @@ Ext.define('CpsiMapview.plugin.FeatureInfoWindow', {
 
         var win = me.openFeatureInfoWindow();
 
+        // always show the window if showFeatureInfoWindowOnlyIfContent is false
+        if (!showFeatureInfoWindowOnlyIfContent) {
+            win.show();
+        }
+
         if (layers.length <= 1) {
             win.getLayout().setConfig({
                 hideCollapseTool: true
@@ -127,10 +133,18 @@ Ext.define('CpsiMapview.plugin.FeatureInfoWindow', {
         }
 
         if (layers.length === 0) {
-            win.add(Ext.create('Ext.panel.Panel', {
-                title: 'No results found'
-            }));
+            if (!showFeatureInfoWindowOnlyIfContent) {
+                win.add(Ext.create('Ext.panel.Panel', {
+                    title: 'No results found'
+                }));
+            } else {
+                // If no layers are enabled and showFeatureInfoWindowOnlyIfContent is true
+                // close the window so the close event is fired and the highlight is removed from the map
+                win.close();
+            }
         } else {
+            var requests = [];
+            var hasContent = false;
             layers.forEach(function (layer) {
 
                 var infoFormat = 'geojson';
@@ -148,7 +162,7 @@ Ext.define('CpsiMapview.plugin.FeatureInfoWindow', {
                     }
                 }
 
-                Ext.Ajax.request({
+                var promise = Ext.Ajax.request({
                     url: url
                 }).then(function (response) {
                     var responseType = response.responseType ? response.responseType :
@@ -158,7 +172,15 @@ Ext.define('CpsiMapview.plugin.FeatureInfoWindow', {
                     // may have returned an error as XML
                     if (responseType.toLowerCase().indexOf(infoFormat) !== -1) {
                         var features = format.readFeatures(response.responseText);
-                        win.add(me.createFeaturePanels(layer, features));
+                        if (features.length) {
+                            // at least one layer has features found
+                            hasContent = true;
+                            // ensure window is show, it may not be if
+                            // showFeatureInfoWindowOnlyIfContent is true
+                            // calling show multiple times is no issue
+                            win.show();
+                            win.add(me.createFeaturePanels(layer, features));
+                        }
                     } else {
                         //<debug>
                         Ext.log.warn(response.responseText);
@@ -167,7 +189,22 @@ Ext.define('CpsiMapview.plugin.FeatureInfoWindow', {
                 }).then(undefined, function (error) {
                     Ext.log.error(error);
                 });
+
+                requests.push(promise);
             });
+
+            if (showFeatureInfoWindowOnlyIfContent) {
+                // When all requests have been performed, and no features are found
+                // for any layer, close the window so that the highlight is removed from the map
+                // Also handles the case where the window was previously open because features were found
+                // But a new click has found no features, so the window is auto closed
+                // This second case behaviour could be changed by checking for win.getHidden()
+                Ext.Promise.all(requests).then(function() {
+                    if (!hasContent) {
+                        win.close();
+                    }
+                });
+            }
         }
     },
 
@@ -234,7 +271,7 @@ Ext.define('CpsiMapview.plugin.FeatureInfoWindow', {
             });
         }
 
-        this.window.show();
+        //this.window.show();
 
         return this.window;
     },
