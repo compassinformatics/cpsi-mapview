@@ -46,7 +46,7 @@ Ext.define('CpsiMapview.plugin.FeatureInfoWindow', {
 
         cmp.on('cmv-mapclick', function (clickedFeatures, evt) {
             if (me.map.get('defaultClickEnabled')) {
-                me.requestFeatureInfos(clickedFeatures, evt, me.map.get('showFeatureInfoWindowOnlyIfContent'));
+                me.requestFeatureInfos(clickedFeatures, evt);
             }
         });
     },
@@ -55,9 +55,8 @@ Ext.define('CpsiMapview.plugin.FeatureInfoWindow', {
      * This method queries all configured layers for feature information. It calls the methods to highlight the click,
      * open a window and display the information
      * @param {ol.MapBrowserEvent} evt
-     * @param {Boolean} showFeatureInfoWindowOnlyIfContent
      */
-    requestFeatureInfos: function (clickedFeatures, evt, showFeatureInfoWindowOnlyIfContent) {
+    requestFeatureInfos: function (clickedFeatures, evt) {
         var me = this;
 
         var layers = [];
@@ -117,9 +116,14 @@ Ext.define('CpsiMapview.plugin.FeatureInfoWindow', {
 
         var win = me.openFeatureInfoWindow();
 
-        // always show the window if showFeatureInfoWindowOnlyIfContent is false
-        if (!showFeatureInfoWindowOnlyIfContent) {
-            win.show();
+        if (!layers.length) {
+            // If no layers are enabled close the window so the close event
+            // is fired and the highlight is removed from the map
+            win.close();
+            // fire event so client can show custom ui, pass through the instance so
+            // that the window might be re-opened and custom content inserted
+            Ext.GlobalEvents.fireEvent('cmv-featureinfowindow-no-layers-enabled', me);
+            return;
         }
 
         if (layers.length <= 1) {
@@ -132,80 +136,70 @@ Ext.define('CpsiMapview.plugin.FeatureInfoWindow', {
             });
         }
 
-        if (layers.length === 0) {
-            if (!showFeatureInfoWindowOnlyIfContent) {
-                win.add(Ext.create('Ext.panel.Panel', {
-                    title: 'No results found'
-                }));
-            } else {
-                // If no layers are enabled and showFeatureInfoWindowOnlyIfContent is true
-                // close the window so the close event is fired and the highlight is removed from the map
-                win.close();
-            }
-        } else {
-            var requests = [];
-            var hasContent = false;
-            layers.forEach(function (layer) {
+        var requests = [];
+        var hasContent = false;
+        layers.forEach(function (layer) {
 
-                var infoFormat = 'geojson';
-                var url = layer.getSource().getFeatureInfoUrl(evt.coordinate, resolution, projection, {
-                    INFO_FORMAT: infoFormat
-                });
-
-                // call the template function onBeforeRequest to
-                // see if this layer should be queried
-                if (Ext.isFunction(me.onBeforeRequest)) {
-                    var ret = me.onBeforeRequest(layer);
-                    if (ret === false) {
-                        // skip to next layer
-                        return;
-                    }
-                }
-
-                var promise = Ext.Ajax.request({
-                    url: url
-                }).then(function (response) {
-                    var responseType = response.responseType ? response.responseType :
-                        response.getResponseHeader ? response.getResponseHeader('content-type') : null;
-
-                    // check if the response is geojson as expected, if not then the server
-                    // may have returned an error as XML
-                    if (responseType.toLowerCase().indexOf(infoFormat) !== -1) {
-                        var features = format.readFeatures(response.responseText);
-                        if (features.length) {
-                            // at least one layer has features found
-                            hasContent = true;
-                            // ensure window is show, it may not be if
-                            // showFeatureInfoWindowOnlyIfContent is true
-                            // calling show multiple times is no issue
-                            win.show();
-                            win.add(me.createFeaturePanels(layer, features));
-                        }
-                    } else {
-                        //<debug>
-                        Ext.log.warn(response.responseText);
-                        //</debug>
-                    }
-                }).then(undefined, function (error) {
-                    Ext.log.error(error);
-                });
-
-                requests.push(promise);
+            var infoFormat = 'geojson';
+            var url = layer.getSource().getFeatureInfoUrl(evt.coordinate, resolution, projection, {
+                INFO_FORMAT: infoFormat
             });
 
-            if (showFeatureInfoWindowOnlyIfContent) {
-                // When all requests have been performed, and no features are found
-                // for any layer, close the window so that the highlight is removed from the map
-                // Also handles the case where the window was previously open because features were found
-                // But a new click has found no features, so the window is auto closed
-                // This second case behaviour could be changed by checking for win.getHidden()
-                Ext.Promise.all(requests).then(function() {
-                    if (!hasContent) {
-                        win.close();
-                    }
-                });
+            // call the template function onBeforeRequest to
+            // see if this layer should be queried
+            if (Ext.isFunction(me.onBeforeRequest)) {
+                var ret = me.onBeforeRequest(layer);
+                if (ret === false) {
+                    // skip to next layer
+                    return;
+                }
             }
-        }
+
+            var promise = Ext.Ajax.request({
+                url: url
+            }).then(function (response) {
+                var responseType = response.responseType ? response.responseType :
+                    response.getResponseHeader ? response.getResponseHeader('content-type') : null;
+
+                // check if the response is geojson as expected, if not then the server
+                // may have returned an error as XML
+                if (responseType.toLowerCase().indexOf(infoFormat) !== -1) {
+                    var features = format.readFeatures(response.responseText);
+                    if (features.length) {
+                        // at least one layer has features found
+                        hasContent = true;
+                        // ensure window is show, it may not be if
+                        // showFeatureInfoWindowOnlyIfContent is true
+                        // calling show multiple times is no issue
+                        win.show();
+                        win.add(me.createFeaturePanels(layer, features));
+                    }
+                } else {
+                    //<debug>
+                    Ext.log.warn(response.responseText);
+                    //</debug>
+                }
+            }).then(undefined, function (error) {
+                Ext.log.error(error);
+            });
+
+            requests.push(promise);
+        });
+
+        // When all requests have been performed, and no features are found
+        // for any layer, close the window so that the highlight is removed from the map
+        // Also handles the case where the window was previously open because features were found
+        // But a new click has found no features, so the window is auto closed
+        // This second case behaviour could be changed by checking for win.getHidden()
+        Ext.Promise.all(requests).then(function() {
+            if (!hasContent) {
+                win.close();
+                // fire event so client can show custom ui, pass through the instance so
+                // that the window might be re-opened and custom content inserted
+                Ext.GlobalEvents.fireEvent('cmv-featureinfowindow-no-features-found', me);
+            }
+        });
+
     },
 
     /**

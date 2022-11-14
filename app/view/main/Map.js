@@ -249,10 +249,6 @@ Ext.define('CpsiMapview.view.main.Map', {
             });
         }
 
-        if (app) {
-            me.map.set('showFeatureInfoWindowOnlyIfContent', app.showFeatureInfoWindowOnlyIfContent);
-        }
-
         // create default items if not already been created in a derived class
         if (!me.items) {
             me.items = [{
