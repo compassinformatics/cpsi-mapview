@@ -13,6 +13,30 @@ Ext.define('CpsiMapview.controller.form.LayerTreeFilter', {
     ],
 
     /**
+     * Clears the textfield for filtering the layer tree.
+     *
+     * @param {Ext.form.field.Text } textField
+     */
+    clearText: function (textField) {
+        var me = this;
+        var view = me.getView();
+
+        textField.setValue('');
+
+        var tree = Ext.ComponentQuery.query('cmv_layertree')[0];
+        if (!tree) {
+            return;
+        }
+        var store = tree.getStore();
+        if (!store) {
+            return;
+        }
+
+        // remove previous filter if exists
+        store.removeFilter(view.TEXT_FILTER_ID);
+    },
+
+    /**
      * Updates the filter with the latest input values.
      *
      * @return {void}
