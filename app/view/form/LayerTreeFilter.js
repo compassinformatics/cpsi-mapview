@@ -42,7 +42,7 @@ Ext.define('CpsiMapview.view.form.LayerTreeFilter', {
 
     items: [{
         xtype: 'textfield',
-        hideTrigger: true,
+        hideTrigger: false,
         anchor: '100%',
         maxWidth: 250,
         bind: {
