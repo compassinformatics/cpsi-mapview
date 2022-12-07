@@ -516,7 +516,8 @@ Ext.define('CpsiMapview.controller.grid.Grid', {
             standardSubmit: true
         }).submit({
             params: params,
-            url: url
+            url: url,
+            target: '_blank' // set the target to a blank tab so if it times out it does not leave the user with an empty page
         });
     },
 
