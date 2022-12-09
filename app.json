@@ -209,15 +209,18 @@
      */
   "js": [
     {
-      "path": "./node_modules/@geoext/openlayers-legacy/dist/ol.js"
+      "path": "./node_modules/@geoext/openlayers-legacy/dist/ol.js",
       // for debugging
-      //"path": "./node_modules/@geoext/openlayers-legacy/dist/ol-debug.js"
+      //"path": "./node_modules/@geoext/openlayers-legacy/dist/ol-debug.js",
+      "compress": false
     },
     {
-      "path": "./node_modules/geostyler-sld-parser/browser/sldStyleParser.js"
+      "path": "./node_modules/geostyler-sld-parser/browser/sldStyleParser.js",
+      "compress": false
     },
     {
-      "path": "./node_modules/geostyler-openlayers-parser/browser/olStyleParser.js"
+      "path": "./node_modules/geostyler-openlayers-parser/browser/olStyleParser.js",
+      "compress": false
     },
     {
       "path": "./node_modules/proj4/dist/proj4.js",

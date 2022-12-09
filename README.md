@@ -108,3 +108,11 @@ karma start --browsers Chrome --single-run=False --debug --auto-watch
 
 See also https://glebbahmutov.com/blog/debugging-karma-unit-tests/
 
+## Production Builds
+
+```
+sencha app build
+cd cpsi-mapview\build\production\CpsiMapview
+python -m http.server 8888
+http://localhost:8888
+```
