@@ -467,6 +467,29 @@ Ext.define('CpsiMapview.controller.grid.Grid', {
     exportToShapefile: function () {
 
         var me = this;
+        me.exportUsingMapServer('shapezip');
+    },
+
+    /**
+     * Export all records in the grid to a zipped Excel
+     * using MapServer
+     *
+     * @private
+     */
+    exportToServerExcel: function () {
+
+        var me = this;
+        me.exportUsingMapServer('xlsx');
+    },
+
+    /**
+     * Export data using MapServer OGR exports
+     *
+     * @private
+     */
+    exportUsingMapServer: function (outputFormat) {
+
+        var me = this;
         var grid = me.getView();
 
         var store = grid.getStore();
@@ -480,7 +503,10 @@ Ext.define('CpsiMapview.controller.grid.Grid', {
             params.filter = wfsGetFeatureFilter;
         }
 
-        params.outputFormat = 'shapezip';
+        params.outputFormat = outputFormat;
+        // remove the count and startIndex parameters so that all records are exported
+        delete params.count;
+        delete params.startIndex;
 
         // files can't be downloaded using Ext.Ajax.request (due to browser security)
         // so a hidden form is used with standardSubmit set to true
@@ -490,9 +516,9 @@ Ext.define('CpsiMapview.controller.grid.Grid', {
             standardSubmit: true
         }).submit({
             params: params,
-            url: url
+            url: url,
+            target: '_blank' // set the target to a blank tab so if it times out it does not leave the user with an empty page
         });
-
     },
 
     /**
