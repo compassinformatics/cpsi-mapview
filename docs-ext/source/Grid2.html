@@ -119,6 +119,7 @@ Ext.define(&#39;CpsiMapview.view.grid.Grid&#39;, {
         items: [{
             xtype: &#39;button&#39;,
             text: &#39;Clear Filters&#39;,
+            tooltip: &#39;Remove all field and spatial filters set on the grid&#39;,
             glyph: &#39;f0b0@FontAwesome&#39;,
             handler: &#39;clearFilters&#39;,
             bind: {
@@ -128,12 +129,14 @@ Ext.define(&#39;CpsiMapview.view.grid.Grid&#39;, {
         {
             xtype: &#39;button&#39;,
             text: &#39;Clear Sorting&#39;,
+            tooltip: &#39;Clear any custom sorting of the grid&#39;,
             glyph: &#39;f039@FontAwesome&#39;,
             handler: &#39;onClearSort&#39;
         },
         {
             xtype: &#39;button&#39;,
             text: &#39;Apply Preset Filters&#39;,
+            tooltip: &#39;Re-apply any default filters that have been configured for the grid&#39;,
             glyph: &#39;f005@FontAwesome&#39;,
             handler: &#39;applyPresetFilters&#39;,
             bind: {
@@ -201,12 +204,14 @@ Ext.define(&#39;CpsiMapview.view.grid.Grid&#39;, {
             text: &#39;Group Edit&#39;,
             enableToggle: true,
             glyph: &#39;xf040@FontAwesome&#39;,
+            tooltip: &#39;Update a field in the grid for multiple records&#39;,
             toggleHandler: &#39;onGroupEditToggle&#39;
         },
         {
             xtype: &#39;button&#39;,
             text: &#39;Export to Excel&#39;,
             glyph: &#39;xf1c3@FontAwesome&#39;,
+            tooltip: &#39;Export the records that are visible in the grid to an Excel file&#39;,
             handler: &#39;exportToExcel&#39;,
             bind: {
                 hidden: &#39;{!exportExcelVisible}&#39;
@@ -214,12 +219,20 @@ Ext.define(&#39;CpsiMapview.view.grid.Grid&#39;, {
         },
         {
             xtype: &#39;button&#39;,
-            text: &#39;Export to Shapefile&#39;,
-            glyph: &#39;eaa2@font-gis&#39;,
-            handler: &#39;exportToShapefile&#39;,
+            text: &#39;Data Exports&#39;,
+            tooltip: &#39;Export all records in the grid to a zip file&#39;,
             bind: {
                 hidden: &#39;{!exportShapefileVisible}&#39;
-            }
+            },
+            menu: [{
+                text: &#39;Export to Shapefile&#39;,
+                glyph: &#39;eaa2@font-gis&#39;,
+                handler: &#39;exportToShapefile&#39;
+            }, {
+                text: &#39;Export to Excel&#39;,
+                glyph: &#39;xf1c3@FontAwesome&#39;,
+                handler: &#39;exportToServerExcel&#39;
+            }]
         }]
     },
     {
@@ -240,7 +253,7 @@ Ext.define(&#39;CpsiMapview.view.grid.Grid&#39;, {
                 boxLabel: &#39;Page Records?&#39;,
                 handler: &#39;togglePaging&#39;
             }]
-    }],
+    }]
 });
 </pre>
 </body>
