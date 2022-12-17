@@ -84,7 +84,12 @@ Ext.define('CpsiMapview.plugin.FeatureInfoWindow', {
 
                 // if there are multiple layers then attempt to also split out styles and filters
                 var idx = 0;
-                var styleNames = params.STYLES.split(',');
+                var styleNames = [];
+
+                if (params.STYLES) {
+                    styleNames = params.STYLES.split(',');
+                }
+
                 var wmsFilterUtil = CpsiMapview.util.WmsFilter;
                 var filters = wmsFilterUtil.getWmsFilters(params);
 
@@ -191,7 +196,7 @@ Ext.define('CpsiMapview.plugin.FeatureInfoWindow', {
         // Also handles the case where the window was previously open because features were found
         // But a new click has found no features, so the window is auto closed
         // This second case behaviour could be changed by checking for win.getHidden()
-        Ext.Promise.all(requests).then(function() {
+        Ext.Promise.all(requests).then(function () {
             if (!hasContent) {
                 win.close();
                 // fire event so client can show custom ui, pass through the instance so
