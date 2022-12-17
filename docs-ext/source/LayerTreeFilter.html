@@ -15,92 +15,108 @@
   </script>
 </head>
 <body onload="prettyPrint(); highlight();">
-  <pre class="prettyprint lang-js"><span id='CpsiMapview-view-from-LayerTreeFilter'>/**
-</span> * Panel with filtering tools for the layer tree.
+  <pre class="prettyprint lang-js"><span id='CpsiMapview-controller-form-LayerTreeFilter'>/**
+</span> * This is the controller for the {@link CpsiMapview.view.form.LayerTreeFilter} component
  *
- * @class CpsiMapview.view.from.LayerTreeFilter
+ * @class CpsiMapview.controller.form.LayerTreeFilter
  */
-Ext.define(&#39;CpsiMapview.view.form.LayerTreeFilter&#39;, {
-    extend: &#39;Ext.form.FieldSet&#39;,
+Ext.define(&#39;CpsiMapview.controller.form.LayerTreeFilter&#39;, {
+    extend: &#39;Ext.app.ViewController&#39;,
 
-    xtype: &#39;cmv_layertreefilter&#39;,
+    alias: &#39;controller.cmv_layertreefilter&#39;,
 
     requires: [
-        &#39;CpsiMapview.controller.form.LayerTreeFilter&#39;
+        &#39;CpsiMapview.util.LayerTreeFilter&#39;
     ],
 
-<span id='CpsiMapview-view-from-LayerTreeFilter-property-controller'>    controller: &#39;cmv_layertreefilter&#39;,
-</span>
-<span id='CpsiMapview-view-from-LayerTreeFilter-property-viewModel'>    viewModel: {
-</span>        data: {
-            hideInvisibleLayersLabel: &#39;Show visible only&#39;,
-            searchTextPlaceholder: &#39;Search for layers&#39;,
-            hideInvisibleLayers: false,
-            searchText: undefined
-        }
-    },
-
-    config: {
-<span id='CpsiMapview-view-from-LayerTreeFilter-cfg-doFilterBaseLayers'>        /**
-</span>         * If baselayers shall be filtered by text filter.
-         */
-        doFilterBaseLayers: true,
-
-<span id='CpsiMapview-view-from-LayerTreeFilter-cfg-hideGroupsWithNoVisibleLayer'>        /**
-</span>         * If groups with no visible layer shall be hidden.
-         */
-        hideGroupsWithNoVisibleLayer: true
-    },
-
-<span id='CpsiMapview-view-from-LayerTreeFilter-property-FILTER_ID'>    /**
-</span>     * The ID of the filter.
+<span id='CpsiMapview-controller-form-LayerTreeFilter-method-clearText'>    /**
+</span>     * Clears the textfield for filtering the layer tree.
+     *
+     * @param {Ext.form.field.Text } textField
      */
-    FILTER_ID: &#39;cpsi-tree-layer-filter&#39;,
+    clearText: function (textField) {
+        var me = this;
+        var view = me.getView();
 
-<span id='CpsiMapview-view-from-LayerTreeFilter-property-items'>    items: [{
-</span>        xtype: &#39;textfield&#39;,
-        hideTrigger: false,
-        anchor: &#39;100%&#39;,
-        maxWidth: 250,
-        bind: {
-            emptyText: &#39;{searchTextPlaceholder}&#39;,
-        },
-        triggers: {
-            clearTreeFilterText: {
-                cls: &#39;x-form-clear-trigger&#39;,
-                handler: &#39;clearText&#39;
-            }
-        },
-        listeners: {
-            change: &#39;onSearchTextChange&#39;
+        textField.setValue(&#39;&#39;);
+
+        var tree = Ext.ComponentQuery.query(&#39;cmv_layertree&#39;)[0];
+        if (!tree) {
+            return;
         }
+        var store = tree.getStore();
+        if (!store) {
+            return;
+        }
+
+        // remove previous filter if exists
+        store.removeFilter(view.TEXT_FILTER_ID);
     },
-    {
-        xtype: &#39;checkboxfield&#39;,
-        bind: {
-            boxLabel: &#39;{hideInvisibleLayersLabel}&#39;,
-        },
-        listeners: {
-            change: &#39;onCheckboxChange&#39;
+
+<span id='CpsiMapview-controller-form-LayerTreeFilter-method-updateFilter'>    /**
+</span>     * Updates the filter with the latest input values.
+     *
+     * @return {void}
+     */
+    updateFilter: function() {
+        var me = this;
+        var view = me.getView();
+        var vm = view.getViewModel();
+        var LayerTreeFilterUtil = CpsiMapview.util.LayerTreeFilter;
+
+        var tree = Ext.ComponentQuery.query(&#39;cmv_layertree&#39;)[0];
+        if (!tree) {
+            return;
         }
-    }],
+        var store = tree.getStore();
+        if (!store) {
+            return;
+        }
 
-<span id='CpsiMapview-view-from-LayerTreeFilter-method-initComponent'>    initComponent: function () {
-</span>        var me = this;
-        me.callParent(arguments);
+        store.removeFilter(view.FILTER_ID);
+        var filter = LayerTreeFilterUtil.createLayerTreeFilter(
+            view.FILTER_ID,
+            vm.get(&#39;hideInvisibleLayers&#39;),
+            vm.get(&#39;searchText&#39;),
+            view.getDoFilterBaseLayers()
+        );
+        store.addFilter(filter);
+    },
 
-        var mapPanel = CpsiMapview.view.main.Map.guess();
-        mapPanel.on(&#39;cmv-init-layersadded&#39;, function () {
-            var tree = Ext.ComponentQuery.query(&#39;cmv_layertree&#39;)[0];
-            if (!tree) {
-                return;
-            }
+<span id='CpsiMapview-controller-form-LayerTreeFilter-method-onSearchTextChange'>    /**
+</span>     * Handler for the input field change event.
+     *
+     * @param {Ext.form.field.Text} textfield The textfield.
+     * @param {string} searchText The search text.
+     * @return  {void}
+     */
+    onSearchTextChange: function(textfield, searchText) {
+        var treeFilter = textfield.up(&#39;cmv_layertreefilter&#39;);
+        var vm = treeFilter.getViewModel();
+        var ctrl = treeFilter.getController();
+        if (!vm || !ctrl) {
+            return;
+        }
+        vm.set(&#39;searchText&#39;, searchText);
+        ctrl.updateFilter();
+    },
 
-            tree.on(&#39;cmv-init-layertree&#39;, function () {
-                me.getController().updateFilter();
-            });
-        });
-
+<span id='CpsiMapview-controller-form-LayerTreeFilter-method-onCheckboxChange'>    /**
+</span>     * Handler for the checkbox change event.
+     *
+     * @param {Ext.form.field.Checkbox} cb The checkbox.
+     * @param {boolean} checked True, if checked. False otherwise.
+     * @return {void}
+     */
+    onCheckboxChange: function(cb, checked) {
+        var treeFilter = cb.up(&#39;cmv_layertreefilter&#39;);
+        var vm = treeFilter.getViewModel();
+        var ctrl = treeFilter.getController();
+        if (!vm || !ctrl) {
+            return;
+        }
+        vm.set(&#39;hideInvisibleLayers&#39;, checked);
+        ctrl.updateFilter();
     }
 });
 </pre>
