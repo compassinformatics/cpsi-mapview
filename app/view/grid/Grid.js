@@ -237,12 +237,5 @@ Ext.define('CpsiMapview.view.grid.Grid', {
                 boxLabel: 'Page Records?',
                 handler: 'togglePaging'
             }]
-    }],
-
-    constructor: function() {
-        this.callParent(arguments);
-
-        //console.log('constructor', this)
-
-    }
+    }]
 });
