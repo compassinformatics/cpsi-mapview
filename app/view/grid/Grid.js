@@ -90,7 +90,8 @@ Ext.define('CpsiMapview.view.grid.Grid', {
         // ensure columns are set when the store is bound to the grid
         reconfigure: 'onColumnsReconfigure',
         clearfilters: 'clearFilters',
-        applypresetfilters: 'applyPresetFilters'
+        applypresetfilters: 'applyPresetFilters',
+        headermenucreate: 'onHeaderMenuCreate'
     },
 
     /**
@@ -236,5 +237,12 @@ Ext.define('CpsiMapview.view.grid.Grid', {
                 boxLabel: 'Page Records?',
                 handler: 'togglePaging'
             }]
-    }]
+    }],
+
+    constructor: function() {
+        this.callParent(arguments);
+
+        //console.log('constructor', this)
+
+    }
 });
