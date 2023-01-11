@@ -915,32 +915,5 @@ Ext.define('CpsiMapview.controller.grid.Grid', {
         var filterValue = {};
         filterValue[filterOperator] = value;
         return filterValue;
-    },
-
-    /**
-     * Sort the column names displayed when opening the submenu alphabetically
-     * @param {any} grid
-     * @param {any} menu
-     */
-    onHeaderMenuCreate: function (grid, menu) {
-        //Fired immediately after the column header menu is created.
-        var columnItems = menu.down('[itemId=columnItem]'),
-            menuItems = columnItems.menu.items.items;
-        // Sorting by column's lowercase "text" in ascending order
-        menuItems.sort(function (item1, item2) {
-            var name1 = item1.text.toLowerCase(),
-                name2 = item2.text.toLowerCase();
-            if (name1 < name2) //sort string ascending
-                return -1;
-            if (name1 > name2)
-                return 1;
-            return 0; //default return value (no sorting)
-        });
-
-        // update keys order as well otherwise it will have old
-        // menu item keys order and grouping by field starts creating a problem.
-        columnItems.menu.items.keys = menuItems.map(function (item) {
-            return item.id;
-        });
     }
 });
