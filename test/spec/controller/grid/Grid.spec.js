@@ -26,17 +26,14 @@ describe('CpsiMapview.controller.grid.Grid', function() {
         });
 
         it('Orders column selector dropdown alphabetically', function() {
-            var menu;
-            // Use an override to find the menu that will be opened by the below click()
-            Ext.override(Ext.menu.Menu, {
-                constructor: function () {
-                    var me = this;
-                    me.callParent(arguments);
-                    if (me.ownerCmp && me.ownerCmp.getItemId() === 'columnItem') {
-                        menu = me;
-                        return;
-                    }
-                }
+            view.on('headermenucreate', function (grid, menu) {
+                var menuItems = menu.down('[itemId=columnItem]').menu.items.items;
+                var orderedTitles = menuItems.map(function (item) {
+                    return item.text;
+                })
+
+                // deep array comparison - original order without sorting would be [ 'Test1', 'Test3', 'Test2' ]
+                expect(orderedTitles).to.eql(['Test1', 'Test2', 'Test3']);
             });
 
             // set fixture columns
@@ -48,15 +45,8 @@ describe('CpsiMapview.controller.grid.Grid', function() {
                 text: 'Test2'
             }]);
 
-            // trigger creation of the menu
+            // trigger the headermenucreate event by clicking a column header dropdown icon
             view.getEl().down('.x-column-header-trigger').dom.click();
-
-            var orderedTitles = menu.items.items.map(function (item) {
-                return item.text;
-            });
-
-            // deep array comparison - original order without sorting would be [ 'Test1', 'Test3', 'Test2' ]
-            expect(orderedTitles).to.eql(['Test1', 'Test2', 'Test3']);
         });
 
     });

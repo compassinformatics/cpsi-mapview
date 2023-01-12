@@ -15,6 +15,8 @@ Ext.define('CpsiMapview.view.grid.Grid', {
         'CpsiMapview.view.button.FeatureSelectionButton'
     ],
 
+    mixins: ['CpsiMapview.util.ColumnMenuOrderMixin'],
+
     xtype: 'cmv_grid',
     controller: 'cmv_grid',
     viewModel: 'cmv_grid',
