@@ -31,7 +31,6 @@ Ext.define('CpsiMapview.util.ColumnMenuOrderMixin', {
      * @param {any} menu
      */
     onHeaderMenuCreate: function (grid, menu) {
-        console.log('CpsiMapview.view.grid.Grid');
         // Fired immediately after the column header menu is created.
         var columnItems = menu.down('[itemId=columnItem]'),
             menuItems = columnItems.menu.items.items;
