@@ -26,8 +26,15 @@ describe('CpsiMapview.controller.grid.Grid', function() {
         });
 
         it('Orders column selector dropdown alphabetically', function() {
-            // set up spy to monitor the function that sorts the menu items
-            var onHeaderMenuCreateSpy = sinon.spy(ctrl, 'onHeaderMenuCreate');
+            view.on('headermenucreate', function (grid, menu) {
+                var menuItems = menu.down('[itemId=columnItem]').menu.items.items;
+                var orderedTitles = menuItems.map(function (item) {
+                    return item.text;
+                })
+
+                // deep array comparison - original order without sorting would be [ 'Test1', 'Test3', 'Test2' ]
+                expect(orderedTitles).to.eql(['Test1', 'Test2', 'Test3']);
+            });
 
             // set fixture columns
             view.setColumns([{
@@ -40,22 +47,6 @@ describe('CpsiMapview.controller.grid.Grid', function() {
 
             // trigger the headermenucreate event by clicking a column header dropdown icon
             view.getEl().down('.x-column-header-trigger').dom.click();
-
-            // assert the handler for headermenucreate event was called
-            expect(onHeaderMenuCreateSpy.calledOnce).to.be(true);
-
-            // get a reference to the menu by taking it from the spy arguments
-            var menu = onHeaderMenuCreateSpy.getCalls()[0].args[1];
-            var menuItems = menu.down('[itemId=columnItem]').menu.items.items;
-            var orderedTitles = menuItems.map(function (item) {
-                return item.text;
-            })
-
-            // deep array comparison - original order without sorting would be [ 'Test1', 'Test3', 'Test2' ]
-            expect(orderedTitles).to.eql(['Test1', 'Test2', 'Test3']);
-
-            // clean up spy
-            onHeaderMenuCreateSpy.restore();
         });
 
     });
