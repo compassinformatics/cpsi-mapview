@@ -32,6 +32,8 @@ Ext.define(&#39;CpsiMapview.view.grid.Grid&#39;, {
         &#39;CpsiMapview.view.button.FeatureSelectionButton&#39;
     ],
 
+    mixins: [&#39;CpsiMapview.util.ColumnMenuOrderMixin&#39;],
+
     xtype: &#39;cmv_grid&#39;,
 <span id='CpsiMapview-view-grid-Grid-property-controller'>    controller: &#39;cmv_grid&#39;,
 </span><span id='CpsiMapview-view-grid-Grid-property-viewModel'>    viewModel: &#39;cmv_grid&#39;,
@@ -107,8 +109,7 @@ Ext.define(&#39;CpsiMapview.view.grid.Grid&#39;, {
         // ensure columns are set when the store is bound to the grid
         reconfigure: &#39;onColumnsReconfigure&#39;,
         clearfilters: &#39;clearFilters&#39;,
-        applypresetfilters: &#39;applyPresetFilters&#39;,
-        headermenucreate: &#39;onHeaderMenuCreate&#39;
+        applypresetfilters: &#39;applyPresetFilters&#39;
     },
 
 <span id='CpsiMapview-view-grid-Grid-property-dockedItems'>    /**
