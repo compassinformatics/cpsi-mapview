@@ -1067,6 +1067,8 @@ Ext.define(&#39;CpsiMapview.factory.Layer&#39;, {
                                 // finish after the subsequent request with extra fields, rendering features
                                 // without the required data, meaning styles would not apply in certain cases
                                 if (xhr &amp;&amp; xhr.readyState !== 4) {
+                                    // ensure the loading bar is hidden
+                                    source.dispatchEvent(&#39;vectorloadend&#39;);
                                     xhr.abort();
                                 }
 
