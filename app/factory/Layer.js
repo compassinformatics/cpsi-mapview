@@ -557,6 +557,7 @@ Ext.define('CpsiMapview.factory.Layer', {
                     onError();
                 }
             };
+            vectorSource.set('xhr', xhr);
             xhr.send(queryParams);
         };
 
@@ -1040,7 +1041,18 @@ Ext.define('CpsiMapview.factory.Layer', {
 
                             if (hasStyleExtraPropertyNames) {
                                 var propertyNames = LayerFactory.buildRequiredPropertyNames(stylePropertyNames, mapLayer.get('toolTipConfig'));
+                                var xhr = source.get('xhr');
+
                                 source.set('propertyNames', propertyNames);
+
+                                // abort an existing xhr for this source if there is one and it is in progress
+                                // to prevent race conditions where the initial request for data would
+                                // finish after the subsequent request with extra fields, rendering features
+                                // without the required data, meaning styles would not apply in certain cases
+                                if (xhr && xhr.readyState !== 4) {
+                                    xhr.abort();
+                                }
+
                                 source.refresh();
                             }
                         });
