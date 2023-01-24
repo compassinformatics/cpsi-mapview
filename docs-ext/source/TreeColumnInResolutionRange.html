@@ -91,7 +91,7 @@ Ext.define(&#39;CpsiMapview.plugin.TreeColumnInResolutionRange&#39;, {
             var changed = description !== descriptionBefore;
             node.getOlLayer().set(&#39;description&#39;, description);
             if (changed) {
-                node.triggerUIUpdate();
+                node.set(&#39;qtip&#39;, description);
             }
         });
         // This triggers the rendering if any existing StyleSwitcherRadioGroups
