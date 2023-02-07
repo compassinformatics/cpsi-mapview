@@ -63,9 +63,11 @@ Ext.define('CpsiMapview.view.LayerTree', {
             title: 'Add ArcGIS REST Map Layer',
             closeAction: 'hide',
             width: 600,
-            height: 500,
+            layout: 'anchor',
             items: [{
-                xtype: 'cmv_add_arcgisrest_form'
+                xtype: 'cmv_add_arcgisrest_form',
+                anchor: '100% 100%',
+                availableLayersFieldSetMaxHeight: 400
             }]
         },
 
