@@ -474,7 +474,7 @@ Ext.define('CpsiMapview.controller.LayerTreeController', {
     */
     updateExpandedItemChildNodesUI: function (layerTreeNode) {
         Ext.each(layerTreeNode.childNodes, function (node) {
-            var layer =  node.getOlLayer(); ;
+            var layer =  node.getOlLayer();
             if (layer.get('isWms') || layer.get('isWfs') || layer.get('isVt')) {
                 CpsiMapview.util.Layer.updateLayerNodeUI(layer, false);
             }
