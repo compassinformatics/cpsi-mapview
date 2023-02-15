@@ -75,8 +75,13 @@ Ext.define('CpsiMapview.util.Layer', {
     /**
     * Update any associated layer tree node to indicate that the layer is filtered or unfiltered
     * @param {any} layer
+    * @param {boolean} triggerUIUpdate
     */
-    updateLayerNodeUI: function (layer) {
+    updateLayerNodeUI: function (layer, triggerUIUpdate) {
+        // default the triggerUIUpdate param to true if not set
+        if (typeof triggerUIUpdate === 'undefined') {
+            triggerUIUpdate = true;
+        }
 
         // Get a reference to the layer trees
         // we will only ever have one layer tree for an application
@@ -112,17 +117,26 @@ Ext.define('CpsiMapview.util.Layer', {
             Ext.log.warn('Layer type not recognized (updateLayerNodeUI)');
         }
 
+        var originalGlyph = layer.get('_origTreeConf') ? layer.get('_origTreeConf').glyph : null;
+        var expandedGlyph = 'f0b0@FontAwesome';
         if (hasFilters) {
-            node.set('glyph', 'f0b0@FontAwesome');
-            node.addCls('cpsi-tree-node-filtered');
+            // only set the glyph and class if needed - better for performance
+            if (node.get('glyph') !== expandedGlyph) {
+                node.set('glyph', 'f0b0@FontAwesome');
+                node.addCls('cpsi-tree-node-filtered');
+            }
         } else {
-            // revert to the original glyph if set on the layer
-            var glyph = layer.get('_origTreeConf') ? layer.get('_origTreeConf').glyph : null;
-            node.set('glyph', glyph);
-            node.removeCls('cpsi-tree-node-filtered');
+            // only set the glyph and class if needed - better for performance
+            if (node.get('glyph') !== originalGlyph) {
+                // revert to the original glyph if set on the layer
+                node.set('glyph', originalGlyph);
+                node.removeCls('cpsi-tree-node-filtered');
+            }
         }
 
-        node.triggerUIUpdate();
+        if (triggerUIUpdate) {
+            node.triggerUIUpdate();
+        }
     },
 
     /**

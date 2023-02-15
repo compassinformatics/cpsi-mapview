@@ -12,7 +12,8 @@ Ext.define('CpsiMapview.controller.LayerTreeController', {
         'BasiGX.util.Map',
         'BasiGX.util.Layer',
         'CpsiMapview.data.model.LayerTreeNode',
-        'CpsiMapview.view.main.Map'
+        'CpsiMapview.view.main.Map',
+        'CpsiMapview.util.Layer'
     ],
 
     statics: {
@@ -465,5 +466,18 @@ Ext.define('CpsiMapview.controller.LayerTreeController', {
             this.addArcGISRestWindow.destroy();
             this.addArcGISRestWindow = null;
         }
+    },
+
+    /**
+    * Updates the UI of childNodes of an expanded item
+    * @param {CpsiMapview.data.model.LayerTreeNode} LayerTreeNode
+    */
+    updateExpandedItemChildNodesUI: function (layerTreeNode) {
+        Ext.each(layerTreeNode.childNodes, function (node) {
+            var layer =  node.getOlLayer(); ;
+            if (layer.get('isWms') || layer.get('isWfs') || layer.get('isVt')) {
+                CpsiMapview.util.Layer.updateLayerNodeUI(layer, false);
+            }
+        });
     }
 });
