@@ -30,7 +30,8 @@ Ext.define('CpsiMapview.view.LayerTree', {
     },
 
     listeners: {
-        'cmv-init-layertree': 'filterLayersByRole'
+        'cmv-init-layertree': 'filterLayersByRole',
+        'afteritemexpand': 'updateExpandedItemChildNodesUI',
     },
 
     // So that instantiation works without errors, might be changed during
