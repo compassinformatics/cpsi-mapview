@@ -282,7 +282,7 @@
       "path": "node_modules/url-polyfill/url-polyfill.min.js"
     },
     {
-      "path": "https://maps.googleapis.com/maps/api/js?v=quarterly&key=AIzaSyCmQRf1m6EISENeiijFjza18iIyrIQiArQ",
+      "path": "https://maps.googleapis.com/maps/api/js?v=quarterly&key=AIzaSyCmQRf1m6EISENeiijFjza18iIyrIQiArQ&callback=Function.prototype",
       "remote": true
     },
     {
