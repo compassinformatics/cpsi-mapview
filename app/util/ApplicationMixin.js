@@ -100,12 +100,6 @@ Ext.define('CpsiMapview.util.ApplicationMixin', {
      */
     tokenValidationUrl: '/WebServices/authorization/validateToken',
 
-    /**
-     * Used to store resource Paths (default.json, tree.json) and can be
-     * overridden by a consumer project
-     */
-    resourcePathsDeferred: null,
-
     errorCode: {
         None: 0,
         AccountLockedOut: 1,
@@ -116,6 +110,15 @@ Ext.define('CpsiMapview.util.ApplicationMixin', {
         NoTokenProvided: 6,
         GeneralServerError: 500,
         FileNotFound: 404
+    },
+
+    getResourcePaths: function () {
+        return new Ext.Promise(function (resolve) {
+            resolve({
+                layerConfig: 'resources/data/layers/default.json',
+                treeConfig: 'resources/data/layers/tree.json'
+            });
+        });
     },
 
     /**
@@ -220,15 +223,6 @@ Ext.define('CpsiMapview.util.ApplicationMixin', {
     onApplicationCreated: function () {
         var me = this;
         me.setupRequestHooks();
-
-        // No resourcePathsDeferred defined, set default paths
-        if (!me.resourcePathsDeferred) {
-            me.resourcePathsDeferred = new Ext.Deferred();
-            me.resourcePathsDeferred.resolve({
-                layerConfig: 'resources/data/layers/default.json',
-                treeConfig: 'resources/data/layers/tree.json'
-            });
-        }
 
         if (me.requireLogin) {
             me.doLogin();

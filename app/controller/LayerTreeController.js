@@ -208,7 +208,7 @@ Ext.define('CpsiMapview.controller.LayerTreeController', {
      */
     loadTreeStructure: function () {
         var app = Ext.getApplication ? Ext.getApplication() : Ext.app.Application.instance;
-        return app.resourcePathsDeferred.then(function (resourcePaths) {
+        return app.getResourcePaths().then(function (resourcePaths) {
             return new Ext.Promise(function (resolve, reject) {
                 Ext.Ajax.request({
                     url: resourcePaths.treeConfig,

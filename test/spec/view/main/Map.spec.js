@@ -2,11 +2,14 @@ describe('CpsiMapview.view.main.Map', function() {
 
     before(function () {
         var app = Ext.getApplication ? Ext.getApplication() : Ext.app.Application.instance;
-        app.resourcePathsDeferred = new Ext.Deferred();
-        app.resourcePathsDeferred.resolve({
-            layerConfig: 'resources/data/layers/default.json',
-            treeConfig: 'resources/data/layers/tree.json'
-        });
+        app.getResourcePaths = function () {
+            return new Ext.Promise(function (resolve) {
+                resolve({
+                    layerConfig: 'resources/data/layers/default.json',
+                    treeConfig: 'resources/data/layers/tree.json'
+                });
+            });
+        };
     });
 
 

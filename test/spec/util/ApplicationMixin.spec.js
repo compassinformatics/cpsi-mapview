@@ -118,12 +118,8 @@ describe('CpsiMapview.util.ApplicationMixin', function () {
             expect(success).to.be(true);
         });
 
-        it('#onApplicationCreated sets default paths if resourcePathsDeferred is null', function () {
-            expect(mixin.resourcePathsDeferred).to.be.null;
-            mixin.onApplicationCreated();
-            expect(mixin.resourcePathsDeferred).to.exist;
-
-            return mixin.resourcePathsDeferred.then(function (data) {
+        it('#getResourcePaths', function () {
+            return mixin.getResourcePaths().then(function (data) {
                 expect(data).to.eql({
                     layerConfig: 'resources/data/layers/default.json',
                     treeConfig: 'resources/data/layers/tree.json'
@@ -131,16 +127,17 @@ describe('CpsiMapview.util.ApplicationMixin', function () {
             });
         });
 
-        it('#onApplicationCreated doesn\'t set resourcePathsDeferred if it already exists', function () {
-            mixin.resourcePathsDeferred = new Ext.Deferred();
-            mixin.resourcePathsDeferred.resolve({
-                layerConfig: 'custom/default.json',
-                treeConfig: 'custom/tree.json'
-            });
+        it('#getResourcePaths can be overridden', function () {
+            mixin.getResourcePaths = function() {
+                return new Ext.Promise(function(resolve) {
+                    resolve({
+                        layerConfig: 'custom/default.json',
+                        treeConfig: 'custom/tree.json'
+                    });
+                });
+            }
 
-            mixin.onApplicationCreated();
-
-            return mixin.resourcePathsDeferred.then(function (data) {
+            return mixin.getResourcePaths().then(function (data) {
                 expect(data).to.eql({
                     layerConfig: 'custom/default.json',
                     treeConfig: 'custom/tree.json'

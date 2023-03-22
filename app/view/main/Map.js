@@ -267,7 +267,7 @@ Ext.define('CpsiMapview.view.main.Map', {
         }
 
         // Load layer JSON configuration
-        app.resourcePathsDeferred.then(function (resourcePaths) {
+        app.getResourcePaths().then(function (resourcePaths) {
             Ext.Ajax.request({
                 url: resourcePaths.layerConfig,
                 success: function (response) {
