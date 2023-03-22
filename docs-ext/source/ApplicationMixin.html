@@ -129,6 +129,15 @@ Ext.define(&#39;CpsiMapview.util.ApplicationMixin&#39;, {
         FileNotFound: 404
     },
 
+<span id='CpsiMapview-util-ApplicationMixin-method-getResourcePaths'>    getResourcePaths: function () {
+</span>        return new Ext.Promise(function (resolve) {
+            resolve({
+                layerConfig: &#39;resources/data/layers/default.json&#39;,
+                treeConfig: &#39;resources/data/layers/tree.json&#39;
+            });
+        });
+    },
+
 <span id='CpsiMapview-util-ApplicationMixin-method-onLogin'>    /**
 </span>     * Fire the global login event when the application is loaded
      * @param {any} loginData
@@ -229,9 +238,9 @@ Ext.define(&#39;CpsiMapview.util.ApplicationMixin&#39;, {
     },
 
 <span id='CpsiMapview-util-ApplicationMixin-method-onApplicationCreated'>    onApplicationCreated: function () {
-</span>
-        var me = this;
+</span>        var me = this;
         me.setupRequestHooks();
+
         if (me.requireLogin) {
             me.doLogin();
         } else {
