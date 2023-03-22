@@ -118,16 +118,17 @@ describe('CpsiMapview.util.ApplicationMixin', function () {
             expect(success).to.be(true);
         });
 
-        it('#getResourcePaths', function () {
-            return mixin.getResourcePaths().then(function (data) {
+        it('#getResourcePaths', function (done) {
+            mixin.getResourcePaths().then(function (data) {
                 expect(data).to.eql({
                     layerConfig: 'resources/data/layers/default.json',
                     treeConfig: 'resources/data/layers/tree.json'
                 });
+                done();
             });
         });
 
-        it('#getResourcePaths can be overridden', function () {
+        it('#getResourcePaths can be overridden', function (done) {
             mixin.getResourcePaths = function() {
                 return new Ext.Promise(function(resolve) {
                     resolve({
@@ -137,11 +138,12 @@ describe('CpsiMapview.util.ApplicationMixin', function () {
                 });
             }
 
-            return mixin.getResourcePaths().then(function (data) {
+            mixin.getResourcePaths().then(function (data) {
                 expect(data).to.eql({
                     layerConfig: 'custom/default.json',
                     treeConfig: 'custom/tree.json'
                 });
+                done()
             });
         });
     });
