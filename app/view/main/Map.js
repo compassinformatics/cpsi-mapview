@@ -267,34 +267,35 @@ Ext.define('CpsiMapview.view.main.Map', {
         }
 
         // Load layer JSON configuration
-        Ext.Ajax.request({
-            url: 'resources/data/layers/default.json',
-            success: function (response) {
-                var layerJson = Ext.decode(response.responseText);
-                var newConfiguration = me.applyDefaultsToApplicationConf(layerJson);
+        app.resourcePathsDeferred.then(function (resourcePaths) {
+            Ext.Ajax.request({
+                url: resourcePaths.layerConfig,
+                success: function (response) {
+                    var layerJson = Ext.decode(response.responseText);
+                    var newConfiguration = me.applyDefaultsToApplicationConf(layerJson);
 
-                Ext.each(newConfiguration.layers, function (layerConf) {
-                    var layer = LayerFactory.createLayer(layerConf);
-                    if (layer) {
-                        me.olMap.addLayer(layer);
+                    Ext.each(newConfiguration.layers, function (layerConf) {
+                        var layer = LayerFactory.createLayer(layerConf);
+                        if (layer) {
+                            me.olMap.addLayer(layer);
+                        }
+                    });
+
+                    //<debug>
+                    // save the layer configuration as property on the application for debugging
+                    app.layerJson = newConfiguration;
+                    //</debug>
+
+                    // fire event to inform subscribers that all layers are loaded
+                    me.fireEvent('cmv-init-layersadded', me);
+
+                    var timeSlider = me.down('cmv_timeslider');
+                    if (timeSlider) {
+                        timeSlider.fireEvent('allLayersAdded',
+                            timeSlider.down('multislider'));
                     }
-                });
-
-                //<debug>
-                // save the layer configuration as property on the application for debugging
-                var app = Ext.getApplication ? Ext.getApplication() : Ext.app.Application.instance;
-                app.layerJson = newConfiguration;
-                //</debug>
-
-                // fire event to inform subscribers that all layers are loaded
-                me.fireEvent('cmv-init-layersadded', me);
-
-                var timeSlider = me.down('cmv_timeslider');
-                if (timeSlider) {
-                    timeSlider.fireEvent('allLayersAdded',
-                        timeSlider.down('multislider'));
                 }
-            }
+            });
         });
 
         me.callParent(arguments);

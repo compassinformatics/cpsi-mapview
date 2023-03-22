@@ -207,17 +207,20 @@ Ext.define('CpsiMapview.controller.LayerTreeController', {
      * @return {Ext.Promise} Promise resolving once the JSON is loaded
      */
     loadTreeStructure: function () {
-        return new Ext.Promise(function (resolve, reject) {
-            Ext.Ajax.request({
-                url: 'resources/data/layers/tree.json',
-                method: 'GET',
-                success: function (response) {
-                    var respJson = Ext.decode(response.responseText);
-                    resolve(respJson);
-                },
-                failure: function (response) {
-                    reject(response.status);
-                }
+        var app = Ext.getApplication ? Ext.getApplication() : Ext.app.Application.instance;
+        return app.resourcePathsDeferred.then(function (resourcePaths) {
+            return new Ext.Promise(function (resolve, reject) {
+                Ext.Ajax.request({
+                    url: resourcePaths.treeConfig,
+                    method: 'GET',
+                    success: function (response) {
+                        var respJson = Ext.decode(response.responseText);
+                        resolve(respJson);
+                    },
+                    failure: function (response) {
+                        reject(response.status);
+                    }
+                });
             });
         });
     },
