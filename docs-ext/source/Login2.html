@@ -215,15 +215,14 @@ Ext.define(&#39;CpsiMapview.controller.form.Login&#39;, {
 </span>
         var me = this;
         var view = me.getView();
-
+        var app = Ext.getApplication ? Ext.getApplication() : Ext.app.Application.instance;
         var formValues = view.down(&#39;form&#39;).getForm().getValues();
         Ext.util.Cookies.set(&#39;username&#39;, formValues.username);
 
-        var jsonData = Ext.JSON.encode(formValues);
+        var jsonData = Ext.JSON.encode(Ext.Object.merge({}, formValues, app.extraLoginParams));
 
         var serviceUrl = me.getViewModel().serviceUrl;
         me.callLoginService(jsonData, serviceUrl, true);
-
     }
 
 });
