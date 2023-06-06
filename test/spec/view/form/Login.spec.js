@@ -28,5 +28,27 @@ describe('CpsiMapview.view.form.Login', function() {
 
             ctrlr.attemptLogin();
         });
+
+    });
+
+    describe('extraLoginParams', function() {
+        before(function () {
+            var app = Ext.getApplication ? Ext.getApplication() : Ext.app.Application.instance;
+            app.extraLoginParams = { test: true };
+        });
+
+        it('adds extraLoginParams to serviceUrl post', function () {
+            var inst = Ext.create('CpsiMapview.view.form.Login', {
+                viewModel: {
+                    serviceUrl: '/resources/data/forms/login.json'
+                }
+            });
+            var ctrlr = inst.getController();
+            var spy = sinon.spy(ctrlr, 'callLoginService');
+            ctrlr.attemptLogin();
+            expect(spy.calledOnce);
+            var jsonDataArg = spy.getCall(0).args[0];
+            expect(JSON.parse(jsonDataArg).test).to.be(true);
+        });
     });
 });
