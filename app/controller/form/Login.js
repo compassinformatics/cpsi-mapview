@@ -198,15 +198,14 @@ Ext.define('CpsiMapview.controller.form.Login', {
 
         var me = this;
         var view = me.getView();
-
+        var app = Ext.getApplication ? Ext.getApplication() : Ext.app.Application.instance;
         var formValues = view.down('form').getForm().getValues();
         Ext.util.Cookies.set('username', formValues.username);
 
-        var jsonData = Ext.JSON.encode(formValues);
+        var jsonData = Ext.JSON.encode(Ext.Object.merge({}, formValues, app.extraLoginParams));
 
         var serviceUrl = me.getViewModel().serviceUrl;
         me.callLoginService(jsonData, serviceUrl, true);
-
     }
 
 });
