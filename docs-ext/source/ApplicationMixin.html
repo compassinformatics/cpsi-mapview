@@ -244,7 +244,7 @@ Ext.define(&#39;CpsiMapview.util.ApplicationMixin&#39;, {
         if (me.requireLogin) {
             me.doLogin();
         } else {
-            me.loadApplication();
+            Ext.onReady(me.loadApplication, me);
         }
 
         // add a listener for whenever any button in the map toggleGroup is toggled
