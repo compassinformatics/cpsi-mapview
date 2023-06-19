@@ -7,7 +7,7 @@
 
     mixins: ['CpsiMapview.util.EditWindowOpenerMixin'],
 
-    showGridWindow: function (layerKey) {
+    showGridWindow: function (layerKey, titleOverride) {
 
         // get a layer by layer key - if this is a switch layer only one may have been loaded to the map
         // search for both and take the first layer found
@@ -17,7 +17,7 @@
         // reuse the logic from the menuitem to find any existing grid window, or create
         // a new one
 
-        var menuItem = Ext.create('CpsiMapview.view.menuitem.LayerGrid', { layer: layer });
+        var menuItem = Ext.create('CpsiMapview.view.menuitem.LayerGrid', { layer: layer, titleOverride: titleOverride });
         menuItem.handlerFunc();
         menuItem.destroy();
     },
