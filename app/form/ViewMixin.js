@@ -35,7 +35,7 @@ Ext.define('CpsiMapview.form.ViewMixin', {
                 xtype: 'tool',
                 callback: 'onPadlockClick',
                 bind: {
-                    hidden: '{currentRecord.phantom}',
+                    hidden: '{!isPadlockVisible}',
                     disabled: '{!canUnlock}',
                     glyph: '{padlockIcon}',
                     tooltip: '{padlockToolText}'
