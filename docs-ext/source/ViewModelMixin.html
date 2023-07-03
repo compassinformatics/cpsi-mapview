@@ -182,9 +182,23 @@ Ext.define(&#39;CpsiMapview.form.ViewModelMixin&#39;, {
                     }
                     return !data.currentRecord.isPhantom();
                 }
+            },
+
+            isPadlockVisible: {
+                bind: {
+                    currentRecord: &#39;{currentRecord}&#39;,
+                    phantom: &#39;{currentRecord.phantom}&#39;
+                },
+                get: function (data) {
+                    if (!data.currentRecord || !data.currentRecord.isPhantom) {
+                        return false;
+                    }
+                    return !data.currentRecord.isPhantom();
+                }
             }
         }
     }
-});</pre>
+});
+</pre>
 </body>
 </html>

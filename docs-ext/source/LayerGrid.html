@@ -34,6 +34,13 @@ Ext.define(&#39;CpsiMapview.view.menuitem.LayerGrid&#39;, {
      */
     layer: null,
 
+<span id='CpsiMapview-view-menuitem-LayerGrid-cfg-titleOverride'>    /**
+</span>     * If set, the gridWindow title will be set to this value
+     *
+     * @cfg {String}
+     */
+    titleOverride: null,
+
 <span id='CpsiMapview-view-menuitem-LayerGrid-cfg-text'>    /**
 </span>     * Text shown in this MenuItem
      * @cfg {String}
@@ -70,6 +77,10 @@ Ext.define(&#39;CpsiMapview.view.menuitem.LayerGrid&#39;, {
     handlerFunc: function () {
         var me = this;
         var gridWindow = CpsiMapview.util.Grid.getGridWindow(me.layer);
+
+        if (me.titleOverride) {
+            gridWindow.setTitle(me.titleOverride);
+        }
 
         var grid = gridWindow.down(&#39;grid&#39;);
         grid.fireEvent(&#39;applypresetfilters&#39;);
