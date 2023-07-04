@@ -79,6 +79,19 @@ Ext.define('CpsiMapview.form.field.NumericField',
                 this.setRawValue(this.rawToValue(this.getRawValue()));
             }
             this.callParent(arguments);
+        },
+
+        /**
+         * Using the keyboard to clear leaves a blank input
+         * even if allowBlank is false or a minValue is defined
+         * This check always forces a number to be present
+         */
+        onChange: function () {
+            var me = this;
+            if (!me.allowBlank && me.getValue() === '') {
+                me.setValue(me.minValue || 0);
+            }
+            this.callParent(arguments);
         }
     }
 );
