@@ -140,6 +140,34 @@ Ext.define('CpsiMapview.controller.grid.GroupEditMixin', {
                     newMenuItems.push(newMenuItem);
                 });
                 break;
+            case 'number':
+                newMenuItem = {
+                    xtype: 'numberfield',
+                    width: 300,
+                    margin: 0,
+                    emptyText: 'Enter a number and press Enter',
+                    allowBlank: true,
+                    allowDecimals: false,
+                    allowExponential: false,
+                    maxLength: 5,
+                    minValue: 0, // no negative numbers
+                    enableKeyEvents: true,
+                    listeners: {
+                        keypress: function (textField, event) {
+                            if (event.keyCode === Ext.event.Event.ENTER && textField.isValid()) {
+                                event.stopPropagation();
+                                // get the list of Ids that will be updated
+                                var list = grid.selModel.getSelection().map(function (x) {
+                                    return x.id;
+                                });
+                                me.onGroupUpdate(activeHeader, list, textField.getValue());
+                            }
+                        },
+                        scope: me
+                    }
+                };
+                newMenuItems.push(newMenuItem);
+                break;
             default:
                 Ext.log.error('Filter type "' + filterType.toLowerCase() + '" not supported');
                 break;
