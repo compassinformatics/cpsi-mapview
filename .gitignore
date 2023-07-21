@@ -15,4 +15,5 @@ package-lock.json
 .vscode
 /.vs/*
 
+lib/*/
 lib/turf.js

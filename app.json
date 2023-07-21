@@ -33,9 +33,9 @@
      */
     "classpath": [
         "app",
-        "./lib/geoext3/src",
-        "./lib/geoext3/classic",
-        "./lib/BasiGX/src"
+        "./node_modules/@geoext/geoext/src",
+        "./node_modules/@geoext/geoext/classic",
+        "./node_modules/@terrestris/basigx/src"
     ],
 
     /**
