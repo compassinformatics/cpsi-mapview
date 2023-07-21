@@ -6,6 +6,7 @@
     "lib": "lib"
   },
   "scripts": {
+    "start": "sencha app watch",
     "lint": "eslint app",
     "jsonlint": "jsonlint -q resources/data/layers/default.json && jsonlint -q resources/data/layers/tree.json",
     "test": "npm run lint && npm run jsonlint && karma start --single-run",

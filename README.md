@@ -14,7 +14,6 @@ Clone this repository
 ```
 git clone https://github.com/compassinformatics/cpsi-mapview.git
 cd cpsi-mapview
-git submodule update --init --recursive
 ```
 
 Ensure that Sencha Cmd is available on the command line. Examples for Windows:
@@ -47,14 +46,12 @@ mklink /D ext D:\Tools\Sencha\ext-6.2.0
 new-item -itemtype symboliclink -path . -name ext -value D:\Tools\Sencha\ext-6.2.0
 ```
 
-Build required turf library:
+Install dependencies:
 
 ```
 npm i
-npm run build:turf
 ```
 
-This will create the required library turf.js (only the needed subset of functions) and put it in `lib/`.
 
 Start dev-server
 
