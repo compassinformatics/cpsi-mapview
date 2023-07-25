@@ -28,18 +28,23 @@ Ext.define(&#39;CpsiMapview.form.field.ComboLegacy&#39;, {
 <span id='CpsiMapview-form-field-ComboLegacy-property-legacyPostfix'>    // the following property can be set to add a label to the combobox entries
 </span>    legacyPostfix: &#39; - Legacy&#39;,
 
-<span id='CpsiMapview-form-field-ComboLegacy-property-'>    /**
-</span>    * Attempt to prevent legacy values from being selected with the keyboard
-    * However using the select event stops the combobox being populated
-    * when a form is loaded
+<span id='CpsiMapview-form-field-ComboLegacy-property-listeners'>    /**
+</span>    * Prevent selection of isLegacy, but only if it is
+    * a user initiated change
     **/
-    //listeners: {
-    //    select: function (combo, record) {
-    //        if (record.get(&#39;isLegacy&#39;)) {
-    //            combo.clearValue();
-    //        }
-    //    }
-    //},
+    listeners: {
+        focus: function (combo) {
+            combo.__isUserInteracting = true;
+        },
+        blur: function (combo) {
+            combo.__isUserInteracting = false;
+        },
+        select: function (combo, record) {
+            if (combo.__isUserInteracting &amp;&amp; record.get(&#39;isLegacy&#39;)) {
+                combo.clearValue();
+            }
+        }
+    },
 
 <span id='CpsiMapview-form-field-ComboLegacy-method-initComponent'>    /**
 </span>     * See https://docs.sencha.com/extjs/6.7.0/classic/Ext.XTemplate.html for docs on templates

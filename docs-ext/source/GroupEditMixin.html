@@ -157,6 +157,34 @@
                     newMenuItems.push(newMenuItem);
                 });
                 break;
+            case &#39;number&#39;:
+                newMenuItem = {
+                    xtype: &#39;numberfield&#39;,
+                    width: 300,
+                    margin: 0,
+                    emptyText: &#39;Enter a number and press Enter&#39;,
+                    allowBlank: true,
+                    allowDecimals: false,
+                    allowExponential: false,
+                    maxLength: 5,
+                    minValue: 0, // no negative numbers
+                    enableKeyEvents: true,
+                    listeners: {
+                        keypress: function (textField, event) {
+                            if (event.keyCode === Ext.event.Event.ENTER &amp;&amp; textField.isValid()) {
+                                event.stopPropagation();
+                                // get the list of Ids that will be updated
+                                var list = grid.selModel.getSelection().map(function (x) {
+                                    return x.id;
+                                });
+                                me.onGroupUpdate(activeHeader, list, textField.getValue());
+                            }
+                        },
+                        scope: me
+                    }
+                };
+                newMenuItems.push(newMenuItem);
+                break;
             default:
                 Ext.log.error(&#39;Filter type &quot;&#39; + filterType.toLowerCase() + &#39;&quot; not supported&#39;);
                 break;
