@@ -12,17 +12,22 @@ Ext.define('CpsiMapview.form.field.ComboLegacy', {
     legacyPostfix: ' - Legacy',
 
     /**
-    * Attempt to prevent legacy values from being selected with the keyboard
-    * However using the select event stops the combobox being populated
-    * when a form is loaded
+    * Prevent selection of isLegacy, but only if it is
+    * a user initiated change
     **/
-    //listeners: {
-    //    select: function (combo, record) {
-    //        if (record.get('isLegacy')) {
-    //            combo.clearValue();
-    //        }
-    //    }
-    //},
+    listeners: {
+        focus: function (combo) {
+            combo.__isUserInteracting = true;
+        },
+        blur: function (combo) {
+            combo.__isUserInteracting = false;
+        },
+        select: function (combo, record) {
+            if (combo.__isUserInteracting && record.get('isLegacy')) {
+                combo.clearValue();
+            }
+        }
+    },
 
     /**
      * See https://docs.sencha.com/extjs/6.7.0/classic/Ext.XTemplate.html for docs on templates
