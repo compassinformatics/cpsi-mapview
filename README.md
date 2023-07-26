@@ -61,6 +61,13 @@ sencha app watch
 
 Open http://localhost:1841 in your browser.
 
+## Override dependencies
+
+To debug against the main branches (or a specific commit) of dependencies, update the `classpath` property in `app.json` to use the `lib` folder instead of `node_modues`, and run the following command to clone git submodules:
+```
+git submodule update --init --recursive
+```
+
 ## Docker install
 
 If a simple local server is needed to omit CORS problems, you can use the one configured in `docker-compose.yml`.
