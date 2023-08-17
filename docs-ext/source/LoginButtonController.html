@@ -27,11 +27,11 @@ Ext.define(&#39;CpsiMapview.controller.button.LoginButtonController&#39;, {
 
     alias: &#39;controller.cmv_login_button&#39;,
 
-<span id='CpsiMapview-controller-button-LoginButtonController-property-browserRolePrefix'>    /**
+<span id='CpsiMapview-controller-button-LoginButtonController-property-displayRolePrefixes'>    /**
 </span>    * The prefix used in the cookie for any browser-based
     * user roles
     * */
-    browserRolePrefix: &#39;Browser_&#39;,
+    displayRolePrefixes: [&#39;Browser_&#39;],
 
 <span id='CpsiMapview-controller-button-LoginButtonController-method-onClick'>    /**
 </span>     * Logout, clear the login cookie, and show
@@ -72,20 +72,24 @@ Ext.define(&#39;CpsiMapview.controller.button.LoginButtonController&#39;, {
     getLoginDetails: function () {
 
         var me = this;
+        var app = Ext.getApplication ? Ext.getApplication() : Ext.app.Application.instance;
         var userName = Ext.util.Cookies.get(&#39;username&#39;);
         var roles = Ext.util.Cookies.get(&#39;roles&#39;);
-
+        var displayRolePrefixes = (app &amp;&amp; app.displayRolePrefixes) || me.displayRolePrefixes;
         if (roles) {
             roles = roles.split(&#39;,&#39;);
-            var browserRoles = [];
+            var displayRoles = [];
 
             Ext.Array.each(roles, function (r) {
-                if (r.startsWith(me.browserRolePrefix)) {
-                    browserRoles.push(r.replace(me.browserRolePrefix, &#39;&#39;));
-                }
+                Ext.Array.each(displayRolePrefixes, function (prefix) {
+                    if (r.startsWith(prefix)) {
+                        displayRoles.push(r.replace(prefix, &#39;&#39;));
+                    }
+                });
             });
 
-            roles = browserRoles.join(&#39;&lt;br /&gt;&#39;);
+            displayRoles.sort();
+            roles = displayRoles.join(&#39;&lt;br /&gt;&#39;);
         }
         return Ext.String.format(&#39;Username: &lt;b&gt;{0}&lt;/b&gt;&lt;br /&gt;User Roles: &lt;br /&gt;&lt;br /&gt;{1}&#39;, userName, roles);
     },
