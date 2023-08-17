@@ -14,7 +14,7 @@ Ext.define('CpsiMapview.controller.button.LoginButtonController', {
     * The prefix used in the cookie for any browser-based
     * user roles
     * */
-    browserRolePrefix: 'Browser_',
+    displayRolePrefixes: ['Browser_'],
 
     /**
      * Logout, clear the login cookie, and show
@@ -55,20 +55,24 @@ Ext.define('CpsiMapview.controller.button.LoginButtonController', {
     getLoginDetails: function () {
 
         var me = this;
+        var app = Ext.getApplication ? Ext.getApplication() : Ext.app.Application.instance;
         var userName = Ext.util.Cookies.get('username');
         var roles = Ext.util.Cookies.get('roles');
-
+        var displayRolePrefixes = (app && app.displayRolePrefixes) || me.displayRolePrefixes;
         if (roles) {
             roles = roles.split(',');
-            var browserRoles = [];
+            var displayRoles = [];
 
             Ext.Array.each(roles, function (r) {
-                if (r.startsWith(me.browserRolePrefix)) {
-                    browserRoles.push(r.replace(me.browserRolePrefix, ''));
-                }
+                Ext.Array.each(displayRolePrefixes, function (prefix) {
+                    if (r.startsWith(prefix)) {
+                        displayRoles.push(r.replace(prefix, ''));
+                    }
+                });
             });
 
-            roles = browserRoles.join('<br />');
+            displayRoles.sort();
+            roles = displayRoles.join('<br />');
         }
         return Ext.String.format('Username: <b>{0}</b><br />User Roles: <br /><br />{1}', userName, roles);
     },
