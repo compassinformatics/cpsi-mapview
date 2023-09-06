@@ -8,6 +8,7 @@ Check out the latest deployed version at https://compassinformatics.github.io/cp
 ## Project setup
 
 This steps assume you have Sencha CMD v6.6 installed on your system and a copy of ExtJS v6.2.0 downloaded.
+The project has been tested using Node v16+ - this is the minimum recommended version.
 
 Clone this repository
 
