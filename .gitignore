@@ -8,8 +8,6 @@ bootstrap.js
 bootstrap.json
 bootstrap.jsonp
 
-package-lock.json
-
 # VSCode workspace
 *.code-workspace
 .vscode
