@@ -4,6 +4,8 @@
 Ext.define('CpsiMapview.controller.button.SpatialQueryButtonController', {
     extend: 'Ext.app.ViewController',
 
+    requires: ['BasiGX.util.Layer'],
+
     alias: 'controller.cmv_spatial_query_btn',
 
     /**

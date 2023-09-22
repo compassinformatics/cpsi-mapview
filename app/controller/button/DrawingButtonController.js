@@ -5,7 +5,7 @@ Ext.define('CpsiMapview.controller.button.DrawingButtonController', {
     extend: 'Ext.app.ViewController',
     requires: [
         'BasiGX.util.Map',
-        'BasiGX.util.MsgBox',
+        'BasiGX.util.Layer',
         'Ext.menu.Menu',
         'GeoExt.component.FeatureRenderer',
         'GeoExt.data.store.Features',

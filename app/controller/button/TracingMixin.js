@@ -10,7 +10,7 @@ Ext.define('CpsiMapview.controller.button.TracingMixin', {
     extend: 'Ext.Mixin',
 
     requires: [
-        'BasiGX.util.Map',
+        'BasiGX.util.Layer',
         'CpsiMapview.util.Tracing'
     ],
 
