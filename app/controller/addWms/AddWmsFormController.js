@@ -1,6 +1,10 @@
 Ext.define('CpsiMapview.controller.addWms.AddWmsFormController', {
     extend: 'Ext.app.ViewController',
 
+    requires: [
+        'BasiGX.util.Map'
+    ],
+
     alias: 'controller.cmv_add_wms_form',
 
     onWmsAdd: function (olLayer) {

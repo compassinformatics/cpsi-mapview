@@ -6,7 +6,10 @@ Ext.define('CpsiMapview.controller.button.FeatureSelectionButtonController', {
 
     alias: 'controller.cmv_feature_selection_btn',
 
-    requires: ['Ext.window.Toast'],
+    requires: [
+        'Ext.window.Toast',
+        'BasiGX.util.Layer'
+    ],
 
     /**
     * The OpenLayers map. If not given, will be auto-detected.

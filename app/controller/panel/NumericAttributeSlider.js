@@ -6,6 +6,8 @@
 Ext.define('CpsiMapview.controller.panel.NumericAttributeSlider', {
     extend: 'Ext.app.ViewController',
 
+    requires: ['BasiGX.util.Layer'],
+
     alias: 'controller.cmv_numericattributeslider',
 
     /**

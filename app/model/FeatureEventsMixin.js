@@ -13,6 +13,7 @@
 Ext.define('CpsiMapview.model.FeatureEventsMixin', {
     requires: [
         'Ext.data.proxy.Rest', // without this the production apps don't work
+        'BasiGX.util.Layer',
         'CpsiMapview.util.Layer'
     ],
     extend: 'Ext.Mixin',

@@ -8,8 +8,7 @@ Ext.define('CpsiMapview.controller.button.StreetViewTool', {
 
     requires: [
         'CpsiMapview.view.window.MinimizableWindow',
-        'BasiGX.util.Map',
-        'BasiGX.util.Layer'
+        'BasiGX.util.Map'
     ],
 
     /**
