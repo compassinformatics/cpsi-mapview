@@ -19,6 +19,8 @@ Ext.define('CpsiMapview.form.TestWindow', {
 
 describe('CpsiMapview.form.ViewMixin', function () {
 
+    Ext.Loader.syncRequire(['CpsiMapview.form.ViewMixin']);
+
     it('is defined', function () {
         expect(CpsiMapview.form.ViewMixin).not.to.be(undefined);
     });

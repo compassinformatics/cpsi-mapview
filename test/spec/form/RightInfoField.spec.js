@@ -1,5 +1,7 @@
 describe('CpsiMapview.form.RightInfoField', function () {
 
+    Ext.Loader.syncRequire(['CpsiMapview.form.RightInfoField']);
+
     it('is defined', function () {
         expect(CpsiMapview.form.RightInfoField).not.to.be(undefined);
     });

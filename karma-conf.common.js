@@ -25,16 +25,31 @@ module.exports = function(config) {
         'https://cdn.jsdelivr.net/gh/highsource/ogc-schemas@2.6.1/scripts/lib/WPS_1_0_0.js',
         'https://cdn.jsdelivr.net/gh/highsource/w3c-schemas@1.4.0/scripts/lib/XLink_1_0.js',
         'https://cdn.jsdelivr.net/npm/proj4@2.5.0/dist/proj4-src.min.js',
-        'https://maps.googleapis.com/maps/api/js?v=3.42&key=AIzaSyAj6xrC0L3G0YquO1q6Qsma1ZEfYgGQotU',
-        'node_modules/@terrestris/basigx/src/**/*.js',
+        'https://maps.googleapis.com/maps/api/js?v=3.42&key=AIzaSyAj6xrC0L3G0YquO1q6Qsma1ZEfYgGQotU&callback=Function.prototype',
         'lib/turf.js',
         {
+            pattern: 'node_modules/@terrestris/basigx/src/**/*.js',
+            served: true,
+            included: false // or get Duplicate entity name errors
+        },
+        'app/util/Style.js', // ensure this is included first as it is used when defining CpsiMapview.view.toolbar.MapFooter
+        {
             pattern: 'app/**/*.js',
+            watched: true,
+            served: true,
+            included: false
+        },
+        {
+            pattern: 'test/**/*.js',
+            watched: true,
+            served: true,
             included: true
         },
-        'test/test-helper-functions.js',
-        'test/**/*.js',
-        {pattern: 'test/resources/**/*', watched: false, included: false, served: true}
+        {
+            pattern: 'test/resources/**/*',
+            included: false,
+            served: true
+        }
     ];
 
     config.set({

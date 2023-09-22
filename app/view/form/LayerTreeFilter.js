@@ -9,6 +9,7 @@ Ext.define('CpsiMapview.view.form.LayerTreeFilter', {
     xtype: 'cmv_layertreefilter',
 
     requires: [
+        'CpsiMapview.view.main.Map',
         'CpsiMapview.controller.form.LayerTreeFilter'
     ],
 

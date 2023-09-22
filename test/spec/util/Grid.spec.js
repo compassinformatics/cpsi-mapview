@@ -1,4 +1,7 @@
-describe('CpsiMapview.util.Grid', function() {
+describe('CpsiMapview.util.Grid', function () {
+
+    Ext.Loader.syncRequire(['CpsiMapview.util.Grid']);
+
     var cmp = CpsiMapview.util.Grid;
 
     describe('Basics', function() {

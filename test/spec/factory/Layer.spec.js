@@ -1,4 +1,7 @@
 describe('CpsiMapview.factory.Layer', function () {
+    
+    Ext.Loader.syncRequire(['CpsiMapview.factory.Layer']);
+
     var layerFactory = CpsiMapview.factory.Layer;
 
     describe('buildRequiredPropertyNames', function () {

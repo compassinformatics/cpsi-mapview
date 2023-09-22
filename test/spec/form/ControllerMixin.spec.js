@@ -11,6 +11,8 @@ Ext.define('CpsiMapview.form.TestController', {
 
 describe('CpsiMapview.form.ControllerMixin', function () {
 
+    Ext.Loader.syncRequire(['CpsiMapview.form.ControllerMixin']);
+
     it('is defined', function () {
         expect(CpsiMapview.form.ControllerMixin).not.to.be(undefined);
     });

@@ -1,4 +1,7 @@
-describe('CpsiMapview.controller.button.LoginButtonController', function() {
+describe('CpsiMapview.controller.button.LoginButtonController', function () {
+
+    Ext.Loader.syncRequire(['CpsiMapview.controller.button.LoginButtonController']);
+
     describe('Basics', function() {
         it('is defined', function() {
             expect(CpsiMapview.controller.button.LoginButtonController).not.to.be(undefined);

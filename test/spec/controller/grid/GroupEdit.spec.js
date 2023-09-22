@@ -43,6 +43,9 @@ Ext.define('CpsiMapview.view.TestGroupEditGrid', {
 
 
 describe('CpsiMapview.controller.grid.GroupEditMixin', function () {
+
+    Ext.Loader.syncRequire(['CpsiMapview.controller.grid.GroupEditMixin']);
+
     describe('Basics', function () {
         it('is defined', function () {
             expect(CpsiMapview.controller.grid.GroupEditMixin).not.to.be(undefined);

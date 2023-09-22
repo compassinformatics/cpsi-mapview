@@ -1,5 +1,5 @@
 Ext.Loader.syncRequire(['GeoExt.form.field.GeocoderComboBox',
-    'BasiGX.view.button.Measure', 'CpsiMapview.model.button.MeasureButton']);
+    'BasiGX.view.button.Measure', 'CpsiMapview.controller.toolbar']);
 
 describe('CpsiMapview.controller.toolbar.MapTools', function () {
 

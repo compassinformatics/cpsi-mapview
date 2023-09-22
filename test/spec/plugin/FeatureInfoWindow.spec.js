@@ -1,5 +1,7 @@
 describe('CpsiMapview.plugin.FeatureInfoWindow', function () {
 
+    Ext.Loader.syncRequire(['CpsiMapview.plugin.FeatureInfoWindow']);
+
     it('is defined', function () {
         expect(CpsiMapview.plugin.FeatureInfoWindow).not.to.be(undefined);
     });

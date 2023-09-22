@@ -1,4 +1,7 @@
 describe('CpsiMapview.controller.button.DigitizeButtonController', function () {
+
+    Ext.Loader.syncRequire(['CpsiMapview.controller.button.DigitizeButtonController']);
+
     describe('Basics', function () {
         it('is defined', function () {
             expect(CpsiMapview.controller.button.DigitizeButtonController).not.to.be(undefined);

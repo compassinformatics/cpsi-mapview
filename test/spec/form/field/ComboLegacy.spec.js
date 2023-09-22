@@ -1,5 +1,7 @@
 describe('CpsiMapview.form.field.ComboLegacy', function () {
 
+    Ext.Loader.syncRequire(['CpsiMapview.form.field.ComboLegacy']);
+
     it('is defined', function () {
         expect(CpsiMapview.form.field.ComboLegacy).not.to.be(undefined);
     });
