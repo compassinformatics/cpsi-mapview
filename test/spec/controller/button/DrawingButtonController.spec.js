@@ -1,4 +1,8 @@
 describe('CpsiMapview.controller.button.DrawingButtonController', function () {
+
+    Ext.Loader.syncRequire(['CpsiMapview.view.button.DrawingButton',
+        'CpsiMapview.controller.button.DrawingButtonController', 'BasiGX.util.Layer']);
+
     describe('Basics', function () {
         it('is defined', function () {
             expect(CpsiMapview.controller.button.DrawingButtonController).not.to.be(undefined);
@@ -31,7 +35,7 @@ describe('CpsiMapview.controller.button.DrawingButtonController', function () {
             // Create the component, then get a reference to the
             // controller under test so that getView() within the
             // controller returns a view, and not undefined
-            view = new CpsiMapview.view.tool.DrawingButton();
+            view = new CpsiMapview.view.button.DrawingButton();
             ctrl = view.getController();
             map = new ol.Map();
             ctrl.map = map;

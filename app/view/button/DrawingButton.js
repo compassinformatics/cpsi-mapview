@@ -1,14 +1,15 @@
 /**
  * A digitize button used for drawing and modifying network features
  *
- * @class CpsiMapview.view.tool.DrawingButton
+ * @class CpsiMapview.view.button.DrawingButton
  */
-Ext.define('CpsiMapview.view.tool.DrawingButton', {
+Ext.define('CpsiMapview.view.button.DrawingButton', {
     extend: 'Ext.button.Button',
     xtype: 'cmv_drawing_button',
 
     requires: [
-        'CpsiMapview.controller.button.DrawingButtonController'
+        'CpsiMapview.controller.button.DrawingButtonController',
+        'CpsiMapview.util.Style'
     ],
 
     /**
