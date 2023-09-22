@@ -18,6 +18,10 @@
   <pre class="prettyprint lang-js">Ext.define(&#39;CpsiMapview.controller.addWms.AddWmsFormController&#39;, {
     extend: &#39;Ext.app.ViewController&#39;,
 
+    requires: [
+        &#39;BasiGX.util.Map&#39;
+    ],
+
     alias: &#39;controller.cmv_add_wms_form&#39;,
 
     onWmsAdd: function (olLayer) {

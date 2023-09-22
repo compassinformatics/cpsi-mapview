@@ -15,20 +15,21 @@
   </script>
 </head>
 <body onload="prettyPrint(); highlight();">
-  <pre class="prettyprint lang-js"><span id='CpsiMapview-view-tool-DrawingButton'>/**
+  <pre class="prettyprint lang-js"><span id='CpsiMapview-view-button-DrawingButton'>/**
 </span> * A digitize button used for drawing and modifying network features
  *
- * @class CpsiMapview.view.tool.DrawingButton
+ * @class CpsiMapview.view.button.DrawingButton
  */
-Ext.define(&#39;CpsiMapview.view.tool.DrawingButton&#39;, {
+Ext.define(&#39;CpsiMapview.view.button.DrawingButton&#39;, {
     extend: &#39;Ext.button.Button&#39;,
     xtype: &#39;cmv_drawing_button&#39;,
 
     requires: [
-        &#39;CpsiMapview.controller.button.DrawingButtonController&#39;
+        &#39;CpsiMapview.controller.button.DrawingButtonController&#39;,
+        &#39;CpsiMapview.util.Style&#39;
     ],
 
-<span id='CpsiMapview-view-tool-DrawingButton-property-viewModel'>    /**
+<span id='CpsiMapview-view-button-DrawingButton-property-viewModel'>    /**
 </span>     * The viewModel for this class
      */
     viewModel: {
@@ -37,113 +38,113 @@ Ext.define(&#39;CpsiMapview.view.tool.DrawingButton&#39;, {
         }
     },
 
-<span id='CpsiMapview-view-tool-DrawingButton-property-controller'>    /**
+<span id='CpsiMapview-view-button-DrawingButton-property-controller'>    /**
 </span>     * The controller for this class
      */
     controller: &#39;cmv_drawing_button&#39;,
 
-<span id='CpsiMapview-view-tool-DrawingButton-property-glyph'>    /**
+<span id='CpsiMapview-view-button-DrawingButton-property-glyph'>    /**
 </span>     * The icon used for the button
      */
     glyph: &#39;xf040@FontAwesome&#39;,
 
     config: {
 
-<span id='CpsiMapview-view-tool-DrawingButton-cfg-drawLayer'>        /**
+<span id='CpsiMapview-view-button-DrawingButton-cfg-drawLayer'>        /**
 </span>         * Set a layer to store the features drawn by a user (points, polygons_
          * If not set a layer will be created and added to the map automatically
          */
         drawLayer: null,
 
-<span id='CpsiMapview-view-tool-DrawingButton-cfg-snappingLayerKeys'>        /**
+<span id='CpsiMapview-view-button-DrawingButton-cfg-snappingLayerKeys'>        /**
 </span>         * The layerKey values for any vector layers the newly drawn lines should
          * snap to e.g. [&#39;NETWORKEDGES_WFS&#39;]
          */
         snappingLayerKeys: [],
 
-<span id='CpsiMapview-view-tool-DrawingButton-cfg-tracingLayerKeys'>        /**
+<span id='CpsiMapview-view-button-DrawingButton-cfg-tracingLayerKeys'>        /**
 </span>         * The layerKey values for any vector layers the newly drawn lines should
          * trace on e.g. [&#39;CHANNELNETWORKVECTOR_WFS&#39;, &#39;NETWORKJUNCTIONS_WFS&#39;, &#39;NETWORKEDGES_WFS&#39;]
          */
         tracingLayerKeys: [],
 
-<span id='CpsiMapview-view-tool-DrawingButton-cfg-nodeLayerKey'>        /**
+<span id='CpsiMapview-view-button-DrawingButton-cfg-nodeLayerKey'>        /**
 </span>         * The vector layer key of a point layer to snap the start and ends
          * of newly drawn lines to, and return the node ids
          */
         nodeLayerKey: null,
 
-<span id='CpsiMapview-view-tool-DrawingButton-cfg-edgeLayerKey'>        /**
+<span id='CpsiMapview-view-button-DrawingButton-cfg-edgeLayerKey'>        /**
 </span>         * The vector layer key of an edge layer to snap the start and ends
          * of newly drawn lines to, and return the edge ids
          */
         edgeLayerKey: null,
 
-<span id='CpsiMapview-view-tool-DrawingButton-cfg-polygonLayerKey'>        /**
+<span id='CpsiMapview-view-button-DrawingButton-cfg-polygonLayerKey'>        /**
 </span>         * The vector layer key of a polygon layer to snap the start and ends
          * of newly drawn lines to, and return the polygon ids
          */
         polygonLayerKey: null,
 
-<span id='CpsiMapview-view-tool-DrawingButton-cfg-showVerticesOfSnappedEdge'>        /**
+<span id='CpsiMapview-view-button-DrawingButton-cfg-showVerticesOfSnappedEdge'>        /**
 </span>         * If the vertices of the snapped edge shall be shown.
          */
         showVerticesOfSnappedEdge: true,
 
-<span id='CpsiMapview-view-tool-DrawingButton-cfg-drawBeforeEditingPoint'>        /**
+<span id='CpsiMapview-view-button-DrawingButton-cfg-drawBeforeEditingPoint'>        /**
 </span>         * Style of the editing cursor, before first point is set.
          */
         drawBeforeEditingPoint: CpsiMapview.util.Style.createBlackCircle(),
 
-<span id='CpsiMapview-view-tool-DrawingButton-cfg-drawStyleStartPoint'>        /**
+<span id='CpsiMapview-view-button-DrawingButton-cfg-drawStyleStartPoint'>        /**
 </span>         * Style of the first point of the drawn line.
          */
         drawStyleStartPoint: CpsiMapview.util.Style.createGreenTriangle(),
 
-<span id='CpsiMapview-view-tool-DrawingButton-cfg-drawStyleEndPoint'>        /**
+<span id='CpsiMapview-view-button-DrawingButton-cfg-drawStyleEndPoint'>        /**
 </span>         * Style of the last point of the currently drawn line.
          */
         drawStyleEndPoint: CpsiMapview.util.Style.createRedSquare(),
 
-<span id='CpsiMapview-view-tool-DrawingButton-cfg-modifySnapPointStyle'>        /**
+<span id='CpsiMapview-view-button-DrawingButton-cfg-modifySnapPointStyle'>        /**
 </span>         * The style of the point to modify.
          */
         modifySnapPointStyle: CpsiMapview.util.Style.createYellowSquare(),
 
-<span id='CpsiMapview-view-tool-DrawingButton-cfg-drawStyleLine'>        /**
+<span id='CpsiMapview-view-button-DrawingButton-cfg-drawStyleLine'>        /**
 </span>         * The style of the line to draw (without start and endpoint)
          */
         drawStyleLine: CpsiMapview.util.Style.createOrangeLine(),
 
-<span id='CpsiMapview-view-tool-DrawingButton-cfg-snappedNodeStyle'>        /**
+<span id='CpsiMapview-view-button-DrawingButton-cfg-snappedNodeStyle'>        /**
 </span>         * The style of the point when snapped to the referenced
          * node layer.
          */
         snappedNodeStyle: CpsiMapview.util.Style.createBlackCross(),
 
-<span id='CpsiMapview-view-tool-DrawingButton-cfg-snappedEdgeStyle'>        /**
+<span id='CpsiMapview-view-button-DrawingButton-cfg-snappedEdgeStyle'>        /**
 </span>         * The style of the point when snapped to the referenced
          * edge layer.
          */
         snappedEdgeStyle: CpsiMapview.util.Style.createBlackRotatedCross(),
 
-<span id='CpsiMapview-view-tool-DrawingButton-cfg-snappedPolygonStyle'>        /**
+<span id='CpsiMapview-view-button-DrawingButton-cfg-snappedPolygonStyle'>        /**
 </span>         * The style of the point when snapped to the referenced
          * polygon layer.
          */
         snappedPolygonStyle: CpsiMapview.util.Style.createBlackStar(),
 
-<span id='CpsiMapview-view-tool-DrawingButton-cfg-snappedEdgeVertexStyle'>        /**
+<span id='CpsiMapview-view-button-DrawingButton-cfg-snappedEdgeVertexStyle'>        /**
 </span>         * The style of the snapped edge&#39;s vertices.
          */
         snappedEdgeVertexStyle: CpsiMapview.util.Style.createWhiteCircle(),
 
-<span id='CpsiMapview-view-tool-DrawingButton-cfg-drawInteractionSnapTolerance'>        /**
+<span id='CpsiMapview-view-button-DrawingButton-cfg-drawInteractionSnapTolerance'>        /**
 </span>         * Pixel distance for snapping to the drawing finish (default 12)
          */
         drawInteractionSnapTolerance: 2,
 
-<span id='CpsiMapview-view-tool-DrawingButton-cfg-allowSnapToHiddenFeatures'>        /**
+<span id='CpsiMapview-view-button-DrawingButton-cfg-allowSnapToHiddenFeatures'>        /**
 </span>         * Allows consumer of component choice of snapping to only visible layer features
          * defined in snappingLayerKeys, or snapping to layer features even if they
          * are invisible.
@@ -151,18 +152,18 @@ Ext.define(&#39;CpsiMapview.view.tool.DrawingButton&#39;, {
         allowSnapToHiddenFeatures: false
     },
 
-<span id='CpsiMapview-view-tool-DrawingButton-property-name'>    /**
+<span id='CpsiMapview-view-button-DrawingButton-property-name'>    /**
 </span>     * The name to be used e.g. in ComponentQueries
      */
     name: &#39;drawingButton&#39;,
 
-<span id='CpsiMapview-view-tool-DrawingButton-property-toggleGroup'>    /**
+<span id='CpsiMapview-view-button-DrawingButton-property-toggleGroup'>    /**
 </span>     * The name of the toggleGroup
      * Activates the toggle behaviour of the button
      */
     toggleGroup: &#39;map&#39;,
 
-<span id='CpsiMapview-view-tool-DrawingButton-property-listeners'>    /**
+<span id='CpsiMapview-view-button-DrawingButton-property-listeners'>    /**
 </span>     * Register the listeners and redirect them
      * to their corresponding controller methods
      */
