@@ -1,5 +1,7 @@
 describe('CpsiMapview.form.field.Combo', function () {
 
+    Ext.Loader.syncRequire(['CpsiMapview.form.field.Combo']);
+
     it('is defined', function () {
         expect(CpsiMapview.form.field.Combo).not.to.be(undefined);
     });

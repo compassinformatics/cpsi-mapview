@@ -1,4 +1,7 @@
 describe('CpsiMapview.util.RoleManager', function () {
+
+    Ext.Loader.syncRequire(['CpsiMapview.util.RoleManager']);
+
     var cmp = CpsiMapview.util.RoleManager;
 
     describe('Basics', function () {

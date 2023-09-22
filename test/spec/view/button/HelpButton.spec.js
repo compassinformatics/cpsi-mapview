@@ -1,4 +1,6 @@
-describe('CpsiMapview.view.button.HelpButton', function() {
+describe('CpsiMapview.view.button.HelpButton', function () {
+    Ext.Loader.syncRequire(['CpsiMapview.view.button.HelpButton']);
+
     describe('Basics', function() {
         it('is defined', function() {
             expect(CpsiMapview.view.button.HelpButton).not.to.be(undefined);

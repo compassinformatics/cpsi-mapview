@@ -1,4 +1,7 @@
 describe('CpsiMapview.util.Layer', function () {
+
+    Ext.Loader.syncRequire(['CpsiMapview.util.Layer']);
+
     var layerUtil = CpsiMapview.util.Layer;
 
     describe('Basics', function () {

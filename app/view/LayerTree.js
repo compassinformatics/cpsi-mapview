@@ -17,10 +17,11 @@ Ext.define('CpsiMapview.view.LayerTree', {
         'CpsiMapview.view.menuitem.LayerMetadata',
         'CpsiMapview.view.menuitem.LayerFilterReset',
         'CpsiMapview.plugin.TreeColumnStyleSwitcher',
+        'CpsiMapview.plugin.TreeColumnInResolutionRange',
         'CpsiMapview.controller.LayerTreeController',
         'CpsiMapview.view.window.MinimizableWindow',
         'CpsiMapview.view.addWms.AddWmsForm',
-        'CpsiMapview.view.addArcGISRest.AddArcGISRestForm'
+        'CpsiMapview.view.addArcGISRest.AddArcGISRestForm',
     ],
 
     controller: 'cmv_layertree',

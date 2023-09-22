@@ -1,4 +1,5 @@
-describe('CpsiMapview.util.Style', function() {
+describe('CpsiMapview.util.Style', function () {
+    Ext.Loader.syncRequire(['CpsiMapview.util.Style']);
     var styleUtil = CpsiMapview.util.Style;
 
     describe('Basics', function() {

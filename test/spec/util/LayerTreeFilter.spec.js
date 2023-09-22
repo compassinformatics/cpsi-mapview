@@ -18,7 +18,10 @@ var createNode = function(opts) {
     return layerNode;
 };
 
-describe('CpsiMapview.util.LayerTreeFilter', function() {
+describe('CpsiMapview.util.LayerTreeFilter', function () {
+
+    Ext.Loader.syncRequire(['CpsiMapview.util.LayerTreeFilter']);
+
     var layerTreeFilterUtil = CpsiMapview.util.LayerTreeFilter;
 
     describe('Basics', function() {

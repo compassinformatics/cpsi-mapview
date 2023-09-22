@@ -1,4 +1,7 @@
-describe('CpsiMapview.view.LayerTree', function() {
+describe('CpsiMapview.view.LayerTree', function () {
+
+    Ext.Loader.syncRequire(['CpsiMapview.view.LayerTree']);
+
     describe('Basics', function() {
         it('is defined', function() {
             expect(CpsiMapview.view.LayerTree).not.to.be(undefined);

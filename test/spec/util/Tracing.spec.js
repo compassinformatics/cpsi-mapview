@@ -1,4 +1,7 @@
 describe('CpsiMapview.util.Tracing', function () {
+
+    Ext.Loader.syncRequire(['CpsiMapview.util.Tracing']);
+
     var util = CpsiMapview.util.Tracing;
 
     describe('Basics', function () {

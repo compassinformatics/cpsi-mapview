@@ -1,5 +1,7 @@
 describe('CpsiMapview.model.FeatureEventsMixin', function () {
 
+    Ext.Loader.syncRequire(['BasiGX.util.Layer', 'CpsiMapview.model.FeatureEventsMixin']);
+
     var map;
     var layer1;
     var layer2;

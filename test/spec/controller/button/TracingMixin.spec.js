@@ -1,5 +1,7 @@
 describe('CpsiMapview.controller.button.TracingMixin', function () {
 
+    Ext.Loader.syncRequire(['CpsiMapview.controller.button.TracingMixin']);
+
     it('is defined', function () {
         expect(CpsiMapview.controller.button.TracingMixin).not.to.be(undefined);
     });

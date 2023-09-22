@@ -10,6 +10,8 @@ Ext.define('CpsiMapview.form.TestViewModel', {
 
 describe('CpsiMapview.form.ViewModelMixin', function () {
 
+    Ext.Loader.syncRequire(['CpsiMapview.form.ViewModelMixin']);
+
     it('is defined', function () {
         expect(CpsiMapview.form.ViewModelMixin).not.to.be(undefined);
     });

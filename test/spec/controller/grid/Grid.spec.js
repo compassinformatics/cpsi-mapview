@@ -1,4 +1,7 @@
-describe('CpsiMapview.controller.grid.Grid', function() {
+describe('CpsiMapview.controller.grid.Grid', function () {
+
+    Ext.Loader.syncRequire(['CpsiMapview.controller.grid.Grid']);
+
     describe('Basics', function() {
         it('is defined', function() {
             expect(CpsiMapview.controller.grid.Grid).not.to.be(undefined);

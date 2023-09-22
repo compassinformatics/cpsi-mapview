@@ -1,4 +1,7 @@
-describe('CpsiMapview.util.ZoomerMixin', function() {
+describe('CpsiMapview.util.ZoomerMixin', function () {
+
+    Ext.Loader.syncRequire(['CpsiMapview.util.ZoomerMixin']);
+
     var cmp = CpsiMapview.util.ZoomerMixin;
 
     describe('Basics', function() {
