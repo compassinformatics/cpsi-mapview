@@ -15,60 +15,84 @@
   </script>
 </head>
 <body onload="prettyPrint(); highlight();">
-  <pre class="prettyprint lang-js"><span id='CpsiMapview-view-window-MinimizableWindow'>/**
-</span> * This class is the minimizable window of cpsi mapview application.
- * All instances of this class contain the minimize button in the header
- * and already implement the minimization logic. If a
- * CpsiMapview.view.toolbar.MinimizedWindows toolbar is given, minimized
- * windows will be added to that toolbar and can be restored afterwards.
- *
- * @class CpsiMapview.view.window.MinimizableWindow
+  <pre class="prettyprint lang-js"><span id='CpsiMapview-controller-window-MinimizableWindow'>/**
+</span> * This class is the controller for the MinimizableWindow.
  */
-Ext.define(&#39;CpsiMapview.view.window.MinimizableWindow&#39;, {
-    extend: &#39;Ext.window.Window&#39;,
-    xtype: &#39;cmv_minimizable_window&#39;,
+Ext.define(&#39;CpsiMapview.controller.window.MinimizableWindow&#39;, {
+    extend: &#39;Ext.app.ViewController&#39;,
 
-    requires: [
-        &#39;CpsiMapview.controller.window.MinimizableWindow&#39;,
-        &#39;CpsiMapview.model.window.MinimizableWindow&#39;
-    ],
+    alias: &#39;controller.cmv_minimizable_window&#39;,
 
-<span id='CpsiMapview-view-window-MinimizableWindow-property-controller'>    controller: &#39;cmv_minimizable_window&#39;,
-</span>
-<span id='CpsiMapview-view-window-MinimizableWindow-property-viewModel'>    viewModel: &#39;cmv_minimizable_window&#39;,
-</span>
-<span id='CpsiMapview-view-window-MinimizableWindow-property-minimizable'><span id='CpsiMapview-view-window-MinimizableWindow-property-constrainHeader'>    constrainHeader: true, // constrain header within the viewport
-</span></span>
-    minimizable: true,
+    mixins: [&#39;CpsiMapview.form.HelpMixin&#39;],
 
-<span id='CpsiMapview-view-window-MinimizableWindow-property-isMinimized'>    /**
-</span>     * True, if the window is currently minimized,
-     * false otherwise.
+<span id='CpsiMapview-controller-window-MinimizableWindow-method-onClose'>    /**
+</span>    * Trigger the windowClosed to remove any associated toolbar
+    * button if the window is closed
      */
-    isMinimized: false,
-
-<span id='CpsiMapview-view-window-MinimizableWindow-property-minimizeTo'>    /**
-</span>     * Component to where the window should be added
-     * when minimized. If null, it will be added to
-     * the first MinimizedWindows toolbar found. If
-     * no toolbar was found, it will minimize into nowhere.
-     */
-    minimizeTo: null,
-
-<span id='CpsiMapview-view-window-MinimizableWindow-property-tools'>    tools: [{
-</span>        type: &#39;help&#39;,
-        tooltip: &#39;Get Help&#39;,
-        callback: &#39;onHelp&#39;,
-        bind: {
-            hidden: &#39;{!helpUrl}&#39;
+    onClose: function () {
+        var me = this;
+        var minimizeTo = me.getMinimizeToolbar();
+        if (minimizeTo) {
+            minimizeTo.fireEvent(&#39;windowClosed&#39;, me.getView());
         }
-    }],
+    },
 
-<span id='CpsiMapview-view-window-MinimizableWindow-property-listeners'>    listeners: {
-</span>        minimize: &#39;onMinimize&#39;,
-        show: &#39;onShow&#39;,
-        close: &#39;onClose&#39;,
-        hide: &#39;onHide&#39;
+<span id='CpsiMapview-controller-window-MinimizableWindow-method-onHide'>    /**
+</span>     * Placeholder function for adding in a hook when the window is hidden
+     */
+    onHide: Ext.emptyFn,
+
+<span id='CpsiMapview-controller-window-MinimizableWindow-method-onMinimize'>    /**
+</span>     * Sets the window invisible and calls the addMinimizedWindow event
+     * of the related MinimizedWindows toolbar.
+     */
+    onMinimize: function () {
+        var me = this;
+        var minimizeTo = me.getMinimizeToolbar();
+        if (minimizeTo == null) {
+            Ext.log({
+                msg: &#39;No cmv_minimized_windows_toolbar found. Window might just disappear.&#39;,
+                level: &#39;warn&#39;
+            });
+        }
+
+        var win = me.getView();
+        win.isMinimized = true;
+        win.setVisible(false);
+        if (minimizeTo) {
+            minimizeTo.fireEvent(&#39;addMinimizedWindow&#39;, win);
+        }
+    },
+
+<span id='CpsiMapview-controller-window-MinimizableWindow-method-getMinimizeToolbar'>    /**
+</span>     * Helper function to get the right MinimizedWindows toolbar.
+     * If defined, returns me.getView().minimizeTo, else checks for
+     * any MinimizedWindows toolbar and returns first match. If no
+     * toolbar found, returns undefined
+     */
+    getMinimizeToolbar: function () {
+        var me = this;
+        var minimizeTo = me.getView().minimizeTo;
+        if (minimizeTo == null) {
+            var toolbars = Ext.ComponentQuery.query(&#39;cmv_minimized_windows_toolbar&#39;);
+            if (toolbars.length &gt; 0) {
+                minimizeTo = toolbars[0];
+            }
+        }
+        return minimizeTo;
+    },
+
+<span id='CpsiMapview-controller-window-MinimizableWindow-method-onShow'>    /**
+</span>     * Fires the restoreFromWindow event if window is currently minimized
+     */
+    onShow: function () {
+        var me = this;
+        if (me.getView().isMinimized) {
+            var minimizeTo = me.getMinimizeToolbar();
+            if (minimizeTo) {
+                minimizeTo.fireEvent(&#39;restoreFromWindow&#39;, me.getView());
+            }
+        }
     }
 });
 </pre>
