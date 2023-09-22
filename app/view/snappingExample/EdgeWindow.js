@@ -5,7 +5,7 @@ Ext.define('CpsiMapview.view.snappingExample.EdgeWindow', {
         'Ext.tab.Panel',
         'CpsiMapview.view.snappingExample.EdgeWindowController',
         'CpsiMapview.view.snappingExample.EdgeWindowViewModel',
-        'CpsiMapview.view.tool.DrawingButton',
+        'CpsiMapview.view.button.DrawingButton',
         'CpsiMapview.form.RightInfoField'
     ],
     controller: 'cmv_edgewindowcontroller',
