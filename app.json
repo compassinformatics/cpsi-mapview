@@ -218,11 +218,11 @@
       "compress": false
     },
     {
-      "path": "./node_modules/geostyler-sld-parser/browser/sldStyleParser.js",
+      "path": "./node_modules/geostyler-sld-parser/browser/sldStyleParser.iife.js",
       "compress": false
     },
     {
-      "path": "./node_modules/geostyler-openlayers-parser/browser/olStyleParser.js",
+      "path": "./node_modules/geostyler-openlayers-parser/browser/olStyleParser.iife.js",
       "compress": false
     },
     {
@@ -330,12 +330,15 @@
             "path": "./resources/font-gis/css/font-gis.css"
         },
         {
+            "path": "./resources/data/styling/ol.css"
+        },
+        {
             // this entry uses an ant variable that is the calculated
             // value of the generated output css file for the app,
             // defined in .sencha/app/defaults.properties
             "path": "${build.out.css.path}",
             "bundle": true,
-            "exclude": ["fashion"]
+            "exclude": [ "fashion" ]
         }
     ],
 
