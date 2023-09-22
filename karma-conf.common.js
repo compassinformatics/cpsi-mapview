@@ -47,6 +47,15 @@ module.exports = function(config) {
             '/CpsiMapview': '/base/app'
         },
 
+        // the following works to limit the tests run
+        // see https://github.com/karma-runner/karma-mocha/issues/192
+        // also https://stackoverflow.com/questions/38876237/karma-start-passing-parameters
+        client: {
+            mocha: {
+                grep: config.grep
+            }
+        },
+
         // frameworks to use
         // available frameworks: https://npmjs.org/browse/keyword/karma-adapter
         frameworks: ['mocha', 'expect', 'sinon'],

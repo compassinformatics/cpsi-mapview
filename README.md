@@ -108,10 +108,15 @@ To open in a browser and leave the browser open (to review UI components, debug,
 
 ```
 karma start --browsers Chrome --single-run=False --debug --auto-watch
-
 ```
 
 See also https://glebbahmutov.com/blog/debugging-karma-unit-tests/
+
+To run for single test file you can use the `grep` option:
+
+```
+karma start --single-run --grep 'CpsiMapview.factory.Layer'
+```
 
 ## Production Builds
 
