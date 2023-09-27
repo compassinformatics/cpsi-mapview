@@ -58,7 +58,7 @@ Ext.define('CpsiMapview.view.menuitem.LayerStyleSwitcher', {
      * StyleSwitcherRadioGroup.
      *
      * @param {CpsiMapview.view.layer.StyleSwitcherRadioGroup} radioGrp
-     * @param {String} newStyle Style name (foo_bar.xml)
+     * @param {String} newStyle Style name (foo_bar)
      * @param {String} newStyleTitle Style title (human readable - 'My Style')
      * @param {ol.layer.Base} layer The layer where the style changed
      */

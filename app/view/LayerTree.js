@@ -155,7 +155,9 @@ Ext.define('CpsiMapview.view.LayerTree', {
      */
     updateLayerNodeUi: function (layer) {
         var node = this.getNodeForLayer(layer);
-        node.triggerUIUpdate();
+        if (node) {
+            node.triggerUIUpdate();
+        }
     },
 
     /**
@@ -165,7 +167,9 @@ Ext.define('CpsiMapview.view.LayerTree', {
      */
     refreshLayerNodeText: function (layer) {
         var node = this.getNodeForLayer(layer);
-        node.set('text', node.get('text'));
+        if (node) {
+            node.set('text', node.get('text'));
+        }
     },
 
     /**

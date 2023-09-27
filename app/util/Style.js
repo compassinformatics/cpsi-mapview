@@ -153,50 +153,44 @@ Ext.define('CpsiMapview.util.Style', {
     },
 
     /**
-     * Returns the human readable label for the given layer style.
-     * If WFS or VT we remove the '_' and the .xml file ending. For other layer
-     * types we return the input value.
-     *
-     * @param  {String} layerStyle The style name to get the label for
-     * @param  {ol.layer.Base} layer The layer to get style label for
-     * @return {String} Human readable label
+     * Get the style URL for the selected style object based on name
+     * @returns
      */
-    getLayerStyleLabel: function (layerStyle, layer) {
-        if (layer.get('isWfs') || layer.get('isVt')) {
-            // remove _ and the .xml file ending
-            var legendUtil = CpsiMapview.util.Legend;
-            return legendUtil.getWmsStyleFromSldFile(layerStyle);
-        } else {
-            return layerStyle;
+    getStyleByName: function (layer, styleName) {
+
+        var styleObj = null;
+
+        if (Ext.isEmpty(layer.get('styles')) === false) {
+            styleObj = layer.get('styles').find(function (style) {
+                return style.name === styleName;
+            });
+            if (!styleObj) {
+                Ext.log.warn('The style ' + styleName + ' was not found in the layer style configs');
+            }
         }
+
+        return styleObj;
+
     },
 
     /**
      * Returns the human readable title for the given layer style.
-     * Either the explicit title property of the style config or the derived
-     * style label (by #getLayerStyleLabel) is returned.
+     * Either the explicit title property of the style config or the
+     * style label
      *
      * @param  {String} layerStyle The style name to get the title for
      * @param  {ol.layer.Base} layer The layer to get style title for
      * @return {String}            Human readable title
      */
     getLayerStyleTitle: function (layerStyleName, layer) {
-        var me = CpsiMapview.util.Style;
+
         var layerStyles = layer.get('styles');
         var layerTitle = null;
 
         Ext.each(layerStyles, function (layerStyle) {
             // get the relevant style definition
-            if (layerStyle === layerStyleName ||
-                layerStyle.name === layerStyleName) {
-                if (layerStyle['title'] && layerStyle['name']) {
-                    // has title property
-                    layerTitle = layerStyle['title'];
-                } else {
-                    // does not have title property
-                    // title generated from style name
-                    layerTitle = me.getLayerStyleLabel(layerStyle, layer);
-                }
+            if (layerStyle.name === layerStyleName) {
+                layerTitle = layerStyle['title'];
             }
         });
 
