@@ -678,8 +678,16 @@ Ext.define('CpsiMapview.factory.Layer', {
         }
 
         // GetStyles returns all styles in the service for a featureType
-        // so this URL is identical for all styles
-        var layerUrl = layerConf.url + 'version=1.3.0&request=GetStyles&service=WMS&layers=' + layerConf.featureType;
+        // so this URL is identical for all styles in a WFS
+        // vector tiles have a WMS-style URL with placeholders so we need to contruct the GetStyles
+        // request differently
+        var layerUrl;
+        if (layerConf.layerType === "vtwms") {
+            layerUrl = layerConf.baseurl + 'version=1.3.0&request=GetStyles&service=WMS&layers=' + layerConf.layerIdentificationName;
+        } else {
+            layerUrl = layerConf.url + 'version=1.3.0&request=GetStyles&service=WMS&layers=' + layerConf.featureType;
+        }
+
 
         // styleCfg can be a string (with a name) or an object
         Ext.Array.each(layerConf.styles, function (styleCfg) {
@@ -859,7 +867,6 @@ Ext.define('CpsiMapview.factory.Layer', {
             url: layerConf.url
         };
         olSourceConf = Ext.apply(olSourceConf, olSourceProps);
-
         var styleConfigs = this.createStyleConfigs(layerConf);
         var vectorSource = new ol.source.VectorTile(olSourceConf);
 
