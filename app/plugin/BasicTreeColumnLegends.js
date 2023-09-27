@@ -61,7 +61,7 @@ Ext.define('CpsiMapview.plugin.BasicTreeColumnLegends', {
                 // key for these or it will always use just the layerKey
                 var activatedStyle = layer.get('activatedStyle');
                 if (activatedStyle) {
-                    layerKey += '_' + LegendUtil.getWmsStyleFromSldFile(activatedStyle).toUpperCase();
+                    layerKey += '_' + activatedStyle.toUpperCase();
                 }
             }
 

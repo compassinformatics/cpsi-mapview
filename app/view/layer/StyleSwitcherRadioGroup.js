@@ -42,28 +42,14 @@ Ext.define('CpsiMapview.view.layer.StyleSwitcherRadioGroup', {
      */
     initComponent: function () {
         var me = this;
-        var styleUtil = CpsiMapview.util.Style;
         var radioButtons = [];
         var layerStyles = me.layer.get('styles');
         var salt = Math.random();
 
         // create a 'radiofield' for each style connected to the layer
         Ext.each(layerStyles, function (layerStyle) {
-
-            var layerTitle;
-            var layerName;
-
-            // check if style has title property
-            if (layerStyle['title'] && layerStyle['name']) {
-                // has title property
-                layerTitle = layerStyle['title'];
-                layerName = layerStyle['name'];
-            } else {
-                // does not have title property
-                // title generated from stlye name
-                layerTitle = styleUtil.getLayerStyleLabel(layerStyle, me.layer);
-                layerName = layerStyle;
-            }
+            var layerTitle = layerStyle['title'];
+            var layerName = layerStyle['name'];
 
             radioButtons.push({
                 name: 'sldstyle' + salt,
@@ -97,7 +83,6 @@ Ext.define('CpsiMapview.view.layer.StyleSwitcherRadioGroup', {
      */
     getCheckedState: function (sldStyle) {
         var me = this;
-
         if (me.layer.get('activatedStyle') && me.layer.get('activatedStyle') === sldStyle) {
             return true;
         } else {
@@ -146,26 +131,8 @@ Ext.define('CpsiMapview.view.layer.StyleSwitcherRadioGroup', {
                 }
 
             } else if (layer.get('isWfs') || layer.get('isVt')) {
-
-                var sldUrl = layer.get('stylesBaseUrl') + newStyle;
-
-                var hasLabels = CpsiMapview.util.Legend.hasLabels;
-
-                // use style with label if one was specified
-                if (layer.get('labelsActive') === true && !Ext.isEmpty(layer.get('styles')) && hasLabels(layer.get('styles'))) {
-                    var styleObj = layer.get('styles').find(function (style) {
-                        return style.name === newStyle;
-                    });
-                    if (styleObj && !Ext.isEmpty(styleObj.label)) {
-                        sldUrl = layer.get('stylesBaseUrl') + styleObj.label;
-                        layer.set('activeLabelStyle', sldUrl);
-                    } else {
-                        layer.set('activeLabelStyle', undefined);
-                    }
-
-                }
                 // load and parse SLD and apply it to layer
-                LayerFactory.loadSld(layer, sldUrl);
+                LayerFactory.loadSld(layer);
 
                 if (layerTreePanel) {
                     // force update of corresponding layer node UI (e.g. legend)
