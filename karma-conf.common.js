@@ -26,6 +26,8 @@ module.exports = function(config) {
         'https://cdn.jsdelivr.net/gh/highsource/w3c-schemas@1.4.0/scripts/lib/XLink_1_0.js',
         'https://cdn.jsdelivr.net/npm/proj4@2.5.0/dist/proj4-src.min.js',
         'https://maps.googleapis.com/maps/api/js?v=3.42&key=AIzaSyAj6xrC0L3G0YquO1q6Qsma1ZEfYgGQotU&callback=Function.prototype',
+        './node_modules/geostyler-sld-parser/browser/sldStyleParser.iife.js',
+        './node_modules/geostyler-openlayers-parser/browser/olStyleParser.iife.js',
         'lib/turf.js',
         {
             pattern: 'node_modules/@terrestris/basigx/src/**/*.js',
