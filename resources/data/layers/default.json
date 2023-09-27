@@ -32,7 +32,6 @@
     },
     "wfs": {
       "url": "https://mapserver.compass.ie/mapserver/?map=/MapServer/apps/mapview-demo/example.map&",
-      "stylesBaseUrl": "resources/data/styling/",
       "serverOptions": {
         "version": "2.0.0"
       },
@@ -81,60 +80,17 @@
       }
     },
     {
-      "layerType": "wms",
-      "layerKey": "OSM_WMS2",
-      "helpUrl": "https://www.openstreetmap.org/about",
-      "url": "https://ows.terrestris.de/osm-gray/service",
-      "serverOptions": {
-        "layers": "OSM-WMS"
-      },
-      "openLayers": {
-        "maxResolution": 1222.99245234375,
-        "opacity": 0.7,
-        "projection": "EPSG:900913",
-        "visibility": false
-      }
-    },
-    {
-      "layerType": "wms",
-      "layerKey": "OSM_WMS3",
-      "helpUrl": "https://www.openstreetmap.org/about",
-      "url": "https://ows.terrestris.de/osm-gray/service",
-      "serverOptions": {
-        "layers": "OSM-WMS"
-      },
-      "openLayers": {
-        "maxResolution": 1222.99245234375,
-        "opacity": 0.7,
-        "projection": "EPSG:900913",
-        "visibility": false
-      }
-    },
-    {
-      "layerType": "wms",
-      "layerKey": "OSM_WMS4",
-      "helpUrl": "https://www.openstreetmap.org/about",
-      "url": "https://ows.terrestris.de/osm-gray/service",
-      "serverOptions": {
-        "layers": "OSM-WMS"
-      },
-      "openLayers": {
-        "maxResolution": 1222.99245234375,
-        "opacity": 0.7,
-        "projection": "EPSG:900913",
-        "visibility": false
-      }
-    },
-    {
       "layerType": "wfs",
       "layerKey": "COUNTRY_WFS",
       "url": "https://ows-demo.terrestris.de/geoserver/osm/wfs",
       "featureType": "osm:osm-country-borders",
-      "geomFieldName": "geometry",
+      "geomFieldName": "the_geom",
       "namespaceDefinitions": {
         "osm": "http://terrestris"
       },
-      "serverOptions": {},
+      "serverOptions": {
+        "version": "1.1.0"
+      },
       "noCluster": true,
       "openLayers": {
         "maxResolution": 1222.99245234375,
@@ -151,17 +107,19 @@
       "featureType": "osm:osm-fuel",
       "styles": [
         {
-          "name": "Test_Gas.xml",
-          "title": "Gas Style",
-          "label": "Test_Gas_label.xml"
+            "name": "Gas Stations",
+            "sldUrl": "resources/data/styling/Test_Gas.xml",
+            "title": "Gas Style",
+            "labelRule": "Labels"
         },
         {
-          "name": "Test_Alternative_Gas_Style.xml",
+          "name": "Gas Stations2",
+          "sldUrl": "resources/data/styling/Test_Alternative_Gas_Style.xml",
           "title": "Another Style",
-          "label": "Test_Alternative_Gas_Style_label.xml"
+          "labelRule": "labels"
         }
       ],
-      "geomFieldName": "geometry",
+      "geomFieldName": "the_geom",
       "namespaceDefinitions": {
         "osm": "http://terrestris"
       },
@@ -221,12 +179,12 @@
           "layerType": "wfs",
           "layerKey": "WATERBODY_SWITCH_LAYER_CLOSE",
           "hasMetadata": true,
-          "geometryProperty": "msGeometry",
+          "geomFieldName": "msGeometry",
           "featureType": "waterbodies",
           "noCluster": true,
           "styles": [
-            "Waterbodies_Default.xml",
-            "Waterbodies_Type.xml"
+            "Waterbodies",
+            "Type"
           ],
           "tooltipsConfig": [
             {
@@ -275,7 +233,7 @@
             "Depth",
             {
               "name": "Unthemed",
-              "title": "Location"
+              "title": "Unthemed"
             }
           ],
           "labelClassName": "labels"
@@ -283,7 +241,7 @@
         {
           "layerType": "wfs",
           "layerKey": "BOREHOLE_WFS",
-          "geometryProperty": "msGeometry",
+          "geomFieldName": "msGeometry",
           "featureType": "Boreholes",
           "hasMetadata": true,
           "openLayers": {
@@ -292,23 +250,20 @@
           },
           "styles": [
             {
-              "name": "Boreholes_Type.xml",
-              "label": "Boreholes_Type_Label.xml",
-              "title": "Type"
+              "name": "Type",
+              "labelRule": "labels"
             },
             {
-              "name": "Boreholes_Depth.xml",
-              "label": "Boreholes_Depth_Label.xml",
+              "name": "Depth",
+              "labelRule": "labels",
               "title": "Depth"
             },
             {
-              "name": "Boreholes_Unthemed.xml",
-              "label": "Boreholes_Unthemed_Label.xml",
-              "title": "Type"
+              "name": "Unthemed",
+              "labelRule": "labels"
             }
           ],
           "noCluster": false,
-          "timeitem": "YEAR",
           "dateFormat": "Y"
         }
       ]
@@ -346,7 +301,7 @@
     {
       "layerType": "wfs",
       "layerKey": "RUINS_SELECTION_WFS",
-      "geometryProperty": "msGeometry",
+      "geomFieldName": "msGeometry",
       "featureType": "ruins",
       "noCluster": true,
       "idProperty": "osm_id",
@@ -396,7 +351,7 @@
       "idProperty": "EdgeId",
       "styles": [
         {
-          "name": "Footways.xml",
+          "name": "Footways",
           "title": "Default"
         }
       ],
@@ -412,7 +367,7 @@
       "idProperty": "EdgeId",
       "styles": [
         {
-          "name": "Services.xml",
+          "name": "Services",
           "title": "Default"
         }
       ],
@@ -428,7 +383,7 @@
       "idProperty": "EdgeId",
       "styles": [
         {
-          "name": "Cycleways.xml",
+          "name": "Cycleways",
           "title": "Default"
         }
       ],
@@ -452,11 +407,11 @@
         }
       ],
       "layerKey": "RUINS_WFS",
-      "geometryProperty": "msGeometry",
+      "geomFieldName": "msGeometry",
       "featureType": "ruins",
       "noCluster": true,
       "hasMetadata": true,
-      "sldUrl": "resources/data/styling/ruins.xml",
+      "sldUrl": "resources/data/styling/Ruins.xml",
       "idProperty": "osm_id",
       "openLayers": {
         "visibility": false,
