@@ -682,7 +682,7 @@ Ext.define('CpsiMapview.factory.Layer', {
         // vector tiles have a WMS-style URL with placeholders so we need to contruct the GetStyles
         // request differently
         var layerUrl;
-        if (layerConf.layerType === "vtwms") {
+        if (layerConf.layerType === 'vtwms') {
             layerUrl = layerConf.baseurl + 'version=1.3.0&request=GetStyles&service=WMS&layers=' + layerConf.layerIdentificationName;
         } else {
             layerUrl = layerConf.url + 'version=1.3.0&request=GetStyles&service=WMS&layers=' + layerConf.featureType;
