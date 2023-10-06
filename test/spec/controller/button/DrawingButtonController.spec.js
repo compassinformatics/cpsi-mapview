@@ -54,7 +54,9 @@ describe('CpsiMapview.controller.button.DrawingButtonController', function () {
                 source: new ol.source.Vector({
                     features: [
                         new ol.Feature({
-                            geometry: new ol.geom.LineString([[0, 0], [1, 1]])
+                            geometry: new ol.geom.LineString([[0, 0], [1, 1]]),
+                            nodeIdFrom: 1,
+                            nodeIdTo: 2
                         }),
                         sharedFeature
                     ]
@@ -180,6 +182,88 @@ describe('CpsiMapview.controller.button.DrawingButtonController', function () {
 
             // expect 2 features
             expect(ctrl.snapInteraction.getFeatures_().getLength()).to.be(expectedUniqueFeaturesCount - 1);
+        });
+
+        it('can get a buffered coord', function () {
+
+            var coord = [0, 0];
+            ctrl.map.getView().setResolution(1); // we need a map resolution to calculate the buffer
+
+            var extent = ctrl.getBufferedCoordExtent(coord);
+            var expectedExtent = [-3, -3, 3, 3];
+            expect(ol.extent.equals(extent, expectedExtent)).to.be(true);
+
+        });
+
+        it('can get a snapped edge', function () {
+
+            var coord = [0, 0];
+            ctrl.map.getView().setResolution(1); // we need a map resolution to calculate the buffer
+            var searchLayer = layer1;
+            var edge = ctrl.getSnappedEdge(coord, searchLayer);
+            expect(edge).to.not.be(null);
+
+        });
+
+        it('no snapped edge returned if the coord is not within buffer', function () {
+
+            var coord = [100, 100];
+            ctrl.map.getView().setResolution(1); // we need a map resolution to calculate the buffer
+            var searchLayer = layer1;
+            var edge = ctrl.getSnappedEdge(coord, searchLayer);
+            expect(edge).to.be(null);
+
+        });
+
+        it('can get NodeId from start of snapped edge', function () {
+
+            var coord = [0, 0];
+            ctrl.map.getView().setResolution(1); // set a low resolution or the buffer covers both ends of the line
+            var edgesLayer = layer1;
+            var edgeLayerConfig = {
+                startNodeProperty: 'nodeIdFrom',
+                endNodeProperty: 'nodeIdTo',
+            };
+
+            var nodeId = ctrl.getNodeIdFromSnappedEdge(edgesLayer, edgeLayerConfig, coord);
+            expect(nodeId).to.be(1);
+        });
+
+        it('can get NodeId from end of snapped edge', function () {
+
+            var coord = [1, 1];
+            ctrl.map.getView().setResolution(1);
+            var edgesLayer = layer1;
+            var edgeLayerConfig = {
+                startNodeProperty: 'nodeIdFrom',
+                endNodeProperty: 'nodeIdTo',
+            };
+
+            var nodeId = ctrl.getNodeIdFromSnappedEdge(edgesLayer, edgeLayerConfig, coord);
+            expect(nodeId).to.be(2);
+        });
+
+        it('can calculate line intersections', function () {
+
+            view.snappingLayerKeys = ['layer1', 'layer2'];
+
+            view.edgeLayerConfig = {
+                startNodeProperty: 'nodeIdFrom',
+                endNodeProperty: 'nodeIdTo',
+            };
+            view.edgeLayerKey = 'layer1';
+
+            ctrl.setSnapInteraction(drawLayer);
+            ctrl.drawLayer = drawLayer;
+            ctrl.map.getView().setResolution(1);
+
+            var inputFeature = new ol.Feature({
+                geometry: new ol.geom.LineString([[1, 1], [10, 10]])
+            });
+
+            ctrl.calculateLineIntersections(inputFeature);
+            expect(inputFeature.get('startNodeId')).to.be(2);
+            expect(inputFeature.get('endNodeId')).to.be(-2);  // indicates not snapped and a new node needs to be created
         });
     });
 });

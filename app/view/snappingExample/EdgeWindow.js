@@ -42,10 +42,14 @@ Ext.define('CpsiMapview.view.snappingExample.EdgeWindow', {
                 bind: {
                     drawLayer: '{resultLayer}' // bind the draw layer to the model's featurestore / layer
                 },
-                snappingLayerKeys: ['SERVICES_WFS', 'NODES_WFS', 'POLYGONS_WFS'],
-                tracingLayerKeys: ['SERVICES_WFS', 'POLYGONS_WFS'],
+                snappingLayerKeys: ['EDGES_WFS', 'NODES_WFS', 'POLYGONS_WFS'],
+                tracingLayerKeys: ['EDGES_WFS', 'POLYGONS_WFS'],
                 nodeLayerKey: 'NODES_WFS',
-                edgeLayerKey: 'SERVICES_WFS',
+                edgeLayerKey: 'EDGES_WFS',
+                edgeLayerConfig: {
+                    startNodeProperty: 'NodeIdFrom',
+                    endNodeProperty: 'NodeIdTo'
+                },
                 polygonLayerKey: 'POLYGONS_WFS'
             }
         }
