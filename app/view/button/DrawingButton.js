@@ -41,13 +41,13 @@ Ext.define('CpsiMapview.view.button.DrawingButton', {
 
         /**
          * The layerKey values for any vector layers the newly drawn lines should
-         * snap to e.g. ['NETWORKEDGES_WFS']
+         * snap to e.g. ['EDGES_WFS']
          */
         snappingLayerKeys: [],
 
         /**
          * The layerKey values for any vector layers the newly drawn lines should
-         * trace on e.g. ['CHANNELNETWORKVECTOR_WFS', 'NETWORKJUNCTIONS_WFS', 'NETWORKEDGES_WFS']
+         * trace on e.g. ['NODES_WFS', 'EDGES_WFS']
          */
         tracingLayerKeys: [],
 
@@ -62,6 +62,15 @@ Ext.define('CpsiMapview.view.button.DrawingButton', {
          * of newly drawn lines to, and return the edge ids
          */
         edgeLayerKey: null,
+
+        /**
+         * A config object for the vector edgeLayer that is used to
+         * store the property names of the start node and end node if available
+         * This allows snapping to ends of a line without requiring the nodeLayer to
+         * be switched on. the config object should have two properties:
+         * {startNodeProperty: 'nodeIdFrom', endNodeProperty: 'nodeIdTo'}
+         */
+        edgeLayerConfig: null,
 
         /**
          * The vector layer key of a polygon layer to snap the start and ends

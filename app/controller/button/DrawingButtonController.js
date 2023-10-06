@@ -386,40 +386,48 @@ Ext.define('CpsiMapview.controller.button.DrawingButtonController', {
 
     },
 
-    getSnappedFeatureId: function (coord, searchLayer) {
+    getSnappedEdge: function (coord, searchLayer) {
+
+        var me = this;
+        var extent = me.getBufferedCoordExtent(coord);
+
+        var features = [];
+        // find all intersecting edges
+        // https://openlayers.org/en/latest/apidoc/module-ol_source_Vector-VectorSource.html
+        searchLayer.getSource().forEachFeatureIntersectingExtent(extent, function (feat) {
+            features.push(feat);
+        });
+
+        if (features.length > 0) {
+            return features[0];
+        } else {
+            return null;
+        }
+    },
+
+    getBufferedCoordExtent: function (coord) {
 
         var me = this;
         var extent = ol.extent.boundingExtent([coord]); // still a single point
-
         var buffer = me.map.getView().getResolution() * 3; // use a 3 pixel tolerance for snapping
+        return ol.extent.buffer(extent, buffer); // buffer the point as it may have snapped to a different feature than the nodes/edges
 
-        extent = ol.extent.buffer(extent, buffer); // buffer the point as it may have snapped to a different feature than the nodes/edges
+    },
 
-        var featureIds = [];
+    getSnappedFeatureId: function (coord, searchLayer) {
 
-        // find all intersecting node points
-        // https://openlayers.org/en/latest/apidoc/module-ol_source_Vector-VectorSource.html
-        searchLayer.getSource().forEachFeatureIntersectingExtent(extent, function (feat) {
-            //<debug>
+        var me = this;
+        var feat = me.getSnappedEdge(coord, searchLayer);
+
+        if (feat) {
             // this requires all GeoJSON features used for the layer to have an id property
+            //<debug>
             Ext.Assert.truthy(feat.getId());
             //</debug>
-            featureIds.push(feat.getId());
-        });
-
-        // cases where the same feature is loaded into the layer leading to duplicated Ids
-        // might be fixed now?
-        featureIds = Ext.Array.unique(featureIds);
-
-        if (featureIds.length === 1) {
-            return featureIds[0];
-        } else {
-            if (featureIds.length > 1) {
-                // TODO show layerKey instead of featureIds
-                Ext.Logger.warn('Multiple features found at ' + coord + ':' + featureIds);
-            }
-            return null;
+            return feat.getId();
         }
+
+        return null;
     },
 
     /**
@@ -498,6 +506,63 @@ Ext.define('CpsiMapview.controller.button.DrawingButtonController', {
     },
 
     /**
+     * Get a nodeId from the closest edge to the input coord
+     * If both ends of the edge are within the snap tolerance of the
+     * input coord then the node closest to the input point is used
+     * @param {any} edgesLayer
+     * @param {any} edgeLayerConfig
+     * @param {any} coord
+     * @returns
+     */
+    getNodeIdFromSnappedEdge: function (edgesLayer, edgeLayerConfig, coord) {
+
+        var me = this;
+        var nodeId;
+
+        // check to see if the coord snaps to the start of any edges
+        var edge = me.getSnappedEdge(coord, edgesLayer);
+        if (!edge) {
+            return null;
+        }
+
+        var inputPoint = new ol.geom.Point(coord);
+
+        var startCoord = edge.getGeometry().getFirstCoordinate();
+        var startExtent = me.getBufferedCoordExtent(startCoord);
+        var startDistance;
+
+        if (inputPoint.intersectsExtent(startExtent)) {
+            nodeId = edge.get(edgeLayerConfig.startNodeProperty);
+            startDistance = new ol.geom.LineString([coord, startCoord]).getLength();
+        }
+
+        var endCoord = edge.getGeometry().getLastCoordinate();
+        var endExtent = me.getBufferedCoordExtent(endCoord);
+
+        if (inputPoint.intersectsExtent(endExtent)) {
+
+            if (startDistance) {
+                var endDistance = new ol.geom.LineString([coord, endCoord]).getLength();
+                if (endDistance < startDistance) {
+                    nodeId = edge.get(edgeLayerConfig.endNodeProperty);
+                }
+            }
+        }
+
+        // if an edge has been found then it should snap at the start or the end
+        // and we should not end up here
+
+        //<debug>
+        if (!nodeId) {
+            Ext.log.warn('A coordinate snapped to an edge, but no nodeId was found. Check the edgeLayerConfig');
+        }
+        //</debug>
+
+        return nodeId;
+
+    },
+
+    /**
      * Calculate where the geometry intersects other parts of the network
      * @param {any} newGeom
      */
@@ -515,7 +580,6 @@ Ext.define('CpsiMapview.controller.button.DrawingButtonController', {
         var foundFeatAtEnd = false;
 
         // get any nodes that the line snaps to
-
         var nodeLayerKey = view.getNodeLayerKey();
         var startNodeId = null;
         var endNodeId = null;
@@ -529,15 +593,43 @@ Ext.define('CpsiMapview.controller.button.DrawingButtonController', {
             foundFeatAtEnd = endNodeId ? true : false;
         }
 
+        var edgeLayerKey = view.getEdgeLayerKey();
+        var edgesLayer;
+
+        if (edgeLayerKey) {
+            edgesLayer = BasiGX.util.Layer.getLayersBy('layerKey', edgeLayerKey)[0];
+        }
+
+        // if the edge layer has been configured with to and from node fields
+        // we will check if the feature snaps at the start or end of edges
+
+        var edgeLayerConfig = view.getEdgeLayerConfig();
+
+        if (edgesLayer && edgeLayerConfig) {
+            var nodeId;
+            nodeId = me.getNodeIdFromSnappedEdge(edgesLayer, edgeLayerConfig, startCoord);
+
+            if (nodeId) {
+                startNodeId = nodeId;
+                foundFeatAtStart = true;
+            }
+
+            nodeId = me.getNodeIdFromSnappedEdge(edgesLayer, edgeLayerConfig, endCoord);
+
+            if (nodeId) {
+                endNodeId = nodeId;
+                foundFeatAtEnd = true;
+            }
+        }
+
         // now check for any edges at both ends, but only in the case
         // where there are no start and end nodes
 
-        var edgeLayerKey = view.getEdgeLayerKey();
+
         var startEdgeId = null;
         var endEdgeId = null;
 
-        if (edgeLayerKey) {
-            var edgesLayer = BasiGX.util.Layer.getLayersBy('layerKey', edgeLayerKey)[0];
+        if (edgesLayer) {
 
             if (!foundFeatAtStart) {
                 startEdgeId = me.getSnappedFeatureId(startCoord, edgesLayer);
