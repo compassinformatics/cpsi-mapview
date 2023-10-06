@@ -1,90 +1,116 @@
-<StyledLayerDescriptor
-    version="1.0.0"
-    xmlns="http://www.opengis.net/sld"
-    xmlns:gml="http://www.opengis.net/gml"
-    xmlns:ogc="http://www.opengis.net/ogc"
-    xmlns:xlink="http://www.w3.org/1999/xlink"
-    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-    xsi:schemaLocation="http://www.opengis.net/sld http://schemas.opengis.net/sld/1.0.0/StyledLayerDescriptor.xsd">
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<StyledLayerDescriptor version="1.1.0" xsi:schemaLocation="http://www.opengis.net/sld StyledLayerDescriptor.xsd" xmlns="http://www.opengis.net/sld" xmlns:ogc="http://www.opengis.net/ogc" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:se="http://www.opengis.net/se">
     <NamedLayer>
-        <Name>Gas Stations</Name>
+        <se:Name>Gas Stations</se:Name>
         <UserStyle>
-            <FeatureTypeStyle>
-                <Rule>
-                    <Name>Other</Name>
-                    <PointSymbolizer>
-                        <Graphic>
-                            <Mark>
-                                <WellKnownName>triangle</WellKnownName>
-                                <Fill>
-                                    <CssParameter name="fill">purple</CssParameter>
-                                </Fill>
-                            </Mark>
-                            <Size>12</Size>
-                        </Graphic>
-                    </PointSymbolizer>
-                </Rule>
-                <Rule>
-                    <Name>Esso</Name>
+            <se:Name>Gas Stations</se:Name>
+            <se:Title>Gas Stations</se:Title>
+            <se:FeatureTypeStyle>
+                <se:Rule>
+                    <se:Name>Labels</se:Name>
+                    <se:TextSymbolizer>
+                        <se:Label>
+                            <ogc:PropertyName>osm_id</ogc:PropertyName>
+                        </se:Label>
+                        <se:Fill>
+                            <se:SvgParameter name="fill">#000000</se:SvgParameter>
+                            <se:SvgParameter name="fill-opacity">1</se:SvgParameter>
+                        </se:Fill>
+                    </se:TextSymbolizer>
+                </se:Rule>
+                <se:Rule>
+                    <se:Name>Other</se:Name>
+                    <se:PointSymbolizer>
+                        <se:Graphic>
+                            <se:Mark>
+                                <se:WellKnownName>circle</se:WellKnownName>
+                                <se:Fill>
+                                    <se:SvgParameter name="fill">#ff0000</se:SvgParameter>
+                                </se:Fill>
+                            </se:Mark>
+                            <se:Size>12</se:Size>
+                        </se:Graphic>
+                    </se:PointSymbolizer>
+                </se:Rule>
+                <se:Rule>
+                    <se:Name>Esso</se:Name>
                     <ogc:Filter>
-                        <ogc:PropertyIsEqualTo>
-                            <ogc:PropertyName>name</ogc:PropertyName>
-                            <ogc:Literal>Esso</ogc:Literal>
-                        </ogc:PropertyIsEqualTo>
+                        <PropertyIsEqualTo>
+                            <PropertyName>name</PropertyName>
+                            <Literal>Esso</Literal>
+                        </PropertyIsEqualTo>
                     </ogc:Filter>
-                    <PointSymbolizer>
-                        <Graphic>
-                            <Mark>
-                                <WellKnownName>star</WellKnownName>
-                                <Fill>
-                                    <CssParameter name="fill">pink</CssParameter>
-                                </Fill>
-                            </Mark>
-                            <Size>12</Size>
-                        </Graphic>
-                    </PointSymbolizer>
-                </Rule>
-                <Rule>
-                    <Name>Texaco</Name>
+                    <se:PointSymbolizer>
+                        <se:Graphic>
+                            <se:Mark>
+                                <se:WellKnownName>circle</se:WellKnownName>
+                                <se:Fill>
+                                    <se:SvgParameter name="fill">#ff0000</se:SvgParameter>
+                                </se:Fill>
+                            </se:Mark>
+                            <se:Size>12</se:Size>
+                        </se:Graphic>
+                    </se:PointSymbolizer>
+                </se:Rule>
+                <se:Rule>
+                    <se:Name>Texaco</se:Name>
                     <ogc:Filter>
-                        <ogc:PropertyIsEqualTo>
-                            <ogc:PropertyName>name</ogc:PropertyName>
-                            <ogc:Literal>Texaco</ogc:Literal>
-                        </ogc:PropertyIsEqualTo>
+                        <PropertyIsEqualTo>
+                            <PropertyName>name</PropertyName>
+                            <Literal>Texaco</Literal>
+                        </PropertyIsEqualTo>
                     </ogc:Filter>
-                    <PointSymbolizer>
-                        <Graphic>
-                            <Mark>
-                                <WellKnownName>square</WellKnownName>
-                                <Fill>
-                                    <CssParameter name="fill">blue</CssParameter>
-                                </Fill>
-                            </Mark>
-                            <Size>12</Size>
-                        </Graphic>
-                    </PointSymbolizer>
-                </Rule>
-                <Rule>
-                    <Name>Topaz</Name>
+                    <se:PointSymbolizer>
+                        <se:Graphic>
+                            <se:Mark>
+                                <se:WellKnownName>circle</se:WellKnownName>
+                                <se:Fill>
+                                    <se:SvgParameter name="fill">#ff0000</se:SvgParameter>
+                                </se:Fill>
+                            </se:Mark>
+                            <se:Size>12</se:Size>
+                        </se:Graphic>
+                    </se:PointSymbolizer>
+                </se:Rule>
+                <se:Rule>
+                    <se:Name>Topaz</se:Name>
                     <ogc:Filter>
-                        <ogc:PropertyIsEqualTo>
-                            <ogc:PropertyName>name</ogc:PropertyName>
-                            <ogc:Literal>Topaz</ogc:Literal>
-                        </ogc:PropertyIsEqualTo>
+                        <PropertyIsEqualTo>
+                            <PropertyName>name</PropertyName>
+                            <Literal>Topaz</Literal>
+                        </PropertyIsEqualTo>
                     </ogc:Filter>
-                    <PointSymbolizer>
-                        <Graphic>
-                            <Mark>
-                                <WellKnownName>star</WellKnownName>
-                                <Fill>
-                                    <CssParameter name="fill">yellow</CssParameter>
-                                </Fill>
-                            </Mark>
-                            <Size>12</Size>
-                        </Graphic>
-                    </PointSymbolizer>
-                </Rule>
-            </FeatureTypeStyle>
+                    <se:PointSymbolizer>
+                        <se:Graphic>
+                            <se:Mark>
+                                <se:WellKnownName>circle</se:WellKnownName>
+                                <se:Fill>
+                                    <se:SvgParameter name="fill">#ff0000</se:SvgParameter>
+                                </se:Fill>
+                            </se:Mark>
+                            <se:Size>12</se:Size>
+                        </se:Graphic>
+                    </se:PointSymbolizer>
+                </se:Rule>
+            </se:FeatureTypeStyle>
+        </UserStyle>
+        <UserStyle>
+            <se:Name>Labels</se:Name>
+            <se:Title>Gas Station Labels</se:Title>
+            <se:FeatureTypeStyle>
+                <se:Rule>
+                    <se:Name>Labels</se:Name>
+                    <se:TextSymbolizer>
+                        <se:Label>
+                            <ogc:PropertyName>osm_id</ogc:PropertyName>
+                        </se:Label>
+                        <se:Fill>
+                            <se:SvgParameter name="fill">#000000</se:SvgParameter>
+                            <se:SvgParameter name="fill-opacity">1</se:SvgParameter>
+                        </se:Fill>
+                    </se:TextSymbolizer>
+                </se:Rule>
+            </se:FeatureTypeStyle>
         </UserStyle>
     </NamedLayer>
 </StyledLayerDescriptor>

@@ -70,8 +70,9 @@ Ext.define(&#39;CpsiMapview.data.model.LayerTreeNode&#39;, {
                     var olLayer = record.getOlLayer();
                     if (olLayer &amp;&amp; olLayer.get(&#39;activatedStyle&#39;)) {
                         // get activated layer style
-                        var activeStyle = olLayer.get(&#39;activatedStyle&#39;);
-                        var styleTitle = CpsiMapview.util.Style.getLayerStyleTitle(activeStyle, olLayer);
+                        var activatedStyle = olLayer.get(&#39;activatedStyle&#39;);
+                        var styleTitle = CpsiMapview.util.Style.getLayerStyleTitle(activatedStyle, olLayer);
+
                         // apply node name + style name
                         var treeNodeConf = olLayer.get(&#39;_origTreeConf&#39;);
                         if (treeNodeConf &amp;&amp; treeNodeConf.text &amp;&amp; styleTitle) {

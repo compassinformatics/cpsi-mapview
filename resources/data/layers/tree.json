@@ -122,24 +122,6 @@
             "text": "OSM WMS",
             "qtip": "An OSM based WMS layer",
             "glyph": "ea68@font-gis"
-          },
-          {
-            "id": "OSM_WMS2",
-            "leaf": true,
-            "text": "A WMS 2",
-            "glyph": "ea9c@font-gis"
-          },
-          {
-            "id": "OSM_WMS3",
-            "leaf": true,
-            "text": "A WMS 3",
-            "glyph": "ea9c@font-gis"
-          },
-          {
-            "id": "OSM_WMS4",
-            "leaf": true,
-            "text": "A WMS 4",
-            "glyph": "ea9c@font-gis"
           }
         ]
       },

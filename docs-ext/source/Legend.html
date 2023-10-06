@@ -61,7 +61,6 @@ Ext.define(&#39;CpsiMapview.util.Legend&#39;, {
                 var splitUrl = url.toLowerCase().split(&#39;?&#39;);
                 url = splitUrl[0];
                 layers = Ext.Object.fromQueryString(splitUrl[1]).layers;
-                activatedStyle = this.getWmsStyleFromSldFile(activatedStyle);
             } else {
                 layers = BasiGX.util.Object.layersFromParams(source.getParams());
             }
@@ -95,7 +94,7 @@ Ext.define(&#39;CpsiMapview.util.Legend&#39;, {
             requestParams += &#39;FORMAT=image%2Fpng&amp;TRANSPARENT=TRUE&amp;SLD_VERSION=1.1.0&amp;&#39;;
             requestParams += &#39;LAYER=&#39; + ft + &#39;&amp;&#39;;
             if (activatedStyle) {
-                requestParams += &#39;STYLE=&#39; + LegendUtil.getWmsStyleFromSldFile(activatedStyle);
+                requestParams += &#39;STYLE=&#39; + activatedStyle;
             }
         }
         if (!url) {
@@ -109,51 +108,6 @@ Ext.define(&#39;CpsiMapview.util.Legend&#39;, {
         url += requestParams;
 
         return url;
-    },
-
-<span id='CpsiMapview-util-Legend-method-getWmsStyleFromSldFile'>    /**
-</span>     * Derives the STYLE parameter by the corresponding SLD file name.
-     * Convention is LAYERS_STYLES.xml (whereas in STYLES we replace blanks by
-     * underscores), e.g. LightUnit_Unit_Type.xml =&gt; &#39;Unit Type&#39;.
-     *
-     * @param  {String} sldFileName The SLD file name
-     * @return {String}             The WMS STYLE parameter
-     */
-    getWmsStyleFromSldFile: function (sldFileName) {
-        // LightUnit_Unit_Type.xml =&gt; [&#39;LightUnit&#39;, &#39;Unit&#39;, &#39;Type&#39;]
-        var parts = sldFileName
-            .replace(&#39;.xml&#39;, &#39;&#39;)
-            .split(&#39;_&#39;);
-        // remove first item since it is the LAYERS name
-        parts.shift();
-        // =&gt; &#39;Unit Type&#39;
-        return parts.join(&#39; &#39;);
-    },
-
-<span id='CpsiMapview-util-Legend-method-getSldFileFromWmsStyle'>    /**
-</span>    * Derives the SLD file name by the corresponding WMS STYLES and LAYERS
-    * parameter.
-    * Convention is LAYERS_STYLES.xml (whereas for STYLES we replace blanks by
-    * underscores), e.g. &#39;Unit Type&#39; and &#39;LightUnit&#39; =&gt; LightUnit_Unit_Type.xml
-    *
-     * @param  {String} wmsStyle  The WMS STYLE parameter
-     * @param  {String} wmsLayers The WMS LAYERS parameter
-     * @return {String}           The SLD file name
-     */
-    getSldFileFromWmsStyle: function (wmsStyle, wmsLayers) {
-        return wmsLayers + &#39;_&#39; + wmsStyle.replace(&#39; &#39;, &#39;_&#39;) + &#39;.xml&#39;;
-    },
-
-<span id='CpsiMapview-util-Legend-method-hasLabels'>    /**
-</span>     * Helper function to check if all styles
-     * have a non-empty label property.
-     * @param {Object[]} styles Styles object from layerConfig to check
-     */
-    hasLabels: function (styles) {
-        var hasLabels = styles.every(function (style) {
-            return !Ext.isEmpty(style.label);
-        });
-        return hasLabels;
     },
 
 <span id='CpsiMapview-util-Legend-method-getUniqueLayersParam'>    /*
@@ -197,11 +151,11 @@ Ext.define(&#39;CpsiMapview.util.Legend&#39;, {
      * @param {String} legendUrl The URL to the legend image
      * @param {String} layerKey The key / ID of the layer (used for storing in lookup)
      */
-    cacheLegendImgAsDataUrl: function(legendUrl, layerKey) {
+    cacheLegendImgAsDataUrl: function (legendUrl, layerKey) {
         var legendImage = new Image();
         legendImage.crossOrigin = &#39;anonymous&#39;;
         CpsiMapview.util.Html.addEvent(
-            legendImage, &#39;load&#39;, function() {
+            legendImage, &#39;load&#39;, function () {
 
                 // set width and height
                 var width = this.naturalWidth;

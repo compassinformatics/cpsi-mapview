@@ -15,96 +15,108 @@
   </script>
 </head>
 <body onload="prettyPrint(); highlight();">
-  <pre class="prettyprint lang-js"><span id='CpsiMapview-util-LayerTreeFilter'>/**
-</span> * Util class for working with LayerTreeFilter
+  <pre class="prettyprint lang-js"><span id='CpsiMapview-controller-form-LayerTreeFilter'>/**
+</span> * This is the controller for the {@link CpsiMapview.view.form.LayerTreeFilter} component
  *
- * @class CpsiMapview.util.LayerTreeFilter
+ * @class CpsiMapview.controller.form.LayerTreeFilter
  */
-Ext.define(&#39;CpsiMapview.util.LayerTreeFilter&#39;, {
-    alternateClassName: &#39;LayerTreeFilterUtil&#39;,
+Ext.define(&#39;CpsiMapview.controller.form.LayerTreeFilter&#39;, {
+    extend: &#39;Ext.app.ViewController&#39;,
+
+    alias: &#39;controller.cmv_layertreefilter&#39;,
 
     requires: [
-        &#39;Ext.util.Filter&#39;
+        &#39;CpsiMapview.util.LayerTreeFilter&#39;
     ],
 
-    statics: {
+<span id='CpsiMapview-controller-form-LayerTreeFilter-method-clearText'>    /**
+</span>     * Clears the textfield for filtering the layer tree.
+     *
+     * @param {Ext.form.field.Text } textField
+     */
+    clearText: function (textField) {
+        var me = this;
+        var view = me.getView();
 
-<span id='CpsiMapview-util-LayerTreeFilter-static-method-isLayerVisible'>        /**
-</span>         * Checks if layer is visible.
-         *
-         * @param {GeoExt.data.model.LayerTreeNode} node The node to check.
-         * @param {boolean} filterBaseLayers True, if baselayers should be filtered. False otherwise.
-         * @return {boolean} True, if layer is visible. False otherwise.
-         */
-        isLayerVisible: function(node, filterBaseLayers) {
-            // check if baselayers should be filtered
-            if (!filterBaseLayers &amp;&amp; node.getOlLayerProp(&#39;isBaseLayer&#39;)) {
-                return true;
-            }
-            var checked = node.get(&#39;checked&#39;);
-            return checked;
-        },
+        textField.setValue(&#39;&#39;);
 
-<span id='CpsiMapview-util-LayerTreeFilter-static-method-isSearchTextInLayerName'>        /**
-</span>         * Checks if a search text can be found in the layer name.
-         *
-         * @param {GeoExt.data.model.LayerTreeNode} node The node to check.
-         * @param {string} searchText The search text.
-         * @param {boolean} filterBaseLayers True, if baselayers should be filtered. False otherwise.
-         * @return {boolean} True, if search text was found in layer name. False otherwise.
-         */
-        isSearchTextInLayerName: function(node, searchText, filterBaseLayers) {
-            // check if baselayers should be filtered
-            if (!filterBaseLayers &amp;&amp; node.getOlLayerProp(&#39;isBaseLayer&#39;)) {
-                return true;
-            }
-            var name = node.get(&#39;text&#39;);
-            if (!name) {
-                return;
-            }
-            // enforce case insensitive matches
-            var text = name.toLowerCase();
-            var compare = searchText.toLowerCase();
-            return text.includes(compare);
-        },
-
-<span id='CpsiMapview-util-LayerTreeFilter-static-method-createLayerTreeFilter'>        /**
-</span>         * Creates a filter for the layer tree.
-         *
-         * @param {string} id The id for the filter.
-         * @param {boolean} hideInvisibleLayers True, if invisible layers should be hidden. False otherwise.
-         * @param {string} searchText The search text to filter by.
-         * @param {boolean} filterBaseLayers True, if base layers should be filtered. False otherwise.
-         * @return {Ext.util.Filter} The created filter.
-         */
-        createLayerTreeFilter: function(id, hideInvisibleLayers, searchText, filterBaseLayers) {
-            var staticMe = CpsiMapview.util.LayerTreeFilter;
-            var filter = Ext.util.Filter({
-                id: id,
-                filterFn: function(node) {
-                    var isLeaf = !node.hasChildNodes();
-                    if (isLeaf) {
-                        if (hideInvisibleLayers) {
-                            var isVisible = staticMe.isLayerVisible(node, filterBaseLayers);
-                            if (!isVisible) {
-                                return false;
-                            }
-                        }
-                        if (searchText) {
-                            var isMatch = staticMe.isSearchTextInLayerName(node, searchText, filterBaseLayers);
-                            if (!isMatch) {
-                                return false;
-                            }
-                        }
-                        return true;
-                    } else {
-                        return false;
-                    }
-                }
-            });
-
-            return filter;
+        var tree = Ext.ComponentQuery.query(&#39;cmv_layertree&#39;)[0];
+        if (!tree) {
+            return;
         }
+        var store = tree.getStore();
+        if (!store) {
+            return;
+        }
+
+        // remove previous filter if exists
+        store.removeFilter(view.TEXT_FILTER_ID);
+    },
+
+<span id='CpsiMapview-controller-form-LayerTreeFilter-method-updateFilter'>    /**
+</span>     * Updates the filter with the latest input values.
+     *
+     * @return {void}
+     */
+    updateFilter: function() {
+        var me = this;
+        var view = me.getView();
+        var vm = view.getViewModel();
+        var LayerTreeFilterUtil = CpsiMapview.util.LayerTreeFilter;
+
+        var tree = Ext.ComponentQuery.query(&#39;cmv_layertree&#39;)[0];
+        if (!tree) {
+            return;
+        }
+        var store = tree.getStore();
+        if (!store) {
+            return;
+        }
+
+        store.removeFilter(view.FILTER_ID);
+        var filter = LayerTreeFilterUtil.createLayerTreeFilter(
+            view.FILTER_ID,
+            vm.get(&#39;hideInvisibleLayers&#39;),
+            vm.get(&#39;searchText&#39;),
+            view.getDoFilterBaseLayers()
+        );
+        store.addFilter(filter);
+    },
+
+<span id='CpsiMapview-controller-form-LayerTreeFilter-method-onSearchTextChange'>    /**
+</span>     * Handler for the input field change event.
+     *
+     * @param {Ext.form.field.Text} textfield The textfield.
+     * @param {string} searchText The search text.
+     * @return  {void}
+     */
+    onSearchTextChange: function(textfield, searchText) {
+        var treeFilter = textfield.up(&#39;cmv_layertreefilter&#39;);
+        var vm = treeFilter.getViewModel();
+        var ctrl = treeFilter.getController();
+        if (!vm || !ctrl) {
+            return;
+        }
+        vm.set(&#39;searchText&#39;, searchText);
+        ctrl.updateFilter();
+    },
+
+<span id='CpsiMapview-controller-form-LayerTreeFilter-method-onCheckboxChange'>    /**
+</span>     * Handler for the checkbox change event.
+     *
+     * @param {Ext.form.field.Checkbox} cb The checkbox.
+     * @param {boolean} checked True, if checked. False otherwise.
+     * @return {void}
+     */
+    onCheckboxChange: function(cb, checked) {
+        var treeFilter = cb.up(&#39;cmv_layertreefilter&#39;);
+        var vm = treeFilter.getViewModel();
+        var ctrl = treeFilter.getController();
+        if (!vm || !ctrl) {
+            return;
+        }
+        vm.set(&#39;hideInvisibleLayers&#39;, checked);
+        ctrl.updateFilter();
     }
 });
 </pre>

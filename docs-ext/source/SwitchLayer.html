@@ -129,22 +129,24 @@ Ext.define(&#39;CpsiMapview.util.SwitchLayer&#39;, {
         var filters = originalSource.get(&#39;additionalFilters&#39;);
         newLayerSource.set(&#39;additionalFilters&#39;, filters);
 
-        var activeStyle = switchLayer.get(&#39;activatedStyle&#39;);
+        var activatedStyle = switchLayer.get(&#39;activatedStyle&#39;);
 
         // TODO: fix this warning and ensure a style is set
-        if (!activeStyle) {
-            Ext.Logger.warn(&#39;activeStyle not set for &#39; + switchLayer.get(&#39;layerKey&#39;));
-            activeStyle = &#39;&#39;;
+        if (!activatedStyle) {
+            Ext.Logger.warn(&#39;activatedStyle not set for &#39; + switchLayer.get(&#39;layerKey&#39;));
+            activatedStyle = &#39;&#39;;
         }
 
-        if (newLayer.get(&#39;isWms&#39;)) {
-            activeStyle = LegendUtil.getWmsStyleFromSldFile(activeStyle);
+        newLayer.set(&#39;activatedStyle&#39;, activatedStyle);
 
+        if (newLayer.get(&#39;isWms&#39;)) {
             // check if a label STYLES parameter was added --&gt; keep this
             // the STYLES value (SLD) for the labels
             var labelClassName = newLayer.get(&#39;labelClassName&#39;);
+            var wmsStyleList = activatedStyle;
+
             if (newLayer.get(&#39;labelsActive&#39;) === true) {
-                activeStyle += &#39;,&#39; + labelClassName;
+                wmsStyleList += &#39;,&#39; + labelClassName;
             }
 
             if (filters &amp;&amp; filters.length &gt; 0) {
@@ -158,26 +160,19 @@ Ext.define(&#39;CpsiMapview.util.SwitchLayer&#39;, {
 
             // apply new style parameter and reload layer
             var newParams = {
-                STYLES: activeStyle,
+                STYLES: wmsStyleList,
                 FILTER: wmsFilterString,
                 TIMESTAMP: Ext.Date.now()
             };
             newLayerSource.updateParams(newParams);
         } else if (newLayer.get(&#39;isWfs&#39;) || newLayer.get(&#39;isVt&#39;)) {
-            var wmsLayerName = originalSource.getParams()[&#39;LAYERS&#39;].split(&#39;,&#39;)[0];
-            activeStyle = LegendUtil.getSldFileFromWmsStyle(activeStyle, wmsLayerName);
-
-            // TODO following code duplicated in CpsiMapview.view.layer.StyleSwitcherRadioGroup
-            var sldUrl = newLayer.get(&#39;stylesBaseUrl&#39;) + activeStyle;
-
             // load and parse SLD and apply it to layer
-            LayerFactory.loadSld(newLayer, sldUrl);
+            if (newLayer.getVisible()) {
+                LayerFactory.loadSld(newLayer);
+            }
         } else {
             Ext.Logger.info(&#39;Layer type not supported in StyleSwitcherRadioGroup&#39;);
         }
-
-        // setting a layer will trigger legend creations etc. so make sure activeStyle is set prior to this
-        newLayer.set(&#39;activatedStyle&#39;, activeStyle);
 
         // `overlayCollection.setAt(0, newLayer)` causes strange
         // errors for some unknown reason. `setAt` at other indexes

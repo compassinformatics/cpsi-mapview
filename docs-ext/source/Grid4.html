@@ -15,114 +15,932 @@
   </script>
 </head>
 <body onload="prettyPrint(); highlight();">
-  <pre class="prettyprint lang-js"><span id='CpsiMapview-util-Grid'>/**
-</span> * Static util class for Grid related operations.
+  <pre class="prettyprint lang-js"><span id='CpsiMapview-controller-grid-Grid'>/**
+</span> * This class is the controller for the cpsi mapview WFS
+ * generic grid class
+ *
  */
-Ext.define(&#39;CpsiMapview.util.Grid&#39;, {
+Ext.define(&#39;CpsiMapview.controller.grid.Grid&#39;, {
+    extend: &#39;Ext.app.ViewController&#39;,
+    alias: &#39;controller.cmv_grid&#39;,
 
-    statics: {
-<span id='CpsiMapview-util-Grid-static-method-getGridWindow'>        /**
-</span>         * Gets the grid panel component for this layer if it exists.
-         * Otherwise it will be created.
-         *
-         * @param {ol.layer.Base} layer The layer for which the grid shall be retrieved
-         * @returns {CpsiMapview.view.grid.Grid} The grid panel component
-         */
-        getGridWindow: function (layer) {
-            var staticMe = CpsiMapview.util.Grid;
-            var gridWindow;
-            var gridXType = layer.get(&#39;gridXType&#39;);
-            if (!gridXType) {
+    requires: [
+        &#39;Ext.menu.Menu&#39;,
+        &#39;Ext.grid.filters.Filters&#39;,
+        &#39;GeoExt.util.OGCFilter&#39;,
+        &#39;BasiGX.util.Layer&#39;,
+        &#39;CpsiMapview.util.WmsFilter&#39;,
+        &#39;CpsiMapview.util.Layer&#39;
+    ],
+
+<span id='CpsiMapview-controller-grid-Grid-property-listen'>    listen: {
+</span>        component: {
+            &#39;#&#39;: {
+                hide: &#39;onWindowHidden&#39;,
+                show: &#39;onWindowShown&#39;
+            }
+        }
+    },
+
+    mixins: {
+        zoomer: &#39;CpsiMapview.util.ZoomerMixin&#39;
+    },
+
+<span id='CpsiMapview-controller-grid-Grid-cfg-spatialFilter'>    /**
+</span>     * The currently active spatial filter for the layer.
+     *
+     * @cfg {Ext.util.Filter} spatialFilter
+     */
+    spatialFilter: null,
+
+<span id='CpsiMapview-controller-grid-Grid-method-onItemContextMenu'>    /**
+</span>     * Open a row-level context-menu with a Zoom to Feature option
+     * @private
+     */
+    onItemContextMenu: function (grid, record, item, index, evt) {
+        var me = this;
+        var vm = me.getViewModel();
+        var map = vm.get(&#39;map&#39;);
+        var isSpatial = vm.get(&#39;isSpatialGrid&#39;);
+
+        // currently there is only one context-menu tool
+        // and it is spatial-related
+        // if more tools are added then remove this guard
+        if (!isSpatial) {
+            return;
+        }
+
+        var contextMenu = Ext.create(&#39;Ext.menu.Menu&#39;, {
+            defaults: {
+                clickHideDelay: 1
+            },
+            items: [{
+                text: &#39;Zoom to Feature&#39;,
+                hidden: !isSpatial,
+                handler: function () {
+                    me.zoomToFeature(record.getFeature(), map);
+                }
+            }],
+            listeners: {
+                hide: {
+                    fn: function (menu) {
+                        menu.destroy();
+                    }
+                }
+            }
+        });
+
+        evt.stopEvent();
+        contextMenu.showAt(evt.pageX, evt.pageY);
+    },
+
+<span id='CpsiMapview-controller-grid-Grid-method-getLayerByKey'>    /**
+</span>     * Find a layer in the map based on its unique and custom layerKey
+     * property
+     *
+     * @param {string} key
+     * @private
+     */
+    getLayerByKey: function (key) {
+        var layers = BasiGX.util.Layer.getLayersBy(&#39;layerKey&#39;, key);
+
+        if (layers &amp;&amp; layers.length === 1) {
+            return layers[0];
+        }
+    },
+
+<span id='CpsiMapview-controller-grid-Grid-method-updateAssociatedLayers'>    /**
+</span>     * Applies both attribute and spatial filters to
+     * any associated WMS and vector layer and reloads both
+     * If filters have not been modified the WMS layer is not updated unless forced
+     *
+     * @private
+     * @param {Boolean} force True to force a WMS refresh (required if underlying data has changed)
+     */
+    updateAssociatedLayers: function (force) {
+
+        var me = this;
+        var grid = me.getView();
+        var viewModel = me.getViewModel();
+
+        var store = grid.getStore();
+        var filters = Ext.clone(store.getFilters().items); // otherwise the actual grid filters are modified
+        var wmsLayer = me.getLayerByKey(viewModel.get(&#39;wmsLayerKey&#39;));
+
+        // also check for MVT layer keys
+        if (!wmsLayer) {
+            wmsLayer = me.getLayerByKey(viewModel.get(&#39;vtwmsLayerKey&#39;));
+        }
+
+        if (me.spatialFilter) {
+            filters.push(me.spatialFilter);
+        }
+
+        if (me.idFilter) {
+            filters.push(me.idFilter);
+        }
+
+        if (wmsLayer) {
+
+            var wmsFilterUtil = CpsiMapview.util.WmsFilter;
+            var wmsSource = wmsLayer.getSource();
+            var wmsParams = wmsFilterUtil.getWmsParams(wmsLayer);
+
+            // save the current filter string to see if the filter has changed
+            var originalFilterString = wmsParams.FILTER || &#39;&#39;;
+
+            // set any new filter
+            if (filters &amp;&amp; filters.length &gt; 0) {
+                var ogcFilters = CpsiMapview.util.Layer.convertAndCombineFilters(filters);
+                wmsParams.FILTER = GeoExt.util.OGCFilter.combineFilters(ogcFilters, &#39;And&#39;, true, &#39;1.1.0&#39;);
+            } else {
+                wmsParams.FILTER = &#39;&#39;; // ensure the filter is reset if no filters are set
+            }
+
+            // ensure there is a filter for every layer listed in the WMS request (required by MapServer)
+            var wmsFilterString = wmsFilterUtil.getWmsFilterString(wmsParams);
+
+            // if the filters have not changed then we do not need to refresh
+            // unless the underlying data has changed and force is used
+            if (force === true || originalFilterString !== wmsFilterString) {
+
+                var newParams = {
+                    FILTER: wmsFilterString,
+                    TIMESTAMP: Ext.Date.now()
+                };
+
+                if (wmsLayer.get(&#39;isVt&#39;) === true) {
+                    CpsiMapview.util.Layer.updateVectorTileParameters(wmsLayer, newParams);
+                } else {
+                    wmsSource.updateParams(newParams);
+                }
+            }
+            // keep a reference to the raw filters so they can be applied to the vector layer
+            // when switching
+            wmsSource.set(&#39;additionalFilters&#39;, filters);
+            CpsiMapview.util.Layer.updateLayerNodeUI(wmsLayer);
+        }
+
+        var vectorLayer = me.getLayerByKey(viewModel.get(&#39;vectorLayerKey&#39;));
+
+        if (vectorLayer) {
+            var vectorSource = vectorLayer.getSource();
+
+            if (vectorSource instanceof ol.source.Cluster) {
+                vectorSource = vectorSource.getSource(); // we use the raw source
+            }
+
+            if (force === true) {
+                vectorSource.set(&#39;timestamp&#39;, Ext.Date.now());
+            }
+
+            vectorSource.set(&#39;additionalFilters&#39;, filters);
+            vectorSource.refresh();
+            CpsiMapview.util.Layer.updateLayerNodeUI(vectorLayer);
+        }
+
+    },
+
+<span id='CpsiMapview-controller-grid-Grid-method-createStoreFilters'>    /**
+</span>     * Create WFS filters for the store
+     * */
+    createStoreFilters: function (store) {
+
+        var me = this;
+        var wfsGetFeatureFilter = &#39;&#39;;
+
+        var filters = Ext.clone(store.getFilters().items);
+
+        if (me.spatialFilter) {
+            filters.push(me.spatialFilter);
+        }
+
+        if (me.idFilter) {
+            filters.push(me.idFilter);
+        }
+
+        if (filters.length &gt; 0) {
+            var ogcFilters = CpsiMapview.util.Layer.convertAndCombineFilters(filters);
+            wfsGetFeatureFilter = GeoExt.util.OGCFilter.combineFilters(ogcFilters, &#39;And&#39;, true, &#39;2.0.0&#39;);
+        }
+
+        return wfsGetFeatureFilter;
+    },
+
+<span id='CpsiMapview-controller-grid-Grid-method-onWfsStoreBeforeLoad'>    /**
+</span>     * Apply any spatial filter to the store request, and convert all
+     * ExtJS filters to WFS filters.
+     * Also set a loading mask on the grid.
+     *
+     * @private
+     */
+    onWfsStoreBeforeLoad: function (store, params) {
+
+        // handle the loadMask ourselves due to various issues around data binding and reconfiguring stores
+        // https://www.sencha.com/forum/showthread.php?299670-ExtJS-5.1.0-LoadMask-missing-on-grids-with-bound-store&amp;p=1116109#post1116109
+        // https://www.sencha.com/forum/showthread.php?301458-Loading-mask-not-setting-for-bound-store-loaded-in-ViewController.init
+        var me = this;
+
+        var view = me.getView();
+        view.setEmptyText(&#39;&#39;);
+        view.setLoading();
+
+        var wfsGetFeatureFilter = me.createStoreFilters(store);
+
+        if (wfsGetFeatureFilter) {
+            params.filter = wfsGetFeatureFilter;
+        }
+    },
+
+<span id='CpsiMapview-controller-grid-Grid-method-onWfsStoreAfterLoad'>    /**
+</span>     * Hide the loading mask when the store has loaded
+     *
+     * @private
+     */
+    onWfsStoreAfterLoad: function (store, features, success) {
+
+        var grid = this.getView();
+        var emptyText = &#39;&#39;;
+
+        // display a message if the WFS request fails
+        if (success === false) {
+            emptyText = &#39;An error occurred loading the data. &#39;;
+            if (store.pageSize === null) {
+                emptyText += &#39;Please check &quot;Page Records&quot; to reduce the amount of records returned&#39;;
+            }
+        }
+
+        grid.setEmptyText(emptyText);
+        grid.setLoading(false);
+    },
+
+<span id='CpsiMapview-controller-grid-Grid-method-onSpatialFilter'>    /**
+</span>     * Store the spatial filter as a property of this class
+     * then force a reload of the grid store with the new filter
+     * Finally apply all filters to any associated layers.
+     *
+     * @param {Ext.util.Filter} spatialFilter
+     * @private
+     */
+    onSpatialFilter: function (spatialFilter) {
+        var me = this;
+        me.spatialFilter = spatialFilter;
+        var clearPaging = true;
+        me.refreshStore(clearPaging);
+        var force = false;
+        me.updateAssociatedLayers(force);
+    },
+
+
+<span id='CpsiMapview-controller-grid-Grid-method-refreshStore'>    /**
+</span>    * Force a reload of the grid store
+    * @param {Boolean} clearPaging True to clear paging parameters
+    */
+    refreshStore: function (clearPaging) {
+
+        var me = this;
+        var grid = me.getView();
+        var store = grid.getStore();
+
+        // clear any paging parameters as these will no longer apply
+        // once filters have been applied
+        if (clearPaging === true) {
+            store.currentPage = 1;
+        }
+
+        if (store.loadWfs) {
+            store.loadWfs();
+        }
+    },
+
+<span id='CpsiMapview-controller-grid-Grid-method-onIdFilterSet'>    /**
+</span>     * Sets an ExtJS &quot;in&quot; filter for feature IDs which has to be applied to the
+     * underlying WFS request.
+     *
+     * @param {Ext.util.Filter} idFilter Filter object with FIDs
+     */
+    onIdFilterSet: function (idFilter) {
+        var me = this;
+        me.idFilter = idFilter;
+
+        var clearPaging = true;
+        me.refreshStore(clearPaging);
+
+        var force = false;
+        me.updateAssociatedLayers(force);
+    },
+
+<span id='CpsiMapview-controller-grid-Grid-method-getRecordEditConfig'>    /**
+</span>    * Gets associatedEditWindow, associatedEditModel and record Id
+    * from a ViewModel and record Model. It is a separate function
+    * so that it might be overridden in a subclass to return custom values
+    * @param {Ext.app.ViewModel} vm
+    * @param {Ext.data.Model} record
+    * @returns {Object} Object containing the config properties
+    */
+    getRecordEditConfig: function (vm, record) {
+        return {
+            associatedEditWindow: vm.get(&#39;associatedEditWindow&#39;),
+            associatedEditModel: vm.get(&#39;associatedEditModel&#39;),
+            id: record.getId()
+        };
+    },
+
+<span id='CpsiMapview-controller-grid-Grid-method-onRowDblClick'>    /**
+</span>     * If there is an edit / view window for individual records
+     * in the grid then open it with this function
+     *
+     * @param {Ext.grid.View} grid
+     * @param {Ext.data.Model} record
+     * @private
+     */
+    onRowDblClick: function (grid, record) {
+
+        var me = this;
+        var vm = me.getViewModel();
+        var config = me.getRecordEditConfig(vm, record);
+        var associatedEditWindow = config.associatedEditWindow;
+        var associatedEditModel = config.associatedEditModel;
+        var recId = config.id;
+
+        // get a reference to the model class so we can use the
+        // static .load function without creating a new empty model
+        var modelPrototype = Ext.ClassManager.get(associatedEditModel);
+
+        if (associatedEditWindow &amp;&amp; modelPrototype) {
+
+            // if the record is already open in a window then simply bring that window to the front
+            var windowXType = Ext.ClassManager.get(associatedEditWindow).prototype.getXType();
+            var existingWindows = Ext.ComponentQuery.query(windowXType);
+            var rec, recordWindow;
+
+            Ext.each(existingWindows, function (w) {
+                rec = w.getViewModel().get(&#39;currentRecord&#39;);
+                if (rec.getId() == recId) {
+                    recordWindow = w;
+                    return false;
+                }
+            });
+
+            if (recordWindow) {
+                // if the window is minimised make sure it is restored
+                if (recordWindow.isMinimized) {
+                    recordWindow.show();
+                }
+                Ext.WindowManager.bringToFront(recordWindow);
+            } else {
+                // load the record into a new window
+                grid.mask(&#39;Loading Record...&#39;);
+                modelPrototype.load(recId, {
+                    success: function (rec) {
+                        var win = Ext.create(associatedEditWindow);
+                        var vm = win.getViewModel();
+                        vm.set(&#39;currentRecord&#39;, rec);
+                        win.show();
+                    },
+                    callback: function () {
+                        grid.unmask();
+                    },
+                    scope: this
+                });
+            }
+        }
+    },
+<span id='CpsiMapview-controller-grid-Grid-method-togglePaging'>    /**
+</span>     * Enable and disable paging for the grid.
+     * Disabling paging allows all records to be loaded into the
+     * grid for an Excel export. Enabling paging improves load
+     * performance.
+     *
+     * @private
+     */
+    togglePaging: function (checkBox, checked) {
+
+        var me = this;
+        var grid = me.getView();
+
+        var pagingToolbar = grid.down(&#39;gx_wfspaging_toolbar&#39;);
+        pagingToolbar.setDisabled(!checked);
+
+        var store = grid.getStore();
+
+        // save the initial store parameters
+        if (!me.originalPageSize) {
+            me.originalPageSize = store.pageSize;
+        }
+
+        var originalHeight = grid.getHeight();
+
+        if (checked) {
+            store.pageSize = me.originalPageSize;
+            store.startIndex = 0; // reset each time // me.startIndex;
+        } else {
+            store.pageSize = null;
+            store.currentPage = 1;
+            store.startIndex = 0;
+            // avoid the grid resizing to fill up the whole screen
+            // set it to the height before paging was deactivated
+            grid.setHeight(originalHeight);
+        }
+
+        store.loadWfs();
+    },
+
+<span id='CpsiMapview-controller-grid-Grid-method-exportToExcel'>    /**
+</span>     * Export the current records in the grid to Excel
+     *
+     * @private
+     */
+    exportToExcel: function () {
+
+        var me = this;
+        var grid = me.getView();
+
+        if (!grid.saveDocumentAs) {
+            Ext.Msg.alert(&#39;Not Supported&#39;,
+                &#39;The Excel export is not supported for this grid&#39;, Ext.emptyFn);
+            return;
+        }
+
+        var originalMsg = grid.loadMask.msg;
+        grid.setLoading(&#39;Exporting to Excel...&#39;);
+
+        // later in an event listeners
+        grid.saveDocumentAs({
+            type: &#39;xlsx&#39;,
+            title: grid.exportTitle,
+            fileName: grid.exportFileName
+        }).then(function () {
+            grid.setLoading(false);
+            grid.loadMask.msg = originalMsg;
+        });
+    },
+
+<span id='CpsiMapview-controller-grid-Grid-method-exportToShapefile'>    /**
+</span>     * Export the current records in the grid to a zipped shapefile
+     *
+     * @private
+     */
+    exportToShapefile: function () {
+
+        var me = this;
+        me.exportUsingMapServer(&#39;shapezip&#39;);
+    },
+
+<span id='CpsiMapview-controller-grid-Grid-method-exportToServerExcel'>    /**
+</span>     * Export all records in the grid to a zipped Excel
+     * using MapServer
+     *
+     * @private
+     */
+    exportToServerExcel: function () {
+
+        var me = this;
+        me.exportUsingMapServer(&#39;xlsx&#39;);
+    },
+
+<span id='CpsiMapview-controller-grid-Grid-method-exportUsingMapServer'>    /**
+</span>     * Export data using MapServer OGR exports
+     *
+     * @private
+     */
+    exportUsingMapServer: function (outputFormat) {
+
+        var me = this;
+        var grid = me.getView();
+
+        var store = grid.getStore();
+        var url = store.url;
+        var params = store.createParameters();
+
+        // apply filters to the shapefile export
+        var wfsGetFeatureFilter = me.createStoreFilters(store);
+
+        if (wfsGetFeatureFilter) {
+            params.filter = wfsGetFeatureFilter;
+        }
+
+        params.outputFormat = outputFormat;
+        // remove the count and startIndex parameters so that all records are exported
+        delete params.count;
+        delete params.startIndex;
+
+        // files can&#39;t be downloaded using Ext.Ajax.request (due to browser security)
+        // so a hidden form is used with standardSubmit set to true
+        // this approach does not allow callbacks to be run on success / failure
+
+        Ext.create(&#39;Ext.form.Panel&#39;, {
+            standardSubmit: true
+        }).submit({
+            params: params,
+            url: url,
+            target: &#39;_blank&#39; // set the target to a blank tab so if it times out it does not leave the user with an empty page
+        });
+    },
+
+<span id='CpsiMapview-controller-grid-Grid-method-getVisibleColumns'>    /**
+</span>     * Whenever columns are shown or hidden update
+     * the WFS propertyName so only data to
+     * be displayed is returned. The idProperty will
+     * always be returned even if the column is hidden.
+     */
+    getVisibleColumns: function () {
+
+        var me = this;
+        var grid = me.getView();
+        var store = grid.getStore();
+
+        var visibleColumnNames, idProperty;
+
+        if (!store.isEmptyStore) {
+            visibleColumnNames = Ext.Array.pluck(grid.getVisibleColumns(), &#39;dataIndex&#39;);
+            idProperty = store.model.prototype.idField.name;
+
+            // add the idProperty as the first item in the list
+            // if not already in list
+            if (visibleColumnNames.indexOf(idProperty) === -1) {
+                visibleColumnNames.unshift(idProperty);
+            }
+            // remove any null columns which may have been created by
+            // selection checkboxes for example
+            visibleColumnNames = Ext.Array.clean(visibleColumnNames);
+            store.propertyName = visibleColumnNames.join(&#39;,&#39;);
+        }
+    },
+
+<span id='CpsiMapview-controller-grid-Grid-method-onColumnHide'>    onColumnHide: function () {
+</span>        this.getVisibleColumns();
+    },
+
+<span id='CpsiMapview-controller-grid-Grid-method-onColumnsReconfigure'>    onColumnsReconfigure: function () {
+</span>        this.getVisibleColumns();
+    },
+
+<span id='CpsiMapview-controller-grid-Grid-method-onColumnShow'>    onColumnShow: function (ct, column) {
+</span>
+        var me = this;
+        var grid = me.getView();
+        var store = grid.getStore();
+
+        me.getVisibleColumns();
+        var idProperty = store.model.prototype.idField.name;
+
+        if ((Ext.isEmpty(column.dataIndex) === false) &amp;&amp; (column.dataIndex !== idProperty)) {
+            // when a new column is displayed
+            // query the server again to retrieve the data
+            // idProperty will always be loaded so no need to reload in this case
+            // if a column does not have a dataIndex (e.g. checkbox columns) then there is no need to requery the server
+
+            // reset lastOptions used to load store to avoid records disappearing
+            // this can happen if spatial filters are applied when on pages of data &gt; 1 and
+            // then new columns are displayed
+            store.lastOptions.start = 0;
+            store.lastOptions.page = 1;
+
+            store.reload();
+        }
+    },
+
+<span id='CpsiMapview-controller-grid-Grid-method-toggleLayerVisibility'>    /**
+</span>     * Hide and show the map layer used to highlight selected features
+     * with the grid.
+     * Although the layer has no styling we need to hide
+     * any selections which are visible
+     */
+    toggleLayerVisibility: function (show) {
+        var me = this;
+        var grid = me.getView();
+        var store = grid.getStore();
+
+        if (store.isEmptyStore !== true &amp;&amp; store.getLayer) {
+            var selectedFeaturesLayer = store.getLayer();
+            if (selectedFeaturesLayer) {
+                selectedFeaturesLayer.setVisible(show);
+            }
+        }
+    },
+
+<span id='CpsiMapview-controller-grid-Grid-method-getOlLayer'>    /**
+</span>     * Returns the layer of the grid.
+     *
+     * @returns {ol.layer.Base} The grid&#39;s layer
+     */
+    getOlLayer: function () {
+        var me = this;
+        var viewModel = me.getViewModel();
+        // look for both wms and vector tile layers (vtwms)
+        var wmsLayerKey = viewModel.get(&#39;wmsLayerKey&#39;) ? viewModel.get(&#39;wmsLayerKey&#39;) : viewModel.get(&#39;vtwmsLayerKey&#39;);
+        var vectorLayerKey = viewModel.get(&#39;vectorLayerKey&#39;);
+        var layer;
+
+        if (wmsLayerKey) {
+            layer = me.getLayerByKey(wmsLayerKey);
+        }
+
+        // in the case of a switch layer we may have 2 layer keys defined
+        // but only one loaded into the map
+        if (!layer &amp;&amp; vectorLayerKey) {
+            layer = me.getLayerByKey(vectorLayerKey);
+        }
+
+        return layer;
+    },
+
+<span id='CpsiMapview-controller-grid-Grid-method-onWindowShown'>    /**
+</span>     * Show selection layer when the grid is shown
+     */
+    onWindowShown: function () {
+        this.toggleLayerVisibility(true);
+    },
+
+<span id='CpsiMapview-controller-grid-Grid-method-onWindowHidden'>    /**
+</span>     * Hide selection layer when the grid is shown
+     */
+    onWindowHidden: function () {
+        this.toggleLayerVisibility(false);
+    },
+
+<span id='CpsiMapview-controller-grid-Grid-method-onClearSort'>    /**
+</span>     * Clear any sorters on the store
+     */
+    onClearSort: function () {
+        var me = this;
+        var grid = me.getView();
+        var store = grid.getStore();
+        store.getSorters().clear();
+        store.reload();
+    },
+
+<span id='CpsiMapview-controller-grid-Grid-method-clearFilters'>    /**
+</span>     * Clear both the grid filters and any spatial filter.
+     * This will cause the store to reload.
+     *
+     * @private
+     */
+    clearFilters: function () {
+        var me = this;
+        var view = me.getView();
+        me.spatialFilter = null;
+        me.idFilter = null;
+        view.getPlugin(&#39;gridfilters&#39;).clearFilters();
+
+        var spatialQueryButton = view.down(&#39;cmv_spatial_query_button&#39;);
+        if (spatialQueryButton !== null) {
+            spatialQueryButton.fireEvent(&#39;clearAssociatedPermanentLayer&#39;);
+            spatialQueryButton.toggle(false);
+        }
+        var featureSelectionButton = view.down(&#39;cmv_feature_selection_button&#39;);
+        if (featureSelectionButton !== null) {
+            featureSelectionButton.toggle(false);
+        }
+
+        view.fireEvent(&#39;cmv-clear-filters&#39;);
+    },
+
+<span id='CpsiMapview-controller-grid-Grid-method-resetFilters'>    /**
+</span>     * Resets all filters without reloading the store.
+     * In case a direct reload of the store is needed use #clearFilters.
+     */
+    resetFilters: function () {
+        var me = this;
+        var grid = me.getView();
+        var store = grid.getStore();
+
+        // instead of grid.clearFilters() it does not force a reload
+        store.filters.clear();
+        me.spatialFilter = null;
+        me.idFilter = null;
+    },
+
+<span id='CpsiMapview-controller-grid-Grid-method-addChildModelListener'>    /**
+</span>     * If any models associated with the grid are edited
+     * (for example in a child form) then automatically update
+     * the grid and associated layers
+     *
+     * @private
+     */
+    addChildModelListener: function () {
+
+        var me = this;
+        var vm = me.getViewModel();
+        var associatedEditModel = vm.get(&#39;associatedEditModel&#39;);
+
+        if (associatedEditModel) {
+            var modelPrototype = Ext.ClassManager.get(associatedEditModel);
+            Ext.util.Observable.observe(modelPrototype, {
+                modelsaved: function () {
+                    var clearPaging = false;
+                    me.refreshStore(clearPaging);
+                    var force = true;
+                    me.updateAssociatedLayers(force);
+                },
+                scope: me
+            });
+        }
+    },
+
+<span id='CpsiMapview-controller-grid-Grid-method-initViewModel'>    /**
+</span>     * @private
+     */
+    initViewModel: function (viewModel) {
+        var me = this;
+
+        me.applyStoreToGrid(viewModel);
+        me.activatePresetFilterButton(viewModel);
+    },
+
+<span id='CpsiMapview-controller-grid-Grid-method-applyStoreToGrid'>    /**
+</span>     * Dynamically apply a store to the grid based on the gridStoreType
+     * config option. Also set the hidden grid vector layer to be associated
+     * with the cmv_spatial_query_button
+     *
+     * @param {Ext.app.ViewModel } viewModel The ViewModel
+     */
+    applyStoreToGrid: function (viewModel) {
+        var me = this;
+
+        me.addChildModelListener();
+
+        var gridStoreType = viewModel.get(&#39;gridStoreType&#39;);
+        var layerName = viewModel.get(&#39;gridLayerName&#39;);
+        // var vectorLayerKey = viewModel.get(&#39;vectorLayerKey&#39;);
+        var featureSelectionLayerKey = viewModel.get(&#39;featureSelectionLayerKey&#39;);
+
+        // TODO check why we can&#39;t simply add a {&#39;queryLayerName&#39;} binding in
+        // the grid view - already created ?
+
+        // we can have 2 cmv_spatial_query_buttons depending on the selection type (simple or advanced)
+        var spatialQueryButtons = viewModel.getView().query(&#39;cmv_spatial_query_button&#39;);
+
+        Ext.Array.each(spatialQueryButtons, (function (btn) {
+            btn.setQueryLayerName(layerName);
+            btn.setVectorLayerKey(layerName); // this name will have _spatialfilter appended to it
+        }));
+
+        // we will only ever have 1 cmv_feature_selection_button tool per grid
+        var featureSelectionButton = viewModel.getView().down(&#39;cmv_feature_selection_button&#39;);
+        featureSelectionButton.setVectorLayerKey(featureSelectionLayerKey);
+
+        // dynamically create the store based on the config setting
+
+        var stores = {
+            gridstore: {
+                type: gridStoreType,
+                map: &#39;{map}&#39;,
+                createLayer: true,
+                style: null, // hide WFS features unless selected - they are visible as part of the WMS
+                listeners: {
+                    &#39;gx-wfsstoreload-beforeload&#39;: &#39;onWfsStoreBeforeLoad&#39;,
+                    &#39;gx-wfsstoreload&#39;: &#39;onWfsStoreAfterLoad&#39;
+                }
+            }
+        };
+
+        viewModel.setStores(stores);
+    },
+
+<span id='CpsiMapview-controller-grid-Grid-method-activatePresetFilterButton'>    /**
+</span>     * Activated the &quot;preset filter&quot; button if the layer
+     * has the respective properties.
+     *
+     * @param {Ext.app.ViewModel } viewModel The ViewModel
+     */
+    activatePresetFilterButton: function (viewModel) {
+        var me = this;
+
+        // check if layer has preset grid Filters
+        // if yes, we activate the respective button
+        var layer = me.getOlLayer();
+        if (layer &amp;&amp; layer.get(&#39;gridFilters&#39;)) {
+            viewModel.set(&#39;usePresetFilters&#39;, true);
+        }
+    },
+
+<span id='CpsiMapview-controller-grid-Grid-method-applyPresetFilters'>    /**
+</span>     * Applies preset filters from the configuration
+     * to the grid.
+     */
+    applyPresetFilters: function () {
+        var me = this;
+
+        var layer = me.getOlLayer();
+        var gridFilters = layer.get(&#39;gridFilters&#39;);
+
+        if (!gridFilters || !Ext.isArray(gridFilters)) {
+            return;
+        }
+
+        var grid = me.getView();
+        if (!grid) {
+            return;
+        }
+
+        var columnManager = grid.getColumnManager();
+        if (!columnManager) {
+            return;
+        }
+
+        // loop through all provided preset filter definitions
+        Ext.each(gridFilters, function (filterDef) {
+            if (!filterDef || !Ext.isObject(filterDef)) {
                 return;
             }
 
-            // we can&#39;t keep a reference to the window in this class
-            // as a new Ext.menu.Item is created each time the menu is
-            // opened - use Ext.ComponentQuery instead
-            var existingGrids = Ext.ComponentQuery.query(gridXType);
+            var columnName = filterDef.property;
+            var value = filterDef.value;
+            var operator = filterDef.operator;
 
-            var gridWindowExists =
-                existingGrids.length &gt; 0 &amp;&amp;
-                existingGrids[0] &amp;&amp;
-                existingGrids[0].up(&#39;window&#39;);
-
-            if (gridWindowExists) {
-                // get the parent window of the grid
-                gridWindow = existingGrids[0].up(&#39;window&#39;);
-            } else {
-                gridWindow = staticMe.createGridWindow(layer);
+            if (!columnName || !value || !operator) {
+                Ext.log.warn(&#39;Preset filter is not properly defined.&#39;);
+                Ext.log.warn(filterDef);
+                return;
             }
-            return gridWindow;
-        },
 
+            var column = columnManager.getHeaderByDataIndex(columnName);
+            if (!column || !column.filter || !column.filter.type) {
+                return;
+            }
+            var columnType = column.filter.type;
 
-<span id='CpsiMapview-util-Grid-static-method-createGridWindow'>        /**
-</span>         * Creates a grid window for the layer.
-         *
-         * @param {ol.layer.Base} layer The layer for which the grid shall be created
-         * @returns {CpsiMapview.view.grid.Grid} The grid panel component
-         */
-        createGridWindow: function (layer) {
-            var gridXType = layer.get(&#39;gridXType&#39;);
-
-            // the Ext.window.Window configuration object
-            var windowConfig = {
-                minHeight: 600,
-                constrain: true,
-                layout: &#39;fit&#39;,
-                maximizable: true,
-                closeAction: &#39;hide&#39; // don&#39;t destroy the window when closed
-            };
-
-            Ext.apply(windowConfig, {
-                title: layer.get(&#39;name&#39;),
-                layout: &#39;fit&#39;,
-                items: [{
-                    xtype: gridXType,
-                    // we need to create this store, otherwise Ext will
-                    // create a default store that causes interference
-                    // between layers with grid
-                    // manually setting another store avoids problems like
-                    // that setting filters to one layers are applied to
-                    // another layer
-                    store: Ext.create(&#39;Ext.data.Store&#39;)
-                }],
-                listeners: {
-                    minimize: Ext.emptyFn,
-                    close: function () {
-                        // hide the spatial tool only when closed rather than when
-                        // minimising the window
-                        var me = this;
-                        var queryButton = me.down(&#39;cmv_spatial_query_button&#39;);
-                        if (queryButton !== null) {
-                            queryButton.fireEvent(&#39;hideAssociatedPermanentLayer&#39;);
-                            queryButton.toggle(false);
-                        }
-                        // hide the layer with the grid (to hide selections)
-                        var grid = me.down(&#39;grid&#39;);
-                        grid.fireEvent(&#39;hide&#39;);
-                    },
-                    show: function () {
-                        var me = this;
-                        var queryButton = me.down(&#39;cmv_spatial_query_button&#39;);
-                        if (queryButton !== null) {
-                            queryButton.fireEvent(&#39;showAssociatedPermanentLayer&#39;);
-                        }
-
-                        var grid = me.down(&#39;grid&#39;);
-                        grid.fireEvent(&#39;show&#39;);
+            switch (columnType) {
+                case &#39;string&#39;:
+                    // only equal is supported for string
+                    if (operator !== &#39;=&#39;) {
+                        Ext.log.warn(&#39;No valid operator provided.&#39;);
+                        return;
                     }
-                }
-            });
-            var gridWindow = Ext.create(&#39;CpsiMapview.view.window.MinimizableWindow&#39;, windowConfig);
+                    column.filter.setValue(value);
+                    break;
+                case &#39;number&#39;:
+                    var filterValue = me.createNumberFilterValue(
+                        operator,
+                        value
+                    );
+                    if (!filterValue) {
+                        return;
+                    }
 
-            // copy any ViewModel properties from the grid on to its containing window
-            // this allows helpUrl to be set at the grid level
-            var gridViewModelData = gridWindow.down(gridXType).getViewModel().getData();
-            // use apply rather than applyIf otherwise the default empty helpUrl is not overwritten
-            Ext.apply(gridWindow.getViewModel().getData(), gridViewModelData);
-            return gridWindow;
+                    column.filter.setValue(filterValue);
+                    break;
+                case &#39;boolean&#39;:
+                    // only equal is supported for boolean
+                    if (operator !== &#39;=&#39;) {
+                        Ext.log.warn(&#39;No valid operator provided.&#39;);
+                        return;
+                    }
+                    column.filter.setValue(value);
+                    break;
+                case &#39;list&#39;:
+                    // we need to apply the initial config again,
+                    // because otherwise the store with the list-choices
+                    // gets lost
+                    var newFilter = Ext.clone(column.initialConfig.filter);
+
+                    if (operator != &#39;in&#39;) {
+                        Ext.log.warn(&#39;No valid operator provided.&#39;);
+                        return;
+                    }
+
+                    // now we apply the operator and the value
+                    newFilter.operator = operator;
+                    newFilter.value = value;
+
+                    var plugin = grid.getPlugin(&#39;gridfilters&#39;);
+                    plugin.addFilter(newFilter);
+                    break;
+                default:
+                    Ext.log.warn(&#39;Filters not implemented for columns of type &#39; + columnType);
+                    break;
+            }
+        });
+    },
+
+<span id='CpsiMapview-controller-grid-Grid-method-createNumberFilterValue'>    /**
+</span>     * Create a value object needed for number filters.
+     *
+     * @param {string} operator The userdefined operator. Allowed values: &#39;=&#39;, &#39;&lt;&#39; and &#39;&gt;&#39;
+     * @param {number} value The numerical value to compare
+     * @returns {Object} The value object for the filter
+     */
+    createNumberFilterValue: function (operator, value) {
+        // translate user defined operators into operators
+        // that are compatible with number filters
+        var operatorMapping = {
+            &#39;=&#39;: &#39;eq&#39;,
+            &#39;&gt;&#39;: &#39;gt&#39;,
+            &#39;&lt;&#39;: &#39;lt&#39;
+        };
+        var filterOperator = operatorMapping[operator];
+        if (!filterOperator) {
+            Ext.log.warn(&#39;No valid operator provided.&#39;);
+            return;
         }
+
+        // the value for number filters are objects like &#39;{eq: 42}&#39;
+        // we need to create them from the original value and the operator
+        var filterValue = {};
+        filterValue[filterOperator] = value;
+        return filterValue;
     }
 });
 </pre>

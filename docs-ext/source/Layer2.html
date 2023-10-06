@@ -183,7 +183,7 @@ Ext.define(&#39;CpsiMapview.factory.Layer&#39;, {
      * @param  {Object} layerConf The configuration object for this layer
      * @return {ol.layer.Base}    The created sub layer
      */
-    createSwitchLayer: function (layerConf, noStyle) {
+    createSwitchLayer: function (layerConf) {
         // compute switch resolution when layer is
         // initialised the first time
         if (!layerConf.switchResolution) {
@@ -207,7 +207,6 @@ Ext.define(&#39;CpsiMapview.factory.Layer&#39;, {
 
         if (resolution &lt; layerConf.switchResolution) {
             var confBelowSwitchResolution = layerConf.layers[1];
-            confBelowSwitchResolution.noStyle = noStyle;
             // apply overall visibility to sub layer
             Ext.Object.merge(confBelowSwitchResolution, olVisibility);
             resultLayer = LayerFactory.createLayer(confBelowSwitchResolution);
@@ -217,7 +216,6 @@ Ext.define(&#39;CpsiMapview.factory.Layer&#39;, {
             );
         } else {
             var confAboveSwitchResolution = layerConf.layers[0];
-            confAboveSwitchResolution.noStyle = noStyle;
             // apply overall visibility to sub layer
             Ext.Object.merge(confAboveSwitchResolution, olVisibility);
             resultLayer = LayerFactory.createLayer(confAboveSwitchResolution);
@@ -451,7 +449,7 @@ Ext.define(&#39;CpsiMapview.factory.Layer&#39;, {
         }
 
         var featureType = layerConf.featureType;
-        var geometryProperty = layerConf.geometryProperty;
+        var geomFieldName = layerConf.geomFieldName ? layerConf.geomFieldName : &#39;geometry&#39;;
         var serverOptions = layerConf.serverOptions || {};
 
         var params = {
@@ -481,7 +479,7 @@ Ext.define(&#39;CpsiMapview.factory.Layer&#39;, {
 
         var vectorSource = new ol.source.Vector(olSourceConf);
 
-        // Dynamically generate the propertyNames to request based on inital propertyname config and props referenced in tooltipsConfig
+        // Dynamically generate the propertyNames to request based on initial propertyname config and props referenced in tooltipsConfig
         // But only if serverOptions.propertyname has been set
         var parsedPropertyNames = Ext.Array.clean((serverOptions.propertyname || &#39;&#39;).split(&#39;,&#39;));
         if (parsedPropertyNames.length) {
@@ -511,16 +509,20 @@ Ext.define(&#39;CpsiMapview.factory.Layer&#39;, {
 
             var allFilters = CpsiMapview.util.Layer.filterVectorSource(layerSource);
 
-            var bboxFilter = BasiGX.util.WFS.getBboxFilter(
-                mapPanel.olMap,
-                geometryProperty,
-                extent,
-                &#39;bbox&#39;
+            var bboxFilter = Ext.String.format(
+                GeoExt.util.OGCFilter.spatialFilterBBoxTpl,
+                geomFieldName,
+                params.SRSNAME,
+                extent[0],
+                extent[1],
+                extent[2],
+                extent[3]
             );
 
             allFilters.push(bboxFilter);
+
             // merge all filters to OGC compliant AND filter
-            var filter = GeoExt.util.OGCFilter.combineFilters(allFilters, &#39;And&#39;, false, &#39;2.0.0&#39;);
+            var filter = GeoExt.util.OGCFilter.combineFilters(allFilters, &#39;And&#39;, false, params.VERSION);
             var reqUrl = Ext.String.urlAppend(
                 baseUrlWithParams, &#39;FILTER=&#39; + encodeURIComponent(filter)
             );
@@ -600,6 +602,8 @@ Ext.define(&#39;CpsiMapview.factory.Layer&#39;, {
             });
         }
 
+        var styleConfigs = this.createStyleConfigs(layerConf);
+
         var olLayerConf = {
             name: layerConf.text,
             source: clusterSource ? clusterSource : vectorSource,
@@ -611,40 +615,29 @@ Ext.define(&#39;CpsiMapview.factory.Layer&#39;, {
             filterable: layerConf.filterable,
             url: baseUrl,
             featureType: featureType,
-            geomFieldName: layerConf.geomFieldName,
-            // TODO docs
+            geomFieldName: geomFieldName,
             // TODO wouldn&#39;t it make sense to have the actual field here
             //      instead of at the slider and globally for all layers?
             isNumericDependent: Ext.isDefined(layerConf.numericitem),
-            styles: layerConf.styles,
-            stylesBaseUrl: layerConf.stylesBaseUrl || &#39;&#39;,
-            sldUrl: layerConf.sldUrl,
-            sldUrlLabel: layerConf.sldUrlLabel,
+            styles: styleConfigs,
             idProperty: layerConf.idProperty
         };
         olLayerConf = Ext.apply(olLayerConf, olLayerProps);
-
         var wfsLayer = new ol.layer.Vector(olLayerConf);
 
-        // derive SLD to style WFS: either directly set in sldUrl or we
-        // we take the first of a possible SLD style list
-        var sldUrl = layerConf.sldUrl;
-        if (Ext.isArray(layerConf.styles) &amp;&amp; layerConf.styles.length) {
-            // check if first SLD style in list is an object (with SLD file
-            // name and UI alias) or if the SLD file name is directly provided
-            var firstStyle = layerConf.styles[0];
-            var style = Ext.isObject(firstStyle) ? firstStyle.name : firstStyle;
-            sldUrl = wfsLayer.get(&#39;stylesBaseUrl&#39;) + style;
-            wfsLayer.set(&#39;activatedStyle&#39;, style);
+        if (!Ext.isEmpty(styleConfigs)) {
+            wfsLayer.set(&#39;activatedStyle&#39;, styleConfigs[0].name);
         }
 
-        if (sldUrl &amp;&amp; !layerConf.noStyle) {
-            // load and parse style and apply it to layer
-            LayerFactory.loadSld(wfsLayer, sldUrl);
-        }
+        // load and parse style and apply it to layer
+        vectorSource.once(
+            &#39;vectorloadstart&#39;, function () {
+                LayerFactory.loadSld(wfsLayer);
+            }
+        );
 
         if (layerConf.tooltipsConfig) {
-            // create a custom toolitp for this layer
+            // create a custom tooltip for this layer
             LayerFactory.registerLayerTooltip(wfsLayer);
         }
 
@@ -679,6 +672,60 @@ Ext.define(&#39;CpsiMapview.factory.Layer&#39;, {
         olLayerConf = Ext.apply(olLayerConf, olLayerProps);
 
         return new ol.layer.Tile(olLayerConf);
+    },
+
+<span id='CpsiMapview-factory-Layer-method-createStyleConfigs'>    /**
+</span>     * There are several different methods used to create style
+     * configurations. This function ensures no matter which config approach
+     * is used, an array of consistent style config objects is created on a layer
+     */
+    createStyleConfigs: function (layerConf) {
+
+        var styleConfigs = [];
+
+        // if an array of style objects is not set then we create an array
+        // with a single entry
+        if (!Ext.isArray(layerConf.styles) &amp;&amp; layerConf.sldUrl) {
+            styleConfigs.push({
+                name: &#39;Default&#39;,
+                title: &#39;Default&#39;,
+                sldUrl: layerConf.sldUrl
+            });
+            return styleConfigs;
+        }
+
+        // GetStyles returns all styles in the service for a featureType
+        // so this URL is identical for all styles in a WFS
+        // vector tiles have a WMS-style URL with placeholders so we need to contruct the GetStyles
+        // request differently
+        var layerUrl;
+        if (layerConf.layerType === &#39;vtwms&#39;) {
+            layerUrl = layerConf.baseurl + &#39;version=1.3.0&amp;request=GetStyles&amp;service=WMS&amp;layers=&#39; + layerConf.layerIdentificationName;
+        } else {
+            layerUrl = layerConf.url + &#39;version=1.3.0&amp;request=GetStyles&amp;service=WMS&amp;layers=&#39; + layerConf.featureType;
+        }
+
+
+        // styleCfg can be a string (with a name) or an object
+        Ext.Array.each(layerConf.styles, function (styleCfg) {
+
+            var styleName, labelRule;
+            if (Ext.isObject(styleCfg)) {
+                styleName = styleCfg.name;
+                labelRule = styleCfg.labelRule ? styleCfg.labelRule : &#39;&#39;;
+            } else {
+                styleName = styleCfg;
+                labelRule = &#39;&#39;;
+            }
+            styleConfigs.push({
+                name: styleName,
+                sldUrl: styleCfg.sldUrl ? styleCfg.sldUrl : layerUrl,
+                title: styleCfg.title ? styleCfg.title : styleName,
+                labelRule: labelRule
+            });
+        });
+
+        return styleConfigs;
     },
 
 <span id='CpsiMapview-factory-Layer-method-createXyz'>    /**
@@ -837,17 +884,16 @@ Ext.define(&#39;CpsiMapview.factory.Layer&#39;, {
             url: layerConf.url
         };
         olSourceConf = Ext.apply(olSourceConf, olSourceProps);
+        var styleConfigs = this.createStyleConfigs(layerConf);
+        var vectorSource = new ol.source.VectorTile(olSourceConf);
 
         var olLayerConf = {
             name: layerConf.text,
             declutter: true,
-            source: new ol.source.VectorTile(olSourceConf),
+            source: vectorSource,
             isVt: true,
-            styles: layerConf.styles,
-            stylesBaseUrl: layerConf.stylesBaseUrl || &#39;&#39;,
+            styles: styleConfigs,
             toolTipConfig: layerConf.tooltipsConfig,
-            sldUrl: layerConf.sldUrl,
-            sldUrlLabel: layerConf.sldUrlLabel,
             baseurl: layerConf.baseurl,
             layerIdentificationName: layerConf.layerIdentificationName
         };
@@ -857,19 +903,17 @@ Ext.define(&#39;CpsiMapview.factory.Layer&#39;, {
 
         // derive SLD to style Vector Tiles:
         // we take the first of a possible SLD style list
-        var sldUrl;
-        if (Ext.isArray(layerConf.styles) &amp;&amp; layerConf.styles.length) {
-            // check if first SLD style in list is an object (with SLD file
-            // name and UI alias) or if the SLD file name is directly provided
-            var firstStyle = layerConf.styles[0];
-            var style = Ext.isObject(firstStyle) ? firstStyle.name : firstStyle;
-            sldUrl = vtLayer.get(&#39;stylesBaseUrl&#39;) + style;
-            vtLayer.set(&#39;activatedStyle&#39;, style);
+
+        if (!Ext.isEmpty(styleConfigs)) {
+            vtLayer.set(&#39;activatedStyle&#39;, styleConfigs[0].name);
         }
-        if (sldUrl &amp;&amp; !layerConf.noStyle) {
-            // load and parse style and apply it to layer
-            LayerFactory.loadSld(vtLayer, sldUrl);
-        }
+
+        // load and parse style and apply it to layer
+        vectorSource.once(
+            &#39;tileloadstart&#39;, function () {
+                LayerFactory.loadSld(vtLayer);
+            }
+        );
 
         if (layerConf.tooltipsConfig) {
             // enable map tooltips for this layer
@@ -976,6 +1020,167 @@ Ext.define(&#39;CpsiMapview.factory.Layer&#39;, {
         return olSourceProps;
     },
 
+<span id='CpsiMapview-factory-Layer-method-removeUnusedUserStyleNodes'>    /**
+</span>     * GeoStyler does not retain UserStyle names once parsed, we need to manually
+     * remove the UserStyles from the XML doc we don&#39;t want before parsing
+     */
+    removeUnusedUserStyleNodes: function (sldXmlDoc, style, labelsActive) {
+
+        var userStyles = Ext.DomQuery.select(&#39;UserStyle&#39;, sldXmlDoc);
+        var labelRuleFound = false;
+
+        Ext.Array.each(userStyles, function (userStyle) {
+
+            var userStyleName = &#39;&#39;;
+
+            // Get the immediate child nodes named &lt;se:Name&gt;
+            var childNodes = Array.prototype.slice.call(userStyle.children);
+            var nameNodes = childNodes.filter(function (child) {
+                return child.nodeName === &#39;se:Name&#39;;
+            });
+
+            if (nameNodes.length &gt; 0) {
+                userStyleName = nameNodes[0].textContent;
+            }
+
+            var keepNode = false;
+
+            // if no UserStyle name is set then it will be displayed
+            if (userStyleName === style.name || !userStyleName) {
+                keepNode = true;
+            }
+
+            if (labelsActive === true &amp;&amp; userStyleName === style.labelRule) {
+                keepNode = true;
+                labelRuleFound = true;
+            }
+
+            if (!keepNode) {
+                userStyle.parentNode.removeChild(userStyle);
+            }
+        });
+
+        if (labelsActive &amp;&amp; !labelRuleFound) {
+            //&lt;debug&gt;
+            Ext.log.warn(&#39;Labels are set on the layer but the label UserStyle &#39; + style.labelRule + &#39; was not found&#39;);
+            //&lt;/debug&gt;
+        }
+
+        return sldXmlDoc;
+    },
+
+<span id='CpsiMapview-factory-Layer-method-applySldToLayer'>    applySldToLayer: function (mapLayer, sldXmlDoc, style) {
+</span>
+        var me = this;
+        var labelsActive = mapLayer.get(&#39;labelsActive&#39;);
+        sldXmlDoc = me.removeUnusedUserStyleNodes(sldXmlDoc, style, labelsActive);
+        var sldXmlString = new XMLSerializer().serializeToString(sldXmlDoc);
+
+        // assume SLD 1.1.0 until https://github.com/geostyler/geostyler-sld-parser/issues/696 is implemented
+        var sldParser = new GeoStylerSLDParser.SldStyleParser({ sldVersion: &#39;1.1.0&#39; });
+        var olParser = new GeoStylerOpenlayersParser.OlStyleParser(ol);
+        sldParser.readStyle(sldXmlString)
+            .then(function (gs) {
+                if (gs.errors) {
+                    Ext.log.warn(&#39;Errors parsing the SLD file &quot;&#39; + style.sldUrl + &#39;&quot;. &#39; + gs.errors);
+                    return;
+                }
+
+                olParser.writeStyle(gs.output).then(function (olStyleFunc) {
+
+                    if (olStyleFunc.errors) {
+                        Ext.log.warn(&#39;Errors writing the OpenLayers style &quot;&#39; + style.sldUrl + &#39;&quot;. &#39; + olStyleFunc.errors);
+                        return;
+                    }
+
+                    var source = mapLayer.getSource();
+                    if (source instanceof ol.source.Cluster) {
+                        // for clustered features add an additional style
+                        // for any grouped features
+
+                        var styleCache = {}; // cache styles per featCount
+                        var styleFuncWrapper = function (feature, resolution) {
+                            var featCount = feature.get(&#39;features&#39;).length;
+                            var style;
+
+                            if (featCount === 1) {
+                                // call the standard style function
+                                var feat = feature.get(&#39;features&#39;)[0];
+
+                                if (typeof olStyleFunc.output === &#39;function&#39;) {
+                                    style = olStyleFunc.output(feat, resolution);
+                                } else {
+                                    //&lt;debug&gt;
+                                    // if there is one rule then an ol.style.Style is returned
+                                    // rather than a function
+                                    Ext.Assert.truthy(typeof olStyleFunc.output === &#39;object&#39;);
+                                    //&lt;/debug&gt;
+                                    style = olStyleFunc.output;
+                                }
+                            } else {
+                                // use a clustered style
+                                style = styleCache[featCount];
+                                if (!style) {
+                                    style = CpsiMapview.util.Style.createClusterStyle(featCount);
+                                    styleCache[featCount] = style;
+                                }
+                            }
+                            return style;
+                        };
+                        mapLayer.setStyle(styleFuncWrapper);
+                    } else {
+                        mapLayer.setStyle(olStyleFunc.output);
+                    }
+
+                    // now force an update of the layer to apply new styling
+                    source.set(&#39;timestamp&#39;, Ext.Date.now());
+                    source.dispatchEvent(&#39;sldapplied&#39;);
+
+                    if (!source.get(&#39;originalPropertyNames&#39;)) {
+                        // is not a type of layer on which originalPropertyNames has not been defined
+                        // refresh as per previous implementation
+                        source.refresh();
+                        return;
+                    }
+
+                    if (!source.get(&#39;originalPropertyNames&#39;).length) {
+                        // originalPropertyNames is empty. This mean no PROPERTYNAME param was
+                        // send meaning all fields are already available
+                        return;
+                    }
+
+                    var currentPropertyNames = Ext.Array.merge(source.get(&#39;propertyNames&#39;), source.get(&#39;originalPropertyNames&#39;));
+                    var stylePropertyNames = LayerFactory.getPropertyNamesInSLD(sldXmlDoc);
+                    var hasStyleExtraPropertyNames = Ext.Array.some(stylePropertyNames, function (prop) {
+                        return currentPropertyNames.indexOf(prop) === -1;
+                    });
+
+                    if (hasStyleExtraPropertyNames) {
+                        var propertyNames = LayerFactory.buildRequiredPropertyNames(stylePropertyNames, mapLayer.get(&#39;toolTipConfig&#39;));
+                        var xhr = source.get(&#39;xhr&#39;);
+
+                        source.set(&#39;propertyNames&#39;, propertyNames);
+
+                        // abort an existing xhr for this source if there is one and it is in progress
+                        // to prevent race conditions where the initial request for data would
+                        // finish after the subsequent request with extra fields, rendering features
+                        // without the required data, meaning styles would not apply in certain cases
+                        if (xhr &amp;&amp; xhr.readyState !== 4) {
+                            // ensure the loading bar is hidden
+                            source.dispatchEvent(&#39;vectorloadend&#39;);
+                            xhr.abort();
+                        }
+
+                        source.refresh();
+                    }
+                });
+            }, function () {
+                // rejection
+                Ext.log.warn(&#39;Could not parse SLD &#39; + style.sldUrl +
+                    &#39;! Default OL style will be applied.&#39;);
+            });
+    },
+
 <span id='CpsiMapview-factory-Layer-method-loadSld'>    /**
 </span>     * Loads and parses the given SLD (by URL) and applies it to the given
      * vector layer.
@@ -983,103 +1188,39 @@ Ext.define(&#39;CpsiMapview.factory.Layer&#39;, {
      * @param  {ol.layer.Vector} mapLayer The layer to apply the style to
      * @param  {String} sldUrl   The URL to the SLD
      */
-    loadSld: function (mapLayer, sldUrl) {
+    loadSld: function (mapLayer) {
+
+        var me = this;
+        var styles = mapLayer.get(&#39;styles&#39;);
+        if (Ext.isEmpty(styles)) {
+            // no styles set on the layer
+            return;
+        }
+
+        // if there is no activated style we display all styles in the SLD file
+        // this will be the case where there is only a single style for a layer
+        var activatedStyle = mapLayer.get(&#39;activatedStyle&#39;);
+
+        if (!activatedStyle) {
+            //&lt;debug&gt;
+            Ext.log.warn(&#39;No activatedStyle set on layer with multiple styles: &#39; + mapLayer.get(&#39;layerKey&#39;));
+            //&lt;/debug&gt;
+            return;
+        }
+
+        var style = styles.find(function (style) {
+            return style.name === activatedStyle;
+        });
+
+        var sldUrl = style.sldUrl;
 
         Ext.Ajax.request({
             url: sldUrl,
             method: &#39;GET&#39;,
             disableCaching: false,
             success: function (response) {
-                var sldXml = response.responseText;
-                var sldParser = new GeoStylerSLDParser.SldStyleParser({ sldVersion: &#39;1.1.0&#39;});
-                var olParser = new GeoStylerOpenlayersParser.OlStyleParser(ol);
-
-                sldParser.readStyle(sldXml)
-                    .then(function (gs) {
-
-                        olParser.writeStyle(gs.output).then(function (olStyleFunc) {
-
-                            if (olStyleFunc.errors) {
-                                Ext.log.warn(&#39;Errors parsing the SLD file&#39; + olStyleFunc.errors);
-                                return;
-                            }
-
-                            var source = mapLayer.getSource();
-                            if (source instanceof ol.source.Cluster) {
-
-                                // for clustered features add an additional style
-                                // for any grouped features
-
-                                var styleCache = {}; // cache styles per featCount
-                                var styleFuncWrapper = function (feature, resolution) {
-                                    var featCount = feature.get(&#39;features&#39;).length;
-                                    var style;
-
-                                    if (featCount === 1) {
-                                        // call the standard style function
-                                        var feat = feature.get(&#39;features&#39;)[0];
-                                        style = olStyleFunc.output(feat, resolution);
-                                    } else {
-                                        // use a clustered style
-                                        style = styleCache[featCount];
-                                        if (!style) {
-                                            style = CpsiMapview.util.Style.createClusterStyle(featCount);
-                                            styleCache[featCount] = style;
-                                        }
-                                    }
-                                    return style;
-                                };
-                                mapLayer.setStyle(styleFuncWrapper);
-                            } else {
-                                mapLayer.setStyle(olStyleFunc.output);
-                            }
-
-                            // now force an update of the layer to apply new styling
-                            source.set(&#39;timestamp&#39;, Ext.Date.now());
-
-                            if (!source.get(&#39;originalPropertyNames&#39;)) {
-                                // is not a type of layer on which originalPropertyNames has not been defined
-                                // refresh as per previous implementation
-                                source.refresh();
-                                return;
-                            }
-
-                            if (!source.get(&#39;originalPropertyNames&#39;).length) {
-                                // originalPropertyNames is empty. This mean no PROPERTYNAME param was
-                                // send meaning all fields are already available
-                                return;
-                            }
-
-                            var currentPropertyNames = Ext.Array.merge(source.get(&#39;propertyNames&#39;), source.get(&#39;originalPropertyNames&#39;));
-                            var stylePropertyNames = LayerFactory.getPropertyNamesInSLD(response.responseXML);
-                            var hasStyleExtraPropertyNames = Ext.Array.some(stylePropertyNames, function (prop) {
-                                return currentPropertyNames.indexOf(prop) === -1;
-                            });
-
-                            if (hasStyleExtraPropertyNames) {
-                                var propertyNames = LayerFactory.buildRequiredPropertyNames(stylePropertyNames, mapLayer.get(&#39;toolTipConfig&#39;));
-                                var xhr = source.get(&#39;xhr&#39;);
-
-                                source.set(&#39;propertyNames&#39;, propertyNames);
-
-                                // abort an existing xhr for this source if there is one and it is in progress
-                                // to prevent race conditions where the initial request for data would
-                                // finish after the subsequent request with extra fields, rendering features
-                                // without the required data, meaning styles would not apply in certain cases
-                                if (xhr &amp;&amp; xhr.readyState !== 4) {
-                                    // ensure the loading bar is hidden
-                                    source.dispatchEvent(&#39;vectorloadend&#39;);
-                                    xhr.abort();
-                                }
-
-                                source.refresh();
-                            }
-                        });
-                    }, function () {
-                        // rejection
-                        Ext.log.warn(&#39;Could not parse SLD &#39; + sldUrl +
-                            &#39;! Default OL style will be applied.&#39;);
-                    });
+                var sldXmlDoc = response.responseXML;
+                me.applySldToLayer(mapLayer, sldXmlDoc, style);
             },
             failure: function () {
                 Ext.log.warn(&#39;Could not load SLD &#39; + sldUrl +
@@ -1153,7 +1294,7 @@ Ext.define(&#39;CpsiMapview.factory.Layer&#39;, {
      */
     getPropertyNamesInSLD: function (xmlDoc) {
         var nameSpacedPropertyNameNodes = Ext.DomQuery.select(&#39;ogc\\:PropertyName&#39;, xmlDoc);
-        var propertyNameNodes =  Ext.DomQuery.select(&#39;PropertyName&#39;, xmlDoc);
+        var propertyNameNodes = Ext.DomQuery.select(&#39;PropertyName&#39;, xmlDoc);
         var props = Ext.Array.merge(
             Ext.Array.pluck(nameSpacedPropertyNameNodes, &#39;textContent&#39;),
             Ext.Array.pluck(propertyNameNodes, &#39;textContent&#39;)
