@@ -515,7 +515,6 @@ Ext.define('CpsiMapview.controller.button.DrawingButtonController', {
      * @returns
      */
     getNodeIdFromSnappedEdge: function (edgesLayer, edgeLayerConfig, coord) {
-
         var me = this;
         var nodeId;
 
@@ -529,7 +528,7 @@ Ext.define('CpsiMapview.controller.button.DrawingButtonController', {
 
         var startCoord = edge.getGeometry().getFirstCoordinate();
         var startExtent = me.getBufferedCoordExtent(startCoord);
-        var startDistance;
+        var startDistance = null;
 
         if (inputPoint.intersectsExtent(startExtent)) {
             nodeId = edge.get(edgeLayerConfig.startNodeProperty);
@@ -540,12 +539,15 @@ Ext.define('CpsiMapview.controller.button.DrawingButtonController', {
         var endExtent = me.getBufferedCoordExtent(endCoord);
 
         if (inputPoint.intersectsExtent(endExtent)) {
-
-            if (startDistance) {
+            var endNodeId = edge.get(edgeLayerConfig.endNodeProperty);
+            if (startDistance !== null) {
+                // if an input coord snaps to both ends of the line, then take the closest end
                 var endDistance = new ol.geom.LineString([coord, endCoord]).getLength();
                 if (endDistance < startDistance) {
-                    nodeId = edge.get(edgeLayerConfig.endNodeProperty);
+                    nodeId = endNodeId;
                 }
+            } else {
+                nodeId = endNodeId;
             }
         }
 
