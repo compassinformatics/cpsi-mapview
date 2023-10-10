@@ -59,10 +59,14 @@
                 bind: {
                     drawLayer: &#39;{resultLayer}&#39; // bind the draw layer to the model&#39;s featurestore / layer
                 },
-                snappingLayerKeys: [&#39;SERVICES_WFS&#39;, &#39;NODES_WFS&#39;, &#39;POLYGONS_WFS&#39;],
-                tracingLayerKeys: [&#39;SERVICES_WFS&#39;, &#39;POLYGONS_WFS&#39;],
+                snappingLayerKeys: [&#39;EDGES_WFS&#39;, &#39;NODES_WFS&#39;, &#39;POLYGONS_WFS&#39;],
+                tracingLayerKeys: [&#39;EDGES_WFS&#39;, &#39;POLYGONS_WFS&#39;],
                 nodeLayerKey: &#39;NODES_WFS&#39;,
-                edgeLayerKey: &#39;SERVICES_WFS&#39;,
+                edgeLayerKey: &#39;EDGES_WFS&#39;,
+                edgeLayerConfig: {
+                    startNodeProperty: &#39;NodeIdFrom&#39;,
+                    endNodeProperty: &#39;NodeIdTo&#39;
+                },
                 polygonLayerKey: &#39;POLYGONS_WFS&#39;
             }
         }

@@ -339,7 +339,7 @@
       "noCluster": true,
       "idProperty": "NodeId",
       "openLayers": {
-        "visibility": true,
+        "visibility": false,
         "maxScale": 800000
       }
     },
