@@ -432,6 +432,12 @@ Ext.define('CpsiMapview.factory.Layer', {
         }
 
         var featureType = layerConf.featureType;
+        var useBbox = true;
+
+        if (Ext.isEmpty(layerConf.useBbox) === false) {
+            useBbox = layerConf.useBbox;
+        }
+
         var geomFieldName = layerConf.geomFieldName ? layerConf.geomFieldName : 'geometry';
         var serverOptions = layerConf.serverOptions || {};
 
@@ -492,17 +498,22 @@ Ext.define('CpsiMapview.factory.Layer', {
 
             var allFilters = CpsiMapview.util.Layer.filterVectorSource(layerSource);
 
-            var bboxFilter = Ext.String.format(
-                GeoExt.util.OGCFilter.spatialFilterBBoxTpl,
-                geomFieldName,
-                params.SRSNAME,
-                extent[0],
-                extent[1],
-                extent[2],
-                extent[3]
-            );
+            // we can skip applying the bbox for a layer if required
+            // by default all layers will use a spatial filter
+            if (useBbox) {
 
-            allFilters.push(bboxFilter);
+                var bboxFilter = Ext.String.format(
+                    GeoExt.util.OGCFilter.spatialFilterBBoxTpl,
+                    geomFieldName,
+                    params.SRSNAME,
+                    extent[0],
+                    extent[1],
+                    extent[2],
+                    extent[3]
+                );
+
+                allFilters.push(bboxFilter);
+            }
 
             // merge all filters to OGC compliant AND filter
             var filter = GeoExt.util.OGCFilter.combineFilters(allFilters, 'And', false, params.VERSION);
