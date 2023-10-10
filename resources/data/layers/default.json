@@ -336,6 +336,7 @@
       "layerType": "wfs",
       "layerKey": "NODES_WFS",
       "featureType": "nodes",
+      "useBbox":  false,
       "noCluster": true,
       "idProperty": "NodeId",
       "openLayers": {
