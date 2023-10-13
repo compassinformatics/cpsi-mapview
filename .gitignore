@@ -15,3 +15,5 @@ bootstrap.jsonp
 
 lib/*/
 lib/turf.js
+.sencha/ide/config.json
+.sencha/.gitignore

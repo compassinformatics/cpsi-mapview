@@ -503,6 +503,9 @@ Ext.define('CpsiMapview.controller.grid.Grid', {
             params.filter = wfsGetFeatureFilter;
         }
 
+        // pass a filename to MapServer
+        params.fileName = params.typeName;
+
         params.outputFormat = outputFormat;
         // remove the count and startIndex parameters so that all records are exported
         delete params.count;
