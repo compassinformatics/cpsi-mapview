@@ -444,7 +444,7 @@ Ext.define(&#39;CpsiMapview.factory.Layer&#39;, {
 
         var srid = &#39;EPSG:3857&#39;;
         var mapPanel = CpsiMapview.view.main.Map.guess();
-        if (mapPanel) {
+        if (mapPanel &amp;&amp; mapPanel.olMap) {
             srid = mapPanel.olMap.getView().getProjection().getCode();
         }
 
@@ -499,6 +499,15 @@ Ext.define(&#39;CpsiMapview.factory.Layer&#39;, {
             // empty arrays ensure no PROPERTYNAME param is sent in the request below
             vectorSource.set(&#39;propertyNames&#39;, []);
             vectorSource.set(&#39;originalPropertyNames&#39;, []);
+        }
+
+        // add any configured filters for the WFS layer
+        if (layerConf.filters) {
+            var filters = [];
+            Ext.each(layerConf.filters, function (filter) {
+                filters.push(new Ext.util.Filter(filter));
+            });
+            vectorSource.set(&#39;additionalFilters&#39;, filters);
         }
 
         var loaderFn = function (extent) {
