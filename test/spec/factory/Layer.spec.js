@@ -65,6 +65,57 @@ describe('CpsiMapview.factory.Layer', function () {
 
         });
 
+
+        it('createWfsLayerWithFilters', function () {
+
+            var layerConf = {
+                "layerKey": "TEST_WFS",
+                "layerType": "wfs",
+                "idProperty": "ObjectId",
+                "noCluster": true,
+                "hasMetadata": true,
+                "featureType": "Test",
+                "styles": [
+                    {
+                        "name": "Test",
+                        "labelRule": "labels",
+                        "title": "Test Layer"
+                    }
+                ],
+                "openLayers": {
+                    "visibility": false,
+                    "opacity": 0.9,
+                    "projection": "EPSG:3857",
+                    "maxScale": 100000
+                },
+                "filters": [
+                    {
+                        "property": "IsActive",
+                        "value": "1",
+                        "operator": "="
+                    }
+                ],
+                "serverOptions": {
+                    "propertyname": "ObjectId"
+                },
+                "tooltipsConfig": [
+                    {
+                        "alias": "ObjectId",
+                        "property": "ObjectId"
+                    }
+                ]
+            };
+
+            var layer = layerFactory.createWfs(layerConf);
+            expect(layer).to.be.a(ol.layer.Vector);
+
+            var filters = layer.getSource().get('additionalFilters');
+            expect(filters.length).to.be(1);
+            expect(filters[0].getOperator()).to.be('=');
+            expect(filters[0].getProperty()).to.be('IsActive');
+            expect(filters[0].getValue()).to.be('1');
+        });
+
     });
 
     describe('buildStyleConfigs', function () {
@@ -292,7 +343,7 @@ describe('CpsiMapview.factory.Layer', function () {
         it('SLD applied to cluster layer', function (done) {
 
             var source = new ol.source.Cluster({
-                source:new ol.source.Vector()
+                source: new ol.source.Vector()
             });
 
             var layer = new ol.layer.Vector({
