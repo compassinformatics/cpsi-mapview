@@ -39,7 +39,8 @@ Ext.define(&#39;CpsiMapview.util.Grid&#39;, {
             // we can&#39;t keep a reference to the window in this class
             // as a new Ext.menu.Item is created each time the menu is
             // opened - use Ext.ComponentQuery instead
-            var existingGrids = Ext.ComponentQuery.query(gridXType);
+            // we pass in (true) to ensure an exact xtype match - excluding inherited classes
+            var existingGrids = Ext.ComponentQuery.query(gridXType + &#39;(true)&#39;);
 
             var gridWindowExists =
                 existingGrids.length &gt; 0 &amp;&amp;
