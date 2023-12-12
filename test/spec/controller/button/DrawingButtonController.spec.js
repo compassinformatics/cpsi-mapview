@@ -29,7 +29,7 @@ describe('CpsiMapview.controller.button.DrawingButtonController', function () {
             return map.getInteractions().getArray().filter(function (v) {
                 return v instanceof ol.interaction.Snap;
             });
-        }
+        };
 
         beforeEach(function () {
             // Create the component, then get a reference to the
@@ -79,9 +79,9 @@ describe('CpsiMapview.controller.button.DrawingButtonController', function () {
             getLayersByStub = sinon.stub(BasiGX.util.Layer, 'getLayersBy').callsFake(function (prop, key) {
                 switch (key) {
                     case 'layer1':
-                        return [layer1]
+                        return [layer1];
                     case 'layer2':
-                        return [layer2]
+                        return [layer2];
                 }
             });
         });
@@ -152,7 +152,7 @@ describe('CpsiMapview.controller.button.DrawingButtonController', function () {
             ctrl.setSnapInteraction(drawLayer);
 
             // Clear features from layer1, leaving only layer2 features
-            layer1.getSource().clear()
+            layer1.getSource().clear();
 
             expect(ctrl.snapInteraction.getFeatures_().getLength()).to.be(expectedUniqueFeaturesCount - 1);
         });
@@ -218,7 +218,8 @@ describe('CpsiMapview.controller.button.DrawingButtonController', function () {
         it('can get NodeId from start of snapped edge', function () {
 
             var coord = [0, 0];
-            ctrl.map.getView().setResolution(1); // set a low resolution or the buffer covers both ends of the line
+            // set a low resolution or the buffer covers both ends of the line
+            ctrl.map.getView().setResolution(1);
             var edgesLayer = layer1;
             var edgeLayerConfig = {
                 startNodeProperty: 'nodeIdFrom',
@@ -243,7 +244,7 @@ describe('CpsiMapview.controller.button.DrawingButtonController', function () {
             expect(nodeId).to.be(2);
         });
 
-        it('can calculate line intersections', function () {
+        it('can calculate line intersections', function (done) {
 
             view.snappingLayerKeys = ['layer1', 'layer2'];
 
@@ -261,9 +262,15 @@ describe('CpsiMapview.controller.button.DrawingButtonController', function () {
                 geometry: new ol.geom.LineString([[1, 1], [10, 10]])
             });
 
+
+            drawLayer.getSource().on('localdrawend', function (evt) {
+                // console.log(evt.result);
+                expect(evt.result.startNodeId).to.be(2);
+                expect(evt.result.endNodeId).to.be(null);
+                done();
+            });
+
             ctrl.calculateLineIntersections(inputFeature);
-            expect(inputFeature.get('startNodeId')).to.be(2);
-            expect(inputFeature.get('endNodeId')).to.be(-2);  // indicates not snapped and a new node needs to be created
         });
     });
 });
