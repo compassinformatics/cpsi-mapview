@@ -333,9 +333,9 @@ Ext.define(&#39;CpsiMapview.controller.button.DrawingButtonController&#39;, {
         // Checks if a feature exists in layers other than the current layer
         var isFeatureInOtherLayers = function (allLayers, currentLayer, feature) {
             var found = false;
-            Ext.Array.each(allLayers, function(layer) {
-                if(layer !== currentLayer) {
-                    if(layer.getSource().hasFeature(feature)) {
+            Ext.Array.each(allLayers, function (layer) {
+                if (layer !== currentLayer) {
+                    if (layer.getSource().hasFeature(feature)) {
                         found = true;
                     }
                 }
@@ -690,13 +690,6 @@ Ext.define(&#39;CpsiMapview.controller.button.DrawingButtonController&#39;, {
             startPolygonId: startPolygonId,
             endPolygonId: endPolygonId
         };
-
-        // set the node ids on the edge feature itself
-        // as these can be used by a polygon tool / grid
-        // the &quot;magic&quot; number -2 indicates a new node should be created
-        // for the line, rather than snapping to an existing node
-        feature.set(&#39;startNodeId&#39;, startNodeId ? startNodeId : -2);
-        feature.set(&#39;endNodeId&#39;, endNodeId ? endNodeId : -2);
 
         // fire an event when the drawing is complete
         var drawSource = me.drawLayer.getSource();

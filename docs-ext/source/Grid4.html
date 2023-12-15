@@ -15,246 +15,116 @@
   </script>
 </head>
 <body onload="prettyPrint(); highlight();">
-  <pre class="prettyprint lang-js"><span id='CpsiMapview-view-grid-Grid'>/**
-</span> * Base class for WFS-based data grids with filtering
- * and Excel exports.
+  <pre class="prettyprint lang-js"><span id='CpsiMapview-util-Grid'>/**
+</span> * Static util class for Grid related operations.
  */
-Ext.define(&#39;CpsiMapview.view.grid.Grid&#39;, {
-    extend: &#39;Ext.grid.Panel&#39;,
+Ext.define(&#39;CpsiMapview.util.Grid&#39;, {
 
-    requires: [
-        &#39;Ext.toolbar.Paging&#39;,
-        &#39;GeoExt.toolbar.WfsPaging&#39;,
-        &#39;GeoExt.selection.FeatureModel&#39;,
-        &#39;CpsiMapview.view.button.SpatialQueryButton&#39;,
-        &#39;CpsiMapview.controller.grid.Grid&#39;,
-        &#39;CpsiMapview.view.button.FeatureSelectionButton&#39;
-    ],
-
-    mixins: [&#39;CpsiMapview.util.ColumnMenuOrderMixin&#39;],
-
-    xtype: &#39;cmv_grid&#39;,
-<span id='CpsiMapview-view-grid-Grid-property-controller'>    controller: &#39;cmv_grid&#39;,
-</span><span id='CpsiMapview-view-grid-Grid-property-viewModel'>    viewModel: &#39;cmv_grid&#39;,
-</span>
-<span id='CpsiMapview-view-grid-Grid-property-plugins'>    plugins: [&#39;gridfilters&#39;],
-</span><span id='CpsiMapview-view-grid-Grid-property-width'>    width: 1090,
-</span>
-<span id='CpsiMapview-view-grid-Grid-cfg-extentBuffer'>    /**
-</span>     * The distance used to buffer a feature when the zoomToFeature
-     * function is used
-     * @cfg {Number}
-     */
-    extentBuffer: 100,
-
-<span id='CpsiMapview-view-grid-Grid-cfg-exportTitle'>    /**
-</span>     * The title added to the Excel document
-     * @cfg {String}
-     */
-    exportTitle: &#39;Records Export&#39;,
-
-<span id='CpsiMapview-view-grid-Grid-cfg-exportFileName'>    /**
-</span>     * The filename of the Excel export
-     * @cfg {String}
-     */
-    exportFileName: &#39;RecordsExport.xlsx&#39;,
-
-<span id='CpsiMapview-view-grid-Grid-property-bind'>    bind: {
-</span>        store: &#39;{gridstore}&#39;
-    },
-
-<span id='CpsiMapview-view-grid-Grid-property-viewConfig'>    viewConfig: {  //this config is passed to the view
-</span>        loadingText: &#39;Loading records&#39;,
-        enableTextSelection: true
-        //loadMask: {
-        //    msg: &#39;Loading records&#39; // TODO not sure why this isn&#39;t applied to the loadMask
-        //}
-    },
-
-<span id='CpsiMapview-view-grid-Grid-property-selModel'>    selModel: {
-</span>        type: &#39;featuremodel&#39;,
-        mode: &#39;SINGLE&#39;,
-        allowDeselect: true,
-        mapSelection: true,
-        selectStyle: new ol.style.Style({
-            image: new ol.style.Circle({
-                radius: 10,
-                stroke: new ol.style.Stroke({
-                    color: &#39;#0ff&#39;,
-                    width: 3
-                })
-            }),
-            stroke: new ol.style.Stroke({
-                width: 3,
-                color: &#39;#0ff&#39;
-            })
-        }),
-        bind: {
-            map: &#39;{map}&#39;
-            // TODO can&#39;t bind to a formula in the ViewModel
-            //selectStyle: &#39;{selectStyle}&#39;
-        }
-    },
-
-<span id='CpsiMapview-view-grid-Grid-property-listeners'>    /**
-</span>     * Functions attached to various listeners on the grid
-     */
-    listeners: {
-        filterchange: &#39;updateAssociatedLayers&#39;,
-        itemcontextmenu: &#39;onItemContextMenu&#39;,
-        columnhide: &#39;onColumnHide&#39;,
-        columnshow: &#39;onColumnShow&#39;,
-        rowdblclick: &#39;onRowDblClick&#39;,
-        // ensure columns are set when the store is bound to the grid
-        reconfigure: &#39;onColumnsReconfigure&#39;,
-        clearfilters: &#39;clearFilters&#39;,
-        applypresetfilters: &#39;applyPresetFilters&#39;
-    },
-
-<span id='CpsiMapview-view-grid-Grid-property-dockedItems'>    /**
-</span>     * Collection of tools and buttons at the top of the grid
-     */
-    dockedItems: [{
-        xtype: &#39;toolbar&#39;,
-        dock: &#39;top&#39;,
-        items: [{
-            xtype: &#39;button&#39;,
-            text: &#39;Clear Filters&#39;,
-            tooltip: &#39;Remove all field and spatial filters set on the grid&#39;,
-            glyph: &#39;f0b0@FontAwesome&#39;,
-            handler: &#39;clearFilters&#39;,
-            bind: {
-                hidden: &#39;{!clearFiltersVisible}&#39;
+    statics: {
+<span id='CpsiMapview-util-Grid-static-method-getGridWindow'>        /**
+</span>         * Gets the grid panel component for this layer if it exists.
+         * Otherwise it will be created.
+         *
+         * @param {ol.layer.Base} layer The layer for which the grid shall be retrieved
+         * @returns {CpsiMapview.view.grid.Grid} The grid panel component
+         */
+        getGridWindow: function (layer) {
+            var staticMe = CpsiMapview.util.Grid;
+            var gridWindow;
+            var gridXType = layer.get(&#39;gridXType&#39;);
+            if (!gridXType) {
+                return;
             }
-        },
-        {
-            xtype: &#39;button&#39;,
-            text: &#39;Clear Sorting&#39;,
-            tooltip: &#39;Clear any custom sorting of the grid&#39;,
-            glyph: &#39;f039@FontAwesome&#39;,
-            handler: &#39;onClearSort&#39;
-        },
-        {
-            xtype: &#39;button&#39;,
-            text: &#39;Apply Preset Filters&#39;,
-            tooltip: &#39;Re-apply any default filters that have been configured for the grid&#39;,
-            glyph: &#39;f005@FontAwesome&#39;,
-            handler: &#39;applyPresetFilters&#39;,
-            bind: {
-                hidden: &#39;{!usePresetFilters}&#39;
+
+            // we can&#39;t keep a reference to the window in this class
+            // as a new Ext.menu.Item is created each time the menu is
+            // opened - use Ext.ComponentQuery instead
+            // we pass in (true) to ensure an exact xtype match - excluding inherited classes
+            var existingGrids = Ext.ComponentQuery.query(gridXType + &#39;(true)&#39;);
+
+            var gridWindowExists =
+                existingGrids.length &gt; 0 &amp;&amp;
+                existingGrids[0] &amp;&amp;
+                existingGrids[0].up(&#39;window&#39;);
+
+            if (gridWindowExists) {
+                // get the parent window of the grid
+                gridWindow = existingGrids[0].up(&#39;window&#39;);
+            } else {
+                gridWindow = staticMe.createGridWindow(layer);
             }
+            return gridWindow;
         },
-        &#39;-&gt;&#39;,
-        {
-            xtype: &#39;cmv_spatial_query_button&#39;,
-            drawGeometryType: &#39;Polygon&#39;,
-            text: &#39;Select by Shape&#39;,
-            spatialOperator: &#39;intersect&#39;,
-            toggleGroup: &#39;map&#39;,
-            triggerWfsRequest: false,
-            displayPermanently: true,
-            glyph: &#39;xf044@FontAwesome&#39;,
-            bind: {
-                hidden: &#39;{!useSimpleSelection}&#39;
-            },
-            listeners: {
-                &#39;cmv-spatial-query-filter&#39;: &#39;onSpatialFilter&#39;
-            }
-        },
-        {
-            xtype: &#39;buttongroup&#39;, // segmentedbutton does not support toggleGroup
-            bind: {
-                hidden: &#39;{!useAdvancedSelection}&#39;
-            },
-            items: [
-                {
-                    xtype: &#39;cmv_spatial_query_button&#39;,
-                    drawGeometryType: &#39;Polygon&#39;,
-                    text: &#39;Select by Shape&#39;,
-                    spatialOperator: &#39;intersect&#39;,
-                    toggleGroup: &#39;map&#39;,
-                    triggerWfsRequest: false,
-                    displayPermanently: true,
-                    glyph: &#39;xf044@FontAwesome&#39;,
-                    listeners: {
-                        &#39;cmv-spatial-query-filter&#39;: &#39;onSpatialFilter&#39;
-                    }
-                },
-                {
-                    xtype: &#39;cmv_feature_selection_button&#39;,
-                    triggerWfsRequest: false,
-                    allowMultiple: true,
-                    toggleGroup: &#39;map&#39;,
-                    bind: {
-                        vectorLayerKey: &#39;{featureSelectionLayerKey}&#39;
+
+
+<span id='CpsiMapview-util-Grid-static-method-createGridWindow'>        /**
+</span>         * Creates a grid window for the layer.
+         *
+         * @param {ol.layer.Base} layer The layer for which the grid shall be created
+         * @returns {CpsiMapview.view.grid.Grid} The grid panel component
+         */
+        createGridWindow: function (layer) {
+            var gridXType = layer.get(&#39;gridXType&#39;);
+
+            // the Ext.window.Window configuration object
+            var windowConfig = {
+                minHeight: 600,
+                constrain: true,
+                layout: &#39;fit&#39;,
+                maximizable: true,
+                closeAction: &#39;hide&#39; // don&#39;t destroy the window when closed
+            };
+
+            Ext.apply(windowConfig, {
+                title: layer.get(&#39;name&#39;),
+                layout: &#39;fit&#39;,
+                items: [{
+                    xtype: gridXType,
+                    // we need to create this store, otherwise Ext will
+                    // create a default store that causes interference
+                    // between layers with grid
+                    // manually setting another store avoids problems like
+                    // that setting filters to one layers are applied to
+                    // another layer
+                    store: Ext.create(&#39;Ext.data.Store&#39;)
+                }],
+                listeners: {
+                    minimize: Ext.emptyFn,
+                    close: function () {
+                        // hide the spatial tool only when closed rather than when
+                        // minimising the window
+                        var me = this;
+                        var queryButton = me.down(&#39;cmv_spatial_query_button&#39;);
+                        if (queryButton !== null) {
+                            queryButton.fireEvent(&#39;hideAssociatedPermanentLayer&#39;);
+                            queryButton.toggle(false);
+                        }
+                        // hide the layer with the grid (to hide selections)
+                        var grid = me.down(&#39;grid&#39;);
+                        grid.fireEvent(&#39;hide&#39;);
                     },
-                    glyph: &#39;xf245@FontAwesome&#39;,
-                    listeners: {
-                        &#39;cmv-reset-grid-filters&#39;: &#39;resetFilters&#39;,
-                        &#39;cmv-id-filter-set&#39;: &#39;onIdFilterSet&#39;
+                    show: function () {
+                        var me = this;
+                        var queryButton = me.down(&#39;cmv_spatial_query_button&#39;);
+                        if (queryButton !== null) {
+                            queryButton.fireEvent(&#39;showAssociatedPermanentLayer&#39;);
+                        }
+
+                        var grid = me.down(&#39;grid&#39;);
+                        grid.fireEvent(&#39;show&#39;);
                     }
                 }
-            ]
-        },
-        {
-            xtype: &#39;button&#39;,
-            bind: {
-                pressed: &#39;{isGroupEditingEnabled}&#39;,
-                hidden: &#39;{!isGroupEditingVisible}&#39;
-            },
-            text: &#39;Group Edit&#39;,
-            enableToggle: true,
-            glyph: &#39;xf040@FontAwesome&#39;,
-            tooltip: &#39;Update a field in the grid for multiple records&#39;,
-            toggleHandler: &#39;onGroupEditToggle&#39;
-        },
-        {
-            xtype: &#39;button&#39;,
-            text: &#39;Export to Excel&#39;,
-            glyph: &#39;xf1c3@FontAwesome&#39;,
-            tooltip: &#39;Export the records that are visible in the grid to an Excel file&#39;,
-            handler: &#39;exportToExcel&#39;,
-            bind: {
-                hidden: &#39;{!exportExcelVisible}&#39;
-            }
-        },
-        {
-            xtype: &#39;button&#39;,
-            text: &#39;Data Exports&#39;,
-            tooltip: &#39;Export all records in the grid to a zip file&#39;,
-            bind: {
-                hidden: &#39;{!exportShapefileVisible}&#39;
-            },
-            menu: [{
-                text: &#39;Export to Shapefile&#39;,
-                glyph: &#39;eaa2@font-gis&#39;,
-                handler: &#39;exportToShapefile&#39;
-            }, {
-                text: &#39;Export to Excel&#39;,
-                glyph: &#39;xf1c3@FontAwesome&#39;,
-                handler: &#39;exportToServerExcel&#39;
-            }]
-        }]
-    },
-    {
-        xtype: &#39;toolbar&#39;,
-        dock: &#39;bottom&#39;,
-        items: [
-            {
-                xtype: &#39;gx_wfspaging_toolbar&#39;,
-                displayInfo: true,
-                bind: {
-                    store: &#39;{gridstore}&#39;
-                }
-            },
-            {
-                xtype: &#39;checkbox&#39;,
-                itemId: &#39;pagingCheckbox&#39;,
-                checked: true,
-                boxLabel: &#39;Page Records?&#39;,
-                handler: &#39;togglePaging&#39;
-            }]
-    }]
+            });
+            var gridWindow = Ext.create(&#39;CpsiMapview.view.window.MinimizableWindow&#39;, windowConfig);
+
+            // copy any ViewModel properties from the grid on to its containing window
+            // this allows helpUrl to be set at the grid level
+            var gridViewModelData = gridWindow.down(gridXType).getViewModel().getData();
+            // use apply rather than applyIf otherwise the default empty helpUrl is not overwritten
+            Ext.apply(gridWindow.getViewModel().getData(), gridViewModelData);
+            return gridWindow;
+        }
+    }
 });
 </pre>
 </body>
