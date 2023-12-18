@@ -44,6 +44,14 @@ Ext.define(&#39;CpsiMapview.view.combo.Gazetteer&#39;, {
      */
     srs: &#39;EPSG:3857&#39;,
 
+<span id='CpsiMapview-view-combo-Gazetteer-cfg-fieldNameSuffix'>    /**
+</span>     * String to append to the field names
+     * from example if set to &#39;3857&#39; extent field names
+     * will be expected to be in the format minX3857
+     * @cfg {String}
+     */
+    fieldNameSuffix: &#39;3857&#39;,
+
 <span id='CpsiMapview-view-combo-Gazetteer-method-onFocus'>    onFocus: Ext.emptyFn,
 </span>
 <span id='CpsiMapview-view-combo-Gazetteer-method-initComponent'>    /**
@@ -67,6 +75,10 @@ Ext.define(&#39;CpsiMapview.view.combo.Gazetteer&#39;, {
                 lineDash: [8, 4]
             })
         });
+
+        // ensure that the scope of convertToExtent is set to this class
+        // so we can get the fieldNameSuffix
+        me.convertToExtent = me.convertToExtent.bind(me);
 
         me.callParent();
 
@@ -104,17 +116,21 @@ Ext.define(&#39;CpsiMapview.view.combo.Gazetteer&#39;, {
 
 <span id='CpsiMapview-view-combo-Gazetteer-method-convertToExtent'>    /**
 </span>     * Function to convert the data delivered by the Gazetteer service to an
-     * ol.Extent ([minx, miny, maxx, maxy]).
+     * ol.Extent ([minX, minY, maxX, maxY]). If `fieldNameSuffix` is set then
+     * field names such as minX2857 can be supported
      *
      * @param  {Mixed}          v   The data value as read by the Reader
      * @param  {Ext.data.Model} rec The data record containing raw data
      * @return {ol.Extent}          The created ol.Extent
      */
     convertToExtent: function (v, rec) {
-        var minx = rec.get(&#39;minX3857&#39;);
-        var miny = rec.get(&#39;minY3857&#39;);
-        var maxx = rec.get(&#39;maxX3857&#39;);
-        var maxy = rec.get(&#39;maxY3857&#39;);
+
+        var me = this;
+
+        var minx = rec.get(&#39;minX&#39; + me.fieldNameSuffix);
+        var miny = rec.get(&#39;minY&#39; + me.fieldNameSuffix);
+        var maxx = rec.get(&#39;maxX&#39; + me.fieldNameSuffix);
+        var maxy = rec.get(&#39;maxY&#39; + me.fieldNameSuffix);
 
         return [minx, miny, maxx, maxy];
     }
