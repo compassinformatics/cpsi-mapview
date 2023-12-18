@@ -59,6 +59,10 @@ Ext.define('CpsiMapview.view.combo.Gazetteer', {
             })
         });
 
+        // ensure that the scope of convertToExtent is set to this class
+        // so we can get the fieldNameSuffix
+        me.convertToExtent = me.convertToExtent.bind(me);
+
         me.callParent();
 
         me.on({
