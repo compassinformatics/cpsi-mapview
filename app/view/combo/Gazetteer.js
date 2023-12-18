@@ -27,6 +27,14 @@ Ext.define('CpsiMapview.view.combo.Gazetteer', {
      */
     srs: 'EPSG:3857',
 
+    /**
+     * String to append to the field names
+     * from example if set to '3857' extent field names
+     * will be expected to be in the format minX3857
+     * @cfg {String}
+     */
+    fieldNameSuffix: '3857',
+
     onFocus: Ext.emptyFn,
 
     /**
@@ -87,17 +95,21 @@ Ext.define('CpsiMapview.view.combo.Gazetteer', {
 
     /**
      * Function to convert the data delivered by the Gazetteer service to an
-     * ol.Extent ([minx, miny, maxx, maxy]).
+     * ol.Extent ([minX, minY, maxX, maxY]). If `fieldNameSuffix` is set then
+     * field names such as minX2857 can be supported
      *
      * @param  {Mixed}          v   The data value as read by the Reader
      * @param  {Ext.data.Model} rec The data record containing raw data
      * @return {ol.Extent}          The created ol.Extent
      */
     convertToExtent: function (v, rec) {
-        var minx = rec.get('minX3857');
-        var miny = rec.get('minY3857');
-        var maxx = rec.get('maxX3857');
-        var maxy = rec.get('maxY3857');
+
+        var me = this;
+
+        var minx = rec.get('minX' + me.fieldNameSuffix);
+        var miny = rec.get('minY' + me.fieldNameSuffix);
+        var maxx = rec.get('maxX' + me.fieldNameSuffix);
+        var maxy = rec.get('maxY' + me.fieldNameSuffix);
 
         return [minx, miny, maxx, maxy];
     }
