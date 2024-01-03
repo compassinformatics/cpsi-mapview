@@ -814,13 +814,14 @@ Ext.define('CpsiMapview.controller.button.DigitizeButtonController', {
      */
     getNetByPolygon: function (feat) {
         var me = this;
+        var srs = me.map.getView().getProjection().getCode();
         var format = new ol.format.GeoJSON({
-            dataProjection: me.map.getView().getProjection().getCode()
+            dataProjection: srs
         });
         var geoJson = format.writeFeature(feat);
-        var jsonParams = {
-            geometry3857: Ext.JSON.decode(geoJson).geometry
-        };
+        var jsonParams = {};
+        var geometryParamName = 'geometry' + srs.replace('EPSG:', '');
+        jsonParams[geometryParamName] = Ext.JSON.decode(geoJson).geometry;
         return me.doAjaxRequest(jsonParams)
             .then(me.parseNetsolverResponse.bind(me));
     },
