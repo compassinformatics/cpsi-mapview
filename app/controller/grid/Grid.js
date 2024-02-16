@@ -529,15 +529,17 @@ Ext.define('CpsiMapview.controller.grid.Grid', {
      * the WFS propertyName so only data to
      * be displayed is returned. The idProperty will
      * always be returned even if the column is hidden.
+     * Merge in an extraPropertyNames defined in the viewModel
      */
     getVisibleColumns: function () {
 
         var me = this;
+        var viewModel = me.getViewModel();
         var grid = me.getView();
         var store = grid.getStore();
+        var extraPropertyNames = viewModel.get('extraPropertyNames');
 
         var visibleColumnNames, idProperty;
-
         if (!store.isEmptyStore) {
             visibleColumnNames = Ext.Array.pluck(grid.getVisibleColumns(), 'dataIndex');
             idProperty = store.model.prototype.idField.name;
@@ -550,7 +552,7 @@ Ext.define('CpsiMapview.controller.grid.Grid', {
             // remove any null columns which may have been created by
             // selection checkboxes for example
             visibleColumnNames = Ext.Array.clean(visibleColumnNames);
-            store.propertyName = visibleColumnNames.join(',');
+            store.propertyName = Ext.Array.merge(visibleColumnNames, extraPropertyNames).join(',');
         }
     },
 

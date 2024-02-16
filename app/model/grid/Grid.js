@@ -25,7 +25,8 @@ Ext.define('CpsiMapview.model.grid.Grid', {
         usePresetFilters: false,
         clearFiltersVisible: true,
         exportExcelVisible: true,
-        exportShapefileVisible: true
+        exportShapefileVisible: true,
+        extraPropertyNames: []
     },
 
     formulas: {
