@@ -15,64 +15,52 @@
   </script>
 </head>
 <body onload="prettyPrint(); highlight();">
-  <pre class="prettyprint lang-js"><span id='CpsiMapview-controller-window-ParallelLineWindow'>/**
-</span> * This class is the controller for the ParallelLine.
+  <pre class="prettyprint lang-js"><span id='CpsiMapview-view-window-ParallelLineWindow'>/**
+</span> * This is an example class for the usage of the ParallelLine toolbar.
+ * A new layer will be added to the map, that contains the latest created
+ * feature.
+ *
+ * @class CpsiMapview.view.window.ParallelLineWindow
  */
-Ext.define(&#39;CpsiMapview.controller.window.ParallelLineWindow&#39;, {
-    extend: &#39;Ext.app.ViewController&#39;,
-
-    alias: &#39;controller.cmv_parallel_line_window&#39;,
+Ext.define(&#39;CpsiMapview.view.window.ParallelLineWindow&#39;, {
+    extend: &#39;Ext.window.Window&#39;,
+    xtype: &#39;cmv_parallel_line_window&#39;,
 
     requires: [
-        &#39;BasiGX.view.component.Map&#39;
+        &#39;Ext.button.Button&#39;,
+        &#39;CpsiMapview.view.toolbar.ParallelLineToolbar&#39;,
+        &#39;CpsiMapview.controller.window.ParallelLineWindow&#39;,
+        &#39;CpsiMapview.model.window.ParallelLineWindow&#39;
     ],
 
-<span id='CpsiMapview-controller-window-ParallelLineWindow-property-selectInteraction'>    selectInteraction: null,
+<span id='CpsiMapview-view-window-ParallelLineWindow-property-controller'>    controller: &#39;cmv_parallel_line_window&#39;,
 </span>
-<span id='CpsiMapview-controller-window-ParallelLineWindow-property-layer'>    layer: null,
+<span id='CpsiMapview-view-window-ParallelLineWindow-property-viewModel'>    viewModel: &#39;cmv_parallel_line_window&#39;,
 </span>
-<span id='CpsiMapview-controller-window-ParallelLineWindow-method-onSelectFeatureToggle'>    onSelectFeatureToggle: function (btn, toggled) {
-</span>        var me = this;
-        var view = me.getView();
-        var vm = view.getViewModel();
-        var map = BasiGX.view.component.Map.guess().getMap();
-        if (toggled) {
-            var interactionConfig = view.interactionConfig ? view.interactionConfig : {};
-            this.selectInteraction = new ol.interaction.Select(interactionConfig);
-            this.selectInteraction.on(&#39;select&#39;, function (evt) {
-                var selectedFeature = evt.selected[0];
-                vm.set(&#39;selectedFeature&#39;, selectedFeature);
-            });
-            map.addInteraction(this.selectInteraction);
-
-        } else {
-            if (!this.selectInteraction) {
-                return;
-            }
-            map.removeInteraction(this.selectInteraction);
-            this.selectInteraction = null;
+<span id='CpsiMapview-view-window-ParallelLineWindow-property-title'>    title: &#39;Parallel Line Example&#39;,
+</span>
+<span id='CpsiMapview-view-window-ParallelLineWindow-property-layer'>    layer: null,
+</span>
+<span id='CpsiMapview-view-window-ParallelLineWindow-property-items'>    items: [{
+</span>        xtype: &#39;button&#39;,
+        text: &#39;Select Feature (example button)&#39;,
+        enableToggle: true,
+        listeners: {
+            toggle: &#39;onSelectFeatureToggle&#39;
         }
-    },
-
-<span id='CpsiMapview-controller-window-ParallelLineWindow-method-onParallelLineCreated'>    onParallelLineCreated: function (newLineFeature) {
-</span>        if (this.layer === null) {
-            this.layer = new ol.layer.Vector();
-            var map = BasiGX.view.component.Map.guess().getMap();
-            if (map) {
-                map.addLayer(this.layer);
-            }
+    }, {
+        xtype: &#39;cmv_parallel_line_toolbar&#39;,
+        bind: {
+            feature: &#39;{selectedFeature}&#39;
+        },
+        listeners: {
+            parallelLineCreated: &#39;onParallelLineCreated&#39;
         }
-        var source = new ol.source.Vector({
-            features: [newLineFeature]
-        });
-        this.layer.setSource(source);
-    },
+    }],
 
-<span id='CpsiMapview-controller-window-ParallelLineWindow-method-onBeforeDestroy'>    onBeforeDestroy: function () {
-</span>        // remove select interaction
-        this.onSelectFeatureToggle(null, false);
+<span id='CpsiMapview-view-window-ParallelLineWindow-property-listeners'>    listeners: {
+</span>        beforedestroy: &#39;onBeforeDestroy&#39;
     }
-
 });
 </pre>
 </body>
