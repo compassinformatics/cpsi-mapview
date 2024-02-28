@@ -431,7 +431,11 @@ Ext.define('CpsiMapview.util.ApplicationMixin', {
     beforeInit: function () {
 
         var me = this;
-        Ext.Ajax.timeout = 60000; // default is 30000 (30 seconds) increase to a minute
+
+        // default timeout is 30000 (30 seconds) increase this to a minute
+        var timeout = 60000;
+        Ext.Ajax.setTimeout(timeout);
+        Ext.override(Ext.data.proxy.Ajax, { timeout: timeout });
 
         // disable warnings about the map panel having no title
         // https://docs.sencha.com/extjs/6.0.0/guides/upgrades_migrations/extjs_upgrade_guide.html#upgrades_migrations-_-extjs_upgrade_guide_-_aria_regions_should_have_a_title
