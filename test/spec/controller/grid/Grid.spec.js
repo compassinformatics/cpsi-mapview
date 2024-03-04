@@ -2,18 +2,18 @@ describe('CpsiMapview.controller.grid.Grid', function () {
 
     Ext.Loader.syncRequire(['CpsiMapview.controller.grid.Grid']);
 
-    describe('Basics', function() {
-        it('is defined', function() {
+    describe('Basics', function () {
+        it('is defined', function () {
             expect(CpsiMapview.controller.grid.Grid).not.to.be(undefined);
         });
 
-        it('can be created', function() {
+        it('can be created', function () {
             var ctrl = new CpsiMapview.controller.grid.Grid();
             expect(ctrl).to.not.be(undefined);
         });
     });
 
-    describe('Advanced', function() {
+    describe('Advanced', function () {
         var view;
         var ctrl;
 
@@ -28,7 +28,7 @@ describe('CpsiMapview.controller.grid.Grid', function () {
             view.destroy();
         });
 
-        it('Orders column selector dropdown alphabetically', function() {
+        it('Orders column selector dropdown alphabetically', function () {
             view.on('headermenucreate', function (grid, menu) {
                 var menuItems = menu.down('[itemId=columnItem]').menu.items.items;
                 var orderedTitles = menuItems.map(function (item) {
@@ -45,7 +45,7 @@ describe('CpsiMapview.controller.grid.Grid', function () {
                 text: 'Test1'
             }, {
                 text: 'Test3'
-            },  {
+            }, {
                 text: 'Test2'
             }]);
 
@@ -53,7 +53,7 @@ describe('CpsiMapview.controller.grid.Grid', function () {
             view.getEl().down('.x-column-header-trigger').dom.click();
         });
 
-        it('Gets visible columns, adds Id prop and any extra propertyNames', function() {
+        it('Gets visible columns, adds Id prop and any extra propertyNames', function () {
             var store = view.getStore();
             var vm = ctrl.getViewModel();
 
@@ -83,5 +83,23 @@ describe('CpsiMapview.controller.grid.Grid', function () {
             expect(store.propertyName).to.be('id,Test1,Test3,Extra');
         });
 
+        it('spatial filter is cleared', function (done) {
+
+            var spatialQueryButton = view.down('cmv_spatial_query_button');
+            var polygonCoords = [
+                [0, 0],
+                [10, 10],
+                [20, 0]
+            ];
+            var polygon = new ol.geom.Polygon([polygonCoords]);
+            var filter = spatialQueryButton.getController().createSpatialFilter(polygon);
+            ctrl.spatialFilter = filter;
+            spatialQueryButton.on('clearAssociatedPermanentLayer', function () {
+                expect(ctrl.spatialFilter).to.be(null);
+                done();
+            });
+
+            ctrl.onClearSpatialFilter();
+        });
     });
 });

@@ -129,21 +129,32 @@ Ext.define('CpsiMapview.view.grid.Grid', {
         },
         '->',
         {
-            xtype: 'cmv_spatial_query_button',
-            drawGeometryType: 'Polygon',
-            text: 'Select by Shape',
-            spatialOperator: 'intersect',
-            toggleGroup: 'map',
-            triggerWfsRequest: false,
-            displayPermanently: true,
-            glyph: 'xf044@FontAwesome',
-            bind: {
-                hidden: '{!useSimpleSelection}'
+            xtype: 'buttongroup',
+            items: [{
+                xtype: 'cmv_spatial_query_button',
+                drawGeometryType: 'Polygon',
+                text: 'Select by Shape',
+                spatialOperator: 'intersect',
+                toggleGroup: 'map',
+                triggerWfsRequest: false,
+                displayPermanently: true,
+                glyph: 'xf044@FontAwesome',
+                bind: {
+                    hidden: '{!useSimpleSelection}'
+                },
+                listeners: {
+                    'cmv-spatial-query-filter': 'onSpatialFilter'
+                }
             },
-            listeners: {
-                'cmv-spatial-query-filter': 'onSpatialFilter'
-            }
+            {
+                xtype: 'button',
+                text: 'Clear',
+                tooltip: 'Clear the spatial filter',
+                glyph: 'f057@FontAwesome',
+                handler: 'onClearSpatialFilter'
+            }]
         },
+
         {
             xtype: 'buttongroup', // segmentedbutton does not support toggleGroup
             bind: {
