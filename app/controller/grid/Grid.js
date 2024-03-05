@@ -660,6 +660,24 @@ Ext.define('CpsiMapview.controller.grid.Grid', {
     },
 
     /**
+    * Clear the spatial filter only
+    */
+    onClearSpatialFilter: function () {
+
+        var me = this;
+        var view = me.getView();
+
+        // trigger a refresh of the store without the spatial filter
+        me.onSpatialFilter(null);
+        // now remove the polygon from the layer
+        var spatialQueryButton = view.down('cmv_spatial_query_button');
+        if (spatialQueryButton !== null) {
+            spatialQueryButton.fireEvent('clearAssociatedPermanentLayer');
+            spatialQueryButton.toggle(false);
+        }
+    },
+
+    /**
      * Clear both the grid filters and any spatial filter.
      * This will cause the store to reload.
      *
