@@ -204,14 +204,20 @@ Ext.define(&#39;CpsiMapview.controller.button.SpatialQueryButtonController&#39;,
             renderTo: Ext.getBody(),
             items: [{
                 text: &#39;Clear Feature&#39;,
+                scope: me,
                 handler: function () {
                     var view = me.getView();
                     // remove the spatial filter on the layer by firing an event
                     view.fireEvent(&#39;cmv-spatial-query-filter&#39;, null);
                     // now remove the polygon from the layer
                     me.onClearAssociatedPermanentLayer();
-                },
-                scope: me
+                }
+            }, {
+                text: &#39;Cancel Drawing&#39;,
+                scope: me,
+                handler: function () {
+                    me.drawQueryInteraction.abortDrawing();
+                }
             }]
         });
         menu.showAt(evt.pageX, evt.pageY);
