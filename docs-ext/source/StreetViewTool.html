@@ -15,144 +15,463 @@
   </script>
 </head>
 <body onload="prettyPrint(); highlight();">
-  <pre class="prettyprint lang-js"><span id='CpsiMapview-view-button-StreetViewTool'>/**
-</span> * Button to open the Street View tool.
- *
- * @class CpsiMapview.view.button.StreetViewTool
+  <pre class="prettyprint lang-js"><span id='CpsiMapview-controller-button-StreetViewTool'>/**
+</span> * This class is the controller of the button to open the Street View tool.
  */
-Ext.define(&#39;CpsiMapview.view.button.StreetViewTool&#39;, {
-    extend: &#39;Ext.button.Button&#39;,
-    xtype: &#39;cmv_streetview_tool&#39;,
+Ext.define(&#39;CpsiMapview.controller.button.StreetViewTool&#39;, {
+    extend: &#39;Ext.app.ViewController&#39;,
+
+    alias: &#39;controller.cmv_streetview_tool&#39;,
 
     requires: [
-        &#39;CpsiMapview.controller.button.StreetViewTool&#39;
+        &#39;CpsiMapview.view.window.MinimizableWindow&#39;,
+        &#39;BasiGX.util.Map&#39;
     ],
 
-<span id='CpsiMapview-view-button-StreetViewTool-property-controller'>    /**
-</span>     * The controller for this class.
-     *
-     * @private
-     */
-    controller: &#39;cmv_streetview_tool&#39;,
-
-<span id='CpsiMapview-view-button-StreetViewTool-cfg-glyph'>    /**
-</span>     * The icon used for the button.
-     *
-     * @cfg {String}
-     */
-    glyph: &#39;xf21d@FontAwesome&#39;,
-
-<span id='CpsiMapview-view-button-StreetViewTool-property-name'>    /**
-</span>     * The name to be used e.g. in ComponentQueries.
-     *
-     * @private
-     */
-    name: &#39;streetViewToolButton&#39;,
-
-<span id='CpsiMapview-view-button-StreetViewTool-property-tooltip'>    /**
-</span>     * The tooltip to display when hovering over the button
-     *
-     * @private
-     */
-    tooltip: &#39;Activate the StreetView tool&#39;,
-
-<span id='CpsiMapview-view-button-StreetViewTool-cfg-enableToggle'>    /**
-</span>     * Enable toggle mode for the button.
-     *
-     * @cfg {Boolean}
-     * @private
-     */
-    enableToggle: true,
-
-<span id='CpsiMapview-view-button-StreetViewTool-cfg-map'>    /**
+<span id='CpsiMapview-controller-button-StreetViewTool-property-map'>    /**
 </span>     * The OL map work / sync with this tool.
      *
-     * @cfg {ol.Map}
+     * @property {ol.Map}
+     * @readonly
      */
     map: null,
 
-<span id='CpsiMapview-view-button-StreetViewTool-cfg-vectorLayerStyle'>    /**
-</span>     * Optional style for the position layer.
+<span id='CpsiMapview-controller-button-StreetViewTool-property-streetViewService'>    /**
+</span>     * The Street View Service instance.
      *
-     * @cfg {ol.style.Style}
+     * @property {google.maps.StreetViewService}
+     * @readonly
      */
-    vectorLayerStyle: null,
+    streetViewService: null,
 
-<span id='CpsiMapview-view-button-StreetViewTool-cfg-vectorIcon'>    /**
-</span>     * The position icon image to be shown on the map.
+<span id='CpsiMapview-controller-button-StreetViewTool-cfg-vectorLayer'>    /**
+</span>     * The vector layer to draw the Street View position feature.
      *
-     * @cfg {String}
+     * @cfg {ol.layer.Vector}
+     * @property {ol.layer.Vector}
      */
-    vectorIcon: &#39;resources/img/streetViewFOV.png&#39;,
+    vectorLayer: null,
 
-<span id='CpsiMapview-view-button-StreetViewTool-cfg-svWinWidth'>    /**
-</span>     * Initial width of the Street View window.
+<span id='CpsiMapview-controller-button-StreetViewTool-property-vectorLayerName'>    /**
+</span>     * The identificator for the layer to draw the Street View position feature.
      *
-     * @cfg {Number}
+     * @property {String}
+     * @private
      */
-    svWinWidth: 800,
+    vectorLayerName: &#39;StreetViewLayer&#39;,
 
-<span id='CpsiMapview-view-button-StreetViewTool-cfg-svWinHeight'>    /**
-</span>     * Initial height of the Street View window.
+<span id='CpsiMapview-controller-button-StreetViewTool-property-svPovChangedListener'>    /**
+</span>     * Listener object for the &#39;pov_changed&#39; event.
+     * Used to unregister the event.
      *
-     * @cfg {Number}
+     * @property {Object}
+     * @private
      */
-    svWinHeight: 600,
+    svPovChangedListener: null,
 
-<span id='CpsiMapview-view-button-StreetViewTool-cfg-svWinTitlePrefix'>    /**
-</span>     * The prefix for the title of the Street View window.
+<span id='CpsiMapview-controller-button-StreetViewTool-property-svPositionChangedListener'>    /**
+</span>     * Listener object for the &#39;position_changed&#39; event.
+     * Used to unregister the event.
      *
-     * @cfg {String}
+     * @property {Object}
+     * @private
      */
-    svWinTitlePrefix: &#39;Google Street View&#39;,
+    svPositionChangedListener: null,
 
-<span id='CpsiMapview-view-button-StreetViewTool-cfg-svWinTitleDateLabel'>    /**
-</span>     * The label to be set in front of the image date of the SV panorama.
-     *
-     * @cfg {String}
-     */
-    svWinTitleDateLabel: &#39; Image Date: &#39;,
-
-<span id='CpsiMapview-view-button-StreetViewTool-cfg-svDefaultPov'>    /**
-</span>     * The default / initial POV settings for the Street View panorama.
-     *
-     * @cfg {Object}
-     */
-    svDefaultPov: {
-        heading: 34,
-        pitch: 10,
-        zoom: 1
+<span id='CpsiMapview-controller-button-StreetViewTool-method-constructor'>    constructor: function () {
+</span>        var me = this;
+        me.onMapClick = me.onMapClick.bind(me);
+        me.callParent(arguments);
     },
 
-<span id='CpsiMapview-view-button-StreetViewTool-cfg-showNoPanoramaWarning'>    /**
-</span>     * Flag to steer if a warning UI is shown in case no panorama is available
-     * for the clicked position.
-     *
-     * @cfg {Boolean}
+<span id='CpsiMapview-controller-button-StreetViewTool-method-init'>    /**
+</span>     * @private
      */
-    showNoPanoramaWarning: true,
+    init: function () {
+        var me = this;
+        var view = me.getView();
 
-<span id='CpsiMapview-view-button-StreetViewTool-cfg-noPanoramaWarningTitle'>    /**
-</span>     * Title of the alert UI shown in case no panorama is available.
-     *
-     * @cfg {String}
-     */
-    noPanoramaWarningTitle: &#39;INFO&#39;,
+        // helper function to disable tool when GMaps API is not available
+        var reactOnMissingGmapsApi = function () {
+            Ext.Logger.warn(&#39;No Google Maps JS-API available. &#39; +
+                &#39;The Street View tool will be deactivated.&#39;);
+            view.setDisabled(true);
+            return;
+        };
+        // GMaps API missing at all
+        if (!Ext.isObject(window.google)) {
+            reactOnMissingGmapsApi();
+            return;
+        }
+        // GMaps API not usable due to missing API key or similar
+        window.gm_authFailure = reactOnMissingGmapsApi;
 
-<span id='CpsiMapview-view-button-StreetViewTool-cfg-noPanoramaWarningText'>    /**
-</span>     * Text of the alert UI shown in case no panorama is available.
-     *
-     * @cfg {String}
-     */
-    noPanoramaWarningText: &#39;No panorama available for the clicked position.&#39;,
+        // detect the map instance we work on
+        if (view.map &amp;&amp; view.map instanceof ol.Map) {
+            me.map = view.map;
+        } else {
+            // guess map as fallback
+            me.map = BasiGX.util.Map.getMapComponent().map;
+        }
 
-<span id='CpsiMapview-view-button-StreetViewTool-property-listeners'>    /**
-</span>     * Register the listeners and redirect them
-     * to their corresponding controller methods
+        // create a vector layer for position if not passed in
+        if (!me.vectorLayer) {
+
+            var style = view.vectorLayerStyle ||
+                new ol.style.Style({
+                    image: new ol.style.Icon(({
+                        anchor: [0.5, 46],
+                        anchorXUnits: &#39;fraction&#39;,
+                        anchorYUnits: &#39;pixels&#39;,
+                        src: view.vectorIcon
+                    }))
+                });
+
+            me.vectorLayer = new ol.layer.Vector({
+                name: me.vectorLayerName,
+                source: new ol.source.Vector(),
+                style: style
+            });
+        }
+
+        // init the Street View Service instance
+        me.streetViewService = new google.maps.StreetViewService();
+    },
+
+<span id='CpsiMapview-controller-button-StreetViewTool-method-onToggle'>    /**
+</span>     * Handles the &#39;toggle&#39; event of the button (view).
+     *
+     * @param  {Ext.button.Button} btn The toggled button
+     * @param  {Boolean}           pressed New pressed state
+     * @private
      */
-    listeners: {
-        toggle: &#39;onToggle&#39;,
-        beforedestroy: &#39;onBeforeDestroy&#39;
+    onToggle: function (btn, pressed) {
+        var me = this;
+
+        if (pressed) {
+            // add layer and raise layer to top of stack
+            me.map.addLayer(me.vectorLayer);
+        } else {
+            me.map.removeLayer(me.vectorLayer);
+            // cleanup
+            me.vectorLayer.getSource().clear();
+            if (me.streetViewWin) {
+                me.streetViewWin.close();
+            }
+        }
+
+        // activate / deactivate click
+        me.registerMapListeners(pressed);
+    },
+
+<span id='CpsiMapview-controller-button-StreetViewTool-method-onBeforeDestroy'>    /**
+</span>     * Handles the &#39;beforedestroy&#39; event of the view.
+     * Performs several cleanup steps.
+     */
+    onBeforeDestroy: function () {
+        var me = this;
+        var btn = me.getView();
+
+        // detoggle button, forces clearing layer
+        me.onToggle(btn, false);
+        // remove GMaps events
+        me.unregisterGmapsEvents();
+        // clean-up window
+        if (me.streetViewWin) {
+            me.streetViewWin.close();
+            me.streetViewWin = null;
+        }
+    },
+
+<span id='CpsiMapview-controller-button-StreetViewTool-method-registerMapListeners'>    /**
+</span>     * Registers listeners on the map we need for this tool.
+     *
+     * @param  {Boolean} activate Flag to activate / deactivate the listeners
+     */
+    registerMapListeners: function(activate) {
+        var me = this;
+
+        if (activate) {
+            me.map.on(&#39;singleclick&#39;, me.onMapClick);
+        } else {
+            me.map.un(&#39;singleclick&#39;, me.onMapClick);
+        }
+    },
+
+<span id='CpsiMapview-controller-button-StreetViewTool-method-onMapClick'>    /**
+</span>     * Handles &#39;singleclick&#39; event on the map.
+     * Show window with Street View panorama for clicked position (if existing)
+     *
+     * @param  {ol.MapBrowserEvent} evt OL event object
+     * @private
+     */
+    onMapClick: function (evt) {
+        var me = this;
+        var clickCoord = evt.coordinate;
+
+        var gmapsLatLng = me.olCoord2GmapsLatLng(clickCoord);
+        me.showStreetViewWindow(gmapsLatLng);
+    },
+
+<span id='CpsiMapview-controller-button-StreetViewTool-method-showStreetViewWindow'>    /**
+</span>     * Shows the window with the Street View panorama at the given position or
+     * fires an event &#39;missingpanorama&#39; on the view instance of this controller.
+     *
+     * @param  {google.maps.LatLng} latLng Position to show SV panorama at
+     * @private
+     */
+    showStreetViewWindow: function (latLng) {
+        var me = this;
+        var view = me.getView();
+
+        if (!me.streetViewWin) {
+            me.streetViewWin = Ext.create(&#39;CpsiMapview.view.window.MinimizableWindow&#39;, {
+                title: view.svWinTitlePrefix,
+                width: view.svWinWidth,
+                height: view.svWinHeight,
+                closeAction: &#39;destroy&#39;,
+                autoShow: false,
+                listeners: {
+                    afterrender: function (win) {
+                        // render SV panorama to body of the window
+                        me.svDiv = Ext.getDom(win.body);
+                    },
+                    resize: function () {
+                        // reload the panorama to fit the new window size
+                        if (me.svPanorama) {
+                            // for an open window use the current position
+                            me.showStreetViewWindow(me.svPanorama.getPosition());
+                        } else {
+                            // for a new window use the new position
+                            me.showStreetViewWindow(latLng);
+                        }
+                    },
+                    destroy: function () {
+                        me.unregisterGmapsEvents();
+                        me.svPanorama = null;
+                        me.streetViewWin = null;
+                        me.vectorLayer.getSource().clear();
+                    }
+                }
+            });
+        }
+
+        // load the panorama for the given position
+        me.streetViewService.getPanoramaByLocation(latLng, 50, function (data, status) {
+            if (status === google.maps.StreetViewStatus.OK) {
+                var win = me.streetViewWin;
+                var title = view.svWinTitlePrefix + view.svWinTitleDateLabel +
+                    data.imageDate;
+
+                win.setTitle(title);
+                win.show();
+
+                // create new Street View panorama
+                var panoConf = {
+                    position: latLng,
+                    pov: view.svDefaultPov
+                };
+                me.svPanorama = new google.maps.StreetViewPanorama(me.svDiv);
+                me.svPanorama.setPov(panoConf.pov);
+                me.svPanorama.setPosition(panoConf.position);
+
+                // initially draw the position on the map and set heading
+                me.drawPositionFeature(me.gmapsLatLng2olCoord(latLng));
+                me.updatePositionFeature();
+
+                me.registerGmapsEvents();
+
+            } else {
+                // inform subscribers that there was no panorama for clicked pos
+                me.getView().fireEvent(&#39;missingpanorama&#39;, {
+                    msg: &#39;No StreetView panorama available at clicked location&#39;
+                });
+
+                if (view.showNoPanoramaWarning) {
+                    Ext.MessageBox.alert(view.noPanoramaWarningTitle,
+                        view.noPanoramaWarningText);
+                }
+            }
+        });
+    },
+
+<span id='CpsiMapview-controller-button-StreetViewTool-method-drawPositionFeature'>    /**
+</span>     * Draws the position feature on the map. Clears an eventually existing
+     * position feature before adding the new one.
+     *
+     * @param  {ol.Coordinate} coord Position to draw on the map
+     * @private
+     */
+    drawPositionFeature: function (coord) {
+        var me = this;
+        var vectorSource = me.vectorLayer.getSource();
+
+        // remove existing position feature
+        vectorSource.clear();
+        // add new position feature
+        var posFeat = new ol.Feature({
+            geometry: new ol.geom.Point(coord),
+        });
+        vectorSource.addFeature(posFeat);
+    },
+
+<span id='CpsiMapview-controller-button-StreetViewTool-method-updatePositionFeature'>    /**
+</span>     * Updates an existing position feature by applying the current position and
+     * heading of the currently opened SV panorama.
+     */
+    updatePositionFeature: function () {
+        var me = this;
+
+        if (!me.svPanorama) {
+            return;
+        }
+
+        var newHeading = me.getHeadingRad();
+        var newPosCoord = me.getPositionCoord();
+        var vectorSource = me.vectorLayer.getSource();
+        var feat = vectorSource.getFeatures()[0];
+
+        if (feat) {
+            // move position feature to current position
+            feat.getGeometry().setCoordinates(newPosCoord);
+
+            // rotate position feature to current heading
+            me.vectorLayer.getStyle().getImage().setRotation(newHeading);
+        }
+    },
+
+<span id='CpsiMapview-controller-button-StreetViewTool-method-handlePovChanged'>    /**
+</span>     * Handles &#39;pov_changed&#39; event of the SV panorama.
+     * Triggers #updatePositionFeature.
+     *
+     * @private
+     */
+    handlePovChanged: function () {
+        var me = this;
+        me.updatePositionFeature();
+    },
+
+<span id='CpsiMapview-controller-button-StreetViewTool-method-handlePositionChanged'>    /**
+</span>     * Handles &#39;position_changed&#39; event of the SV panorama.
+     * Triggers #updatePositionFeature.
+     *
+     * @private
+     */
+    handlePositionChanged: function () {
+        var me = this;
+        me.updatePositionFeature();
+    },
+
+<span id='CpsiMapview-controller-button-StreetViewTool-method-getHeadingRad'>    /**
+</span>     * Returns the current heading of the SV panorama as radiant.
+     *
+     * @return {Number} Heading in radiant
+     */
+    getHeadingRad: function () {
+        var me = this;
+        var heading = me.svPanorama.getPov().heading;
+
+        // normalize and convert to radiant
+        heading = me.normaliseDegrees(heading);
+        heading = heading / 180 * Math.PI;
+
+        return heading;
+    },
+
+<span id='CpsiMapview-controller-button-StreetViewTool-method-getPositionCoord'>    /**
+</span>     * Returns the current position of the SV panorama as OL coordinate.
+     *
+     * @return {ol.Coordinate} SV panorama position
+     */
+    getPositionCoord: function () {
+        var me = this;
+        var pos = me.svPanorama.getPosition();
+        return me.gmapsLatLng2olCoord(pos);
+    },
+
+<span id='CpsiMapview-controller-button-StreetViewTool-method-normaliseDegrees'>    /**
+</span>     * Normalizes the given degree value.
+     *
+     * @param  {Number} value Degree value to normalize
+     * @return {Number}       Normalized degree value
+     * @private
+     */
+    normaliseDegrees: function (value) {
+        if (value &lt; 0) {
+            value += 360;
+        } else {
+            if (value &gt; 360) {
+                value -= 360;
+            }
+        }
+        return Number(value);
+    },
+
+<span id='CpsiMapview-controller-button-StreetViewTool-method-olCoord2GmapsLatLng'>    /**
+</span>     * Converts an OpenLayers coordinate to a Google Maps LatLng object.
+     * Transforms the coordinates to EPSG:4326.
+     *
+     * @param  {ol.Coordinate} coords OL coordinate to transform
+     * @return {google.maps.LatLng}   Google Maps LatLng object
+     */
+    olCoord2GmapsLatLng: function (coords) {
+        var me = this;
+        var latLonProj = &#39;EPSG:4326&#39;;
+        var mapProj = me.map.getView().getProjection().getCode();
+
+        var latLonCoord;
+        if (mapProj !== latLonProj) {
+            latLonCoord = ol.proj.transform(coords, mapProj, latLonProj);
+        } else {
+            latLonCoord = coords;
+        }
+
+        return new google.maps.LatLng(latLonCoord[1], latLonCoord[0]);
+    },
+
+<span id='CpsiMapview-controller-button-StreetViewTool-method-gmapsLatLng2olCoord'>    /**
+</span>     * Converts an Google Maps LatLng object to a OpenLayers coordinate.
+     * Transforms the coordinates to the map projection.
+     *
+     * @param  {google.maps.LatLng} latLng Google Maps LatLng object
+     * @return {ol.Coordinate}             OL coordinate in map projection
+     */
+    gmapsLatLng2olCoord: function (latLng) {
+        var me = this;
+        var latLonProj = &#39;EPSG:4326&#39;;
+        var mapProj = me.map.getView().getProjection().getCode();
+        var latLonCoord = [latLng.lng(), latLng.lat()];
+
+        var mapCoord;
+        if (mapProj !== latLonProj) {
+            mapCoord = ol.proj.transform(latLonCoord, latLonProj, mapProj);
+        } else {
+            mapCoord = latLonCoord;
+        }
+
+        return mapCoord;
+    },
+
+<span id='CpsiMapview-controller-button-StreetViewTool-method-registerGmapsEvents'>    /**
+</span>     * Registers the &#39;pov_changed&#39; and the &#39;position_changed&#39; events for the
+     * SV panorama.
+     */
+    registerGmapsEvents: function () {
+        var me = this;
+        me.svPovChangedListener = google.maps.event.addListener(
+            me.svPanorama, &#39;pov_changed&#39;, me.handlePovChanged.bind(me));
+        me.svPositionChangedListener = google.maps.event.addListener(
+            me.svPanorama, &#39;position_changed&#39;, me.handlePositionChanged.bind(me));
+    },
+
+<span id='CpsiMapview-controller-button-StreetViewTool-method-unregisterGmapsEvents'>    /**
+</span>     * Unregisters the &#39;pov_changed&#39; and the &#39;position_changed&#39; events for the
+     * SV panorama.
+     */
+    unregisterGmapsEvents: function () {
+        var me = this;
+        google.maps.event.removeListener(me.svPovChangedListener);
+        google.maps.event.removeListener(me.svPositionChangedListener);
     }
 });
 </pre>

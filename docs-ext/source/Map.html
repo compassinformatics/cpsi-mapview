@@ -64,7 +64,11 @@ Ext.define(&#39;CpsiMapview.view.main.Map&#39;, {
 <span id='CpsiMapview-view-main-Map-property-mapViewConfig'>    mapViewConfig: {
 </span>        projection: &#39;EPSG:3857&#39;,
         zoom: 10,
-        center: [-890555.9263461886, 7076025.276180581] // ol.proj.fromLonLat([-8, 53.5])
+        center: [-890555.9263461886, 7076025.276180581], // ol.proj.fromLonLat([-8, 53.5])
+        // the number of pixels used for &#39;cmv-mapclick&#39; tolerance
+        // 0 is the OpenLayers default
+        // see https://openlayers.org/en/latest/apidoc/module-ol_Map-Map.html#forEachFeatureAtPixel
+        hitTolerance: 0
     },
 
 <span id='CpsiMapview-view-main-Map-property-listeners'>    /**
@@ -328,6 +332,9 @@ Ext.define(&#39;CpsiMapview.view.main.Map&#39;, {
                     function (feature, layer) {
                         // collect all clicked features and their layers
                         clickedFeatures.push({ feature: feature, layer: layer });
+                    },
+                    {
+                        hitTolerance: me.mapViewConfig.hitTolerance
                     }
                 );
 

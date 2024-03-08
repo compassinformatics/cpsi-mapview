@@ -15,148 +15,138 @@
   </script>
 </head>
 <body onload="prettyPrint(); highlight();">
-  <pre class="prettyprint lang-js"><span id='CpsiMapview-controller-panel-NumericAttributeSlider'>/**
-</span> * This is the controller for the {@link CpsiMapview.view.panel.NumericAttributeSlider} component
+  <pre class="prettyprint lang-js"><span id='CpsiMapview-view-panel-NumericAttributeSlider'>/**
+</span> * A toggleable slider which constructs a numeric filter and applies that to
+ * associated layers.
  *
- * @class CpsiMapview.controller.panel.NumericAttributeSlider
+ * @class CpsiMapview.view.panel.NumericAttributeSlider
  */
-Ext.define(&#39;CpsiMapview.controller.panel.NumericAttributeSlider&#39;, {
-    extend: &#39;Ext.app.ViewController&#39;,
+Ext.define(&#39;CpsiMapview.view.panel.NumericAttributeSlider&#39;, {
+    extend: &#39;Ext.panel.Panel&#39;,
+    xtype: &#39;cmv_numericattributeslider&#39;,
 
-    requires: [&#39;BasiGX.util.Layer&#39;],
+    requires: [
+        &#39;Ext.form.field.Checkbox&#39;,
+        &#39;Ext.slider.Multi&#39;,
+        &#39;CpsiMapview.controller.panel.NumericAttributeSlider&#39;
+    ],
 
-    alias: &#39;controller.cmv_numericattributeslider&#39;,
-
-<span id='CpsiMapview-controller-panel-NumericAttributeSlider-method-initSlider'>    /**
-</span>     * Initially filter if enabled.
-     */
-    initSlider: function() {
-        if (this.getView().getEnabled()) {
-            this.applySliderEffects();
-        }
+<span id='CpsiMapview-view-panel-NumericAttributeSlider-property-controller'>    controller: &#39;cmv_numericattributeslider&#39;,
+</span>
+<span id='CpsiMapview-view-panel-NumericAttributeSlider-property-layout'>    layout: &#39;hbox&#39;,
+</span>
+    config: {
+<span id='CpsiMapview-view-panel-NumericAttributeSlider-cfg-minValue'>        minValue: 0,
+</span><span id='CpsiMapview-view-panel-NumericAttributeSlider-cfg-maxValue'>        maxValue: 15,
+</span><span id='CpsiMapview-view-panel-NumericAttributeSlider-cfg-currLowerValue'>        currLowerValue: 5,
+</span><span id='CpsiMapview-view-panel-NumericAttributeSlider-cfg-currUpperValue'>        currUpperValue: 11,
+</span><span id='CpsiMapview-view-panel-NumericAttributeSlider-cfg-increment'>        increment: 0.5,
+</span><span id='CpsiMapview-view-panel-NumericAttributeSlider-cfg-sliderLabel'>        sliderLabel: &#39;Num. attribute&#39;,
+</span><span id='CpsiMapview-view-panel-NumericAttributeSlider-cfg-checkboxLabel'>        checkboxLabel: &#39;active?&#39;,
+</span><span id='CpsiMapview-view-panel-NumericAttributeSlider-cfg-enabled'><span id='CpsiMapview-view-panel-NumericAttributeSlider-cfg-numericField'>        numericField: null, // required, or better at the layer level?
+</span></span>        enabled: true
     },
 
-<span id='CpsiMapview-controller-panel-NumericAttributeSlider-method-getAffectedLayers'>    /**
-</span>     * Returns those layers that the slider will affect.
+<span id='CpsiMapview-view-panel-NumericAttributeSlider-property-cls'>    /**
+</span>     * The CSS class of the slider
      */
-    getAffectedLayers: function() {
-        return BasiGX.util.Layer.getLayersBy(&#39;isNumericDependent&#39;, true);
+    cls: &#39;cpsi-numeric-attribute-slider&#39;,
+
+<span id='CpsiMapview-view-panel-NumericAttributeSlider-method-constructor'>    /**
+</span>     * Construct an instance of the numeric attribute slider. We need to take
+     * care of the correct handling of the inherited disabled configuration.
+     *
+     * @param {object} config The configuration object.
+     */
+    constructor: function(config) {
+        var cfg = config || {};
+        var cfgEnabled = cfg.enabled;
+        var cfgDisabled = cfg.disabled;
+        delete cfg.enabled;
+        delete cfg.disabled;
+
+        var hasPassedCfgEnabled = Ext.isDefined(cfgEnabled);
+        var hasPassedCfgDisabled = Ext.isDefined(cfgDisabled);
+
+        var finalEnabled = cfgEnabled; // either undefined or user defined
+
+        if (hasPassedCfgEnabled &amp;&amp; hasPassedCfgDisabled) {
+            // user passed both, ensure they make sense or warn
+            if (cfgEnabled !== !cfgDisabled) { // semantically not same
+                Ext.Logger.warn(&#39;Conflicting disabled/enabled configs found. &#39;
+                    + &#39;NumericAttributeSlider will be using &quot;enabled:&#39;
+                    + finalEnabled + &#39;&quot;.&#39;);
+            }
+        } else if (hasPassedCfgDisabled) {
+            // user passed only disabled, warn and switch to enabled
+            finalEnabled = !cfgDisabled;
+            Ext.Logger.info(&#39;Config option &quot;disabled=&#39; + cfgDisabled + &#39;&quot; passed,&#39;
+                + &#39; transforming to option &quot;enabled=&#39; + finalEnabled + &#39;&quot;.&#39;);
+        } else if (!hasPassedCfgEnabled) {
+            // reinitiate the default of this class
+            var clazz = CpsiMapview.view.panel.NumericAttributeSlider;
+            finalEnabled = clazz.prototype.config.enabled;
+        }
+
+        cfg.enabled = finalEnabled;
+
+        this.callParent([cfg]);
     },
 
-<span id='CpsiMapview-controller-panel-NumericAttributeSlider-method-orderValues'>    /**
-</span>     * Orders the values of the slider so that the first index always is the
-     * lower value, and the second is at least equally big.
-     * @param {number[]} values
+<span id='CpsiMapview-view-panel-NumericAttributeSlider-method-initComponent'>    /**
+</span>     * Initializes the numeric attribute slider.
      */
-    orderValues: function(values) {
-        var lower = Math.min(values[0], values[1]);
-        var upper = Math.max(values[0], values[1]);
-        return [lower, upper];
-    },
-
-<span id='CpsiMapview-controller-panel-NumericAttributeSlider-method-getTipText'>    /**
-</span>     * Returns the current range of the slider as tooltip.
-     * @param {Ext.slider.Thumb} thumb
-     */
-    getTipText: function(thumb) {
-        var slider = thumb.slider;
-        var draggedValue = thumb.value;
-        var thumbIdx = thumb.index;
-        var otherThumb = slider.thumbs[thumbIdx == 0 ? 1 : 0];
-        var lowerThumb = otherThumb.value &lt;= draggedValue ? otherThumb : thumb;
-        var upperThumb = lowerThumb === thumb ? otherThumb : thumb;
-        var lower = lowerThumb.value;
-        var upper = upperThumb.value;
-        if (lower === draggedValue) {
-            lower = &#39;&lt;strong&gt;&#39; + lower + &#39;&lt;/strong&gt;&#39;;
-        }
-        if (upper === draggedValue) {
-            upper = &#39;&lt;strong&gt;&#39; + upper + &#39;&lt;/strong&gt;&#39;;
-        }
-        return lower + &#39; - &#39; + upper;
-    },
-
-<span id='CpsiMapview-controller-panel-NumericAttributeSlider-method-onCheckChange'>    /**
-</span>     * Handles the changing of the checked state of the active-checkbox.
-     * @param {Ext.form.field.Checkbox} cb
-     * @param {boolean} checked
-     */
-    onCheckChange: function(cb, checked) {
-        var slider = cb.up().down(&#39;multislider&#39;);
-        if(slider) {
-            slider.setDisabled(!checked);
-        }
-        if(checked) {
-            this.applySliderEffects();
-        } else {
-            this.removeSliderEffects();
-        }
-    },
-
-<span id='CpsiMapview-controller-panel-NumericAttributeSlider-method-applySliderEffects'>    /**
-</span>     * Applies the effect of the slider, e.g. filters by the numeric values.
-     */
-    applySliderEffects: function() {
+    initComponent: function () {
         var me = this;
-        var view = me.getView();
-        var slider = view.down(&#39;multislider&#39;);
-        var orderedVals = me.orderValues(slider.getValues());
-        var layers = me.getAffectedLayers();
-        var fieldName = view.getNumericField();
-        // between-filter is also inclusive
-        var gteFilter = GeoExt.util.OGCFilter.getOgcFilter(
-            fieldName, &#39;gte&#39;, orderedVals[0], &#39;2.0.0&#39;
-        );
-        var lteFilter = GeoExt.util.OGCFilter.getOgcFilter(
-            fieldName, &#39;lte&#39;, orderedVals[1], &#39;2.0.0&#39;
-        );
-        var combined = GeoExt.util.OGCFilter.combineFilters(
-            [gteFilter, lteFilter], &#39;And&#39;, false
-        );
+        var values = [me.getCurrLowerValue(), me.getCurrUpperValue()];
+        me.items = [{
+            xtype: &#39;multislider&#39;,
+            name: &#39;slider&#39;,
+            labelAlign: &#39;right&#39;,
+            listeners: {
+                afterrender: &#39;initSlider&#39;,
+                changecomplete: &#39;applySliderEffects&#39;
+            },
+            constrainThumbs: false,
+            tipText: &#39;getTipText&#39;,
+            fieldLabel: me.getSliderLabel(),
+            width: 200,
+            values: values,
+            increment: me.getIncrement(),
+            minValue: me.getMinValue(),
+            maxValue: me.getMaxValue(),
+            disabled: !me.getEnabled()
+        },
+        {
+            xtype: &#39;checkbox&#39;,
+            name: &#39;active&#39;,
+            boxLabel: me.getCheckboxLabel(),
+            checked: me.getEnabled(),
+            listeners: {
+                change: &#39;onCheckChange&#39;
+            }
+        }];
 
-        Ext.each(layers, function(layer) {
-            var source = layer.getSource();
-            if (source instanceof ol.source.Cluster) {
-                source = source.getSource();
-            }
-            if (layer.get(&#39;isWfs&#39;)) {
-                source.set(&#39;numericFilters&#39;, combined);
-                source.clear();
-                source.refresh();
-            } else if (layer.get(&#39;isWms&#39;)) {
-                // What about existing FILTER in params?
-                // same goes for the case when we remove the filter, see below.
-                // …Replace any existing filters for now
-                source.updateParams({
-                    &#39;FILTER&#39;: combined
-                });
-            }
-        });
+        me.callParent();
     },
 
-<span id='CpsiMapview-controller-panel-NumericAttributeSlider-method-removeSliderEffects'>    /**
-</span>     * Removes the effects of the slider, e.g. unfilters by the numeric values.
+<span id='CpsiMapview-view-panel-NumericAttributeSlider-method-setDisabled'>    /**
+</span>     * Overide the inherited setDisabled, to handle disabling like we would.
+     * One might argue that disabling should also actually disable the
+     * checkbox, this can be added if agreed upon.
+     *
+     * @param {boolean} newDisabled
      */
-    removeSliderEffects: function () {
-        this.getAffectedLayers();
-        var layers = this.getAffectedLayers();
-        Ext.each(layers, function(layer) {
-            var source = layer.getSource();
-            if (source instanceof ol.source.Cluster) {
-                source = source.getSource();
-            }
-            if (layer.get(&#39;isWfs&#39;)) {
-                source.set(&#39;numericFilters&#39;, null);
-                source.clear();
-                source.refresh();
-            } else if (layer.get(&#39;isWms&#39;)) {
-                // …unset any existing filters for now
-                source.updateParams({
-                    &#39;FILTER&#39;: undefined
-                });
-            }
-        });
+    setDisabled: function(newDisabled) {
+        // override the original method and
+        // fast forward to checkbox check / uncheck
+        var newEnabled = !newDisabled;
+        this.setEnabled(newEnabled);
+        var cb = this.down(&#39;checkbox[name=&quot;active&quot;]&#39;);
+        cb.setValue(newEnabled);
+        return this; // the original method is chainable
     }
+
 });
 </pre>
 </body>

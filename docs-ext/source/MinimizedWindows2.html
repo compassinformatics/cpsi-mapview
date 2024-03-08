@@ -15,95 +15,35 @@
   </script>
 </head>
 <body onload="prettyPrint(); highlight();">
-  <pre class="prettyprint lang-js"><span id='CpsiMapview-controller-toolbar-MinimizedWindows'>/**
-</span> * This class is the controller for the MinimizedWindows.
+  <pre class="prettyprint lang-js"><span id='CpsiMapview-view-toolbar-MinimizedWindows'>/**
+</span> * This class is the toolbar of cpsi mapview application that contains
+ * minimized windows. After a window was resized, the toolbar will be visible.
+ * If a window was minimized without adding this toolbar in advance, the window
+ * will minimize into nowhere.
+ *
+ * @class CpsiMapview.view.toolbar.MinimizedWindows
  */
-Ext.define(&#39;CpsiMapview.controller.toolbar.MinimizedWindows&#39;, {
-    extend: &#39;Ext.app.ViewController&#39;,
+Ext.define(&#39;CpsiMapview.view.toolbar.MinimizedWindows&#39;, {
+    extend: &#39;Ext.toolbar.Toolbar&#39;,
+    xtype: &#39;cmv_minimized_windows_toolbar&#39;,
 
-    alias: &#39;controller.cmv_minimized_windows_toolbar&#39;,
+    requires: [
+        &#39;CpsiMapview.controller.toolbar.MinimizedWindows&#39;
+    ],
 
-<span id='CpsiMapview-controller-toolbar-MinimizedWindows-method-onAddMinimizedWindow'>    /**
-</span>     * Handles the toolbar related actions when minimizing a window
-     * @param {CpsiMapview.view.window.MinimizableWindow} minimizedWindow window to add
-     */
-    onAddMinimizedWindow: function (minimizedWindow) {
-        var me = this;
-        me.addButtonForWindow(minimizedWindow);
-        me.getView().setHidden(false);
-    },
-
-<span id='CpsiMapview-controller-toolbar-MinimizedWindows-method-addButtonForWindow'>    /**
-</span>     * Adds a button to the toolbar that represents a minimized window
-     * @param {CpsiMapview.view.window.MinimizableWindow} minimizedWindow window to represent
-     */
-    addButtonForWindow: function (minimizedWindow) {
-        var me = this;
-        var windowId = minimizedWindow.getId();
-        var windowTitle = minimizedWindow.getTitle();
-
-        var button = Ext.create(&#39;Ext.button.Button&#39;, {
-            text: windowTitle != null ? windowTitle : windowId,
-            windowRef: windowId,
-            listeners: {
-                click: &#39;onRestoreFromButton&#39;,
-                scope: me
-            }
-        });
-        me.getView().add(button);
-    },
-
-<span id='CpsiMapview-controller-toolbar-MinimizedWindows-method-onRestoreFromButton'>    /**
-</span>     * Handles restoring a minimized window using the toolbar button object
-     * @param {Ext.button.Button} minimizedWindow
-     */
-    onRestoreFromButton: function (button) {
-        var me = this;
-        var windowRef = button.windowRef;
-        me.restoreWindow(windowRef);
-    },
-
-<span id='CpsiMapview-controller-toolbar-MinimizedWindows-method-onRestoreFromWindow'>    /**
-</span>     * Handles restoring a minimized window using the window object
-     * @param {CpsiMapview.view.window.MinimizableWindow} minimizedWindow
-     */
-    onRestoreFromWindow: function (minimizedWindow) {
-        var me = this;
-        var windowId = minimizedWindow.getId();
-        me.restoreWindow(windowId);
-    },
-
-<span id='CpsiMapview-controller-toolbar-MinimizedWindows-method-restoreWindow'>    /**
-</span>     * Handles all actions to restore a minimized window
-     * @param {String} windowRef reference to the minimized window
-     */
-    restoreWindow: function (windowRef) {
-        var me = this;
-        var minimizedWindow = Ext.ComponentQuery.query(&#39;#&#39; + windowRef)[0];
-        minimizedWindow.setVisible(true);
-        minimizedWindow.isMinimized = false;
-
-        me.removeButtonFromToolbar(windowRef);
-
-    },
-
-<span id='CpsiMapview-controller-toolbar-MinimizedWindows-method-removeButtonFromToolbar'>    removeButtonFromToolbar: function (windowRef) {
+<span id='CpsiMapview-view-toolbar-MinimizedWindows-property-controller'>    controller: &#39;cmv_minimized_windows_toolbar&#39;,
 </span>
-        var me = this;
-
-        var button = me.getView().items.findBy(function (item) {
-            return (item.getXType() === &#39;button&#39;) &amp;&amp; (item.windowRef === windowRef);
-        });
-
-        if (button !== undefined) {
-            me.getView().remove(button);
-        }
-
-        if (me.getView().items.length == 0) {
-            me.getView().setHidden(true);
-        }
+<span id='CpsiMapview-view-toolbar-MinimizedWindows-property-cls'>    cls: &#39;cmv_minimized_windows_toolbar&#39;,
+</span>
+<span id='CpsiMapview-view-toolbar-MinimizedWindows-property-name'>    name: null,
+</span>
+<span id='CpsiMapview-view-toolbar-MinimizedWindows-property-hidden'>    hidden: true,
+</span>
+<span id='CpsiMapview-view-toolbar-MinimizedWindows-property-listeners'>    listeners: {
+</span>        addMinimizedWindow: &#39;onAddMinimizedWindow&#39;,
+        restoreFromWindow: &#39;onRestoreFromWindow&#39;,
+        windowClosed: &#39;removeButtonFromToolbar&#39;
     }
-
 });
 </pre>
 </body>
