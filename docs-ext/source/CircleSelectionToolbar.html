@@ -15,112 +15,69 @@
   </script>
 </head>
 <body onload="prettyPrint(); highlight();">
-  <pre class="prettyprint lang-js"><span id='CpsiMapview-controller-toolbar-CircleSelectionToolbar'>/**
-</span> * This class is the controller for the CircleSelectionToolbar.
+  <pre class="prettyprint lang-js"><span id='global-property-'>/**
+</span> * This class is the circle selection toolbar of cpsi mapview application
+ * It can be used e.g. for manipulating the radius of a drawn circle
+ * and using that circle for filtering features.
  */
-Ext.define(&#39;CpsiMapview.controller.toolbar.CircleSelectionToolbar&#39;, {
-    extend: &#39;Ext.app.ViewController&#39;,
+<span id='CpsiMapview-view-toolbar-CircleSelectionToolbar'>/**
+</span> * Circle Selection Toolbar
+ *
+ * @class CpsiMapview.view.toolbar.CircleSelectionToolbar
+ */
+Ext.define(&#39;CpsiMapview.view.toolbar.CircleSelectionToolbar&#39;, {
+    extend: &#39;Ext.toolbar.Toolbar&#39;,
 
-    alias: &#39;controller.cmv_circle_selection_toolbar&#39;,
+    xtype: &#39;cmv_circle_selection_toolbar&#39;,
 
-<span id='CpsiMapview-controller-toolbar-CircleSelectionToolbar-method-handleApply'>    /**
-</span>     * Handles the click on the `Apply` button by firing
-     * the `circleSelectApply` event of the button that created
-     * the toolbar
+    requires: [
+        &#39;Ext.form.field.Number&#39;,
+        &#39;CpsiMapview.controller.toolbar.CircleSelectionToolbar&#39;,
+        &#39;CpsiMapview.model.toolbar.CircleSelectionToolbar&#39;
+    ],
+
+<span id='CpsiMapview-view-toolbar-CircleSelectionToolbar-property-viewModel'>    viewModel: &#39;cmv_circle_selection_toolbar&#39;,
+</span>
+<span id='CpsiMapview-view-toolbar-CircleSelectionToolbar-property-controller'>    controller: &#39;cmv_circle_selection_toolbar&#39;,
+</span>
+<span id='CpsiMapview-view-toolbar-CircleSelectionToolbar-property-cls'>    cls: &#39;cmv_circle_selection_toolbar&#39;,
+</span>
+<span id='CpsiMapview-view-toolbar-CircleSelectionToolbar-property-name'>    name: &#39;circleSelectionTool&#39;,
+</span>
+<span id='CpsiMapview-view-toolbar-CircleSelectionToolbar-property-dock'>    dock: &#39;top&#39;,
+</span>
+<span id='CpsiMapview-view-toolbar-CircleSelectionToolbar-property-feature'>    /**
+</span>     * ol circle feature that will be manipulated by toolbar
      */
-    handleApply: function () {
-        var me = this;
-        var feat = me.getView().feature;
-        me.fireEvent(&#39;circleSelectApply&#39;, feat);
-    },
+    feature: null,
 
-<span id='CpsiMapview-controller-toolbar-CircleSelectionToolbar-method-handleCancel'>    /**
-</span>     * Handles the click on the `Cancel` button by firing
-     * the `circleSelectCancel` event of the button that created
-     * the toolbar
-     */
-    handleCancel: function () {
-        var me = this;
-        me.fireEvent(&#39;circleSelectCancel&#39;);
-    },
-
-<span id='CpsiMapview-controller-toolbar-CircleSelectionToolbar-method-handleEnterKey'>    /**
-</span>     * Handles a keypress in the textfield and triggers
-     * handleApply when the Enter key is pressed
-     */
-    handleEnterKey: function (fld, e) {
-        var me = this;
-
-        if (e.getCharCode() == Ext.EventObject.ENTER) {
-            me.handleApply();
-        }
-
-    },
-
-<span id='CpsiMapview-controller-toolbar-CircleSelectionToolbar-method-getCurrentRadius'>    /**
-</span>     * Gets the radius of the ol circle feature.
-     */
-    getCurrentRadius: function () {
-        var me = this;
-        var feat = me.getView().feature;
-        var radius;
-        if (feat != null) {
-            var geom = feat.getGeometry();
-            if (geom !== undefined) {
-                // geom.getRadius actually is the diameter
-                // therefore we have to divide by 2
-                radius = geom.getRadius() / 2;
+<span id='CpsiMapview-view-toolbar-CircleSelectionToolbar-property-items'>    items: [
+</span>        {
+            xtype: &#39;numberfield&#39;,
+            name: &#39;circleRadius&#39;,
+            bind: {
+                value: &#39;{radius}&#39;,
+                fieldLabel: &#39;Radius in {unit}&#39;
+            },
+            minValue: 0,
+            enableKeyEvents: true, // required for keypress event
+            listeners: {
+                change: &#39;onRadiusChange&#39;,
+                keypress: &#39;handleEnterKey&#39;
             }
-        }
-        return radius;
-    },
-
-<span id='CpsiMapview-controller-toolbar-CircleSelectionToolbar-method-onRadiusChange'>    /**
-</span>     * Handles changes in the numberField by applying the value
-     * as radius for the ol circle feature
-     * @param {Ext.form.field.Number} numberField component that fired the event
-     * @param {float} newVal new value of the numberField
-     */
-    onRadiusChange: function (numberField, newVal) {
-        var me = this;
-        var feat = me.getView().feature;
-        if (feat != null) {
-            var geom = me.getView().feature.getGeometry();
-            if (geom !== undefined) {
-                // geom.setRadius actually is the diameter
-                // therefore we have to multiply by 2
-                geom.setRadius(newVal * 2);
+        }, {
+            xtype: &#39;button&#39;,
+            text: &#39;Apply&#39;,
+            handler: &#39;handleApply&#39;,
+            bind: {
+                disabled: &#39;{!radius}&#39;
             }
+        }, {
+            xtype: &#39;button&#39;,
+            text: &#39;Cancel&#39;,
+            handler: &#39;handleCancel&#39;
         }
-    },
-
-<span id='CpsiMapview-controller-toolbar-CircleSelectionToolbar-method-setCurrentUnit'>    /**
-</span>     * Sets the unit to the unit of the current projection
-     */
-    setCurrentUnit: function () {
-        var me = this;
-        var cmp = BasiGX.util.Map.getMapComponent();
-
-        if (cmp) {
-            var map = cmp.map;
-            var unit = map.getView().getProjection().getUnits();
-            me.getViewModel().set(&#39;unit&#39;, unit);
-        } else {
-            Ext.log.warn(&#39;No map component found for the CircleSelectionToolbar&#39;);
-        }
-    },
-
-<span id='CpsiMapview-controller-toolbar-CircleSelectionToolbar-method-init'>    /**
-</span>     * Sets the initial value for the `radius` data field in the ViewModel
-     * to the current radius of the ol circle feature
-     */
-    init: function () {
-        var me = this;
-        var radius = me.getCurrentRadius();
-        me.getViewModel().set(&#39;radius&#39;, radius);
-        me.setCurrentUnit();
-    }
-
+    ]
 });
 </pre>
 </body>
