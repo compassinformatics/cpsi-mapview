@@ -57,7 +57,7 @@ Ext.define('CpsiMapview.controller.MapController', {
         // Prevent triggering other map events, if we click on the coordinate marker
         var coordinateMousePanel = Ext.ComponentQuery.query('basigx-panel-coordinatemouseposition')[0];
         if (coordinateMousePanel) {
-            var coordinateMarker = Ext.Array.findBy(clickedFeatures, function(clickedFeature) {
+            var coordinateMarker = Ext.Array.findBy(clickedFeatures, function (clickedFeature) {
                 return coordinateMousePanel.fireEvent('isMapMarker', clickedFeature.feature);
             });
             if (coordinateMarker) {
@@ -117,16 +117,26 @@ Ext.define('CpsiMapview.controller.MapController', {
 
             var modelPrototype = Ext.ClassManager.get(modelClass);
 
-            // now load the full record in the appropriate form
-            modelPrototype.load(recId, {
-                success: function (rec) {
-                    // check if the window is already open
-                    var win = me.getEditingFormWindow(rec, editWindowClass);
-                    var vm = win.getViewModel();
-                    vm.set('currentRecord', rec);
+            // check if the window is already open
+            var win = me.getExistingEditingFormWindow(recId, editWindowClass);
+
+            // if the record is not already opened, create a new window and load the record
+            if (win === null) {
+                win = Ext.create(editWindowClass);
+                modelPrototype.load(recId, {
+                    success: function (rec) {
+                        var vm = win.getViewModel();
+                        vm.set('currentRecord', rec);
+                        win.show();
+                    }
+                });
+            } else {
+                // if the window is minimised make sure it is restored
+                if (win.isMinimized) {
                     win.show();
                 }
-            });
+                Ext.WindowManager.bringToFront(win);
+            }
 
             return false; // stop other map handlers
         }
