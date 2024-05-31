@@ -1,4 +1,4 @@
-﻿/**
+/**
  * A mixin for any edit window controller allowing for
  * validation, saving, deletion, exports etc.
  *
@@ -178,6 +178,15 @@ Ext.define('CpsiMapview.form.ControllerMixin', {
     },
 
     /**
+     * Override this function to return any additional parameters to send to
+     * the Delete URL as a querystring
+     *
+     * @returns An object of key value pairs
+     */
+    getDeleteParameters: function () {
+        return {};
+    },
+    /**
      * Action for deletion
      * */
     onDelete: function () {
@@ -189,6 +198,7 @@ Ext.define('CpsiMapview.form.ControllerMixin', {
         rec.proxy.erase(Ext.create('Ext.data.operation.Destroy', {
             url: rec.proxy.getUrl(),
             records: [rec],
+            params: me.getDeleteParameters(),
             callback: function (records, operation, success) {
                 w.unmask();
                 // do something whether the delete succeeded or failed
