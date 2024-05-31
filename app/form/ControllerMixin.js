@@ -180,7 +180,7 @@ Ext.define('CpsiMapview.form.ControllerMixin', {
     /**
      * Override this function to return any additional parameters to send to
      * the Delete URL as a querystring
-     * 
+     *
      * @returns An object of key value pairs
      */
     getDeleteParameters: function () {
