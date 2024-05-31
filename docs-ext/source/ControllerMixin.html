@@ -194,6 +194,15 @@ Ext.define(&#39;CpsiMapview.form.ControllerMixin&#39;, {
         view.close();
     },
 
+<span id='CpsiMapview-form-ControllerMixin-method-getDeleteParameters'>    /**
+</span>     * Override this function to return any additional parameters to send to
+     * the Delete URL as a querystring
+     *
+     * @returns An object of key value pairs
+     */
+    getDeleteParameters: function () {
+        return {};
+    },
 <span id='CpsiMapview-form-ControllerMixin-method-onDelete'>    /**
 </span>     * Action for deletion
      * */
@@ -206,6 +215,7 @@ Ext.define(&#39;CpsiMapview.form.ControllerMixin&#39;, {
         rec.proxy.erase(Ext.create(&#39;Ext.data.operation.Destroy&#39;, {
             url: rec.proxy.getUrl(),
             records: [rec],
+            params: me.getDeleteParameters(),
             callback: function (records, operation, success) {
                 w.unmask();
                 // do something whether the delete succeeded or failed

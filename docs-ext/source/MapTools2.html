@@ -15,76 +15,199 @@
   </script>
 </head>
 <body onload="prettyPrint(); highlight();">
-  <pre class="prettyprint lang-js"><span id='CpsiMapview-controller-toolbar-MapTools'>/**
-</span> * This class is the controller for the map toolbar of cpsi mapview
- *
+  <pre class="prettyprint lang-js"><span id='CpsiMapview-view-toolbar-MapTools'>/**
+</span> * Toolbar offering map tools, like zoom or measure.
  */
-Ext.define(&#39;CpsiMapview.controller.toolbar.MapTools&#39;, {
-    extend: &#39;Ext.app.ViewController&#39;,
+Ext.define(&#39;CpsiMapview.view.toolbar.MapTools&#39;, {
+    extend: &#39;Ext.toolbar.Toolbar&#39;,
+    xtype: &#39;cmv_maptools&#39;,
+    requires: [
+        &#39;Ext.container.ButtonGroup&#39;,
+        &#39;GeoExt.form.field.GeocoderComboBox&#39;,
+        &#39;BasiGX.view.button.Measure&#39;,
+        &#39;BasiGX.view.button.ZoomIn&#39;,
+        &#39;BasiGX.view.button.ZoomOut&#39;,
+        &#39;BasiGX.view.button.ZoomToExtent&#39;,
+        &#39;BasiGX.view.button.History&#39;,
+        &#39;CpsiMapview.view.button.DigitizeButton&#39;,
+        &#39;CpsiMapview.model.button.MeasureButton&#39;,
+        &#39;CpsiMapview.controller.button.MeasureButtonController&#39;,
+        &#39;CpsiMapview.controller.toolbar.MapTools&#39;,
+        &#39;CpsiMapview.model.toolbar.MapToolsModel&#39;,
+        &#39;CpsiMapview.view.combo.Gazetteer&#39;,
+        &#39;CpsiMapview.view.button.StreetViewTool&#39;,
+        &#39;CpsiMapview.view.panel.TimeSlider&#39;,
+        &#39;CpsiMapview.view.panel.NumericAttributeSlider&#39;,
+        &#39;CpsiMapview.view.lineSliceGridExample.LineSliceGridButton&#39;,
+        &#39;CpsiMapview.view.snappingExample.EdgeButton&#39;,
+        &#39;CpsiMapview.view.window.ParallelLineWindow&#39;
+    ],
 
-    alias: &#39;controller.cmv_maptools&#39;,
-
-<span id='CpsiMapview-controller-toolbar-MapTools-method-initializeMeasureBtn'>    /**
-</span>     * Initialize measure buttons
-     * @param {Ext.button.Button} btn The measure button
-     */
-    initializeMeasureBtn: function (btn) {
-
-        // avoid showing &quot;null&quot; in IE11 by setting to an empty string
-        btn.getViewModel().set(&#39;clickToDrawText&#39;, &#39;&#39;);
-
-        btn.setBind({
-            text: &#39;{measureTooltext}&#39;,
-            tooltip: btn.measureType === &#39;line&#39; ? &#39;{lineMeasureTooltip}&#39; :
-                &#39;{polygonMeasureAreaTooltip}&#39;
-        });
-        var tTipStr = btn.measureType === &#39;line&#39; ?
-            btn.getViewModel().get(&#39;lineMeasureTooltip&#39;) :
-            btn.getViewModel().get(&#39;polygonMeasureAreaTooltip&#39;);
-        btn.tooltipStr = tTipStr;
-    },
-
-<span id='CpsiMapview-controller-toolbar-MapTools-method-setGazetteerExtent'>    /**
-</span>    * Limit a gazetteer to only return results within a certain extent
-    * This sets viewbox and bounded parameters for a Nominatim search
-    * @param {any} cmb
-    */
-    setGazetteerExtent: function (cmb) {
-
-        var map = BasiGX.util.Map.getMapComponent().map;
-
-        var app = Ext.getApplication ? Ext.getApplication() : Ext.app.Application.instance;
-        var initialExtent = app.initialExtent;
-
-        var mv = map.getView();
-        cmb.addMapExtentParams(initialExtent, mv.getProjection());
-    },
-
-<span id='CpsiMapview-controller-toolbar-MapTools-method-init'>    init: function () {
+<span id='CpsiMapview-view-toolbar-MapTools-property-controller'>    controller: &#39;cmv_maptools&#39;,
+</span><span id='CpsiMapview-view-toolbar-MapTools-property-viewModel'>    viewModel: &#39;cmv_maptools&#39;,
 </span>
-        // update the loggedIn property on the viewmodel so any role-restricted
-        // buttons or menus are activated
-        var me = this;
-        Ext.GlobalEvents.on({
-            login: function () {
-                me.getViewModel().set(&#39;loggedIn&#39;, true);
+<span id='CpsiMapview-view-toolbar-MapTools-property-dock'>    dock: &#39;top&#39;,
+</span>
+<span id='CpsiMapview-view-toolbar-MapTools-property-items'>    /**
+</span>     * These would typically be overridden in a client application
+     **/
+    items: [
+        {
+            xtype: &#39;buttongroup&#39;,
+            title: &#39;Basic Tools&#39;,
+            items: [
+                {
+                    xtype: &#39;basigx-button-zoomtoextent&#39;,
+                    extent: [-1210762, 6688545, -600489, 7490828]
+                }, {
+                    xtype: &#39;button&#39;,
+                    toggleGroup: &#39;map&#39;,
+                    name: &#39;pan&#39;,
+                    tooltip: &#39;Pan the map&#39;,
+                    glyph: &#39;xf256@FontAwesome&#39;,
+                }, {
+                    xtype: &#39;basigx-button-zoomin&#39;,
+                    toggleGroup: &#39;map&#39;
+                }, {
+                    xtype: &#39;basigx-button-zoomout&#39;,
+                    toggleGroup: &#39;map&#39;,
+                    enableZoomOutWithBox: true
+                }, {
+                    xtype: &#39;basigx-button-measure&#39;,
+                    toggleGroup: &#39;map&#39;,
+                    measureType: &#39;line&#39;,
+                    viewModel: &#39;cmv_btn_measure&#39;,
+                    controller: &#39;cmv_btn_measure&#39;,
+                    glyph: &#39;ea13@font-gis&#39;,
+                    listeners: {
+                        afterrender: &#39;initializeMeasureBtn&#39;
+                    }
+                }, {
+                    xtype: &#39;basigx-button-measure&#39;,
+                    toggleGroup: &#39;map&#39;,
+                    measureType: &#39;polygon&#39;,
+                    glyph: &#39;ea14@font-gis&#39;,
+                    viewModel: &#39;cmv_btn_measure&#39;,
+                    controller: &#39;cmv_btn_measure&#39;,
+                    listeners: {
+                        afterrender: &#39;initializeMeasureBtn&#39;
+                    }
+                }, {
+                    xtype: &#39;basigx-button-history&#39;,
+                    direction: &#39;BACK&#39;,
+                    glyph: &#39;xf104@FontAwesome&#39;
+                }, {
+                    xtype: &#39;basigx-button-history&#39;,
+                    direction: &#39;FORWARD&#39;,
+                    glyph: &#39;xf105@FontAwesome&#39;
+                }]
+        },
+        {
+            xtype: &#39;buttongroup&#39;,
+            title: &#39;Advanced Tools&#39;,
+            items: [{
+                xtype: &#39;cmv_digitize_button&#39;,
+                toggleGroup: &#39;map&#39;,
+                tooltip: &#39;Point&#39;,
+                glyph: &#39;ea52@font-gis&#39;,
+                apiUrl: &#39;/pmspy/netsolver&#39;,
+                groups: true,
+                pointExtentBuffer: 50,
+                listeners: {
+                    responseFeatures: function () {
+                        this.getController().onResponseFeatures();
+                    }
+                }
             },
-            logout: function () {
-                me.getViewModel().set(&#39;loggedIn&#39;, false);
-            }
-        });
-
-        // as gx_geocoder_combo does not allow binding of the map property
-        // set this when the view is created
-        // TODO add late-binding of the map to gx_geocoder_combo
-        var map = BasiGX.util.Map.getMapComponent().map;
-        var gazetteers = me.getView().query(&#39;gx_geocoder_combo&#39;);
-
-        Ext.each(gazetteers, function (cmb) {
-            cmb.map = map;
-            cmb.map.addLayer(cmb.locationLayer);
-        });
-    }
+            {
+                xtype: &#39;cmv_digitize_button&#39;,
+                toggleGroup: &#39;map&#39;,
+                type: &#39;LineString&#39;,
+                glyph: &#39;ea02@font-gis&#39;,
+                tooltip: &#39;Line&#39;
+            },
+            {
+                xtype: &#39;cmv_digitize_button&#39;,
+                toggleGroup: &#39;map&#39;,
+                type: &#39;Polygon&#39;,
+                tooltip: &#39;Polygon&#39;,
+                glyph: &#39;ea03@font-gis&#39;,
+                apiUrl: &#39;/WebServices/roadschedule/cutWithPolygon&#39;,
+                listeners: {
+                    responseFeatures: function () {
+                        this.getController().onResponseFeatures();
+                    }
+                }
+            },
+            {
+                xtype: &#39;cmv_digitize_button&#39;,
+                toggleGroup: &#39;map&#39;,
+                type: &#39;Circle&#39;,
+                tooltip: &#39;Circle&#39;,
+                apiUrl: &#39;/WebServices/roadschedule/cutWithPolygon&#39;,
+                listeners: {
+                    responseFeatures: function () {
+                        this.getController().onResponseFeatures();
+                    }
+                }
+            }, {
+                xtype: &#39;cmv_streetview_tool&#39;,
+                toggleGroup: &#39;map&#39;,
+            }, {
+                xtype: &#39;cmv_line_slice_grid_button&#39;,
+                text: &#39;&#39;,
+                tooltip: &#39;Linear Reference demo&#39;,
+                glyph: &#39;ea78@font-gis&#39;,
+            }, {
+                xtype: &#39;cmv_edgebutton&#39;,
+                tooltip: &#39;Snapping demo&#39;,
+                glyph: &#39;ea76@font-gis&#39;
+            }, {
+                glyph: &#39;ea50@font-gis&#39;,
+                tooltip: &#39;Draw Parallel Lines&#39;,
+                toggleGroup: &#39;map&#39;,
+                listeners: {
+                    toggle: function (btn, toggled) {
+                        var parallelLineWindow;
+                        if (toggled) {
+                            parallelLineWindow = Ext.create({
+                                xtype: &#39;cmv_parallel_line_window&#39;,
+                            });
+                            parallelLineWindow.show();
+                        } else {
+                            parallelLineWindow = Ext.ComponentQuery.query(
+                                &#39;cmv_parallel_line_window&#39;)[0];
+                            if (parallelLineWindow) {
+                                parallelLineWindow.destroy();
+                            }
+                        }
+                    }
+                }
+            }]
+        },
+        &#39;-&gt;&#39;,
+        {
+            xtype: &#39;buttongroup&#39;,
+            title: &#39;Global Timeslider&#39;,
+            items: [{
+                xtype: &#39;cmv_timeslider&#39;,
+                startDate: new Date(1946, 0, 1),
+                endDate: new Date(2020, 11, 30)
+            }]
+        }, {
+            xtype: &#39;buttongroup&#39;,
+            title: &#39;Gazetteers&#39;,
+            items: [{
+                xtype: &#39;gx_geocoder_combo&#39;
+            }, {
+                xtype: &#39;cmv_gazetteer_combo&#39;, // custom CPSI gazetteer
+                url: &#39;/WebServices/townland/gazetteer/&#39;,
+                proxyRootProperty: &#39;data&#39;,
+                displayValueMapping: &#39;name&#39;,
+                emptyText: &#39;Townland...&#39;
+            }]
+        }
+    ]
 });
 </pre>
 </body>
