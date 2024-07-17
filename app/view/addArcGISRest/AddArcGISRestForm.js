@@ -11,10 +11,10 @@ Ext.define('CpsiMapview.view.addArcGISRest.AddArcGISRestForm', {
             arcGISUrlTextFieldLabel: 'ArcGIS Service URL',
             availableLayersFieldSetTitle: 'Available layers',
             resetBtnText: 'Reset',
-            requestLayersBtnText: 'Request available layers',
+            requestLayersBtnText: 'List Map Services',
             checkAllLayersBtnText: 'Check all',
             uncheckAllLayersBtnText: 'Uncheck all',
-            addCheckedLayersBtnText: 'Add chosen layers',
+            addCheckedLayersBtnText: 'Add Selected Layers',
             errorRequestFailed: 'The given URL could not be requested.',
             msgRequestTimedOut: 'The request was not answered in time and was aborted.',
             msgCorsMisconfiguration: 'HTTP access control (CORS) on the target server is probably not ' +
