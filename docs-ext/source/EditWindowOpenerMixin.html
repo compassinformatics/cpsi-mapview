@@ -37,7 +37,9 @@ Ext.define(&#39;CpsiMapview.util.EditWindowOpenerMixin&#39;, {
 
         Ext.each(existingWindows, function (w) {
             rec = w.getViewModel().get(&#39;currentRecord&#39;);
-            if (rec.getId() == recId) {
+            // if the window has been opened but the model failed to load
+            // then rec can be null
+            if (rec &amp;&amp; rec.getId() == recId) {
                 recordWindow = w;
                 return false;
             }
@@ -61,6 +63,7 @@ Ext.define(&#39;CpsiMapview.util.EditWindowOpenerMixin&#39;, {
         return recordWindow || Ext.create(editWindowType);
     }
 
-});</pre>
+});
+</pre>
 </body>
 </html>
