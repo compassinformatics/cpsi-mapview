@@ -129,7 +129,7 @@ Ext.define('CpsiMapview.controller.MapController', {
                         vm.set('currentRecord', rec);
                         win.show();
                     },
-                    failure: function (rec) {
+                    failure: function () {
                         Ext.toast({
                             html: 'Cannot load the record with id ' + recId,
                             title: 'Record Loading Failed',
