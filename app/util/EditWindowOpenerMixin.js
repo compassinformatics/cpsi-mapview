@@ -1,4 +1,4 @@
-﻿/**
+/**
  * A mixin for any menu controller or window controller which
  * needs to check if a model is already opened in a window.
  *
@@ -20,7 +20,9 @@ Ext.define('CpsiMapview.util.EditWindowOpenerMixin', {
 
         Ext.each(existingWindows, function (w) {
             rec = w.getViewModel().get('currentRecord');
-            if (rec.getId() == recId) {
+            // if the window has been opened but the model failed to load
+            // then rec can be null
+            if (rec && rec.getId() == recId) {
                 recordWindow = w;
                 return false;
             }

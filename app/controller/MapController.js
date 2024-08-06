@@ -128,6 +128,14 @@ Ext.define('CpsiMapview.controller.MapController', {
                         var vm = win.getViewModel();
                         vm.set('currentRecord', rec);
                         win.show();
+                    },
+                    failure: function (rec) {
+                        Ext.toast({
+                            html: 'Cannot load the record with id ' + recId,
+                            title: 'Record Loading Failed',
+                            width: 200,
+                            align: 'br'
+                        });
                     }
                 });
             } else {
