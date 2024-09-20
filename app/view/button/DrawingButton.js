@@ -141,7 +141,12 @@ Ext.define('CpsiMapview.view.button.DrawingButton', {
          * defined in snappingLayerKeys, or snapping to layer features even if they
          * are invisible.
          */
-        allowSnapToHiddenFeatures: false
+        allowSnapToHiddenFeatures: false,
+
+        /**
+        * The ExtJS record associated with the tool (if any), that can be used to apply snapping logic
+        */
+        parentRecord: null,
     },
 
     /**

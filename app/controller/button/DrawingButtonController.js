@@ -399,7 +399,24 @@ Ext.define('CpsiMapview.controller.button.DrawingButtonController', {
         });
 
         if (features.length > 0) {
-            return features[0];
+            var selectedFeat = null;
+            var parentRec = me.getView().getParentRecord();
+            if (parentRec) {
+                features.forEach(function (feat) {
+                    if (feat.getId() !== parentRec.getId()) {
+                        // the found feature does not share the same Id as the associated record
+                        // this allows us to avoid snapping a feature to itself
+                        selectedFeat = feat;
+                        return false;
+                    }
+                });
+            }
+
+            if (!selectedFeat) {
+                selectedFeat = features[0]; // by default return the first feature
+            }
+
+            return selectedFeat;
         } else {
             return null;
         }
@@ -722,26 +739,26 @@ Ext.define('CpsiMapview.controller.button.DrawingButtonController', {
             }
         }
 
-        me.prepareDrawingStyles();
+        if (!me.defaultDrawStyle) {
+            me.prepareDrawingStyles();
+            // set initial style for drawing features
+            me.defaultDrawStyle = [
+                view.getDrawBeforeEditingPoint(),
+                view.getDrawStyleStartPoint(),
+                view.getDrawStyleLine(),
+                view.getDrawStyleEndPoint(),
+            ];
+            me.drawLayer.setStyle(me.defaultDrawStyle);
 
-        // set initial style for drawing features
-        me.defaultDrawStyle = [
-            view.getDrawBeforeEditingPoint(),
-            view.getDrawStyleStartPoint(),
-            view.getDrawStyleLine(),
-            view.getDrawStyleEndPoint(),
-        ];
-        me.drawLayer.setStyle(me.defaultDrawStyle);
-
-        me.setDrawInteraction(me.drawLayer);
-        me.setModifyInteraction(me.drawLayer);
-        me.setSnapInteraction(me.drawLayer);
+            me.setDrawInteraction(me.drawLayer);
+            me.setModifyInteraction(me.drawLayer);
+            me.setSnapInteraction(me.drawLayer);
+        }
 
         var viewPort = me.map.getViewport();
 
-        var tracingLayerKeys = view.getTracingLayerKeys();
-
         if (pressed) {
+            var tracingLayerKeys = view.getTracingLayerKeys();
 
             me.initTracing(
                 tracingLayerKeys,
