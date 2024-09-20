@@ -21,6 +21,7 @@ describe('CpsiMapview.controller.button.DrawingButtonController', function () {
         var drawLayer;
         var layer1;
         var layer2;
+        var layer3;
         var getLayersByStub;
         // change in future if test layers get more features
         var expectedUniqueFeaturesCount = 3;
@@ -71,6 +72,32 @@ describe('CpsiMapview.controller.button.DrawingButtonController', function () {
                             geometry: new ol.geom.LineString([[0, 0], [1, 1]])
                         }),
                         sharedFeature
+                    ]
+                })
+            });
+
+            var feat3 = new ol.Feature({
+                geometry: new ol.geom.LineString([[0, 0], [1, 1]]),
+                nodeIdFrom: 1,
+                nodeIdTo: 2
+            });
+
+            feat3.setId(3);
+
+            var feat4 = new ol.Feature({
+                geometry: new ol.geom.LineString([[1, 1], [2, 2]]),
+                nodeIdFrom: 2,
+                nodeIdTo: 3
+            });
+
+            feat4.setId(4);
+
+            layer3 = new ol.layer.Vector({
+                isWfs: true,
+                source: new ol.source.Vector({
+                    features: [
+                        feat3,
+                        feat4
                     ]
                 })
             });
@@ -271,6 +298,29 @@ describe('CpsiMapview.controller.button.DrawingButtonController', function () {
             });
 
             ctrl.calculateLineIntersections(inputFeature);
+        });
+
+        it('snap to self at an intersection', function () {
+
+            var coord = [1, 1];
+            ctrl.map.getView().setResolution(1);
+            var selectedFeat = ctrl.getSnappedEdge(coord, layer3);
+            expect(selectedFeat.getId()).to.be(3);
+        });
+        it('avoid snapping an edge to itself at an intersection by setting an associated record', function () {
+
+            var coord = [1, 1];
+
+            // associate a record with the controller
+            // mock a record with a getId function
+            var rec = {
+                getId: function () { return 3 } // 1 matches the Id of feat1
+            };
+            ctrl.getView().setParentRecord(rec);
+            ctrl.map.getView().setResolution(1);
+
+            var selectedFeat = ctrl.getSnappedEdge(coord, layer3);
+            expect(selectedFeat.getId()).to.be(4);
         });
     });
 });
