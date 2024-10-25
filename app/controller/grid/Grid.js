@@ -665,7 +665,6 @@ Ext.define('CpsiMapview.controller.grid.Grid', {
     onClearSpatialFilter: function () {
 
         var me = this;
-        var view = me.getView();
 
         // trigger a refresh of the store without the spatial filter
         me.onSpatialFilter(null);
