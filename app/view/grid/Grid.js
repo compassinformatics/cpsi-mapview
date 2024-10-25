@@ -130,6 +130,9 @@ Ext.define('CpsiMapview.view.grid.Grid', {
         '->',
         {
             xtype: 'buttongroup',
+            bind: {
+                hidden: '{!useSimpleSelection}'
+            },
             items: [{
                 xtype: 'cmv_spatial_query_button',
                 drawGeometryType: 'Polygon',
@@ -139,9 +142,6 @@ Ext.define('CpsiMapview.view.grid.Grid', {
                 triggerWfsRequest: false,
                 displayPermanently: true,
                 glyph: 'xf044@FontAwesome',
-                bind: {
-                    hidden: '{!useSimpleSelection}'
-                },
                 listeners: {
                     'cmv-spatial-query-filter': 'onSpatialFilter'
                 }
@@ -173,6 +173,13 @@ Ext.define('CpsiMapview.view.grid.Grid', {
                     listeners: {
                         'cmv-spatial-query-filter': 'onSpatialFilter'
                     }
+                },
+                {
+                    xtype: 'button',
+                    text: 'Clear',
+                    tooltip: 'Clear the spatial filter',
+                    glyph: 'f057@FontAwesome',
+                    handler: 'onClearSpatialFilter'
                 },
                 {
                     xtype: 'cmv_feature_selection_button',

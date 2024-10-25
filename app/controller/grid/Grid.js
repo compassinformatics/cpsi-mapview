@@ -665,18 +665,37 @@ Ext.define('CpsiMapview.controller.grid.Grid', {
     onClearSpatialFilter: function () {
 
         var me = this;
-        var view = me.getView();
 
         // trigger a refresh of the store without the spatial filter
         me.onSpatialFilter(null);
         // now remove the polygon from the layer
-        var spatialQueryButton = view.down('cmv_spatial_query_button');
+        var spatialQueryButton = me.getVisibleSpatialQueryButton();
         if (spatialQueryButton !== null) {
             spatialQueryButton.fireEvent('clearAssociatedPermanentLayer');
             spatialQueryButton.toggle(false);
         }
     },
 
+    /**
+    * The grid can have a simple or an advanced spatial selection button.
+    * Make sure the visible button is returned
+    */
+    getVisibleSpatialQueryButton: function () {
+
+        var me = this;
+        var view = me.getView();
+
+        var spatialQueryButtons = view.query('cmv_spatial_query_button');
+        var spatialQueryButton = null;
+        Ext.each(spatialQueryButtons, function (button) {
+            if (button.isVisible(true)) { // check visibility including parent containers
+                spatialQueryButton = button;
+                return false; // exit the loop
+            }
+        });
+
+        return spatialQueryButton;
+    },
     /**
      * Clear both the grid filters and any spatial filter.
      * This will cause the store to reload.
@@ -690,7 +709,7 @@ Ext.define('CpsiMapview.controller.grid.Grid', {
         me.idFilter = null;
         view.getPlugin('gridfilters').clearFilters();
 
-        var spatialQueryButton = view.down('cmv_spatial_query_button');
+        var spatialQueryButton = me.getVisibleSpatialQueryButton();
         if (spatialQueryButton !== null) {
             spatialQueryButton.fireEvent('clearAssociatedPermanentLayer');
             spatialQueryButton.toggle(false);
