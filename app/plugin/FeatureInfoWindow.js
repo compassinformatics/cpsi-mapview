@@ -68,7 +68,12 @@ Ext.define('CpsiMapview.plugin.FeatureInfoWindow', {
 
         me.highlightClick(evt);
 
-        me.map.forEachLayerAtPixel(evt.pixel, function (layer) {
+        Ext.each(me.map.getAllLayers(), function (layer) {
+
+            if (layer.get('featureInfoWindow') !== true) {
+                return;
+            }
+
             var params = layer.getSource().getParams();
 
             // Map layers combining multiple WMS layers e.g. roads,rivers
@@ -112,10 +117,6 @@ Ext.define('CpsiMapview.plugin.FeatureInfoWindow', {
                 });
             } else {
                 layers.push(layer);
-            }
-        }, {
-            layerFilter: function (layer) {
-                return layer.get('featureInfoWindow');
             }
         });
 
