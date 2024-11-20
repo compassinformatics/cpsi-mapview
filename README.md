@@ -22,29 +22,29 @@ Ensure that Sencha Cmd is available on the command line. Examples for Windows:
 Powershell:
 
 ```
-$env:Path = "D:\Tools\Sencha\Cmd\6.6.0.13;" + $env:Path
+$env:Path = "D:\Tools\Sencha\Cmd\7.8.0.59;" + $env:Path
 ```
 
 Command prompt:
 
 ```
-SET PATH=D:\Tools\Sencha\Cmd\6.6.0.13;%PATH%
+SET PATH=D:\Tools\Sencha\Cmd\7.8.0.59;%PATH%
 ```
 
-Now add your ExtJS library. The project is tested with both 6.2 (GPL), and 6.7 (commercial license).
+Now add your ExtJS library. The project is tested with both 7.0 (GPL), and 7.8 (commercial license).
 
 ```
-sencha app upgrade /path/to/local/extjs6.2
+sencha app upgrade /path/to/local/extjs7.8
 ```
 
-Alternatively place a junction (shortcut) to point to an existing ExtJS folder:
+Alternatively place a junction (shortcut) to point to an existing ExtJS folder (recommended approach):
 
 ```
 # Command Prompt
-mklink /D ext D:\Tools\Sencha\ext-6.2.0
+mklink /D ext D:\Tools\Sencha\ext-7.8.0
 
 # PowerShell
-new-item -itemtype symboliclink -path . -name ext -value D:\Tools\Sencha\ext-6.2.0
+new-item -itemtype symboliclink -path . -name ext -value D:\Tools\Sencha\ext-7.8.0
 ```
 
 Install dependencies:
@@ -64,7 +64,9 @@ Open http://localhost:1841 in your browser.
 
 ## Override dependencies
 
-To debug against the main branches (or a specific commit) of dependencies, update the `classpath` property in `app.json` to use the `lib` folder instead of `node_modues`, and run the following command to clone git submodules:
+To debug against the main branches (or a specific commit) of dependencies, update the `classpath` property in `app.json` to use the `lib` folder instead of `node_modules`,
+and run the following command to clone git submodules:
+
 ```
 git submodule update --init --recursive
 ```
