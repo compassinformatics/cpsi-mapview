@@ -59,7 +59,6 @@ Ext.define('CpsiMapview.plugin.FeatureInfoWindow', {
     requestFeatureInfos: function (clickedFeatures, evt) {
         var me = this;
 
-        var layers = [];
         var mapView = me.map.getView();
 
         var resolution = mapView.getResolution();
@@ -68,56 +67,60 @@ Ext.define('CpsiMapview.plugin.FeatureInfoWindow', {
 
         me.highlightClick(evt);
 
-        me.map.forEachLayerAtPixel(evt.pixel, function (layer) {
-            var params = layer.getSource().getParams();
+        const pixel = evt.pixel; // Get the pixel from the event
+        const map = me.map; // Reference to the map instance
+        const layers = []; // Array to hold processed layers
 
-            // Map layers combining multiple WMS layers e.g. roads,rivers
-            // will cause errors in the back-end MapServer as the JSON properties
-            // will be different for different layers
-            // Split the layers and create temporary layers for the GetFeatureInfo requests
+        map.getLayers().forEach(layer => {
+            if (layer.get('featureInfoWindow') && layer.getVisible()) { // Apply the layer filter
+                const data = layer.getData(pixel);
+                if (data) { // Ensure there's data at the pixel
+                    const params = layer.getSource().getParams();
 
-            // we only check for unique layer names - if labels are used then duplicate layer names
-            // are used in requests, but we only want one set of FeatureInfo results
-            var layerNames = Ext.Array.unique(params.LAYERS.split(','));
+                    // Map layers combining multiple WMS layers e.g. roads,rivers
+                    // will cause errors in the back-end MapServer as the JSON properties
+                    // will be different for different layers
+                    // Split the layers and create temporary layers for the GetFeatureInfo requests
 
-            if (layerNames.length > 1) {
+                    // We only check for unique layer names - if labels are used then duplicate layer names
+                    // are used in requests, but we only want one set of FeatureInfo results
+                    const layerNames = Ext.Array.unique(params.LAYERS.split(','));
 
-                // if there are multiple layers then attempt to also split out styles and filters
-                var idx = 0;
-                var styleNames = [];
+                    if (layerNames.length > 1) {
+                        // If there are multiple layers then attempt to also split out styles and filters
+                        let idx = 0;
+                        let styleNames = [];
 
-                if (params.STYLES) {
-                    styleNames = params.STYLES.split(',');
+                        if (params.STYLES) {
+                            styleNames = params.STYLES.split(',');
+                        }
+
+                        const wmsFilterUtil = CpsiMapview.util.WmsFilter;
+                        const filters = wmsFilterUtil.getWmsFilters(params);
+
+                        Ext.Array.each(layerNames, function (layerName) {
+                            const newParams = Ext.clone(params);
+                            newParams.LAYERS = layerName;
+                            newParams.STYLES = styleNames[idx] ? styleNames[idx] : '';
+                            newParams.FILTER = filters[idx] ? filters[idx] : '';
+
+                            const wmsLayer = new ol.layer.Image({
+                                name: layerName,
+                                source: new ol.source.ImageWMS({
+                                    url: layer.getSource().getUrl(),
+                                    params: newParams
+                                })
+                            });
+                            layers.push(wmsLayer);
+                            idx += 1;
+                        });
+                    } else {
+                        layers.push(layer);
+                    }
                 }
-
-                var wmsFilterUtil = CpsiMapview.util.WmsFilter;
-                var filters = wmsFilterUtil.getWmsFilters(params);
-
-                Ext.Array.each(layerNames, function (layerName) {
-
-                    var newParams = Ext.clone(params);
-                    newParams.LAYERS = layerName;
-                    newParams.STYLES = styleNames[idx] ? styleNames[idx] : '';
-                    newParams.FILTER = filters[idx] ? filters[idx] : '';
-
-                    var wmsLayer = new ol.layer.Image({
-                        name: layerName,
-                        source: new ol.source.ImageWMS({
-                            url: layer.getSource().getUrl(),
-                            params: newParams
-                        })
-                    });
-                    layers.push(wmsLayer);
-                    idx += 1;
-                });
-            } else {
-                layers.push(layer);
-            }
-        }, {
-            layerFilter: function (layer) {
-                return layer.get('featureInfoWindow');
             }
         });
+
 
         var win = me.openFeatureInfoWindow();
 
