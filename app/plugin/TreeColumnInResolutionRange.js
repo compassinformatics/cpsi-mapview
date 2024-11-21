@@ -72,7 +72,13 @@ Ext.define('CpsiMapview.plugin.TreeColumnInResolutionRange', {
             var descriptionBefore = node.getOlLayer().get('description');
             var description = me.getTooltipText(node, inRange, unit);
             var changed = description !== descriptionBefore;
-            node.getOlLayer().set('description', description);
+            var layer = node.getOlLayer();
+            if (layer) {
+                layer.set('description', description);
+            } else {
+                Ext.log.warn('No layer associated with the tree node ' + node.get('text'));
+            }
+
             if (changed) {
                 node.set('qtip', description);
             }
