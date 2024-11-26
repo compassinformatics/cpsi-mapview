@@ -24,7 +24,7 @@ Ext.define('CpsiMapview.plugin.FeatureInfoWindow', {
 
     /**
      * Feature Window height as a percentage of the viewport
-     * @param {number} percentage as deciaml
+     * @param {number} percentage as decimal
      */
     percentageHeight: 0.8,
 
@@ -67,12 +67,13 @@ Ext.define('CpsiMapview.plugin.FeatureInfoWindow', {
 
         me.highlightClick(evt);
 
-        const pixel = evt.pixel; // Get the pixel from the event
-        const map = me.map; // Reference to the map instance
-        const layers = []; // Array to hold processed layers
+        const pixel = evt.pixel;
+        const layers = [];
 
-        map.getLayers().forEach(layer => {
-            if (layer.get('featureInfoWindow') && layer.getVisible()) { // Apply the layer filter
+        const infoLayers = BasiGX.util.Layer.getLayersBy('featureInfoWindow', true);
+
+        infoLayers.forEach(layer => {
+            if (layer.getVisible()) {
                 const data = layer.getData(pixel);
                 if (data) { // Ensure there's data at the pixel
                     const params = layer.getSource().getParams();
