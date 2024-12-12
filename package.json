@@ -32,6 +32,7 @@
     "@terrestris/basigx": "5.0",
     "@turf/line-offset": "^7.1.0",
     "browserify": "^17.0.1",
+    "font-awesome": "^4.7.0",
     "font-gis": "^1.0.6",
     "geostyler-openlayers-parser": "^5.0.0",
     "geostyler-sld-parser": "^7.0.0",
