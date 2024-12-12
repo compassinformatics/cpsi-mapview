@@ -30,7 +30,7 @@ Ext.define('CpsiMapview.util.Turf', {
                 units: offsetUnit
             };
         }
-        var parallelGeojsonFeature = turf.lineOffset(
+        var parallelGeojsonFeature = turf.lineOffset.lineOffset(
             geojsonFeature.geometry, offset, opts
         );
         var parallelFeature = format.readFeature(parallelGeojsonFeature);

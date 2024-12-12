@@ -9,6 +9,13 @@ describe('CpsiMapview.util.Turf', function () {
         it('is defined', function () {
             expect(cmp).not.to.be(undefined);
         });
+        it('turf is defined', function () {
+            expect(turf).not.to.be(undefined);
+        });
+
+        it('turf.lineOffset is defined', function () {
+            expect(turf.lineOffset).not.to.be(undefined);
+        });
     });
 
     describe('#createParallelFeature', function () {
