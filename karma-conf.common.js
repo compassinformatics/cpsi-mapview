@@ -1,34 +1,42 @@
 /* eslint-env node */
 /* eslint max-len: 0 */
-module.exports = function(config) {
+module.exports = function (config) {
 
     var files = [
-        'https://cdnjs.cloudflare.com/ajax/libs/extjs/6.2.0/classic/theme-neptune/resources/theme-neptune-all_1.css',
-        'https://cdnjs.cloudflare.com/ajax/libs/extjs/6.2.0/classic/theme-neptune/resources/theme-neptune-all_2.css',
-        'https://cdnjs.cloudflare.com/ajax/libs/extjs/6.2.0/classic/theme-neptune/resources/theme-neptune-all.css',
-        'node_modules/@geoext/openlayers-legacy/dist/ol.css',
-        'node_modules/@geoext/openlayers-legacy/dist/ol.js',
-        'https://cdnjs.cloudflare.com/ajax/libs/extjs/6.2.0/ext-all-debug.js',
-        'https://cdnjs.cloudflare.com/ajax/libs/extjs/6.2.0/packages/ux/classic/ux.js',
-        'https://geoext.github.io/geoext3/master/GeoExt.js',
+        'https://geoext.github.io/extjs-gpl/build/classic/theme-neptune/resources/theme-neptune-all_1.css',
+        'https://geoext.github.io/extjs-gpl/build/classic/theme-neptune/resources/theme-neptune-all_2.css',
+        'https://geoext.github.io/extjs-gpl/build/classic/theme-neptune/resources/theme-neptune-all.css',
+        './node_modules/ol/ol.css',
+        './node_modules/ol/dist/ol.js',
+        'https://geoext.github.io/extjs-gpl/build/ext-all-debug.js',
+        'https://geoext.github.io/extjs-gpl/build/packages/ux/classic/ux.js',
+        //'https://geoext.github.io/geoext/master/GeoExt.js',
         'https://cdnjs.cloudflare.com/ajax/libs/opentype.js/0.6.9/opentype.min.js',
-        'https://cdn.jsdelivr.net/npm/jsonix@3.0.0/jsonix.min.js',
+        './node_modules/jsonix/jsonix.js',
         'https://cdn.jsdelivr.net/gh/bjornharrtell/jsts@gh-pages/1.4.0/jsts.min.js',
-        'https://cdn.jsdelivr.net/gh/highsource/ogc-schemas@2.6.1/scripts/lib/SLD_1_0_0_GeoServer.js',
-        'https://cdn.jsdelivr.net/gh/highsource/ogc-schemas@2.6.1/scripts/lib/Filter_1_0_0.js',
-        'https://cdn.jsdelivr.net/gh/highsource/ogc-schemas@2.6.1/scripts/lib/GML_2_1_2.js',
-        'https://cdn.jsdelivr.net/gh/highsource/ogc-schemas@2.6.1/scripts/lib/GML_3_1_1.js',
-        'https://cdn.jsdelivr.net/gh/highsource/ogc-schemas@2.6.1/scripts/lib/OWS_1_1_0.js',
-        'https://cdn.jsdelivr.net/gh/highsource/ogc-schemas@2.6.1/scripts/lib/SMIL_2_0.js',
-        'https://cdn.jsdelivr.net/gh/highsource/ogc-schemas@2.6.1/scripts/lib/SMIL_2_0_Language.js',
-        'https://cdn.jsdelivr.net/gh/highsource/ogc-schemas@2.6.1/scripts/lib/WCS_1_1.js',
-        'https://cdn.jsdelivr.net/gh/highsource/ogc-schemas@2.6.1/scripts/lib/WPS_1_0_0.js',
-        'https://cdn.jsdelivr.net/gh/highsource/w3c-schemas@1.4.0/scripts/lib/XLink_1_0.js',
-        'https://cdn.jsdelivr.net/npm/proj4@2.5.0/dist/proj4-src.min.js',
+        './node_modules/@ogc-schemas/ogc-schemas/lib/SLD_1_0_0_GeoServer.js',
+        './node_modules/@ogc-schemas/ogc-schemas/lib/Filter_1_0_0.js',
+        './node_modules/@ogc-schemas/ogc-schemas/lib/GML_2_1_2.js',
+        './node_modules/@ogc-schemas/ogc-schemas/lib/GML_3_1_1.js',
+        './node_modules/@ogc-schemas/ogc-schemas/lib/OWS_1_1_0.js',
+        './node_modules/@ogc-schemas/ogc-schemas/lib/SMIL_2_0.js',
+        './node_modules/@ogc-schemas/ogc-schemas/lib/SMIL_2_0_Language.js',
+        './node_modules/@ogc-schemas/ogc-schemas/lib/WCS_1_1.js',
+        './node_modules/@ogc-schemas/ogc-schemas/lib/WPS_1_0_0.js',
+        './node_modules/w3c-schemas/lib/XLink_1_0.js',
+        './node_modules/proj4/dist/proj4.js',
         'https://maps.googleapis.com/maps/api/js?v=3.42&key=AIzaSyAj6xrC0L3G0YquO1q6Qsma1ZEfYgGQotU&callback=Function.prototype',
-        './node_modules/geostyler-sld-parser/browser/sldStyleParser.iife.js',
-        './node_modules/geostyler-openlayers-parser/browser/olStyleParser.iife.js',
+        './node_modules/geostyler-sld-parser/dist/sldStyleParser.iife.js',
+        './node_modules/geostyler-openlayers-parser/dist/olStyleParser.iife.js',
         'lib/turf.js',
+        {
+            pattern: 'node_modules/@geoext/geoext/src/**/*.js',
+            included: true
+        },
+        {
+            pattern: 'node_modules/@geoext/geoext/classic/**/*.js',
+            included: true
+        },
         {
             pattern: 'node_modules/@terrestris/basigx/src/**/*.js',
             served: true,
@@ -61,7 +69,8 @@ module.exports = function(config) {
             '/resources': '/base/test/resources',
             '/spec': '/base/test/spec',
             '/BasiGX': '/base/node_modules/@terrestris/basigx/src',
-            '/CpsiMapview': '/base/app'
+            '/CpsiMapview': '/base/app',
+            '/GeoExt': '/base/src',
         },
 
         // the following works to limit the tests run
@@ -76,6 +85,15 @@ module.exports = function(config) {
         // frameworks to use
         // available frameworks: https://npmjs.org/browse/keyword/karma-adapter
         frameworks: ['mocha', 'expect', 'sinon'],
+
+        plugins: [
+            require("karma-mocha"),
+            require("karma-mocha-reporter"),
+            require("karma-coverage"),
+            require("karma-expect"),
+            require("karma-sinon"),
+            require("karma-chrome-launcher"),
+        ],
 
         // list of files / patterns to load in the browser
         files: files,

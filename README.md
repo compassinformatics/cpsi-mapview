@@ -7,8 +7,9 @@ Check out the latest deployed version at https://compassinformatics.github.io/cp
 
 ## Project setup
 
-This steps assume you have Sencha CMD v6.6 installed on your system and a copy of ExtJS v6.2.0 downloaded.
-The project has been tested using Node v16+ - this is the minimum recommended version.
+This steps assume you have Sencha CMD v7.8 (or the GPL version v7.2.0.84) installed on your system and a copy of ExtJS v7.0.0 downloaded (or
+the commercial version ExtJS 7.8.0 if you have a licence).
+The project has been tested using Node v20+ - this is the minimum recommended version.
 
 Clone this repository
 
@@ -118,13 +119,15 @@ To run for single test file you can use the `grep` option:
 
 ```
 karma start --single-run --grep 'CpsiMapview.factory.Layer'
+karma start --single-run --grep 'CpsiMapview.util.Turf' --debug
 ```
 
 ## Production Builds
 
 ```
+cd cpsi-mapview
 sencha app build
-cd cpsi-mapview\build\production\CpsiMapview
+cd build\production\CpsiMapview
 python -m http.server 8888
 http://localhost:8888
 ```

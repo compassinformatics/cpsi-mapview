@@ -1,9 +1,12 @@
+// see https://github.com/geoext/geoext/blob/master/.eslintrc
+// and https://github.com/openlayers/eslint-config-openlayers/blob/main/index.js
 module.exports = {
+    "extends": "eslint:recommended",
     "env": {
         "browser": true,
-        "es6": true // to allow Uint8Array
+        "es6": true, // to allow Uint8Array
+        "es2021": true
     },
-    "extends": "eslint:recommended",
     "globals": {
         "ol": false,
         "Ext": false,
@@ -25,9 +28,6 @@ module.exports = {
         "GML_3_2_0": false,
         "Jsonix": false,
         "turf": false
-    },
-    "parserOptions": {
-        "ecmaVersion": 5
     },
     "rules": {
         "no-trailing-spaces": "error",
