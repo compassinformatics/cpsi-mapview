@@ -322,11 +322,10 @@
      */
     "css": [
         {
-            // "path": "./node_modules/@geoext/openlayers-legacy/dist/ol.css"
             "path": "./node_modules/ol/ol.css"
         },
         {
-            "path": "./resources/font-gis/css/font-gis.css"
+            "path": "./node_modules/font-gis/css/font-gis.css"
         },
         {
             "path": "./resources/data/styling/ol.css"
