@@ -3,13 +3,6 @@
  *  styling should be located the view's corresponding scss file.
  */
 
-@font-face {
-    font-family: "FontAwesome"; /* Alias name */
-    src: local("Font Awesome 5 Free"), local("Font Awesome 5 Free Regular");
-    font-weight: 400; /* Regular weight */
-    font-style: normal;
-}
-
 $enable-font-awesome: dynamic(true);
 
 $font-size: dynamic(12px);
