@@ -125,7 +125,7 @@ Ext.define('CpsiMapview.view.main.Map', {
      * Fires when the OL map is clicked.
      * @param {CpsiMapview.view.main.Map} this
      * @param {Object[]} clickInfo The clicked features and the corresponding layers, like `[{feature: aFeat, layer: aLayer}, ...]`
-     * @param {ol.MapBrowserEvent)} evt The original 'singleclick' event of OpenLayers
+     * @param {ol.MapBrowserEvent} evt The original 'singleclick' event of OpenLayers
      */
 
     /**

@@ -11,30 +11,22 @@ jobs:
 
     steps:
     - name: Checkout repository and submodules
-      uses: actions/checkout@v2
+      uses: actions/checkout@v4
       with:
         submodules: recursive
 
-    - name: Use Node.js 14.x
-      uses: actions/setup-node@v1
+    - name: Use Node.js 20.x
+      uses: actions/setup-node@v3
       with:
-        node-version: 14.x
+        node-version: 20.x
 
     - name: Install needed Java version
       uses: actions/setup-java@v1
       with:
         java-version: '8'
 
-    - name: Install ruby
-      uses: ruby/setup-ruby@v1
-      with:
-        ruby-version: '2.6'
-
-    - name: Install jsduck
-      run: gem install jsduck
-
     - name: Cache Node.js modules 💾
-      uses: actions/cache@v2
+      uses: actions/cache@v4
       with:
         path: |
           node_modules
@@ -44,12 +36,12 @@ jobs:
           ${{ runner.OS }}-
 
     - name: Cache ext 💾
-      uses: actions/cache@v2
+      uses: actions/cache@v4
       with:
         path: |
           resources/external
-          ext-6.2.0
-          ext-6.2.0-gpl.zip
+          ext-7.0.0
+          ext-7.0.0-gpl.zip
           sencha-cmd-download
           sencha-cmd
         key: ${{ runner.OS }}-node-${{ hashFiles('resources/external/ext-all.js') }}
@@ -59,14 +51,14 @@ jobs:
 
     - name: Download ExtJS, install sencha cmd
       run: |
-        if (test ! -f ext-6.2.0-gpl.zip); then wget -q http://cdn.sencha.com/ext/gpl/ext-6.2.0-gpl.zip -O ext-6.2.0-gpl.zip; fi
-        if (test ! -d ext-6.2.0); then unzip -qo ext-6.2.0-gpl.zip; fi
+        if (test ! -f ext-7.0.0-gpl.zip); then wget -q http://cdn.sencha.com/ext/gpl/ext-7.0.0-gpl.zip -O ext-7.0.0-gpl.zip; fi
+        if (test ! -d ext-7.0.0); then unzip -qo ext-7.0.0-gpl.zip; fi
         mkdir -p sencha-cmd-download
-        if (test ! -f sencha-cmd-download/SenchaCmd-7.3.0.19-linux-amd64.sh.zip); then wget -q http://cdn.sencha.com/cmd/7.3.0.19/no-jre/SenchaCmd-7.3.0.19-linux-amd64.sh.zip -O sencha-cmd-download/SenchaCmd-7.3.0.19-linux-amd64.sh.zip; fi
-        if (test ! -f sencha-cmd-download/SenchaCmd-7.3.0.19-linux-amd64.sh); then unzip -q -d sencha-cmd-download sencha-cmd-download/SenchaCmd-7.3.0.19-linux-amd64.sh.zip; fi
+        if (test ! -f sencha-cmd-download/SenchaCmd-7.2.0.84-linux-amd64.sh.zip); then wget -q  https://cdn.sencha.com/cmd/7.2.0.84/no-jre/SenchaCmd-7.2.0.84-linux-amd64.sh.zip -O sencha-cmd-download/SenchaCmd-7.2.0.84-linux-amd64.sh.zip; fi
+        if (test ! -f sencha-cmd-download/SenchaCmd-7.2.0.84-linux-amd64.sh); then unzip -q -d sencha-cmd-download sencha-cmd-download/SenchaCmd-7.2.0.84-linux-amd64.sh.zip; fi
         mkdir -p sencha-cmd
-        if (test ! -f sencha-cmd/sencha); then ./sencha-cmd-download/SenchaCmd-7.3.0.19-linux-amd64.sh -q -dir "$PWD/sencha-cmd"; fi
-        mv ext-6.2.0 ext
+        if (test ! -f sencha-cmd/sencha); then ./sencha-cmd-download/SenchaCmd-7.2.0.84-linux-amd64.sh -q -dir "$PWD/sencha-cmd"; fi
+        mv ext-7.0.0 ext
 
     - name: Install dependencies ⏬
       run: npm install
@@ -92,8 +84,9 @@ jobs:
 
     - name: Cleanup and prepare pages
       run: |
-        mkdir -p docs-ext
+        mkdir -p docs
         npm run generate:docs
+        cp -r docs build/production/CpsiMapview/docs
 
     - name: Copy presentation to output folder and prepare pages
       run: |

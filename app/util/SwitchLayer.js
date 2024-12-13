@@ -11,8 +11,8 @@ Ext.define('CpsiMapview.util.SwitchLayer', {
 
     /** The possible states of the layer switch */
     switchStates: {
-        ABOVE_SWITCH_RESOLUTION : 'cmv_above_switch_resolution',
-        BELOW_SWITCH_RESOLUTION : 'cmv_below_switch_resolution'
+        ABOVE_SWITCH_RESOLUTION: 'cmv_above_switch_resolution',
+        BELOW_SWITCH_RESOLUTION: 'cmv_below_switch_resolution'
     },
 
     /**
@@ -21,7 +21,7 @@ Ext.define('CpsiMapview.util.SwitchLayer', {
      *
      * @param {Number} resolution The new resolution
      */
-    handleSwitchLayerOnResolutionChange: function(resolution) {
+    handleSwitchLayerOnResolutionChange: function (resolution) {
         var staticMe = CpsiMapview.util.SwitchLayer;
 
         var layerCollection = BasiGX.util.Map.getMapComponent().getMap().getLayers();
@@ -35,13 +35,13 @@ Ext.define('CpsiMapview.util.SwitchLayer', {
      * @param {ol.Collection} layerCollection the layers of the map
      * @param {Number} mapResolution the resolution of the map
      */
-    checkSwitchLayersRecursively: function(layerCollection, mapResolution) {
+    checkSwitchLayersRecursively: function (layerCollection, mapResolution) {
         var staticMe = CpsiMapview.util.SwitchLayer;
 
-        layerCollection.forEach(function (layerOrGroup, index){
+        layerCollection.forEach(function (layerOrGroup, index) {
 
-            if(layerOrGroup instanceof ol.layer.Layer &&
-                layerOrGroup.get('isSwitchLayer')){
+            if (layerOrGroup instanceof ol.layer.Layer &&
+                layerOrGroup.get('isSwitchLayer')) {
                 var switchLayer = layerOrGroup;
                 var switchConfiguration = switchLayer.get('switchConfiguration');
                 // get precomputed switch resolution from layer config
@@ -54,12 +54,12 @@ Ext.define('CpsiMapview.util.SwitchLayer', {
                     mapResolution
                 );
 
-                if(switchNecessary){
+                if (switchNecessary) {
                     staticMe.changeInternalLayer(layerCollection, switchLayer, index);
                 }
             }
 
-            else if(layerOrGroup instanceof ol.layer.Group){
+            else if (layerOrGroup instanceof ol.layer.Group) {
                 var newOverlayCollection = layerOrGroup.getLayers();
                 staticMe.checkSwitchLayersRecursively(newOverlayCollection, mapResolution);
             }
@@ -76,7 +76,7 @@ Ext.define('CpsiMapview.util.SwitchLayer', {
      * @param {ol.layer.Layer} switchLayer The switchLayer to change
      * @param {Number} index the index of the switchLayer in the collection
      */
-    changeInternalLayer: function(layerCollection, switchLayer, index) {
+    changeInternalLayer: function (layerCollection, switchLayer, index) {
         var staticMe = CpsiMapview.util.SwitchLayer;
 
         // complete any load events for the layer so the BasiGX.view.MapLoadingStatusBar
@@ -188,7 +188,7 @@ Ext.define('CpsiMapview.util.SwitchLayer', {
      *
      * @returns {Boolean} If layerswitch is necessary
      */
-    isLayerSwitchNecessary: function(currentSwitchType, switchResolution, resolution) {
+    isLayerSwitchNecessary: function (currentSwitchType, switchResolution, resolution) {
         var staticMe = CpsiMapview.util.SwitchLayer;
         // logic that checks when a switch layer needs to be replaced
         var mapviewBelowSwitchResolution = (resolution < switchResolution);
@@ -205,7 +205,7 @@ Ext.define('CpsiMapview.util.SwitchLayer', {
      * Updates the switch layer items of the layer tree. This is
      * necessary when switch layers get replaced.
      */
-    updateLayerTreeForSwitchLayers: function() {
+    updateLayerTreeForSwitchLayers: function () {
         var treePanel = Ext.ComponentQuery.query('treepanel')[0];
         var treeStore = treePanel.getStore();
         var treeNodes = treeStore.getData();
@@ -214,7 +214,7 @@ Ext.define('CpsiMapview.util.SwitchLayer', {
             var switchConf = node.getOlLayer().get('switchConfiguration');
 
             // only change for switch layers
-            if(switchConf) {
+            if (switchConf) {
                 // apply tree node text from tree config
                 var origTreeNodeConf = node.getOlLayer().get('_origTreeConf');
                 node.set('text', origTreeNodeConf.text);
@@ -225,6 +225,5 @@ Ext.define('CpsiMapview.util.SwitchLayer', {
             }
         });
     }
-}
-);
+});
 

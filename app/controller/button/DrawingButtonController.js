@@ -529,7 +529,7 @@ Ext.define('CpsiMapview.controller.button.DrawingButtonController', {
      * @param {any} edgesLayer
      * @param {any} edgeLayerConfig
      * @param {any} coord
-     * @returns
+     * @returns {Number}
      */
     getNodeIdFromSnappedEdge: function (edgesLayer, edgeLayerConfig, coord) {
         var me = this;
