@@ -66,7 +66,6 @@ Ext.define('CpsiMapview.view.toolbar.MapTools', {
                     }
                 }, {
                     xtype: 'basigx-button-zoomout',
-                    xtype: 'button',
                     toggleGroup: 'map',
                     enableZoomOutWithBox: true,
                     iconCls: 'x-fa fa-search-minus',
