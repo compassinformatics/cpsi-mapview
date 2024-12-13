@@ -340,5 +340,4 @@ Ext.define('CpsiMapview.util.Tracing', {
         }
 
     }
-}
-);
+});

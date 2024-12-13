@@ -28,25 +28,25 @@ Ext.define('CpsiMapview.view.layer.ToolTip', {
 
     /**
      * Custom background color of this tooltip
-     * @type {String} Color
+     * @property {String} Color
      */
     bgColor: null,
 
     /**
      * Custom text color of this tooltip
-     * @type {String} Color
+     * @property {String} Color
      */
     textColor: null,
 
     /**
      * Custom bold font weight of this tooltip
-     * @type {Boolean} true=bold
+     * @property {Boolean} true=bold
      */
     bold: false,
 
     /**
      * Custom background opacity of this tooltip
-     * @type {Number} Opacity between 0 and 1
+     * @property {Number} Opacity between 0 and 1
      */
     opacity: null,
 

@@ -19,21 +19,21 @@ Ext.define('CpsiMapview.controller.button.FeatureSelectionButtonController', {
 
     /**
      * The selector UI for the #filterMode. Created in #onBtnToggle.
-     * @property
+     * @property {String}
      * @readonly
      */
     modeSelector: null,
 
     /**
      * The filter mode (set by the user via #modeSelector UI).
-     * @property
+     * @property {String}
      * @readonly
      */
     filterMode: 'ADD_TO_SELECTION', // ADD_TO_SELECTION or NEW_SELECTION
 
     /**
      * The feature IDs (FIDs) used for filtering.
-     * @property
+     * @property {Array}
      * @readonly
      */
     fidsToFilter: [],

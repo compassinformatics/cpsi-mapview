@@ -154,7 +154,7 @@ Ext.define('CpsiMapview.util.Style', {
 
     /**
      * Get the style URL for the selected style object based on name
-     * @returns
+     * @returns {Object}
      */
     getStyleByName: function (layer, styleName) {
 

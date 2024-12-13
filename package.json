@@ -12,7 +12,7 @@
     "test": "npm run lint && npm run jsonlint && karma start --single-run",
     "test:watch": "karma start karma-watch.conf.js",
     "test:coverage": "karma start karma.conf.js --single-run --reporters coverage",
-    "generate:docs": "jsduck --config=jsduck.json --output=docs-ext --title=\"MapView Documentation\" && cp -r docs-ext build/production/CpsiMapview/docs-ext",
+    "generate:docs": "jsdoc -c .jsdoc.json -d docs",
     "postinstall": "npm run build:turf",
     "build:turf": "browserify turf-builder.js -s turf > lib/turf.js"
   },
@@ -43,6 +43,7 @@
   "devDependencies": {
     "eslint": "^8.56.0",
     "jsonlint": "^1.6.3",
+    "jsdoc": "^4.0.4",
     "karma": "^6.4.4",
     "karma-chrome-launcher": "^3.2.0",
     "karma-cli": "^2.0.0",
