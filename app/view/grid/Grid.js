@@ -104,7 +104,7 @@ Ext.define('CpsiMapview.view.grid.Grid', {
             xtype: 'button',
             text: 'Clear Filters',
             tooltip: 'Remove all field and spatial filters set on the grid',
-            glyph: 'f0b0@FontAwesome',
+            iconCls: 'x-fa fa-filter',
             handler: 'clearFilters',
             bind: {
                 hidden: '{!clearFiltersVisible}'
@@ -114,14 +114,14 @@ Ext.define('CpsiMapview.view.grid.Grid', {
             xtype: 'button',
             text: 'Clear Sorting',
             tooltip: 'Clear any custom sorting of the grid',
-            glyph: 'f039@FontAwesome',
+            iconCls: 'x-fa fa-align-justify',
             handler: 'onClearSort'
         },
         {
             xtype: 'button',
             text: 'Apply Preset Filters',
             tooltip: 'Re-apply any default filters that have been configured for the grid',
-            glyph: 'f005@FontAwesome',
+            iconCls: 'x-fa fa-star',
             handler: 'applyPresetFilters',
             bind: {
                 hidden: '{!usePresetFilters}'
@@ -141,7 +141,7 @@ Ext.define('CpsiMapview.view.grid.Grid', {
                 toggleGroup: 'map',
                 triggerWfsRequest: false,
                 displayPermanently: true,
-                glyph: 'xf044@FontAwesome',
+                iconCls: 'x-fa fa-pencil-alt',
                 listeners: {
                     'cmv-spatial-query-filter': 'onSpatialFilter'
                 }
@@ -150,7 +150,7 @@ Ext.define('CpsiMapview.view.grid.Grid', {
                 xtype: 'button',
                 text: 'Clear',
                 tooltip: 'Clear the spatial filter',
-                glyph: 'f057@FontAwesome',
+                iconCls: 'x-fa fa-times-circle',
                 handler: 'onClearSpatialFilter'
             }]
         },
@@ -169,7 +169,7 @@ Ext.define('CpsiMapview.view.grid.Grid', {
                     toggleGroup: 'map',
                     triggerWfsRequest: false,
                     displayPermanently: true,
-                    glyph: 'xf044@FontAwesome',
+                    iconCls: 'x-fa fa-pencil-alt',
                     listeners: {
                         'cmv-spatial-query-filter': 'onSpatialFilter'
                     }
@@ -178,7 +178,7 @@ Ext.define('CpsiMapview.view.grid.Grid', {
                     xtype: 'button',
                     text: 'Clear',
                     tooltip: 'Clear the spatial filter',
-                    glyph: 'f057@FontAwesome',
+                    iconCls: 'x-fa fa-times-circle',
                     handler: 'onClearSpatialFilter'
                 },
                 {
@@ -189,7 +189,7 @@ Ext.define('CpsiMapview.view.grid.Grid', {
                     bind: {
                         vectorLayerKey: '{featureSelectionLayerKey}'
                     },
-                    glyph: 'xf245@FontAwesome',
+                    iconCls: 'x-fa fa-mouse-pointer',
                     listeners: {
                         'cmv-reset-grid-filters': 'resetFilters',
                         'cmv-id-filter-set': 'onIdFilterSet'
@@ -205,14 +205,14 @@ Ext.define('CpsiMapview.view.grid.Grid', {
             },
             text: 'Group Edit',
             enableToggle: true,
-            glyph: 'xf040@FontAwesome',
+            iconCls: 'x-fa fa-pencil-alt',
             tooltip: 'Update a field in the grid for multiple records',
             toggleHandler: 'onGroupEditToggle'
         },
         {
             xtype: 'button',
             text: 'Export to Excel',
-            glyph: 'xf1c3@FontAwesome',
+            iconCls: 'x-far fa-file-excel',
             tooltip: 'Export the records that are visible in the grid to an Excel file',
             handler: 'exportToExcel',
             bind: {
@@ -228,11 +228,11 @@ Ext.define('CpsiMapview.view.grid.Grid', {
             },
             menu: [{
                 text: 'Export to Shapefile',
-                glyph: 'eaa2@font-gis',
+                iconCls: 'fg-shape-file',
                 handler: 'exportToShapefile'
             }, {
                 text: 'Export to Excel',
-                glyph: 'xf1c3@FontAwesome',
+                iconCls: 'x-fa fa-file-excel',
                 handler: 'exportToServerExcel'
             }]
         }]

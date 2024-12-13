@@ -1,4 +1,4 @@
-﻿/**
+/**
  * Controller for the grid used to display a collection of attachments
  *
  * @class CpsiMapview.view.fileupload.FileGridController
@@ -102,7 +102,7 @@ Ext.define('CpsiMapview.view.fileupload.FileGridController', {
             maximizable: true,
             resizable: true,
             closeAction: 'destroy',
-            glyph: 'f030@FontAwesome',
+            iconCls: 'x-fa fa-camera',
             items: {
                 xtype: 'component',
                 html: Ext.String.format('<a href="{0}" target="_blank"><img src={1} {2} ></a>',

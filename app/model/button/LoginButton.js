@@ -28,11 +28,11 @@ Ext.define('CpsiMapview.model.button.LoginButton', {
             return tooltip;
         },
 
-        glyph: function (get) {
+        iconCls: function (get) {
             if (get('loggedIn')) {
-                return 'f08b@FontAwesome'; // sign-out icon
+                return 'x-fa fa-sign-in-alt'; // logout
             } else {
-                return 'f090@FontAwesome'; // sign-in icon
+                return 'x-fa fa-sign-out-alt'; // login
             }
         },
 

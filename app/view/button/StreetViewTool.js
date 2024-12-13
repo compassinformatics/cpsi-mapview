@@ -23,8 +23,7 @@ Ext.define('CpsiMapview.view.button.StreetViewTool', {
      *
      * @cfg {String}
      */
-    glyph: 'xf21d@FontAwesome',
-
+    iconCls: 'x-fa fa-street-view',
     /**
      * The name to be used e.g. in ComponentQueries.
      *

@@ -29,7 +29,7 @@ Ext.define('CpsiMapview.view.button.LoginButton', {
 
     bind: {
         text: '{text}',
-        glyph: '{glyph}',
+        iconCls: '{iconCls}',
         tooltip: '{tooltip}'
     },
 

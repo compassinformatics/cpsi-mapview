@@ -16,7 +16,7 @@ Ext.define('CpsiMapview.view.button.HelpButton', {
     /**
      * The icon the button should use
      */
-    glyph: 'f059@FontAwesome',
+    iconCls: 'x-fa fa-question-circle',
 
     /**
      * The controller for this class
