@@ -2,6 +2,7 @@
  *  This file can be used to set variables and supply global styling.  View specific 
  *  styling should be located the view's corresponding scss file.
  */
+
 $enable-font-awesome: dynamic(true);
 
 $font-size: dynamic(12px);
@@ -48,3 +49,16 @@ $tab-padding: dynamic(3px 13px 0px 10px);
 }
 
 // end
+
+// migration to ExtJS 7
+// font-awesome is an ExtJS package located at ext-7.8.0/packages/font-awesome/sass/etc
+
+.x-tree-icon {
+    font-family: "Font Awesome 5 Free Regular"; // otherwise uses solid icons
+}
+
+// BasiGX has a hard-coded glyph set to xf192@FontAwesome
+div[id^="basigx-panel-coordinatemouseposition-"] .x-btn .x-btn-icon-el:before {
+    font-family: "Font Awesome 5 Free Regular";
+    content: "\f192 "; /* new Unicode value for the icon */
+}

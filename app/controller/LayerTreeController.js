@@ -400,7 +400,7 @@ Ext.define('CpsiMapview.controller.LayerTreeController', {
     updateSwitchLayerNodes: function(groupNode) {
         var me = this;
         groupNode.cascade(function(child){
-            var layer = child.getData();
+            var layer = child.getOlLayer();
             if (!layer || !layer.get('isSwitchLayer')) {
                 // we only care about switch layers
                 return;

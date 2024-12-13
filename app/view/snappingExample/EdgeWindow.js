@@ -36,8 +36,7 @@ Ext.define('CpsiMapview.view.snappingExample.EdgeWindow', {
                 itemId: 'drawNetworkEdge',
                 text: 'Draw Edge',
                 toggleGroup: 'map',
-                iconCls: 'icon-line3',
-                glyph: null,
+                iconCls: 'fg-polyline-pt',
                 tooltip: 'Create new features to join the network',
                 bind: {
                     drawLayer: '{resultLayer}' // bind the draw layer to the model's featurestore / layer

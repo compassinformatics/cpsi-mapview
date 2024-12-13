@@ -96,13 +96,13 @@
     -->
 
     <target name="-after-build">
-        <copy todir="${build.dir}/node_modules/geostyler-sld-parser/browser">
-            <fileset dir="${app.dir}/node_modules/geostyler-sld-parser/browser">
+        <copy todir="${build.dir}/node_modules/geostyler-sld-parser/dist">
+            <fileset dir="${app.dir}/node_modules/geostyler-sld-parser/dist">
                 <include name="sldStyleParser.iife.js.map"/>
             </fileset>
         </copy>
-        <copy todir="${build.dir}/node_modules/geostyler-openlayers-parser/browser">
-            <fileset dir="${app.dir}/node_modules/geostyler-openlayers-parser/browser">
+        <copy todir="${build.dir}/node_modules/geostyler-openlayers-parser/dist">
+            <fileset dir="${app.dir}/node_modules/geostyler-openlayers-parser/dist">
                 <include name="olStyleParser.iife.js.map"/>
             </fileset>
         </copy>

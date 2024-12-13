@@ -41,27 +41,46 @@ Ext.define('CpsiMapview.view.toolbar.MapTools', {
             items: [
                 {
                     xtype: 'basigx-button-zoomtoextent',
-                    extent: [-1210762, 6688545, -600489, 7490828]
+                    extent: [-1210762, 6688545, -600489, 7490828],
+                    iconCls: 'x-fa fa-arrows-alt',
+                    glyph: null,
+                    viewModel: {
+                        data: {
+                            tooltip: 'Zoom to Full Extent'
+                        }
+                    }
                 }, {
                     xtype: 'button',
                     toggleGroup: 'map',
                     name: 'pan',
                     tooltip: 'Pan the map',
-                    glyph: 'xf256@FontAwesome',
+                    iconCls: 'x-far fa-hand-paper'
                 }, {
-                    xtype: 'basigx-button-zoomin',
-                    toggleGroup: 'map'
+                    xtype: 'button',
+                    toggleGroup: 'map',
+                    iconCls: 'x-fa fa-search-plus',
+                    viewModel: {
+                        data: {
+                            tooltip: 'Zoom In'
+                        }
+                    }
                 }, {
                     xtype: 'basigx-button-zoomout',
                     toggleGroup: 'map',
-                    enableZoomOutWithBox: true
+                    enableZoomOutWithBox: true,
+                    iconCls: 'x-fa fa-search-minus',
+                    viewModel: {
+                        data: {
+                            tooltip: 'Zoom Out'
+                        }
+                    }
                 }, {
                     xtype: 'basigx-button-measure',
                     toggleGroup: 'map',
                     measureType: 'line',
                     viewModel: 'cmv_btn_measure',
                     controller: 'cmv_btn_measure',
-                    glyph: 'ea13@font-gis',
+                    iconCls: 'fg-measure-line',
                     listeners: {
                         afterrender: 'initializeMeasureBtn'
                     }
@@ -69,7 +88,7 @@ Ext.define('CpsiMapview.view.toolbar.MapTools', {
                     xtype: 'basigx-button-measure',
                     toggleGroup: 'map',
                     measureType: 'polygon',
-                    glyph: 'ea14@font-gis',
+                    iconCls: 'fg-measure-area',
                     viewModel: 'cmv_btn_measure',
                     controller: 'cmv_btn_measure',
                     listeners: {
@@ -78,11 +97,11 @@ Ext.define('CpsiMapview.view.toolbar.MapTools', {
                 }, {
                     xtype: 'basigx-button-history',
                     direction: 'BACK',
-                    glyph: 'xf104@FontAwesome'
+                    iconCls: 'x-fa fa-angle-left'
                 }, {
                     xtype: 'basigx-button-history',
                     direction: 'FORWARD',
-                    glyph: 'xf105@FontAwesome'
+                    iconCls: 'x-fa fa-angle-right'
                 }]
         },
         {
@@ -92,7 +111,7 @@ Ext.define('CpsiMapview.view.toolbar.MapTools', {
                 xtype: 'cmv_digitize_button',
                 toggleGroup: 'map',
                 tooltip: 'Point',
-                glyph: 'ea52@font-gis',
+                iconCls: 'fg-multipoint',
                 apiUrl: '/pmspy/netsolver',
                 groups: true,
                 pointExtentBuffer: 50,
@@ -106,7 +125,7 @@ Ext.define('CpsiMapview.view.toolbar.MapTools', {
                 xtype: 'cmv_digitize_button',
                 toggleGroup: 'map',
                 type: 'LineString',
-                glyph: 'ea02@font-gis',
+                iconCls: 'fg-polyline-pt',
                 tooltip: 'Line'
             },
             {
@@ -114,7 +133,7 @@ Ext.define('CpsiMapview.view.toolbar.MapTools', {
                 toggleGroup: 'map',
                 type: 'Polygon',
                 tooltip: 'Polygon',
-                glyph: 'ea03@font-gis',
+                iconCls: 'fg-polygon-pt',
                 apiUrl: '/WebServices/roadschedule/cutWithPolygon',
                 listeners: {
                     responseFeatures: function () {
@@ -140,13 +159,13 @@ Ext.define('CpsiMapview.view.toolbar.MapTools', {
                 xtype: 'cmv_line_slice_grid_button',
                 text: '',
                 tooltip: 'Linear Reference demo',
-                glyph: 'ea78@font-gis',
+                iconCls: 'fg-split-line'
             }, {
                 xtype: 'cmv_edgebutton',
                 tooltip: 'Snapping demo',
-                glyph: 'ea76@font-gis'
+                iconCls: 'fg-snap'
             }, {
-                glyph: 'ea50@font-gis',
+                iconCls: 'fg-copy-line',
                 tooltip: 'Draw Parallel Lines',
                 toggleGroup: 'map',
                 listeners: {

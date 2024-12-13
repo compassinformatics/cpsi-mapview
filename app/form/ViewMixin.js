@@ -1,4 +1,4 @@
-﻿/**
+/**
  * To be mixed into any edit form window.
  * Provides default buttons which can be hidden by assigning values to the viewModel
  * @class CpsiMapview.form.ViewMixin
@@ -115,8 +115,7 @@ Ext.define('CpsiMapview.form.ViewMixin', {
         groups: false,
         resetOnToggle: false,
         pointExtentBuffer: 50,
-        iconCls: 'icon-line3',
-        glyph: null,  // set this or we get the default glyph and the icon
+        iconCls: 'fg-polyline-pt',
         drawLayerStyle: new ol.style.Style({
             image: new ol.style.Circle({
                 radius: 5,
@@ -146,8 +145,7 @@ Ext.define('CpsiMapview.form.ViewMixin', {
         toggleGroup: 'map',
         apiUrl: '/WebServices/roadschedule/cutWithPolygon',
         resetOnToggle: false,
-        iconCls: 'icon-polygon2',
-        glyph: null,
+        iconCls: 'fg-polygon-pt',
         listeners: {
             toggle: 'onDigitizingToolToggle'
         },
@@ -165,8 +163,7 @@ Ext.define('CpsiMapview.form.ViewMixin', {
         tooltip: 'Create features by drawing lines',
         toggleGroup: 'map',
         resetOnToggle: false,
-        iconCls: 'icon-line3',
-        glyph: null,
+        iconCls: 'fg-polyline-pt',
         bind: {
             drawLayer: '{resultLayer}',
             disabled: '{isLocked}',
@@ -182,7 +179,7 @@ Ext.define('CpsiMapview.form.ViewMixin', {
         toggleGroup: 'map',
         apiUrl: '/WebServices/roadschedule/cutWithPolygon',
         resetOnToggle: false,
-        glyph: 'xf1db@FontAwesome',
+        iconCls: 'x-fa fa-circle-thin',
         listeners: {
             toggle: 'onDigitizingToolToggle'
         },
@@ -200,7 +197,7 @@ Ext.define('CpsiMapview.form.ViewMixin', {
         tooltip: 'Create points by clicking on the map',
         toggleGroup: 'map',
         resetOnToggle: false,
-        glyph: 'xf1db@FontAwesome',
+        iconCls: 'x-fa fa-circle-thin',
         bind: {
             drawLayer: '{resultLayer}',
             disabled: '{isLocked}',

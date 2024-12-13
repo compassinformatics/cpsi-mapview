@@ -247,10 +247,10 @@ Ext.define('CpsiMapview.view.main.Map', {
             me.map = new ol.Map({
                 // layers will be created from default.json later
                 layers: [],
-                controls: ol.control.defaults().extend([
+                controls: ol.control.defaults.defaults().extend([
                     new ol.control.FullScreen()
                 ]),
-                interactions: ol.interaction.defaults().extend([
+                interactions: ol.interaction.defaults.defaults().extend([
                     new ol.interaction.DragRotateAndZoom()
                 ]),
                 view: view

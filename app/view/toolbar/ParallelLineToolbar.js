@@ -70,7 +70,7 @@ Ext.define('CpsiMapview.view.toolbar.ParallelLineToolbar', {
             }
         }
     }, {
-        glyph: 'ea50@font-gis',
+        iconCls: 'fg-copy-line',
         bind: {
             tooltip: '{parallelTooltip}',
             disabled: '{!feature}'

@@ -29,7 +29,7 @@ Ext.define('CpsiMapview.view.button.DrawingButton', {
     /**
      * The icon used for the button
      */
-    glyph: 'xf040@FontAwesome',
+    iconCls: 'x-fa fa-pencil-alt',
 
     config: {
 

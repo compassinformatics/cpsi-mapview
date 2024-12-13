@@ -118,11 +118,11 @@ Ext.define('CpsiMapview.util.Layer', {
         }
 
         var originalGlyph = layer.get('_origTreeConf') ? layer.get('_origTreeConf').glyph : null;
-        var expandedGlyph = 'f0b0@FontAwesome';
+        var expandedGlyph = 'f0b0';
         if (hasFilters) {
             // only set the glyph and class if needed - better for performance
             if (node.get('glyph') !== expandedGlyph) {
-                node.set('glyph', 'f0b0@FontAwesome');
+                node.set('glyph', expandedGlyph);
                 node.addCls('cpsi-tree-node-filtered');
             }
         } else {

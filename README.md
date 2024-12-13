@@ -7,8 +7,9 @@ Check out the latest deployed version at https://compassinformatics.github.io/cp
 
 ## Project setup
 
-This steps assume you have Sencha CMD v6.6 installed on your system and a copy of ExtJS v6.2.0 downloaded.
-The project has been tested using Node v16+ - this is the minimum recommended version.
+This steps assume you have Sencha CMD v7.8 (or the GPL version v7.2.0.84) installed on your system and a copy of ExtJS v7.0.0 downloaded (or
+the commercial version ExtJS 7.8.0 if you have a licence).
+The project has been tested using Node v20+ - this is the minimum recommended version.
 
 Clone this repository
 
@@ -22,29 +23,29 @@ Ensure that Sencha Cmd is available on the command line. Examples for Windows:
 Powershell:
 
 ```
-$env:Path = "D:\Tools\Sencha\Cmd\6.6.0.13;" + $env:Path
+$env:Path = "D:\Tools\Sencha\Cmd\7.8.0.59;" + $env:Path
 ```
 
 Command prompt:
 
 ```
-SET PATH=D:\Tools\Sencha\Cmd\6.6.0.13;%PATH%
+SET PATH=D:\Tools\Sencha\Cmd\7.8.0.59;%PATH%
 ```
 
-Now add your ExtJS library. The project is tested with both 6.2 (GPL), and 6.7 (commercial license).
+Now add your ExtJS library. The project is tested with both 7.0 (GPL), and 7.8 (commercial license).
 
 ```
-sencha app upgrade /path/to/local/extjs6.2
+sencha app upgrade /path/to/local/extjs7.8
 ```
 
-Alternatively place a junction (shortcut) to point to an existing ExtJS folder:
+Alternatively place a junction (shortcut) to point to an existing ExtJS folder (recommended approach):
 
 ```
 # Command Prompt
-mklink /D ext D:\Tools\Sencha\ext-6.2.0
+mklink /D ext D:\Tools\Sencha\ext-7.8.0
 
 # PowerShell
-new-item -itemtype symboliclink -path . -name ext -value D:\Tools\Sencha\ext-6.2.0
+new-item -itemtype symboliclink -path . -name ext -value D:\Tools\Sencha\ext-7.8.0
 ```
 
 Install dependencies:
@@ -64,7 +65,9 @@ Open http://localhost:1841 in your browser.
 
 ## Override dependencies
 
-To debug against the main branches (or a specific commit) of dependencies, update the `classpath` property in `app.json` to use the `lib` folder instead of `node_modues`, and run the following command to clone git submodules:
+To debug against the main branches (or a specific commit) of dependencies, update the `classpath` property in `app.json` to use the `lib` folder instead of `node_modules`,
+and run the following command to clone git submodules:
+
 ```
 git submodule update --init --recursive
 ```
@@ -116,13 +119,15 @@ To run for single test file you can use the `grep` option:
 
 ```
 karma start --single-run --grep 'CpsiMapview.factory.Layer'
+karma start --single-run --grep 'CpsiMapview.util.Turf' --debug
 ```
 
 ## Production Builds
 
 ```
+cd cpsi-mapview
 sencha app build
-cd cpsi-mapview\build\production\CpsiMapview
+cd build\production\CpsiMapview
 python -m http.server 8888
 http://localhost:8888
 ```

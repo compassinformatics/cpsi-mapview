@@ -18,7 +18,8 @@
             disableCaching: false,
             paths: {
                 'BasiGX': '/BasiGX',
-                'CpsiMapview': '/CpsiMapview'
+                'CpsiMapview': '/CpsiMapview',
+                'GeoExt': '/GeoExt',
             }
         });
 
