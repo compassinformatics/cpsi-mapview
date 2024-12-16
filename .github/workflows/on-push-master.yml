@@ -23,6 +23,7 @@ jobs:
     - name: Install needed Java version
       uses: actions/setup-java@v4
       with:
+        distribution: 'temurin'
         java-version: '21'
 
     - name: Cache Node.js modules 💾
