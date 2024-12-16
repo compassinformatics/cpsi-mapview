@@ -59,6 +59,8 @@ Start dev-server
 
 ```
 sencha app watch
+# or with a specific port
+sencha app watch  --j2ee --port 1888
 ```
 
 Open http://localhost:1841 in your browser.

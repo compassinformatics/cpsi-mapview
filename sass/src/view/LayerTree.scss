@@ -13,11 +13,8 @@
     font-style: italic;
     font-weight: bold;
 
-    .x-tree-checkbox:before {
+    .x-tree-checkbox:after {
         content: "\f0b0";
-    }
-
-    .x-tree-icon {
         font-family: "Font Awesome 5 Free" !important;
     }
 }
