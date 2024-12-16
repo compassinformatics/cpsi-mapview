@@ -106,5 +106,13 @@
                 <include name="olStyleParser.iife.js.map"/>
             </fileset>
         </copy>
+        <!-- no easy way to add .woff2 font files to the build output so copy across manually -->
+        <copy todir="${build.dir}/node_modules/font-gis/fonts">
+            <fileset dir="${app.dir}/node_modules/font-gis/fonts">
+                <include name="font-gis.woff"/>
+                <include name="font-gis.woff2"/>
+                <include name="font-gis.ttf"/>
+            </fileset>
+        </copy>
     </target>
 </project>
