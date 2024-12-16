@@ -81,6 +81,7 @@ jobs:
     - name: Build sencha app
       run: |
         SENCHACMD="$PWD/sencha-cmd/sencha"
+        export OPENSSL_CONF=/dev/null
         $SENCHACMD app build
 
     - name: Cleanup and prepare pages
