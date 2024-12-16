@@ -1,0 +1,292 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>JSDoc: Source: controller/grid/GroupEditMixin.js</title>
+
+    <script src="scripts/prettify/prettify.js"> </script>
+    <script src="scripts/prettify/lang-css.js"> </script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <link type="text/css" rel="stylesheet" href="styles/prettify-tomorrow.css">
+    <link type="text/css" rel="stylesheet" href="styles/jsdoc-default.css">
+</head>
+
+<body>
+
+<div id="main">
+
+    <h1 class="page-title">Source: controller/grid/GroupEditMixin.js</h1>
+
+    
+
+
+
+    
+    <section>
+        <article>
+            <pre class="prettyprint source linenums"><code>Ext.define('CpsiMapview.controller.grid.GroupEditMixin', {
+    extend: 'Ext.Mixin',
+    requires: ['Ext.menu.Menu'],
+    mixinConfig: {
+        on: {
+            init: function () {
+                var me = this;
+                var view = this.getView();
+
+                view.on('beforerender', function (grid) {
+                    var dropdownMenu = grid.headerCt.getMenu();
+                    dropdownMenu.on({
+                        beforeshow: me.onHeaderMenuBeforeShow,
+                        scope: me
+                    });
+
+                    // Add custom menu items to the default grid menu
+                    dropdownMenu.insert(dropdownMenu.items.length - 2, [{
+                        itemId: 'groupEditorMenuItem',
+                        text: 'Group Edit',
+                        tooltip: 'Group Edit mode must be enabled to use this menu. If you do not see the Group Edit button, you may not have sufficient permissions for grid editing.',
+                        bind: {
+                            disabled: '{!isGroupEditingEnabled}'
+                        }
+                    }]);
+                });
+
+                // Hide the checkbox selection column on initial load
+                view.on('render', function (grid) {
+                    var c = grid.columnManager.getFirst();
+                    if (c) c.hide();
+                });
+
+                view.on('staterestore', function (grid, state) {
+                    grid.getViewModel().set('isGroupEditingEnabled', state.isGroupEditingEnabled);
+                });
+            }
+        }
+    },
+
+    /**
+     * When the Group Edit is clicked then show the record checkbox
+     * column, remove any selections, and disable paging so all
+     * records are displayed
+     * @param {any} btn
+     * @param {any} state
+     */
+    onGroupEditToggle: function (btn, state) {
+        var grid = this.getView();
+        grid.getViewModel().set('isGroupEditingEnabled', state);
+        if (state) {
+            grid.columnManager.getFirst().show();
+        } else {
+            grid.columnManager.getFirst().hide();
+        }
+        grid.selModel.deselectAll();
+    },
+
+    onHeaderMenuBeforeShow: function (menu) {
+        var me = this;
+        var menuItem = menu.down('#groupEditorMenuItem');
+
+        // check if it is a column that can be bulk edited
+        if (!menu.activeHeader.groupEditable) {
+            menuItem.hide(); // simply hide the menu if it is not editable
+        } else {
+            var newMenu = menuItem.menu;
+
+            if (newMenu) {
+                newMenu.removeAll();
+            } else {
+                newMenu = menuItem.menu = Ext.create('Ext.menu.Menu');
+            }
+
+            var newMenuItems = me.createGroupEditMenuItems(menu);
+            newMenu.add(newMenuItems);
+            menuItem.show();
+        }
+    },
+
+    createGroupEditMenuItems: function (menu) {
+        var me = this;
+        var grid = me.getView();
+        var newMenuItem;
+        var newMenuItems = [];
+        var activeHeader = menu.activeHeader;
+        var filterType = activeHeader.filter.type || '';
+        switch (filterType.toLowerCase()) {
+            case 'list':
+                var ff = menu.down('#filters');
+                // create menu options based on the filter options
+                Ext.each(ff.menu.items.items, function (item) {
+
+                    if (item.value === -1) {
+                        // don not create a "No Data" option
+                        // but continue creating the other items
+                        return true;
+                    }
+
+                    newMenuItem = {
+                        text: item.text,
+                        value: item.value,
+                        handler: function (item, event) {
+                            event.stopPropagation();
+
+                            // get the list of Ids that will be updated
+                            var list = grid.selModel.getSelection().map(function (x) {
+                                return x.id;
+                            });
+
+                            me.onGroupUpdate(activeHeader, list, item.value);
+                        }
+                    };
+
+                    newMenuItems.push(newMenuItem);
+                });
+                break;
+            case 'boolean':
+                // create menu options for true and false
+                var trueText = activeHeader.trueText || 'true';
+                var falseText = activeHeader.falseText || 'false';
+                var items = [{ text: trueText, value: true }, { text: falseText, value: false }];
+
+                Ext.each(items, function (item) {
+                    newMenuItem = {
+                        text: item.text,
+                        value: item.value,
+                        handler: function (item, event) {
+                            event.stopPropagation();
+
+                            // get the list of Ids that will be updated
+                            var list = grid.selModel.getSelection().map(function (x) {
+                                return x.id;
+                            });
+
+                            me.onGroupUpdate(activeHeader, list, item.value);
+                        }
+                    };
+
+                    newMenuItems.push(newMenuItem);
+                });
+                break;
+            case 'number':
+                newMenuItem = {
+                    xtype: 'numberfield',
+                    width: 300,
+                    margin: 0,
+                    emptyText: 'Enter a number and press Enter',
+                    allowBlank: true,
+                    allowDecimals: false,
+                    allowExponential: false,
+                    maxLength: 5,
+                    minValue: 0, // no negative numbers
+                    enableKeyEvents: true,
+                    listeners: {
+                        keypress: function (textField, event) {
+                            if (event.keyCode === Ext.event.Event.ENTER &amp;&amp; textField.isValid()) {
+                                event.stopPropagation();
+                                // get the list of Ids that will be updated
+                                var list = grid.selModel.getSelection().map(function (x) {
+                                    return x.id;
+                                });
+                                me.onGroupUpdate(activeHeader, list, textField.getValue());
+                            }
+                        },
+                        scope: me
+                    }
+                };
+                newMenuItems.push(newMenuItem);
+                break;
+            default:
+                Ext.log.error('Filter type "' + filterType.toLowerCase() + '" not supported');
+                break;
+        }
+
+        return newMenuItems;
+    },
+
+    onGroupUpdate: function (activeHeader, selectedIDs, newValue) {
+
+        var me = this;
+
+        Ext.Msg.show({
+            title: 'Group editing',
+            message: 'You are about to update ' + selectedIDs.length + ' selected items, do you want to proceed?',
+            buttons: Ext.Msg.YESNO,
+            scope: me,
+            fn: function (buttonId) {
+
+                if (buttonId == 'yes') {
+
+                    var data = {};
+                    var idProperty = me.getViewModel().get('idProperty');
+                    var serviceUrl = me.getViewModel().get('serviceUrl') + activeHeader.groupEditService;
+
+                    // first char to lower case to match backend naming
+                    idProperty = idProperty[0].toLowerCase() + idProperty.slice(1);
+                    data[idProperty] = selectedIDs;
+                    data[activeHeader.groupEditDataProp] = newValue;
+
+                    Ext.Ajax.request({
+                        url: serviceUrl,
+                        method: 'POST',
+                        jsonData: data,
+                        success: function (response) {
+                            var resp = Ext.decode(response.responseText);
+                            if (resp.success === true) {
+                                // trigger a refresh of all related layers and stores, including the grid itself
+                                // as defined by syncLayerKeys and syncStoreIds in the model
+                                var clearPaging = false;
+                                me.refreshStore(clearPaging);
+                                var force = true;
+                                me.updateAssociatedLayers(force);
+                            } else {
+                                Ext.Msg.show({
+                                    title: 'Error',
+                                    message: 'Error updating the selected records: ' + resp.message,
+                                    buttons: Ext.Msg.OK,
+                                    icon: Ext.window.MessageBox.ERROR
+                                });
+                            }
+                        },
+                        failure: function () {
+                            Ext.Msg.show({
+                                title: 'Error',
+                                message: 'Error connecting to the update service ' + serviceUrl,
+                                buttons: Ext.Msg.OK,
+                                icon: Ext.window.MessageBox.ERROR
+                            });
+                        }
+                    });
+                }
+            }
+        });
+    }
+
+});
+</code></pre>
+        </article>
+    </section>
+
+
+
+
+</div>
+
+<nav>
+    <h2><a href="index.html">Home</a></h2><h3>Classes</h3><ul><li><a href="CpsiMapview.controller.LayerTreeController.html">LayerTreeController</a></li><li><a href="CpsiMapview.controller.button.TracingMixin.html">TracingMixin</a></li><li><a href="CpsiMapview.controller.form.LayerTreeFilter.html">LayerTreeFilter</a></li><li><a href="CpsiMapview.controller.form.Login.html">Login</a></li><li><a href="CpsiMapview.controller.panel.NumericAttributeSlider.html">NumericAttributeSlider</a></li><li><a href="CpsiMapview.data.model.LayerTreeNode.html">LayerTreeNode</a></li><li><a href="CpsiMapview.factory.Layer.html">Layer</a></li><li><a href="CpsiMapview.form.ControllerMixin.html">ControllerMixin</a></li><li><a href="CpsiMapview.form.HelpMixin.html">HelpMixin</a></li><li><a href="CpsiMapview.form.LayersMixin.html">LayersMixin</a></li><li><a href="CpsiMapview.form.RightInfoField.html">RightInfoField</a></li><li><a href="CpsiMapview.form.ValidationMessagesMixin.html">ValidationMessagesMixin</a></li><li><a href="CpsiMapview.form.ViewMixin.html">ViewMixin</a></li><li><a href="CpsiMapview.form.ViewModelMixin.html">ViewModelMixin</a></li><li><a href="CpsiMapview.form.field.Combo.html">Combo</a></li><li><a href="CpsiMapview.form.field.ComboLegacy.html">ComboLegacy</a></li><li><a href="CpsiMapview.model.fileupload.Attachment.html">Attachment</a></li><li><a href="CpsiMapview.plugin.ExpandPanel.html">ExpandPanel</a></li><li><a href="CpsiMapview.plugin.FeatureAttributeGrouping.html">FeatureAttributeGrouping</a></li><li><a href="CpsiMapview.plugin.TreeColumnContextMenu.html">TreeColumnContextMenu</a></li><li><a href="CpsiMapview.store.WfsFeatures.html">WfsFeatures</a></li><li><a href="CpsiMapview.util.ColumnMenuOrderMixin.html">ColumnMenuOrderMixin</a></li><li><a href="CpsiMapview.util.EditWindowOpenerMixin.html">EditWindowOpenerMixin</a></li><li><a href="CpsiMapview.util.Layer.html">Layer</a></li><li><a href="CpsiMapview.util.LayerTreeFilter.html">LayerTreeFilter</a></li><li><a href="CpsiMapview.util.Legend.html">Legend</a></li><li><a href="CpsiMapview.util.RoleManager.html">RoleManager</a></li><li><a href="CpsiMapview.util.Style.html">Style</a></li><li><a href="CpsiMapview.util.SwitchLayer.html">SwitchLayer</a></li><li><a href="CpsiMapview.util.Tracing.html">Tracing</a></li><li><a href="CpsiMapview.util.Turf.html">Turf</a></li><li><a href="CpsiMapview.util.WmsFilter.html">WmsFilter</a></li><li><a href="CpsiMapview.util.ZoomerMixin.html">ZoomerMixin</a></li><li><a href="CpsiMapview.view.button.DigitizeButton.html">DigitizeButton</a></li><li><a href="CpsiMapview.view.button.DrawingButton.html">DrawingButton</a></li><li><a href="CpsiMapview.view.button.FeatureSelectionButton.html">FeatureSelectionButton</a></li><li><a href="CpsiMapview.view.button.HelpButton.html">HelpButton</a></li><li><a href="CpsiMapview.view.button.LoginButton.html">LoginButton</a></li><li><a href="CpsiMapview.view.button.MinimizeAllButton.html">MinimizeAllButton</a></li><li><a href="CpsiMapview.view.button.SpatialQueryButton.html">SpatialQueryButton</a></li><li><a href="CpsiMapview.view.button.SplitByClickButton.html">SplitByClickButton</a></li><li><a href="CpsiMapview.view.button.StreetViewTool.html">StreetViewTool</a></li><li><a href="CpsiMapview.view.fileupload.FileGrid.html">FileGrid</a></li><li><a href="CpsiMapview.view.fileupload.FileGridController.html">FileGridController</a></li><li><a href="CpsiMapview.view.fileupload.FileUploadWindow.html">FileUploadWindow</a></li><li><a href="CpsiMapview.view.fileupload.FileUploadWindowController.html">FileUploadWindowController</a></li><li><a href="CpsiMapview.view.fileupload.Report.html">Report</a></li><li><a href="CpsiMapview.view.from.LayerTreeFilter.html">LayerTreeFilter</a></li><li><a href="CpsiMapview.view.grid.ItemDeleter.html">ItemDeleter</a></li><li><a href="CpsiMapview.view.menuitem.LayerFilterReset.html">LayerFilterReset</a></li><li><a href="CpsiMapview.view.menuitem.LayerGrid.html">LayerGrid</a></li><li><a href="CpsiMapview.view.menuitem.LayerHelp.html">LayerHelp</a></li><li><a href="CpsiMapview.view.menuitem.LayerLabels.html">LayerLabels</a></li><li><a href="CpsiMapview.view.menuitem.LayerMetadata.html">LayerMetadata</a></li><li><a href="CpsiMapview.view.menuitem.LayerOpacity.html">LayerOpacity</a></li><li><a href="CpsiMapview.view.menuitem.LayerRefresh.html">LayerRefresh</a></li><li><a href="CpsiMapview.view.menuitem.LayerStyleSwitcher.html">LayerStyleSwitcher</a></li><li><a href="CpsiMapview.view.panel.NumericAttributeSlider.html">NumericAttributeSlider</a></li><li><a href="CpsiMapview.view.toolbar.CircleSelectionToolbar.html">CircleSelectionToolbar</a></li><li><a href="CpsiMapview.view.toolbar.MinimizedWindows.html">MinimizedWindows</a></li><li><a href="CpsiMapview.view.toolbar.ParallelLineToolbar.html">ParallelLineToolbar</a></li><li><a href="CpsiMapview.view.window.MinimizableWindow.html">MinimizableWindow</a></li><li><a href="CpsiMapview.view.window.ParallelLineWindow.html">ParallelLineWindow</a></li></ul><h3>Events</h3><ul><li><a href="global.html#event:cmv-init-layersaddedFireswhenallinitiallayersfromtheconfighavebeencreatedandaddedtotheOLmap.">cmv-init-layersadded
+Fires when all initial layers from the config have been created and added to the OL map.</a></li><li><a href="global.html#event:cmv-mapclickFireswhentheOLmapisclicked.">cmv-mapclick
+Fires when the OL map is clicked.</a></li><li><a href="global.html#event:parallelLineCreatedFires,whenanewparallellinewascreated.">parallelLineCreated
+Fires, when a new parallel line was created.</a></li></ul><h3>Global</h3><ul><li><a href="global.html#TemplatefunctioncalledbeforedoingtheGetFeatureInforequestReturnfalseifyoudon'twanttomaketheGetFeatureInforequest.">Template function called before doing the GetFeatureInfo request
+Return false if you don't want to make the GetFeatureInfo request.</a></li><li><a href="global.html#beforeSave">beforeSave</a></li><li><a href="global.html#getErrors">getErrors</a></li><li><a href="global.html#onAfterSaveSucceded">onAfterSaveSucceded</a></li><li><a href="global.html#onChange">onChange</a></li><li><a href="global.html#onFocus">onFocus</a></li><li><a href="global.html#onGroupEditToggle">onGroupEditToggle</a></li><li><a href="global.html#rawToValue">rawToValue</a></li><li><a href="global.html#setValue">setValue</a></li><li><a href="global.html#storeConfig">storeConfig</a></li><li><a href="global.html#validate">validate</a></li></ul>
+</nav>
+
+<br class="clear">
+
+<footer>
+    Documentation generated by <a href="https://github.com/jsdoc/jsdoc">JSDoc 4.0.4</a> on Mon Dec 16 2024 16:38:08 GMT+0000 (Coordinated Universal Time)
+</footer>
+
+<script> prettyPrint(); </script>
+<script src="scripts/linenumber.js"> </script>
+</body>
+</html>

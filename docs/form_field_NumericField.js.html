@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>JSDoc: Source: form/field/NumericField.js</title>
+
+    <script src="scripts/prettify/prettify.js"> </script>
+    <script src="scripts/prettify/lang-css.js"> </script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <link type="text/css" rel="stylesheet" href="styles/prettify-tomorrow.css">
+    <link type="text/css" rel="stylesheet" href="styles/jsdoc-default.css">
+</head>
+
+<body>
+
+<div id="main">
+
+    <h1 class="page-title">Source: form/field/NumericField.js</h1>
+
+    
+
+
+
+    
+    <section>
+        <article>
+            <pre class="prettyprint source linenums"><code>/*
+ * GNU General Public License Usage
+ * This file may be used under the terms of the GNU General Public License version 3.0 as published by the Free Software Foundation and appearing in the file LICENSE included in the packaging of this file.  Please review the following information to ensure the GNU General Public License version 3.0 requirements will be met: http://www.gnu.org/copyleft/gpl.html.
+ *
+ * http://www.gnu.org/licenses/lgpl.html
+ *
+ * @description: This class provide aditional format to numbers by extending Ext.form.field.Number
+ *               Based on the original work by Greivin Britton brittongr@gmail.com, adapted for ExtJS 6.7
+ *               https://www.sencha.com/forum/showthread.php?147962-Number-Field-with-currency-symbol-thousand-separator-amp-international-support-ExtJS4
+ *
+ * @author: Greivin Britton
+ * @email: brittongr@gmail.com
+ * @version: 2 compatible with ExtJS 4, upgraded for ExtJS 6.7
+ */
+
+Ext.define('CpsiMapview.form.field.NumericField',
+    {
+        extend: 'Ext.form.field.Number',
+        xtype: 'cmv_numericfield',
+        requires: ['Ext.util.Format'],
+        symbol: null,
+        decimalPrecision: 0,
+        showSymbolAtTheEnd: true,
+
+        width: 100,
+        fieldStyle: 'text-align: right;',
+        constructor: function (config) {
+            if (config.labelWidth &amp;&amp; !Ext.isEmpty(config.fieldLabel) &amp;&amp; !config.width) {
+                config.width = config.labelWidth + this.width;
+            }
+            this.callParent(arguments);
+        },
+
+        valueToRaw: function (value) {
+            var ret = value;
+            if (!Ext.isEmpty(value)) {
+                ret = Ext.util.Format.currency(
+                    value,
+                    this.symbol,
+                    this.decimalPrecision, // number of decimals
+                    this.showSymbolAtTheEnd,
+                    ' '
+                );
+                if (!this.symbol) {
+                    // if no symbol specified ExtJS will default to the configured currency symbol, but in our implementation we will not have a symbol
+                    ret = ret
+                        .replace(Ext.util.Format.currencySign + ' ', '')
+                        .replace(' ' + Ext.util.Format.currencySign, '');
+                }
+            }
+            return ret;
+        },
+        /**
+         * Remove only the format added by this class to let the superclass validate with its rules.
+         * @param {Object} value
+         */
+        rawToValue: function (value) {
+            if (!Ext.isEmpty(value)) {
+                value = value.toString().replace(this.symbol + ' ', '');
+                value = value.toString().replace(' ' + this.symbol, '');
+                value = Ext.util.Format.thousandSeparator ? value.replace(new RegExp('[' + Ext.util.Format.thousandSeparator + ']', 'g'), '') : value;
+                value = Number(value);
+            }
+            return value;
+        },
+        /**
+         * Remove the format before validating the the value.
+         * @param {Number} value
+         */
+        getErrors: function (value) {
+            return (value) ? this.callParent([this.rawToValue(value)]) : this.callParent(arguments);
+        },
+        /**
+         * Display the numeric value with the fixed decimal precision and without the format using the setRawValue, don't need to do a setValue because we don't want a double
+         * formatting and process of the value because beforeBlur perform a getRawValue and then a setValue.
+         */
+        onFocus: function () {
+            if (!this.readOnly){
+                this.setRawValue(this.rawToValue(this.getRawValue()));
+            }
+            this.callParent(arguments);
+        },
+
+        /**
+         * Using the keyboard to clear leaves a blank input
+         * even if allowBlank is false or a minValue is defined
+         * This check always forces a number to be present
+         */
+        onChange: function () {
+            var me = this;
+            if (!me.allowBlank &amp;&amp; me.getValue() === '') {
+                me.setValue(me.minValue || 0);
+            }
+            this.callParent(arguments);
+        }
+    }
+);
+</code></pre>
+        </article>
+    </section>
+
+
+
+
+</div>
+
+<nav>
+    <h2><a href="index.html">Home</a></h2><h3>Classes</h3><ul><li><a href="CpsiMapview.controller.LayerTreeController.html">LayerTreeController</a></li><li><a href="CpsiMapview.controller.button.TracingMixin.html">TracingMixin</a></li><li><a href="CpsiMapview.controller.form.LayerTreeFilter.html">LayerTreeFilter</a></li><li><a href="CpsiMapview.controller.form.Login.html">Login</a></li><li><a href="CpsiMapview.controller.panel.NumericAttributeSlider.html">NumericAttributeSlider</a></li><li><a href="CpsiMapview.data.model.LayerTreeNode.html">LayerTreeNode</a></li><li><a href="CpsiMapview.factory.Layer.html">Layer</a></li><li><a href="CpsiMapview.form.ControllerMixin.html">ControllerMixin</a></li><li><a href="CpsiMapview.form.HelpMixin.html">HelpMixin</a></li><li><a href="CpsiMapview.form.LayersMixin.html">LayersMixin</a></li><li><a href="CpsiMapview.form.RightInfoField.html">RightInfoField</a></li><li><a href="CpsiMapview.form.ValidationMessagesMixin.html">ValidationMessagesMixin</a></li><li><a href="CpsiMapview.form.ViewMixin.html">ViewMixin</a></li><li><a href="CpsiMapview.form.ViewModelMixin.html">ViewModelMixin</a></li><li><a href="CpsiMapview.form.field.Combo.html">Combo</a></li><li><a href="CpsiMapview.form.field.ComboLegacy.html">ComboLegacy</a></li><li><a href="CpsiMapview.model.fileupload.Attachment.html">Attachment</a></li><li><a href="CpsiMapview.plugin.ExpandPanel.html">ExpandPanel</a></li><li><a href="CpsiMapview.plugin.FeatureAttributeGrouping.html">FeatureAttributeGrouping</a></li><li><a href="CpsiMapview.plugin.TreeColumnContextMenu.html">TreeColumnContextMenu</a></li><li><a href="CpsiMapview.store.WfsFeatures.html">WfsFeatures</a></li><li><a href="CpsiMapview.util.ColumnMenuOrderMixin.html">ColumnMenuOrderMixin</a></li><li><a href="CpsiMapview.util.EditWindowOpenerMixin.html">EditWindowOpenerMixin</a></li><li><a href="CpsiMapview.util.Layer.html">Layer</a></li><li><a href="CpsiMapview.util.LayerTreeFilter.html">LayerTreeFilter</a></li><li><a href="CpsiMapview.util.Legend.html">Legend</a></li><li><a href="CpsiMapview.util.RoleManager.html">RoleManager</a></li><li><a href="CpsiMapview.util.Style.html">Style</a></li><li><a href="CpsiMapview.util.SwitchLayer.html">SwitchLayer</a></li><li><a href="CpsiMapview.util.Tracing.html">Tracing</a></li><li><a href="CpsiMapview.util.Turf.html">Turf</a></li><li><a href="CpsiMapview.util.WmsFilter.html">WmsFilter</a></li><li><a href="CpsiMapview.util.ZoomerMixin.html">ZoomerMixin</a></li><li><a href="CpsiMapview.view.button.DigitizeButton.html">DigitizeButton</a></li><li><a href="CpsiMapview.view.button.DrawingButton.html">DrawingButton</a></li><li><a href="CpsiMapview.view.button.FeatureSelectionButton.html">FeatureSelectionButton</a></li><li><a href="CpsiMapview.view.button.HelpButton.html">HelpButton</a></li><li><a href="CpsiMapview.view.button.LoginButton.html">LoginButton</a></li><li><a href="CpsiMapview.view.button.MinimizeAllButton.html">MinimizeAllButton</a></li><li><a href="CpsiMapview.view.button.SpatialQueryButton.html">SpatialQueryButton</a></li><li><a href="CpsiMapview.view.button.SplitByClickButton.html">SplitByClickButton</a></li><li><a href="CpsiMapview.view.button.StreetViewTool.html">StreetViewTool</a></li><li><a href="CpsiMapview.view.fileupload.FileGrid.html">FileGrid</a></li><li><a href="CpsiMapview.view.fileupload.FileGridController.html">FileGridController</a></li><li><a href="CpsiMapview.view.fileupload.FileUploadWindow.html">FileUploadWindow</a></li><li><a href="CpsiMapview.view.fileupload.FileUploadWindowController.html">FileUploadWindowController</a></li><li><a href="CpsiMapview.view.fileupload.Report.html">Report</a></li><li><a href="CpsiMapview.view.from.LayerTreeFilter.html">LayerTreeFilter</a></li><li><a href="CpsiMapview.view.grid.ItemDeleter.html">ItemDeleter</a></li><li><a href="CpsiMapview.view.menuitem.LayerFilterReset.html">LayerFilterReset</a></li><li><a href="CpsiMapview.view.menuitem.LayerGrid.html">LayerGrid</a></li><li><a href="CpsiMapview.view.menuitem.LayerHelp.html">LayerHelp</a></li><li><a href="CpsiMapview.view.menuitem.LayerLabels.html">LayerLabels</a></li><li><a href="CpsiMapview.view.menuitem.LayerMetadata.html">LayerMetadata</a></li><li><a href="CpsiMapview.view.menuitem.LayerOpacity.html">LayerOpacity</a></li><li><a href="CpsiMapview.view.menuitem.LayerRefresh.html">LayerRefresh</a></li><li><a href="CpsiMapview.view.menuitem.LayerStyleSwitcher.html">LayerStyleSwitcher</a></li><li><a href="CpsiMapview.view.panel.NumericAttributeSlider.html">NumericAttributeSlider</a></li><li><a href="CpsiMapview.view.toolbar.CircleSelectionToolbar.html">CircleSelectionToolbar</a></li><li><a href="CpsiMapview.view.toolbar.MinimizedWindows.html">MinimizedWindows</a></li><li><a href="CpsiMapview.view.toolbar.ParallelLineToolbar.html">ParallelLineToolbar</a></li><li><a href="CpsiMapview.view.window.MinimizableWindow.html">MinimizableWindow</a></li><li><a href="CpsiMapview.view.window.ParallelLineWindow.html">ParallelLineWindow</a></li></ul><h3>Events</h3><ul><li><a href="global.html#event:cmv-init-layersaddedFireswhenallinitiallayersfromtheconfighavebeencreatedandaddedtotheOLmap.">cmv-init-layersadded
+Fires when all initial layers from the config have been created and added to the OL map.</a></li><li><a href="global.html#event:cmv-mapclickFireswhentheOLmapisclicked.">cmv-mapclick
+Fires when the OL map is clicked.</a></li><li><a href="global.html#event:parallelLineCreatedFires,whenanewparallellinewascreated.">parallelLineCreated
+Fires, when a new parallel line was created.</a></li></ul><h3>Global</h3><ul><li><a href="global.html#TemplatefunctioncalledbeforedoingtheGetFeatureInforequestReturnfalseifyoudon'twanttomaketheGetFeatureInforequest.">Template function called before doing the GetFeatureInfo request
+Return false if you don't want to make the GetFeatureInfo request.</a></li><li><a href="global.html#beforeSave">beforeSave</a></li><li><a href="global.html#getErrors">getErrors</a></li><li><a href="global.html#onAfterSaveSucceded">onAfterSaveSucceded</a></li><li><a href="global.html#onChange">onChange</a></li><li><a href="global.html#onFocus">onFocus</a></li><li><a href="global.html#onGroupEditToggle">onGroupEditToggle</a></li><li><a href="global.html#rawToValue">rawToValue</a></li><li><a href="global.html#setValue">setValue</a></li><li><a href="global.html#storeConfig">storeConfig</a></li><li><a href="global.html#validate">validate</a></li></ul>
+</nav>
+
+<br class="clear">
+
+<footer>
+    Documentation generated by <a href="https://github.com/jsdoc/jsdoc">JSDoc 4.0.4</a> on Mon Dec 16 2024 16:38:08 GMT+0000 (Coordinated Universal Time)
+</footer>
+
+<script> prettyPrint(); </script>
+<script src="scripts/linenumber.js"> </script>
+</body>
+</html>

@@ -1,0 +1,292 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>JSDoc: Source: controller/button/FeatureSelectionButtonController.js</title>
+
+    <script src="scripts/prettify/prettify.js"> </script>
+    <script src="scripts/prettify/lang-css.js"> </script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <link type="text/css" rel="stylesheet" href="styles/prettify-tomorrow.css">
+    <link type="text/css" rel="stylesheet" href="styles/jsdoc-default.css">
+</head>
+
+<body>
+
+<div id="main">
+
+    <h1 class="page-title">Source: controller/button/FeatureSelectionButtonController.js</h1>
+
+    
+
+
+
+    
+    <section>
+        <article>
+            <pre class="prettyprint source linenums"><code>/**
+* This class is the controller for the button 'FeatureSelectionButton'
+ */
+Ext.define('CpsiMapview.controller.button.FeatureSelectionButtonController', {
+    extend: 'Ext.app.ViewController',
+
+    alias: 'controller.cmv_feature_selection_btn',
+
+    requires: [
+        'Ext.window.Toast',
+        'BasiGX.util.Layer'
+    ],
+
+    /**
+    * The OpenLayers map. If not given, will be auto-detected.
+    * @cfg
+    */
+    map: null,
+
+    /**
+     * The selector UI for the #filterMode. Created in #onBtnToggle.
+     * @property {String}
+     * @readonly
+     */
+    modeSelector: null,
+
+    /**
+     * The filter mode (set by the user via #modeSelector UI).
+     * @property {String}
+     * @readonly
+     */
+    filterMode: 'ADD_TO_SELECTION', // ADD_TO_SELECTION or NEW_SELECTION
+
+    /**
+     * The feature IDs (FIDs) used for filtering.
+     * @property {Array}
+     * @readonly
+     */
+    fidsToFilter: [],
+
+    constructor: function () {
+        var me = this;
+        me.onMapClick = me.onMapClick.bind(me);
+        me.callParent(arguments);
+    },
+
+    init: function () {
+        var me = this;
+        var ownerGrid = this.getView().up('grid');
+        if (ownerGrid) {
+            // reset FIDs if grid clears its filters
+            ownerGrid.on('cmv-clear-filters', function() {
+                me.fidsToFilter = [];
+            });
+        }
+    },
+
+    /**
+     * Activates this tool.
+     * Adds a click handler to the map and tries to detect the IDs of the
+     * clicked features. Builds a filter object for the ("where ID IN(1,2,3))
+     * and forwards it to the grid so it gets applied to the underlying WFS.
+     *
+     * @param {Ext.button.Button} btn The toggled button.
+     * @param {Boolean} pressed The toggle state.
+     */
+    onBtnToggle: function (btn, pressed) {
+        var me = this;
+        var view = me.getView();
+
+        if (view.map &amp;&amp; view.map instanceof ol.Map) {
+            me.map = view.map;
+        } else {
+            // guess map as fallback
+            me.map = BasiGX.util.Map.getMapComponent().map;
+        }
+
+        if (!view.queryLayer) {
+            me.findWfsLayer();
+        }
+
+        if (pressed) {
+            // create and show selector UI
+            me.addModeSelectorUi();
+            view.queryLayer.setVisible(true);
+            me.map.on('click', me.onMapClick);
+        } else {
+            me.modeSelector.hide();
+            view.queryLayer.setVisible(false);
+            me.map.un('click', me.onMapClick);
+        }
+
+    },
+
+    /**
+     * Adds the mode selector UI to the toolbar (if not existing) and shows it.
+     */
+    addModeSelectorUi: function () {
+        var me = this;
+
+        if (!me.modeSelector) {
+            me.modeSelector = Ext.create('Ext.button.Split', {
+                viewModel: me.getViewModel(),
+                bind: {
+                    text: '{addToSelectionLabel}'
+                },
+                hidden: false,
+                menu: new Ext.menu.Menu({
+                    items: [
+                        {
+                            bind: {
+                                text: '{addToSelectionLabel}'
+                            },
+                            handler: function (menu) {
+                                me.filterMode = 'ADD_TO_SELECTION';
+                                me.modeSelector.setText(menu.text);
+                            }
+                        },
+                        {
+                            bind: {
+                                text: '{newSelectionLabel}'
+                            },
+                            handler: function (menu) {
+                                me.filterMode = 'NEW_SELECTION';
+                                me.modeSelector.setText(menu.text);
+                            }
+                        },
+                    ]
+                })
+            });
+
+            var tb = me.getView().up('toolbar');
+            var btnGroup = me.getView().up('buttongroup');
+            if (tb &amp;&amp; btnGroup) {
+                btnGroup.add(me.modeSelector);
+            }
+        }
+
+        me.modeSelector.show();
+    },
+
+    /**
+     * Function to determine the WFS layer to connect the click handler if not
+     * yet defined.
+     */
+    findWfsLayer: function () {
+        var me = this;
+        var view = me.getView();
+        if (!view.queryLayer &amp;&amp; view.vectorLayerKey) {
+            view.queryLayer = BasiGX.util.Layer.getLayerBy(
+                'layerKey', view.vectorLayerKey
+            );
+        }
+
+        if (!view.queryLayer) {
+            Ext.Logger.warn('No queryLayer found in the map for the FeaureSelectionButton with the name: ' + view.queryLayerName);
+        } else {
+            // save the ID property name for future use
+            me.idProperty = view.queryLayer.get('idProperty');
+        }
+
+    },
+
+    /**
+     * Handles map click for selection of features.
+     *
+     * @param {ol.MapBrowserEvent} evt The OL event
+     */
+    onMapClick: function (evt) {
+        var me = this;
+        var view = me.getView();
+
+        // clear FIDs to filter when we have a new selection
+        if (me.filterMode === 'NEW_SELECTION') {
+            me.fidsToFilter = [];
+        }
+
+        // collect all IDs of clicked features
+        var clickedFeatureIds = [];
+        me.map.forEachFeatureAtPixel(evt.pixel, function(feature, layer) {
+            // add check for correct layer
+            if (layer &amp;&amp; view.queryLayer &amp;&amp; (layer.id === view.queryLayer.id)) {
+
+                var source = view.queryLayer.getSource();
+                if (source instanceof ol.source.Cluster) {
+                    var origFeats = feature.get('features');
+                    if (Ext.isArray(origFeats)) {
+                        // add all sub-feature due to clustering
+                        Ext.each(origFeats, function (origFeat) {
+                            me.fidsToFilter.push(origFeat.get(me.idProperty));
+                            clickedFeatureIds.push(origFeat.get(me.idProperty));
+                        });
+                    }
+                } else {
+                    // "normal" layers without clustering
+                    me.fidsToFilter.push(feature.get(me.idProperty));
+                    clickedFeatureIds.push(feature.get(me.idProperty));
+                }
+            }
+        });
+
+        // inform that no feature was hit on the map
+        if (clickedFeatureIds.length === 0) {
+            if (view.showNoSelectionMessage) {
+                Ext.toast('No feature(s) at clicked position.', null, 'br');
+            }
+
+            view.fireEvent('cmv-no-feature-selected', view);
+            return;
+        }
+
+        // create ExtJS "IN" filter with unique values
+        var uniqueFids = Ext.Array.unique(me.fidsToFilter);
+        var extInFilter = new Ext.util.Filter({
+            type: 'fid',
+            property: me.idProperty,
+            value   : uniqueFids,
+            operator: 'in'
+        });
+
+        if (me.filterMode === 'NEW_SELECTION') {
+            // removes all filters from grid without reloading WFS store
+            view.fireEvent('cmv-reset-grid-filters');
+        }
+        // sets the ID filter in the grid
+        view.fireEvent('cmv-id-filter-set', extInFilter);
+    },
+
+    onBeforeDestroy: function () {
+        var me = this;
+        var btn = me.getView();
+
+        // detoggle button
+        me.onBtnToggle(btn, false);
+    }
+
+});
+</code></pre>
+        </article>
+    </section>
+
+
+
+
+</div>
+
+<nav>
+    <h2><a href="index.html">Home</a></h2><h3>Classes</h3><ul><li><a href="CpsiMapview.controller.LayerTreeController.html">LayerTreeController</a></li><li><a href="CpsiMapview.controller.button.TracingMixin.html">TracingMixin</a></li><li><a href="CpsiMapview.controller.form.LayerTreeFilter.html">LayerTreeFilter</a></li><li><a href="CpsiMapview.controller.form.Login.html">Login</a></li><li><a href="CpsiMapview.controller.panel.NumericAttributeSlider.html">NumericAttributeSlider</a></li><li><a href="CpsiMapview.data.model.LayerTreeNode.html">LayerTreeNode</a></li><li><a href="CpsiMapview.factory.Layer.html">Layer</a></li><li><a href="CpsiMapview.form.ControllerMixin.html">ControllerMixin</a></li><li><a href="CpsiMapview.form.HelpMixin.html">HelpMixin</a></li><li><a href="CpsiMapview.form.LayersMixin.html">LayersMixin</a></li><li><a href="CpsiMapview.form.RightInfoField.html">RightInfoField</a></li><li><a href="CpsiMapview.form.ValidationMessagesMixin.html">ValidationMessagesMixin</a></li><li><a href="CpsiMapview.form.ViewMixin.html">ViewMixin</a></li><li><a href="CpsiMapview.form.ViewModelMixin.html">ViewModelMixin</a></li><li><a href="CpsiMapview.form.field.Combo.html">Combo</a></li><li><a href="CpsiMapview.form.field.ComboLegacy.html">ComboLegacy</a></li><li><a href="CpsiMapview.model.fileupload.Attachment.html">Attachment</a></li><li><a href="CpsiMapview.plugin.ExpandPanel.html">ExpandPanel</a></li><li><a href="CpsiMapview.plugin.FeatureAttributeGrouping.html">FeatureAttributeGrouping</a></li><li><a href="CpsiMapview.plugin.TreeColumnContextMenu.html">TreeColumnContextMenu</a></li><li><a href="CpsiMapview.store.WfsFeatures.html">WfsFeatures</a></li><li><a href="CpsiMapview.util.ColumnMenuOrderMixin.html">ColumnMenuOrderMixin</a></li><li><a href="CpsiMapview.util.EditWindowOpenerMixin.html">EditWindowOpenerMixin</a></li><li><a href="CpsiMapview.util.Layer.html">Layer</a></li><li><a href="CpsiMapview.util.LayerTreeFilter.html">LayerTreeFilter</a></li><li><a href="CpsiMapview.util.Legend.html">Legend</a></li><li><a href="CpsiMapview.util.RoleManager.html">RoleManager</a></li><li><a href="CpsiMapview.util.Style.html">Style</a></li><li><a href="CpsiMapview.util.SwitchLayer.html">SwitchLayer</a></li><li><a href="CpsiMapview.util.Tracing.html">Tracing</a></li><li><a href="CpsiMapview.util.Turf.html">Turf</a></li><li><a href="CpsiMapview.util.WmsFilter.html">WmsFilter</a></li><li><a href="CpsiMapview.util.ZoomerMixin.html">ZoomerMixin</a></li><li><a href="CpsiMapview.view.button.DigitizeButton.html">DigitizeButton</a></li><li><a href="CpsiMapview.view.button.DrawingButton.html">DrawingButton</a></li><li><a href="CpsiMapview.view.button.FeatureSelectionButton.html">FeatureSelectionButton</a></li><li><a href="CpsiMapview.view.button.HelpButton.html">HelpButton</a></li><li><a href="CpsiMapview.view.button.LoginButton.html">LoginButton</a></li><li><a href="CpsiMapview.view.button.MinimizeAllButton.html">MinimizeAllButton</a></li><li><a href="CpsiMapview.view.button.SpatialQueryButton.html">SpatialQueryButton</a></li><li><a href="CpsiMapview.view.button.SplitByClickButton.html">SplitByClickButton</a></li><li><a href="CpsiMapview.view.button.StreetViewTool.html">StreetViewTool</a></li><li><a href="CpsiMapview.view.fileupload.FileGrid.html">FileGrid</a></li><li><a href="CpsiMapview.view.fileupload.FileGridController.html">FileGridController</a></li><li><a href="CpsiMapview.view.fileupload.FileUploadWindow.html">FileUploadWindow</a></li><li><a href="CpsiMapview.view.fileupload.FileUploadWindowController.html">FileUploadWindowController</a></li><li><a href="CpsiMapview.view.fileupload.Report.html">Report</a></li><li><a href="CpsiMapview.view.from.LayerTreeFilter.html">LayerTreeFilter</a></li><li><a href="CpsiMapview.view.grid.ItemDeleter.html">ItemDeleter</a></li><li><a href="CpsiMapview.view.menuitem.LayerFilterReset.html">LayerFilterReset</a></li><li><a href="CpsiMapview.view.menuitem.LayerGrid.html">LayerGrid</a></li><li><a href="CpsiMapview.view.menuitem.LayerHelp.html">LayerHelp</a></li><li><a href="CpsiMapview.view.menuitem.LayerLabels.html">LayerLabels</a></li><li><a href="CpsiMapview.view.menuitem.LayerMetadata.html">LayerMetadata</a></li><li><a href="CpsiMapview.view.menuitem.LayerOpacity.html">LayerOpacity</a></li><li><a href="CpsiMapview.view.menuitem.LayerRefresh.html">LayerRefresh</a></li><li><a href="CpsiMapview.view.menuitem.LayerStyleSwitcher.html">LayerStyleSwitcher</a></li><li><a href="CpsiMapview.view.panel.NumericAttributeSlider.html">NumericAttributeSlider</a></li><li><a href="CpsiMapview.view.toolbar.CircleSelectionToolbar.html">CircleSelectionToolbar</a></li><li><a href="CpsiMapview.view.toolbar.MinimizedWindows.html">MinimizedWindows</a></li><li><a href="CpsiMapview.view.toolbar.ParallelLineToolbar.html">ParallelLineToolbar</a></li><li><a href="CpsiMapview.view.window.MinimizableWindow.html">MinimizableWindow</a></li><li><a href="CpsiMapview.view.window.ParallelLineWindow.html">ParallelLineWindow</a></li></ul><h3>Events</h3><ul><li><a href="global.html#event:cmv-init-layersaddedFireswhenallinitiallayersfromtheconfighavebeencreatedandaddedtotheOLmap.">cmv-init-layersadded
+Fires when all initial layers from the config have been created and added to the OL map.</a></li><li><a href="global.html#event:cmv-mapclickFireswhentheOLmapisclicked.">cmv-mapclick
+Fires when the OL map is clicked.</a></li><li><a href="global.html#event:parallelLineCreatedFires,whenanewparallellinewascreated.">parallelLineCreated
+Fires, when a new parallel line was created.</a></li></ul><h3>Global</h3><ul><li><a href="global.html#TemplatefunctioncalledbeforedoingtheGetFeatureInforequestReturnfalseifyoudon'twanttomaketheGetFeatureInforequest.">Template function called before doing the GetFeatureInfo request
+Return false if you don't want to make the GetFeatureInfo request.</a></li><li><a href="global.html#beforeSave">beforeSave</a></li><li><a href="global.html#getErrors">getErrors</a></li><li><a href="global.html#onAfterSaveSucceded">onAfterSaveSucceded</a></li><li><a href="global.html#onChange">onChange</a></li><li><a href="global.html#onFocus">onFocus</a></li><li><a href="global.html#onGroupEditToggle">onGroupEditToggle</a></li><li><a href="global.html#rawToValue">rawToValue</a></li><li><a href="global.html#setValue">setValue</a></li><li><a href="global.html#storeConfig">storeConfig</a></li><li><a href="global.html#validate">validate</a></li></ul>
+</nav>
+
+<br class="clear">
+
+<footer>
+    Documentation generated by <a href="https://github.com/jsdoc/jsdoc">JSDoc 4.0.4</a> on Mon Dec 16 2024 16:38:08 GMT+0000 (Coordinated Universal Time)
+</footer>
+
+<script> prettyPrint(); </script>
+<script src="scripts/linenumber.js"> </script>
+</body>
+</html>

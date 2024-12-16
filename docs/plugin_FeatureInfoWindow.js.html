@@ -1,0 +1,361 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>JSDoc: Source: plugin/FeatureInfoWindow.js</title>
+
+    <script src="scripts/prettify/prettify.js"> </script>
+    <script src="scripts/prettify/lang-css.js"> </script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <link type="text/css" rel="stylesheet" href="styles/prettify-tomorrow.css">
+    <link type="text/css" rel="stylesheet" href="styles/jsdoc-default.css">
+</head>
+
+<body>
+
+<div id="main">
+
+    <h1 class="page-title">Source: plugin/FeatureInfoWindow.js</h1>
+
+    
+
+
+
+    
+    <section>
+        <article>
+            <pre class="prettyprint source linenums"><code>/**
+ * This is a plugin for the `GeoExt.component.Map` component. It provides a window that opens on a singleclick on the map.
+ * All WMS that have the property `featureInfoWindow` set to true will be queried for feature info in format `geojson`.
+ * The resulting informations will be shown in property grids.
+ */
+Ext.define('CpsiMapview.plugin.FeatureInfoWindow', {
+    extend: 'Ext.plugin.Abstract',
+    alias: 'plugin.cmv_feature_info_window',
+    pluginId: 'cmv_feature_info_window',
+
+    requires: [
+        'Ext.panel.Panel',
+        'CpsiMapview.view.window.MinimizableWindow',
+        'CpsiMapview.util.WmsFilter',
+        'BasiGX.view.grid.FeaturePropertyGrid',
+        'BasiGX.util.Map'
+    ],
+
+    /**
+     * A source containing a feature that highlights the click on the map.
+     * @property {ol.source.Vector}
+     */
+    highlightSource: null,
+
+    /**
+     * Feature Window height as a percentage of the viewport
+     * @param {number} percentage as decimal
+     */
+    percentageHeight: 0.8,
+
+    /**
+     * @method
+     *
+     * Template function called before doing the GetFeatureInfo request
+     * Return false if you don't want to make the GetFeatureInfo request.
+     *
+     * @param {Object} layer
+     */
+    onBeforeRequest: Ext.emptyFn,
+
+    init: function () {
+        var me = this;
+        var cmp = me.getCmp();
+
+        me.map = cmp.map ? cmp.map : BasiGX.util.Map.getMapComponent().map;
+
+        cmp.on('cmv-mapclick', function (clickedFeatures, evt) {
+            if (me.map.get('defaultClickEnabled')) {
+                me.requestFeatureInfos(clickedFeatures, evt);
+            }
+        });
+    },
+
+    /**
+     * This method queries all configured layers for feature information. It calls the methods to highlight the click,
+     * open a window and display the information
+     * @param {ol.MapBrowserEvent} evt
+     */
+    requestFeatureInfos: function (clickedFeatures, evt) {
+        var me = this;
+
+        var mapView = me.map.getView();
+
+        var resolution = mapView.getResolution();
+        var projection = mapView.getProjection();
+        var format = new ol.format.GeoJSON();
+
+        me.highlightClick(evt);
+
+        const pixel = evt.pixel;
+        const layers = [];
+
+        const infoLayers = BasiGX.util.Layer.getLayersBy('featureInfoWindow', true);
+
+        infoLayers.forEach(layer => {
+            if (layer.getVisible()) {
+                const data = layer.getData(pixel);
+                if (data) { // Ensure there's data at the pixel
+                    const params = layer.getSource().getParams();
+
+                    // Map layers combining multiple WMS layers e.g. roads,rivers
+                    // will cause errors in the back-end MapServer as the JSON properties
+                    // will be different for different layers
+                    // Split the layers and create temporary layers for the GetFeatureInfo requests
+
+                    // We only check for unique layer names - if labels are used then duplicate layer names
+                    // are used in requests, but we only want one set of FeatureInfo results
+                    const layerNames = Ext.Array.unique(params.LAYERS.split(','));
+
+                    if (layerNames.length > 1) {
+                        // If there are multiple layers then attempt to also split out styles and filters
+                        let idx = 0;
+                        let styleNames = [];
+
+                        if (params.STYLES) {
+                            styleNames = params.STYLES.split(',');
+                        }
+
+                        const wmsFilterUtil = CpsiMapview.util.WmsFilter;
+                        const filters = wmsFilterUtil.getWmsFilters(params);
+
+                        Ext.Array.each(layerNames, function (layerName) {
+                            const newParams = Ext.clone(params);
+                            newParams.LAYERS = layerName;
+                            newParams.STYLES = styleNames[idx] ? styleNames[idx] : '';
+                            newParams.FILTER = filters[idx] ? filters[idx] : '';
+
+                            const wmsLayer = new ol.layer.Image({
+                                name: layerName,
+                                source: new ol.source.ImageWMS({
+                                    url: layer.getSource().getUrl(),
+                                    params: newParams
+                                })
+                            });
+                            layers.push(wmsLayer);
+                            idx += 1;
+                        });
+                    } else {
+                        layers.push(layer);
+                    }
+                }
+            }
+        });
+
+
+        var win = me.openFeatureInfoWindow();
+
+        if (!layers.length) {
+            // If no layers are enabled close the window so the close event
+            // is fired and the highlight is removed from the map
+            win.close();
+            // fire event so client can show custom ui, pass through the instance so
+            // that the window might be re-opened and custom content inserted
+            Ext.GlobalEvents.fireEvent('cmv-featureinfowindow-no-layers-enabled', me);
+            return;
+        }
+
+        if (layers.length &lt;= 1) {
+            win.getLayout().setConfig({
+                hideCollapseTool: true
+            });
+        } else {
+            win.getLayout().setConfig({
+                hideCollapseTool: false
+            });
+        }
+
+        var requests = [];
+        var hasContent = false;
+        layers.forEach(function (layer) {
+
+            var infoFormat = 'geojson';
+            var url = layer.getSource().getFeatureInfoUrl(evt.coordinate, resolution, projection, {
+                INFO_FORMAT: infoFormat
+            });
+
+            // call the template function onBeforeRequest to
+            // see if this layer should be queried
+            if (Ext.isFunction(me.onBeforeRequest)) {
+                var ret = me.onBeforeRequest(layer);
+                if (ret === false) {
+                    // skip to next layer
+                    return;
+                }
+            }
+
+            var promise = Ext.Ajax.request({
+                url: url
+            }).then(function (response) {
+                var responseType = response.responseType ? response.responseType :
+                    response.getResponseHeader ? response.getResponseHeader('content-type') : null;
+
+                // check if the response is geojson as expected, if not then the server
+                // may have returned an error as XML
+                if (responseType.toLowerCase().indexOf(infoFormat) !== -1) {
+                    var features = format.readFeatures(response.responseText);
+                    if (features.length) {
+                        // at least one layer has features found
+                        hasContent = true;
+                        // ensure window is show, it may not be if
+                        // showFeatureInfoWindowOnlyIfContent is true
+                        // calling show multiple times is no issue
+                        win.show();
+                        win.add(me.createFeaturePanels(layer, features));
+                    }
+                } else {
+                    //&lt;debug>
+                    Ext.log.warn(response.responseText);
+                    //&lt;/debug>
+                }
+            }).then(undefined, function (error) {
+                Ext.log.error(error);
+            });
+
+            requests.push(promise);
+        });
+
+        // When all requests have been performed, and no features are found
+        // for any layer, close the window so that the highlight is removed from the map
+        // Also handles the case where the window was previously open because features were found
+        // But a new click has found no features, so the window is auto closed
+        // This second case behaviour could be changed by checking for win.getHidden()
+        Ext.Promise.all(requests).then(function () {
+            if (!hasContent) {
+                win.close();
+                // fire event so client can show custom ui, pass through the instance so
+                // that the window might be re-opened and custom content inserted
+                Ext.GlobalEvents.fireEvent('cmv-featureinfowindow-no-features-found', me);
+            }
+        });
+
+    },
+
+    /**
+     * This method highlights the clicked point on the map.
+     * @param {ol.MapBrowserEvent} evt
+     */
+    highlightClick: function (evt) {
+
+        var me = this;
+
+        if (!this.highlightSource) {
+            this.highlightSource = new ol.source.Vector();
+            new ol.layer.Vector({
+                source: this.highlightSource,
+                style: new ol.style.Style({
+                    image: new ol.style.Circle({
+                        radius: 5,
+                        stroke: new ol.style.Stroke({
+                            color: 'red',
+                            width: 2
+                        })
+                    })
+                }),
+                map: me.map
+            });
+        } else {
+            this.highlightSource.clear();
+        }
+
+        var feature = new ol.Feature(new ol.geom.Point(evt.coordinate));
+        this.highlightSource.addFeature(feature);
+    },
+
+    /**
+     * This method opens a window to display the results in.
+     * @returns {CpsiMapview.view.window.MinimizableWindow}
+     */
+    openFeatureInfoWindow: function () {
+        var me = this;
+
+        // set the initial height of the window to 80% of the viewport height
+        // a user is then free to resize as they wish
+        var height = Ext.getBody().getViewSize().height * me.percentageHeight;
+
+        if (this.window) {
+            this.window.removeAll(true);
+        } else {
+            this.window = Ext.create('CpsiMapview.view.window.MinimizableWindow', {
+                title: 'Feature Information',
+                closeAction: 'hide', // reuse the window for all requests so a user can fix the position
+                scollable: true,
+                height: height,
+                width: 400,
+                layout: {
+                    type: 'accordion',
+                    titleCollapse: false,
+                    animate: true
+                }
+            });
+
+            this.window.on('close', function () {
+                me.highlightSource.clear();
+            });
+        }
+
+        //this.window.show();
+
+        return this.window;
+    },
+
+    /**
+     * This method returns a property grid for every feature given.
+     * @param {ol.layer.Layer} layer
+     * @param {ol.Feature[]} features
+     * @returns {BasiGX.view.grid.FeaturePropertyGrid[]}
+     */
+    createFeaturePanels: function (layer, features) {
+        return features.map(function (feature) {
+            return Ext.create('BasiGX.view.grid.FeaturePropertyGrid', {
+                title: layer.get('name'),
+                olFeature: feature,
+                propertyWhiteList: Object.keys(feature.getProperties()),
+                scrollable: true,
+                nameColumnWidth: 150,
+                viewConfig: {
+                    enableTextSelection: true,
+                    // the following is needed to make `enableTextSelection` work. See https://stackoverflow.com/questions/42760943
+                    getRowClass: function () {
+                        return this.enableTextSelection ? 'x-selectable' : '';
+                    }
+                }
+            });
+        });
+    },
+});
+</code></pre>
+        </article>
+    </section>
+
+
+
+
+</div>
+
+<nav>
+    <h2><a href="index.html">Home</a></h2><h3>Classes</h3><ul><li><a href="CpsiMapview.controller.LayerTreeController.html">LayerTreeController</a></li><li><a href="CpsiMapview.controller.button.TracingMixin.html">TracingMixin</a></li><li><a href="CpsiMapview.controller.form.LayerTreeFilter.html">LayerTreeFilter</a></li><li><a href="CpsiMapview.controller.form.Login.html">Login</a></li><li><a href="CpsiMapview.controller.panel.NumericAttributeSlider.html">NumericAttributeSlider</a></li><li><a href="CpsiMapview.data.model.LayerTreeNode.html">LayerTreeNode</a></li><li><a href="CpsiMapview.factory.Layer.html">Layer</a></li><li><a href="CpsiMapview.form.ControllerMixin.html">ControllerMixin</a></li><li><a href="CpsiMapview.form.HelpMixin.html">HelpMixin</a></li><li><a href="CpsiMapview.form.LayersMixin.html">LayersMixin</a></li><li><a href="CpsiMapview.form.RightInfoField.html">RightInfoField</a></li><li><a href="CpsiMapview.form.ValidationMessagesMixin.html">ValidationMessagesMixin</a></li><li><a href="CpsiMapview.form.ViewMixin.html">ViewMixin</a></li><li><a href="CpsiMapview.form.ViewModelMixin.html">ViewModelMixin</a></li><li><a href="CpsiMapview.form.field.Combo.html">Combo</a></li><li><a href="CpsiMapview.form.field.ComboLegacy.html">ComboLegacy</a></li><li><a href="CpsiMapview.model.fileupload.Attachment.html">Attachment</a></li><li><a href="CpsiMapview.plugin.ExpandPanel.html">ExpandPanel</a></li><li><a href="CpsiMapview.plugin.FeatureAttributeGrouping.html">FeatureAttributeGrouping</a></li><li><a href="CpsiMapview.plugin.TreeColumnContextMenu.html">TreeColumnContextMenu</a></li><li><a href="CpsiMapview.store.WfsFeatures.html">WfsFeatures</a></li><li><a href="CpsiMapview.util.ColumnMenuOrderMixin.html">ColumnMenuOrderMixin</a></li><li><a href="CpsiMapview.util.EditWindowOpenerMixin.html">EditWindowOpenerMixin</a></li><li><a href="CpsiMapview.util.Layer.html">Layer</a></li><li><a href="CpsiMapview.util.LayerTreeFilter.html">LayerTreeFilter</a></li><li><a href="CpsiMapview.util.Legend.html">Legend</a></li><li><a href="CpsiMapview.util.RoleManager.html">RoleManager</a></li><li><a href="CpsiMapview.util.Style.html">Style</a></li><li><a href="CpsiMapview.util.SwitchLayer.html">SwitchLayer</a></li><li><a href="CpsiMapview.util.Tracing.html">Tracing</a></li><li><a href="CpsiMapview.util.Turf.html">Turf</a></li><li><a href="CpsiMapview.util.WmsFilter.html">WmsFilter</a></li><li><a href="CpsiMapview.util.ZoomerMixin.html">ZoomerMixin</a></li><li><a href="CpsiMapview.view.button.DigitizeButton.html">DigitizeButton</a></li><li><a href="CpsiMapview.view.button.DrawingButton.html">DrawingButton</a></li><li><a href="CpsiMapview.view.button.FeatureSelectionButton.html">FeatureSelectionButton</a></li><li><a href="CpsiMapview.view.button.HelpButton.html">HelpButton</a></li><li><a href="CpsiMapview.view.button.LoginButton.html">LoginButton</a></li><li><a href="CpsiMapview.view.button.MinimizeAllButton.html">MinimizeAllButton</a></li><li><a href="CpsiMapview.view.button.SpatialQueryButton.html">SpatialQueryButton</a></li><li><a href="CpsiMapview.view.button.SplitByClickButton.html">SplitByClickButton</a></li><li><a href="CpsiMapview.view.button.StreetViewTool.html">StreetViewTool</a></li><li><a href="CpsiMapview.view.fileupload.FileGrid.html">FileGrid</a></li><li><a href="CpsiMapview.view.fileupload.FileGridController.html">FileGridController</a></li><li><a href="CpsiMapview.view.fileupload.FileUploadWindow.html">FileUploadWindow</a></li><li><a href="CpsiMapview.view.fileupload.FileUploadWindowController.html">FileUploadWindowController</a></li><li><a href="CpsiMapview.view.fileupload.Report.html">Report</a></li><li><a href="CpsiMapview.view.from.LayerTreeFilter.html">LayerTreeFilter</a></li><li><a href="CpsiMapview.view.grid.ItemDeleter.html">ItemDeleter</a></li><li><a href="CpsiMapview.view.menuitem.LayerFilterReset.html">LayerFilterReset</a></li><li><a href="CpsiMapview.view.menuitem.LayerGrid.html">LayerGrid</a></li><li><a href="CpsiMapview.view.menuitem.LayerHelp.html">LayerHelp</a></li><li><a href="CpsiMapview.view.menuitem.LayerLabels.html">LayerLabels</a></li><li><a href="CpsiMapview.view.menuitem.LayerMetadata.html">LayerMetadata</a></li><li><a href="CpsiMapview.view.menuitem.LayerOpacity.html">LayerOpacity</a></li><li><a href="CpsiMapview.view.menuitem.LayerRefresh.html">LayerRefresh</a></li><li><a href="CpsiMapview.view.menuitem.LayerStyleSwitcher.html">LayerStyleSwitcher</a></li><li><a href="CpsiMapview.view.panel.NumericAttributeSlider.html">NumericAttributeSlider</a></li><li><a href="CpsiMapview.view.toolbar.CircleSelectionToolbar.html">CircleSelectionToolbar</a></li><li><a href="CpsiMapview.view.toolbar.MinimizedWindows.html">MinimizedWindows</a></li><li><a href="CpsiMapview.view.toolbar.ParallelLineToolbar.html">ParallelLineToolbar</a></li><li><a href="CpsiMapview.view.window.MinimizableWindow.html">MinimizableWindow</a></li><li><a href="CpsiMapview.view.window.ParallelLineWindow.html">ParallelLineWindow</a></li></ul><h3>Events</h3><ul><li><a href="global.html#event:cmv-init-layersaddedFireswhenallinitiallayersfromtheconfighavebeencreatedandaddedtotheOLmap.">cmv-init-layersadded
+Fires when all initial layers from the config have been created and added to the OL map.</a></li><li><a href="global.html#event:cmv-mapclickFireswhentheOLmapisclicked.">cmv-mapclick
+Fires when the OL map is clicked.</a></li><li><a href="global.html#event:parallelLineCreatedFires,whenanewparallellinewascreated.">parallelLineCreated
+Fires, when a new parallel line was created.</a></li></ul><h3>Global</h3><ul><li><a href="global.html#TemplatefunctioncalledbeforedoingtheGetFeatureInforequestReturnfalseifyoudon'twanttomaketheGetFeatureInforequest.">Template function called before doing the GetFeatureInfo request
+Return false if you don't want to make the GetFeatureInfo request.</a></li><li><a href="global.html#beforeSave">beforeSave</a></li><li><a href="global.html#getErrors">getErrors</a></li><li><a href="global.html#onAfterSaveSucceded">onAfterSaveSucceded</a></li><li><a href="global.html#onChange">onChange</a></li><li><a href="global.html#onFocus">onFocus</a></li><li><a href="global.html#onGroupEditToggle">onGroupEditToggle</a></li><li><a href="global.html#rawToValue">rawToValue</a></li><li><a href="global.html#setValue">setValue</a></li><li><a href="global.html#storeConfig">storeConfig</a></li><li><a href="global.html#validate">validate</a></li></ul>
+</nav>
+
+<br class="clear">
+
+<footer>
+    Documentation generated by <a href="https://github.com/jsdoc/jsdoc">JSDoc 4.0.4</a> on Mon Dec 16 2024 16:38:08 GMT+0000 (Coordinated Universal Time)
+</footer>
+
+<script> prettyPrint(); </script>
+<script src="scripts/linenumber.js"> </script>
+</body>
+</html>

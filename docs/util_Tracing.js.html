@@ -1,0 +1,398 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>JSDoc: Source: util/Tracing.js</title>
+
+    <script src="scripts/prettify/prettify.js"> </script>
+    <script src="scripts/prettify/lang-css.js"> </script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <link type="text/css" rel="stylesheet" href="styles/prettify-tomorrow.css">
+    <link type="text/css" rel="stylesheet" href="styles/jsdoc-default.css">
+</head>
+
+<body>
+
+<div id="main">
+
+    <h1 class="page-title">Source: util/Tracing.js</h1>
+
+    
+
+
+
+    
+    <section>
+        <article>
+            <pre class="prettyprint source linenums"><code>/**
+ * Util class for tracing related functions.
+ *
+ * @class CpsiMapview.util.Tracing
+ */
+Ext.define('CpsiMapview.util.Tracing', {
+
+    statics: {
+
+        /**
+         * Compute the modulo for negative values.
+         *
+         * Example: staticMe.computeModulo(-1, 4) returns 3
+         *
+         * Taken from the official OpenLayers example:
+         * https://openlayers.org/en/latest/examples/tracing.html
+         *
+         * @param {Number} a The first number
+         * @param {Number} b The second number
+         *
+         * @returns {Number} The modulo
+         */
+        computeModulo: function (a, b) {
+            return ((a % b) + b) % b;
+        },
+
+        /**
+         * Checks if a LineString is is populated i.e. is not empty.
+         *
+         * @param {ol.Feature} feature The feature to check
+         * @returns {Boolean} true/false if LineString is populated, undefined if something unexpected happened
+         */
+        lineStringPopulated: function (feature) {
+            if (!feature) {
+                return;
+            }
+            var geom = feature.getGeometry();
+            if (!geom) {
+                return;
+            }
+
+            var type = geom.getType();
+            if (type != 'LineString') {
+                return;
+            }
+            var coords = geom.getCoordinates();
+            if (!coords) {
+                return;
+            }
+            return coords.length >= 2;
+        },
+
+        /**
+         * Finds the index of a coordinate in a coordinate array
+         * by only comparing its value.
+         *
+         * @param {ol.coordinate.Coordinate[]} coordinateArray The coordinate array
+         * @param {ol.coordinate.Coordinate} coordToFind The coordinate to find
+         * @returns {Number} The index of the coordinate, or -1 if not found
+         */
+        // TODO: use Ext.Array.reduce instead of Ext.Array.findBy you can omit the second loop
+        getCoordIndex: function (coordinateArray, coordToFind) {
+            var found = Ext.Array.findBy(coordinateArray, function (c) {
+                return Ext.Array.equals(c, coordToFind);
+            });
+            return coordinateArray.indexOf(found);
+        },
+
+        /**
+         * Checks if two LineString geometries are touching at only startpoint and/or endpoint.
+         *
+         * @param {ol.geom.LineString} lineA The first LineString
+         * @param {ol.geom.LineString} lineB The second LineString
+         *
+         * @returns {Boolean} If lines are touching.
+         */
+        linesTouchAtStartEndPoint: function (lineA, lineB) {
+            var firstA = lineA.getFirstCoordinate();
+            var lastA = lineA.getLastCoordinate();
+
+            var firstB = lineB.getFirstCoordinate();
+            var lastB = lineB.getLastCoordinate();
+
+            var endStart = Ext.Array.equals(lastA, firstB);
+            var endEnd = Ext.Array.equals(lastA, lastB);
+            var startStart = Ext.Array.equals(firstA, firstB);
+            var startEnd = Ext.Array.equals(firstA, lastB);
+            return endStart || endEnd || startStart || startEnd;
+        },
+
+        /**
+         * Checks if the interior of one line touches the startpoint
+         * or the endpoint of another line. If yes, the touching point is returned.
+         *
+         * @param {ol.geom.LineString} lineGeomA The first LineString
+         * @param {ol.geom.LineString} lineGeomB The second LineString
+         * @returns {ol.coordinate.Coordinate} The touching coordinate or null
+         */
+        lineInteriorTouchesLineStartEnd: function (lineA, lineB) {
+
+            var firstB = lineB.getFirstCoordinate();
+            var lastB = lineB.getLastCoordinate();
+
+            if (lineA.intersectsCoordinate(firstB)) {
+                return firstB;
+            }
+
+            if (lineA.intersectsCoordinate(lastB)) {
+                return lastB;
+            }
+
+        },
+
+        /**
+         * Checks if the startpoint or the endpoint of a line touches the interior of another line.
+         * If yes, the touching point is returned.
+         *
+         * @param {ol.geom.LineString} lineGeomA The first LineString
+         * @param {ol.geom.LineString} lineGeomB The second LineString
+         * @returns {ol.coordinate.Coordinate} The touching coordinate
+         */
+        lineStartEndTouchesLineInterior: function (lineA, lineB) {
+            var firstA = lineA.getFirstCoordinate();
+            var lastA = lineA.getLastCoordinate();
+
+            if (lineB.intersectsCoordinate(firstA)) {
+                return firstA;
+            }
+            if (lineB.intersectsCoordinate(lastA)) {
+                return lastA;
+            }
+
+        },
+
+        /**
+         * Compute the length of the [a, b] segment.
+         *
+         * Taken from the official OpenLayers example:
+         * https://openlayers.org/en/latest/examples/tracing.html
+         *
+         * @param {ol.coordinate.Coordinate} a The start coordinate of the segment
+         * @param {ol.coordinate.Coordinate} b The end coordinate of the segment
+         *
+         * @returns {ol.coordinate.Coordinate} The length of the segment
+         */
+        computeLength: function (a, b) {
+            return Math.sqrt(
+                (b[0] - a[0]) * (b[0] - a[0]) + (b[1] - a[1]) * (b[1] - a[1])
+            );
+        },
+
+        /**
+         * Finds the closest coordinate to a point.
+         *
+         * @param {ol.coordinate.Coordinate[]} coordinateArray An array of coordinates
+         * @param {ol.coordinate.Coordinate} pointCoordinate The point coordinate
+         *
+         * @returns {ol.coordinate.Coordinate} The found coordinate
+         */
+        getClosestCoordinateToPoint: function (coordinateArray, pointCoordinate) {
+            var staticMe = CpsiMapview.util.Tracing;
+
+            var found, length;
+            Ext.each(coordinateArray, function (c) {
+                var tmpLength = staticMe.computeLength(c, pointCoordinate);
+                if (!length || tmpLength &lt; length) {
+                    length = tmpLength;
+                    found = c;
+                }
+            });
+            return found;
+        },
+
+        /**
+         * Checks if coordinate c is on the [a, b] segment.
+         *
+         * Taken from the official OpenLayers example:
+         * https://openlayers.org/en/latest/examples/tracing.html
+         *
+         * @param {ol.coordinate.Coordinate} c The coordinate to check
+         * @param {ol.coordinate.Coordinate} a The start coordinate of the segment
+         * @param {ol.coordinate.Coordinate} b The end coordinate of the segment
+         *
+         * @returns {Boolean} If coordinate c is on the [a, b] segment
+         */
+        coordIsOnSegment: function (c, a, b) {
+            var staticMe = CpsiMapview.util.Tracing;
+
+            var lengthAc = staticMe.computeLength(a, c);
+            var lengthAb = staticMe.computeLength(a, b);
+            var dot =
+                ((c[0] - a[0]) * (b[0] - a[0]) + (c[1] - a[1]) * (b[1] - a[1])) / lengthAb;
+            return Math.abs(lengthAc - dot) &lt; 1e-6 &amp;&amp; lengthAc &lt; lengthAb;
+        },
+
+        /**
+         * Concatenate two coordinate arrays if they are touching at the startpoint or endpoint.
+         * It takes the direction of the arrays into account.
+         *
+         * @param {ol.coordinate.Coordinate[]} aLineCoords The first coordinate array
+         * @param {ol.coordinate.Coordinate[]} bLineCoords The second coordinate array
+         * @returns {ol.coordinate.Coordinate[]} The combined coordinate array if input arrays are touching, empty array otherwise
+         */
+        concatLineCoords: function (aLineCoords, bLineCoords) {
+
+            var inputValid =
+                Ext.isArray(aLineCoords) &amp;&amp;
+                aLineCoords.length >= 2 &amp;&amp;
+                Ext.isArray(bLineCoords) &amp;&amp;
+                bLineCoords.length >= 2;
+
+            if (!inputValid) {
+                return;
+            }
+
+            var aFirst = aLineCoords[0];
+            var aLast = aLineCoords[aLineCoords.length - 1];
+
+            var bFirst = bLineCoords[0];
+            var bLast = bLineCoords[bLineCoords.length - 1];
+
+            var lastFirst = Ext.Array.equals(aLast, bFirst);
+            var lastLast = Ext.Array.equals(aLast, bLast);
+            var firstFirst = Ext.Array.equals(aFirst, bFirst);
+            var firstLast = Ext.Array.equals(aFirst, bLast);
+
+            if (lastLast) {
+                // reverse second array
+                bLineCoords.reverse();
+
+            } else if (firstFirst) {
+                // reverse first array
+                aLineCoords.reverse();
+
+            } else if (firstLast) {
+                // reverse both arrays
+                aLineCoords.reverse();
+                bLineCoords.reverse();
+
+            } else if (!lastFirst) {
+                // lines do not touch
+                Ext.Logger.warn('Cannot concat lines, because they do not touch.');
+                return undefined;
+            }
+            // remove intersecting vertex
+            aLineCoords.pop();
+            var resultCoords = aLineCoords.concat(bLineCoords);
+            return resultCoords;
+        },
+
+        // TODO: this code was originally built for polygons and
+        //       might need more adjustment for simple linestrings
+        /**
+         * Returns a coordinates array which contains the segments of the traced feature
+         * between the start and the end point.
+         *
+         * The basic functionality is taken from the official OpenLayers example:
+         * https://openlayers.org/en/latest/examples/tracing.html
+         *
+         * @param {ol.Feature} feature The feature to trace
+         * @param {ol.coordinate.Coordinate} startPoint The coordinate of the start point
+         * @param {ol.coordinate.Coordinate} endPoint The coordinate of the end point
+         *
+         * @returns {ol.coordinate.Coordinate[]} The coordinates of the traced segment.
+         */
+        getPartialSegmentCoords: function (feature, startPoint, endPoint) {
+            var staticMe = CpsiMapview.util.Tracing;
+            var geometry = feature.getGeometry();
+            var ringCoords;
+            if (geometry.getType() === 'MultiPolygon') {
+                geometry = geometry.getPolygon(0);
+                ringCoords = geometry.getLinearRing().getCoordinates();
+            } else if (geometry.getType() === 'Polygon') {
+                ringCoords = geometry.getLinearRing().getCoordinates();
+            } else if (geometry.getType() === 'LineString') {
+                ringCoords = geometry.getCoordinates();
+            } else {
+                Ext.Logger.warn('Tracing only works for LineString, Polygon and MultiPolygon');
+                return;
+            }
+
+            var i,
+                pointA,
+                pointB,
+                startSegmentIndex = -1;
+            for (i = 0; i &lt; ringCoords.length; i++) {
+                pointA = ringCoords[i];
+                pointB = ringCoords[staticMe.computeModulo(i + 1, ringCoords.length)];
+
+                // check if this is the start segment dot product
+                if (staticMe.coordIsOnSegment(startPoint, pointA, pointB)) {
+                    startSegmentIndex = i;
+                    break;
+                }
+            }
+
+            var cwCoordinates = [];
+            var cwLength = 0;
+            var ccwCoordinates = [];
+            var ccwLength = 0;
+
+            // build clockwise coordinates
+            for (i = 0; i &lt; ringCoords.length; i++) {
+                pointA =
+                    i === 0
+                        ? startPoint
+                        : ringCoords[staticMe.computeModulo(i + startSegmentIndex, ringCoords.length)];
+                pointB = ringCoords[staticMe.computeModulo(i + startSegmentIndex + 1, ringCoords.length)];
+                cwCoordinates.push(pointA);
+
+                if (staticMe.coordIsOnSegment(endPoint, pointA, pointB)) {
+                    cwCoordinates.push(endPoint);
+                    cwLength += staticMe.computeLength(pointA, endPoint);
+                    break;
+                } else {
+                    cwLength += staticMe.computeLength(pointA, pointB);
+                }
+            }
+
+            // build counter-clockwise coordinates
+            for (i = 0; i &lt; ringCoords.length; i++) {
+                pointA = ringCoords[staticMe.computeModulo(startSegmentIndex - i, ringCoords.length)];
+                pointB =
+                    i === 0
+                        ? startPoint
+                        : ringCoords[staticMe.computeModulo(startSegmentIndex - i + 1, ringCoords.length)];
+                ccwCoordinates.push(pointB);
+
+                if (staticMe.coordIsOnSegment(endPoint, pointA, pointB)) {
+                    ccwCoordinates.push(endPoint);
+                    ccwLength += staticMe.computeLength(endPoint, pointB);
+                    break;
+                } else {
+                    ccwLength += staticMe.computeLength(pointA, pointB);
+                }
+            }
+
+            // keep the shortest path
+            return ccwLength &lt; cwLength ? ccwCoordinates : cwCoordinates;
+        }
+
+    }
+});
+</code></pre>
+        </article>
+    </section>
+
+
+
+
+</div>
+
+<nav>
+    <h2><a href="index.html">Home</a></h2><h3>Classes</h3><ul><li><a href="CpsiMapview.controller.LayerTreeController.html">LayerTreeController</a></li><li><a href="CpsiMapview.controller.button.TracingMixin.html">TracingMixin</a></li><li><a href="CpsiMapview.controller.form.LayerTreeFilter.html">LayerTreeFilter</a></li><li><a href="CpsiMapview.controller.form.Login.html">Login</a></li><li><a href="CpsiMapview.controller.panel.NumericAttributeSlider.html">NumericAttributeSlider</a></li><li><a href="CpsiMapview.data.model.LayerTreeNode.html">LayerTreeNode</a></li><li><a href="CpsiMapview.factory.Layer.html">Layer</a></li><li><a href="CpsiMapview.form.ControllerMixin.html">ControllerMixin</a></li><li><a href="CpsiMapview.form.HelpMixin.html">HelpMixin</a></li><li><a href="CpsiMapview.form.LayersMixin.html">LayersMixin</a></li><li><a href="CpsiMapview.form.RightInfoField.html">RightInfoField</a></li><li><a href="CpsiMapview.form.ValidationMessagesMixin.html">ValidationMessagesMixin</a></li><li><a href="CpsiMapview.form.ViewMixin.html">ViewMixin</a></li><li><a href="CpsiMapview.form.ViewModelMixin.html">ViewModelMixin</a></li><li><a href="CpsiMapview.form.field.Combo.html">Combo</a></li><li><a href="CpsiMapview.form.field.ComboLegacy.html">ComboLegacy</a></li><li><a href="CpsiMapview.model.fileupload.Attachment.html">Attachment</a></li><li><a href="CpsiMapview.plugin.ExpandPanel.html">ExpandPanel</a></li><li><a href="CpsiMapview.plugin.FeatureAttributeGrouping.html">FeatureAttributeGrouping</a></li><li><a href="CpsiMapview.plugin.TreeColumnContextMenu.html">TreeColumnContextMenu</a></li><li><a href="CpsiMapview.store.WfsFeatures.html">WfsFeatures</a></li><li><a href="CpsiMapview.util.ColumnMenuOrderMixin.html">ColumnMenuOrderMixin</a></li><li><a href="CpsiMapview.util.EditWindowOpenerMixin.html">EditWindowOpenerMixin</a></li><li><a href="CpsiMapview.util.Layer.html">Layer</a></li><li><a href="CpsiMapview.util.LayerTreeFilter.html">LayerTreeFilter</a></li><li><a href="CpsiMapview.util.Legend.html">Legend</a></li><li><a href="CpsiMapview.util.RoleManager.html">RoleManager</a></li><li><a href="CpsiMapview.util.Style.html">Style</a></li><li><a href="CpsiMapview.util.SwitchLayer.html">SwitchLayer</a></li><li><a href="CpsiMapview.util.Tracing.html">Tracing</a></li><li><a href="CpsiMapview.util.Turf.html">Turf</a></li><li><a href="CpsiMapview.util.WmsFilter.html">WmsFilter</a></li><li><a href="CpsiMapview.util.ZoomerMixin.html">ZoomerMixin</a></li><li><a href="CpsiMapview.view.button.DigitizeButton.html">DigitizeButton</a></li><li><a href="CpsiMapview.view.button.DrawingButton.html">DrawingButton</a></li><li><a href="CpsiMapview.view.button.FeatureSelectionButton.html">FeatureSelectionButton</a></li><li><a href="CpsiMapview.view.button.HelpButton.html">HelpButton</a></li><li><a href="CpsiMapview.view.button.LoginButton.html">LoginButton</a></li><li><a href="CpsiMapview.view.button.MinimizeAllButton.html">MinimizeAllButton</a></li><li><a href="CpsiMapview.view.button.SpatialQueryButton.html">SpatialQueryButton</a></li><li><a href="CpsiMapview.view.button.SplitByClickButton.html">SplitByClickButton</a></li><li><a href="CpsiMapview.view.button.StreetViewTool.html">StreetViewTool</a></li><li><a href="CpsiMapview.view.fileupload.FileGrid.html">FileGrid</a></li><li><a href="CpsiMapview.view.fileupload.FileGridController.html">FileGridController</a></li><li><a href="CpsiMapview.view.fileupload.FileUploadWindow.html">FileUploadWindow</a></li><li><a href="CpsiMapview.view.fileupload.FileUploadWindowController.html">FileUploadWindowController</a></li><li><a href="CpsiMapview.view.fileupload.Report.html">Report</a></li><li><a href="CpsiMapview.view.from.LayerTreeFilter.html">LayerTreeFilter</a></li><li><a href="CpsiMapview.view.grid.ItemDeleter.html">ItemDeleter</a></li><li><a href="CpsiMapview.view.menuitem.LayerFilterReset.html">LayerFilterReset</a></li><li><a href="CpsiMapview.view.menuitem.LayerGrid.html">LayerGrid</a></li><li><a href="CpsiMapview.view.menuitem.LayerHelp.html">LayerHelp</a></li><li><a href="CpsiMapview.view.menuitem.LayerLabels.html">LayerLabels</a></li><li><a href="CpsiMapview.view.menuitem.LayerMetadata.html">LayerMetadata</a></li><li><a href="CpsiMapview.view.menuitem.LayerOpacity.html">LayerOpacity</a></li><li><a href="CpsiMapview.view.menuitem.LayerRefresh.html">LayerRefresh</a></li><li><a href="CpsiMapview.view.menuitem.LayerStyleSwitcher.html">LayerStyleSwitcher</a></li><li><a href="CpsiMapview.view.panel.NumericAttributeSlider.html">NumericAttributeSlider</a></li><li><a href="CpsiMapview.view.toolbar.CircleSelectionToolbar.html">CircleSelectionToolbar</a></li><li><a href="CpsiMapview.view.toolbar.MinimizedWindows.html">MinimizedWindows</a></li><li><a href="CpsiMapview.view.toolbar.ParallelLineToolbar.html">ParallelLineToolbar</a></li><li><a href="CpsiMapview.view.window.MinimizableWindow.html">MinimizableWindow</a></li><li><a href="CpsiMapview.view.window.ParallelLineWindow.html">ParallelLineWindow</a></li></ul><h3>Events</h3><ul><li><a href="global.html#event:cmv-init-layersaddedFireswhenallinitiallayersfromtheconfighavebeencreatedandaddedtotheOLmap.">cmv-init-layersadded
+Fires when all initial layers from the config have been created and added to the OL map.</a></li><li><a href="global.html#event:cmv-mapclickFireswhentheOLmapisclicked.">cmv-mapclick
+Fires when the OL map is clicked.</a></li><li><a href="global.html#event:parallelLineCreatedFires,whenanewparallellinewascreated.">parallelLineCreated
+Fires, when a new parallel line was created.</a></li></ul><h3>Global</h3><ul><li><a href="global.html#TemplatefunctioncalledbeforedoingtheGetFeatureInforequestReturnfalseifyoudon'twanttomaketheGetFeatureInforequest.">Template function called before doing the GetFeatureInfo request
+Return false if you don't want to make the GetFeatureInfo request.</a></li><li><a href="global.html#beforeSave">beforeSave</a></li><li><a href="global.html#getErrors">getErrors</a></li><li><a href="global.html#onAfterSaveSucceded">onAfterSaveSucceded</a></li><li><a href="global.html#onChange">onChange</a></li><li><a href="global.html#onFocus">onFocus</a></li><li><a href="global.html#onGroupEditToggle">onGroupEditToggle</a></li><li><a href="global.html#rawToValue">rawToValue</a></li><li><a href="global.html#setValue">setValue</a></li><li><a href="global.html#storeConfig">storeConfig</a></li><li><a href="global.html#validate">validate</a></li></ul>
+</nav>
+
+<br class="clear">
+
+<footer>
+    Documentation generated by <a href="https://github.com/jsdoc/jsdoc">JSDoc 4.0.4</a> on Mon Dec 16 2024 16:38:08 GMT+0000 (Coordinated Universal Time)
+</footer>
+
+<script> prettyPrint(); </script>
+<script src="scripts/linenumber.js"> </script>
+</body>
+</html>

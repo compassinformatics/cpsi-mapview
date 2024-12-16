@@ -1,0 +1,321 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>JSDoc: Source: controller/button/SplitByClickButtonController.js</title>
+
+    <script src="scripts/prettify/prettify.js"> </script>
+    <script src="scripts/prettify/lang-css.js"> </script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <link type="text/css" rel="stylesheet" href="styles/prettify-tomorrow.css">
+    <link type="text/css" rel="stylesheet" href="styles/jsdoc-default.css">
+</head>
+
+<body>
+
+<div id="main">
+
+    <h1 class="page-title">Source: controller/button/SplitByClickButtonController.js</h1>
+
+    
+
+
+
+    
+    <section>
+        <article>
+            <pre class="prettyprint source linenums"><code>/**
+ * This class is the controller for the SplitByClick button.
+ */
+Ext.define('CpsiMapview.controller.button.SplitByClickButtonController', {
+    extend: 'Ext.app.ViewController',
+    requires: [
+        'BasiGX.util.Map',
+        'GeoExt.component.FeatureRenderer',
+        'GeoExt.data.store.Features'
+    ],
+
+    alias: 'controller.cmv_split_by_click_button',
+
+    /**
+     * The OpenLayers map. If not given, will be auto-detected
+     */
+    map: null,
+
+    /**
+     * The BasiGX mapComponent. If not given, will be auto-detected
+     */
+    mapComponent: null,
+
+    /**
+     * Temporary vector layer used to display the response split features
+     */
+    resultLayer: null,
+
+    constructor: function() {
+        var me = this;
+        me.splitOnClickedPosition = me.splitOnClickedPosition.bind(me);
+
+        me.callParent(arguments);
+    },
+
+    /**
+     * Set the layer used to store features returned by the split service
+     * @param {ol.Layer} layer
+     */
+    setResultLayer: function(layer) {
+        var me = this;
+
+        if (!me.map) {
+            return;
+        }
+
+        if (me.resultLayer) {
+            me.map.removeLayer(me.resultLayer);
+        }
+
+        me.resultLayer = layer;
+    },
+
+
+    /**
+     * Main handler which activates or deactivates the click listener for the
+     * map.
+     *
+     * @param {Ext.button.Button} btn The button that has been pressed
+     * @param {boolean} pressed The toggle state of the button
+     */
+    onToggle: function(btn, pressed) {
+        var me = this;
+        var view = me.getView();
+
+        // guess the map if not given
+        if (!me.map) {
+            me.map = BasiGX.util.Map.getMapComponent().map;
+        }
+
+        // create a result layer unless one has already been set
+        if (!me.resultLayer) {
+            me.resultLayer = view.resultLayer;
+        }
+
+        if (pressed) {
+            me.map.on('click', me.splitOnClickedPosition);
+        } else {
+            me.map.un('click', me.splitOnClickedPosition);
+        }
+    },
+
+    /**
+     * Asynchronously request and proceed split features depending on clicked
+     * position.
+     *
+     * @param {Event} evt OpenLayers click event
+     * @returns {Ext.Promise&lt;any|undefined>}
+     */
+    splitOnClickedPosition: function(evt) {
+        var me = this;
+        var map = me.map;
+        var proj = map.getView().getProjection().getCode();
+        var coordinates = evt.coordinate;
+        var point = new ol.Feature(new ol.geom.Point(coordinates));
+        var extent = point.getGeometry().getExtent();
+        var associatedWin = this.getView().up('window');
+        var associatedVm = associatedWin.getViewModel();
+        var parentId = associatedVm.get('currentRecord.publicPrivateSplitId');
+        var buffered = ol.extent.buffer(extent, me.getView().getPointExtentBuffer());
+        // transform to ITM since this projection is expected by backend.
+        var bufferedITM = ol.proj.transformExtent(buffered, proj, 'EPSG:2157');
+        var bboxSearchParam = '&amp;bbox=' + encodeURIComponent(bufferedITM.join(','));
+        var idParam = 'publicPrivateSplitId=';
+
+        if (isNaN(parentId)) {
+            // we're going to create a new split
+            idParam += '0';
+        } else {
+            // we're going to edit the existing one
+            idParam += parentId;
+        }
+        var searchParams = idParam + bboxSearchParam;
+
+        return me.doAjaxRequest(searchParams)
+            .then(me.parseSplitResponse.bind(me))
+            .then(me.handleFinalResult.bind(me));
+    },
+
+    /**
+     * Parses the split result to OpenLayers features
+     *
+     * @param {XMLHttpRequest} response
+     * @returns {ol.Feature[]}
+     */
+    parseSplitResponse: function(response) {
+        if (response) {
+            var json;
+
+            if (!Ext.isEmpty(response.responseText)) {
+
+                try {
+                    json = Ext.decode(response.responseText);
+                } catch (e) {
+                    BasiGX.error('Could not parse the response: ' +
+                        response.responseText);
+                    return;
+                }
+
+                if (json.success &amp;&amp; json.data) {
+                    var existingPpSplitId = json.data.existingPublicPrivateSplitId;
+                    if (existingPpSplitId !== null) {
+                        this.handleExistingSplit(existingPpSplitId);
+                    } else {
+                        var splitEdgeFeats = json.data.splitEdgeFeatures;
+                        if (splitEdgeFeats.features &amp;&amp; splitEdgeFeats.features.length === 2) {
+                            var format = new ol.format.GeoJSON();
+                            return format.readFeaturesFromObject(splitEdgeFeats);
+                        }
+                    }
+                } else {
+                    BasiGX.error('Could not perform the split: ' +
+                        (json.message ? json.message : JSON.stringify(json)));
+                }
+            } else {
+                BasiGX.error('Could not perform the split: ' +
+                    (json.message ? json.message : JSON.stringify(json)));
+            }
+        } else {
+            BasiGX.error('Response was empty');
+        }
+    },
+
+    /**
+     * Issues an Ext.Ajax.request against the configured endpoint with
+     * the given params.
+     *
+     * @param {string} searchParams The serarchParams which will be
+     *   appended to the request url
+     * @returns {Ext.request.Base}
+     */
+    doAjaxRequest: function(searchParams) {
+        var me = this;
+        var mapComponent = me.mapComponent || BasiGX.util.Map.getMapComponent();
+        var view = me.getView();
+        var url = view.getApiUrl();
+
+        if (!url) {
+            Ext.log.warn('No API URL passed - split is not possible.');
+            return;
+        }
+
+        if (searchParams) {
+            url = Ext.urlAppend(url, searchParams);
+        }
+
+        mapComponent.setLoading(true);
+
+        return new Ext.Promise(function(resolve) {
+            Ext.Ajax.request({
+                url: url,
+                method: 'GET',
+                success: function(response) {
+                    mapComponent.setLoading(false);
+                    resolve(response);
+                },
+                failure: function(response) {
+                    mapComponent.setLoading(false);
+
+                    if (response.aborted !== true) {
+                        var errorMessage = 'Error while requesting the API endpoint';
+
+                        if (response.responseText &amp;&amp; response.responseText.message) {
+                            errorMessage += ': ' + response.responseText.message;
+                        }
+
+                        BasiGX.error(errorMessage);
+                    }
+                }
+            });
+        });
+    },
+
+    /**
+     * Show confirm dialog to decide, whether the found existing split should be
+     * opened for edit.
+     * @param {number} splitId
+     */
+    handleExistingSplit: function(splitId) {
+
+        var msg = 'This edge has already been split. Open existing split record?';
+        var me = this;
+
+        BasiGX.confirm(msg, {
+            title: 'Open Existing Split?',
+            fn: function(buttonId) {
+                if (buttonId === 'yes') {
+                    var win = me.getView().up('window');
+                    win.fireEvent('splitedgesupdate', splitId);
+                }
+            }
+        });
+    },
+
+    /**
+     * Handles the final result from endopoint. Refreshes the result layer with
+     * retrieved split features.
+     *
+     * @param {undefined|ol.Feature[]} features The features returned from the API.
+     */
+    handleFinalResult: function(features) {
+        if (features) {
+            var me = this;
+            var resultSource = me.resultLayer.getSource();
+            resultSource.clear();
+            resultSource.addFeatures(features);
+        }
+    },
+
+    /**
+     * Remove the result layer when this component gets destroyed.
+     */
+    onBeforeDestroy: function() {
+
+        var me = this;
+        var btn = me.getView();
+
+        // detoggle button
+        me.onToggle(btn, false);
+
+        if (me.resultLayer) {
+            me.map.removeLayer(me.resultLayer);
+        }
+
+    }
+});
+</code></pre>
+        </article>
+    </section>
+
+
+
+
+</div>
+
+<nav>
+    <h2><a href="index.html">Home</a></h2><h3>Classes</h3><ul><li><a href="CpsiMapview.controller.LayerTreeController.html">LayerTreeController</a></li><li><a href="CpsiMapview.controller.button.TracingMixin.html">TracingMixin</a></li><li><a href="CpsiMapview.controller.form.LayerTreeFilter.html">LayerTreeFilter</a></li><li><a href="CpsiMapview.controller.form.Login.html">Login</a></li><li><a href="CpsiMapview.controller.panel.NumericAttributeSlider.html">NumericAttributeSlider</a></li><li><a href="CpsiMapview.data.model.LayerTreeNode.html">LayerTreeNode</a></li><li><a href="CpsiMapview.factory.Layer.html">Layer</a></li><li><a href="CpsiMapview.form.ControllerMixin.html">ControllerMixin</a></li><li><a href="CpsiMapview.form.HelpMixin.html">HelpMixin</a></li><li><a href="CpsiMapview.form.LayersMixin.html">LayersMixin</a></li><li><a href="CpsiMapview.form.RightInfoField.html">RightInfoField</a></li><li><a href="CpsiMapview.form.ValidationMessagesMixin.html">ValidationMessagesMixin</a></li><li><a href="CpsiMapview.form.ViewMixin.html">ViewMixin</a></li><li><a href="CpsiMapview.form.ViewModelMixin.html">ViewModelMixin</a></li><li><a href="CpsiMapview.form.field.Combo.html">Combo</a></li><li><a href="CpsiMapview.form.field.ComboLegacy.html">ComboLegacy</a></li><li><a href="CpsiMapview.model.fileupload.Attachment.html">Attachment</a></li><li><a href="CpsiMapview.plugin.ExpandPanel.html">ExpandPanel</a></li><li><a href="CpsiMapview.plugin.FeatureAttributeGrouping.html">FeatureAttributeGrouping</a></li><li><a href="CpsiMapview.plugin.TreeColumnContextMenu.html">TreeColumnContextMenu</a></li><li><a href="CpsiMapview.store.WfsFeatures.html">WfsFeatures</a></li><li><a href="CpsiMapview.util.ColumnMenuOrderMixin.html">ColumnMenuOrderMixin</a></li><li><a href="CpsiMapview.util.EditWindowOpenerMixin.html">EditWindowOpenerMixin</a></li><li><a href="CpsiMapview.util.Layer.html">Layer</a></li><li><a href="CpsiMapview.util.LayerTreeFilter.html">LayerTreeFilter</a></li><li><a href="CpsiMapview.util.Legend.html">Legend</a></li><li><a href="CpsiMapview.util.RoleManager.html">RoleManager</a></li><li><a href="CpsiMapview.util.Style.html">Style</a></li><li><a href="CpsiMapview.util.SwitchLayer.html">SwitchLayer</a></li><li><a href="CpsiMapview.util.Tracing.html">Tracing</a></li><li><a href="CpsiMapview.util.Turf.html">Turf</a></li><li><a href="CpsiMapview.util.WmsFilter.html">WmsFilter</a></li><li><a href="CpsiMapview.util.ZoomerMixin.html">ZoomerMixin</a></li><li><a href="CpsiMapview.view.button.DigitizeButton.html">DigitizeButton</a></li><li><a href="CpsiMapview.view.button.DrawingButton.html">DrawingButton</a></li><li><a href="CpsiMapview.view.button.FeatureSelectionButton.html">FeatureSelectionButton</a></li><li><a href="CpsiMapview.view.button.HelpButton.html">HelpButton</a></li><li><a href="CpsiMapview.view.button.LoginButton.html">LoginButton</a></li><li><a href="CpsiMapview.view.button.MinimizeAllButton.html">MinimizeAllButton</a></li><li><a href="CpsiMapview.view.button.SpatialQueryButton.html">SpatialQueryButton</a></li><li><a href="CpsiMapview.view.button.SplitByClickButton.html">SplitByClickButton</a></li><li><a href="CpsiMapview.view.button.StreetViewTool.html">StreetViewTool</a></li><li><a href="CpsiMapview.view.fileupload.FileGrid.html">FileGrid</a></li><li><a href="CpsiMapview.view.fileupload.FileGridController.html">FileGridController</a></li><li><a href="CpsiMapview.view.fileupload.FileUploadWindow.html">FileUploadWindow</a></li><li><a href="CpsiMapview.view.fileupload.FileUploadWindowController.html">FileUploadWindowController</a></li><li><a href="CpsiMapview.view.fileupload.Report.html">Report</a></li><li><a href="CpsiMapview.view.from.LayerTreeFilter.html">LayerTreeFilter</a></li><li><a href="CpsiMapview.view.grid.ItemDeleter.html">ItemDeleter</a></li><li><a href="CpsiMapview.view.menuitem.LayerFilterReset.html">LayerFilterReset</a></li><li><a href="CpsiMapview.view.menuitem.LayerGrid.html">LayerGrid</a></li><li><a href="CpsiMapview.view.menuitem.LayerHelp.html">LayerHelp</a></li><li><a href="CpsiMapview.view.menuitem.LayerLabels.html">LayerLabels</a></li><li><a href="CpsiMapview.view.menuitem.LayerMetadata.html">LayerMetadata</a></li><li><a href="CpsiMapview.view.menuitem.LayerOpacity.html">LayerOpacity</a></li><li><a href="CpsiMapview.view.menuitem.LayerRefresh.html">LayerRefresh</a></li><li><a href="CpsiMapview.view.menuitem.LayerStyleSwitcher.html">LayerStyleSwitcher</a></li><li><a href="CpsiMapview.view.panel.NumericAttributeSlider.html">NumericAttributeSlider</a></li><li><a href="CpsiMapview.view.toolbar.CircleSelectionToolbar.html">CircleSelectionToolbar</a></li><li><a href="CpsiMapview.view.toolbar.MinimizedWindows.html">MinimizedWindows</a></li><li><a href="CpsiMapview.view.toolbar.ParallelLineToolbar.html">ParallelLineToolbar</a></li><li><a href="CpsiMapview.view.window.MinimizableWindow.html">MinimizableWindow</a></li><li><a href="CpsiMapview.view.window.ParallelLineWindow.html">ParallelLineWindow</a></li></ul><h3>Events</h3><ul><li><a href="global.html#event:cmv-init-layersaddedFireswhenallinitiallayersfromtheconfighavebeencreatedandaddedtotheOLmap.">cmv-init-layersadded
+Fires when all initial layers from the config have been created and added to the OL map.</a></li><li><a href="global.html#event:cmv-mapclickFireswhentheOLmapisclicked.">cmv-mapclick
+Fires when the OL map is clicked.</a></li><li><a href="global.html#event:parallelLineCreatedFires,whenanewparallellinewascreated.">parallelLineCreated
+Fires, when a new parallel line was created.</a></li></ul><h3>Global</h3><ul><li><a href="global.html#TemplatefunctioncalledbeforedoingtheGetFeatureInforequestReturnfalseifyoudon'twanttomaketheGetFeatureInforequest.">Template function called before doing the GetFeatureInfo request
+Return false if you don't want to make the GetFeatureInfo request.</a></li><li><a href="global.html#beforeSave">beforeSave</a></li><li><a href="global.html#getErrors">getErrors</a></li><li><a href="global.html#onAfterSaveSucceded">onAfterSaveSucceded</a></li><li><a href="global.html#onChange">onChange</a></li><li><a href="global.html#onFocus">onFocus</a></li><li><a href="global.html#onGroupEditToggle">onGroupEditToggle</a></li><li><a href="global.html#rawToValue">rawToValue</a></li><li><a href="global.html#setValue">setValue</a></li><li><a href="global.html#storeConfig">storeConfig</a></li><li><a href="global.html#validate">validate</a></li></ul>
+</nav>
+
+<br class="clear">
+
+<footer>
+    Documentation generated by <a href="https://github.com/jsdoc/jsdoc">JSDoc 4.0.4</a> on Mon Dec 16 2024 16:38:08 GMT+0000 (Coordinated Universal Time)
+</footer>
+
+<script> prettyPrint(); </script>
+<script src="scripts/linenumber.js"> </script>
+</body>
+</html>

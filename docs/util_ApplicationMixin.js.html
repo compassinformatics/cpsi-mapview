@@ -1,0 +1,502 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>JSDoc: Source: util/ApplicationMixin.js</title>
+
+    <script src="scripts/prettify/prettify.js"> </script>
+    <script src="scripts/prettify/lang-css.js"> </script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <link type="text/css" rel="stylesheet" href="styles/prettify-tomorrow.css">
+    <link type="text/css" rel="stylesheet" href="styles/jsdoc-default.css">
+</head>
+
+<body>
+
+<div id="main">
+
+    <h1 class="page-title">Source: util/ApplicationMixin.js</h1>
+
+    
+
+
+
+    
+    <section>
+        <article>
+            <pre class="prettyprint source linenums"><code>
+/**
+ * A mapview Application mixin containing generic functions that can be reused
+ * between applications
+ */
+Ext.define('CpsiMapview.util.ApplicationMixin', {
+    extend: 'Ext.Mixin',
+
+    requires: [
+        'Ext.window.MessageBox',
+        'CpsiMapview.view.form.Login'
+    ],
+
+    // see https://docs.sencha.com/extjs/6.7.0/classic/Ext.app.Application.html#cfg-quickTips
+    quickTips: false,
+
+    /**
+     * The xtype of the main application viewport to be loaded
+     * once a user is logged in
+     */
+    mainViewXType: null,
+
+    /**
+     * Property to store a reference to the login window
+     */
+    loginWindow: null,
+
+    /**
+     * Does the application require a login window for access
+     */
+    requireLogin: true,
+
+    /**
+     * Set the minimum role name (a string) that is required to access the browser system,
+     * in the event that users are shared between browser and other applications
+     */
+    minimumRequiredRole: null,
+
+    // when the platform is matched any properties are placed on the class
+    platformConfig: {
+        desktop: {
+            quickTips: true
+        }
+    },
+
+    /**
+    * A counter property to keep track of how many stores need to
+    * be loaded before the application can become active
+    */
+    storeCounter: 0,
+
+    /**
+    * A flag to indicate if the viewport and stores have been loaded
+    * for the application
+    */
+    applicationLoaded: false,
+
+    /**
+    * Custom property to list all stores that should be loaded as soon as a user logs in
+    */
+    lookupStores: [],
+
+    mixinConfig: {
+        after: {
+            constructor: 'onApplicationCreated',
+            onAppUpdate: 'onApplicationUpdated'
+        }, before:
+        {
+            init: 'beforeInit'
+        }
+    },
+
+    /**
+     * URLs to monitor for service errors
+     */
+    serviceUrls: [],
+
+    /**
+     * URLs to ignore for errors
+     */
+    excludedUrls: [],
+
+    /**
+     * URL to use as the root for any window helpUrl
+     */
+    rootHelpUrl: '',
+
+    /**
+     * The token name within a cookie that stores a login token
+     */
+    tokenName: 'cookietoken',
+
+    /**
+     * URL for logging into the application
+     */
+    authenticationUrl: '/WebServices/authorization/authenticate',
+
+    /**
+     * URL for validating application tokens
+     */
+    tokenValidationUrl: '/WebServices/authorization/validateToken',
+
+    errorCode: {
+        None: 0,
+        AccountLockedOut: 1,
+        AccountDoesNotExist: 2,
+        UserTokenExpired: 3,
+        CookieHeaderMissing: 4,
+        NoPermission: 5,
+        NoTokenProvided: 6,
+        GeneralServerError: 500,
+        FileNotFound: 404
+    },
+
+    getResourcePaths: function () {
+        return new Ext.Promise(function (resolve) {
+            resolve({
+                layerConfig: 'resources/data/layers/default.json',
+                treeConfig: 'resources/data/layers/tree.json'
+            });
+        });
+    },
+
+    /**
+     * Fire the global login event when the application is loaded
+     * @param {any} loginData
+     */
+    onLogin: function (loginData) {
+
+        var me = this;
+
+        if (me.applicationLoaded === false) {
+            me.loadApplication();
+            // now that the viewport is has been created re-fire the login event so any UI elements
+            // that listen to this can be updated
+            Ext.GlobalEvents.fireEvent('login', loginData);
+        }
+    },
+
+    onAjaxBeforeRequest: function () {
+        Ext.emptyFn();
+    },
+
+    onAjaxRequestComplete: function (connection, response) {
+
+        var me = this;
+
+        var msg = 'The operation failed.';
+        var result;
+        var requestUrl = response.request.url;
+        var success = response.status === 200;
+
+        var urlTest = function (url) {
+            var ignoreCase = true;
+            return Ext.String.startsWith(requestUrl, url, ignoreCase);
+        };
+
+        if (Ext.Array.some(me.serviceUrls, urlTest) === true) {
+            if (Ext.Array.some(me.excludedUrls, urlTest) === false) {
+
+                var responseType = response.responseType ? response.responseType : response.getResponseHeader ? response.getResponseHeader('content-type') : null;
+
+                // check for geojson (coming from MapServer)
+                if (responseType &amp;&amp; responseType.includes('subtype=geojson')) {
+                    responseType = 'geojson';
+                }
+
+                // form submissions (i.e. attachments upload) return bogus responses with no content-type
+                // we can try and parse the response to see if it is valid JSON
+                if (responseType === null) {
+                    if (Ext.JSON.decode(response.responseText, true)) { // pass true to avoid errors
+                        responseType = 'json';
+                    }
+                }
+
+                switch (responseType) {
+                    case 'json':
+                    case 'application/json':
+                        if (response.responseJson) {
+                            result = response.responseJson;
+                        }
+                        else {
+                            result = JSON.parse(response.responseText);
+                        }
+
+                        if (result.success !== true) {
+                            switch (result.errorCode) {
+                                case me.errorCode.UserTokenExpired:
+                                case me.errorCode.CookieHeaderMissing:
+                                case me.errorCode.NoTokenProvided:
+                                    // user must login again
+                                    me.doLogin();
+                                    break;
+                                case null:
+                                    Ext.Msg.alert('Error', result.message);
+                                    break;
+                                default:
+                                    //&lt;debug>
+                                    Ext.log.error(requestUrl, result.message ? result.message : msg);
+                                    //&lt;/debug>
+                                    break;
+                            }
+                        }
+                        break;
+                    case 'geojson':
+                        break;
+                    case 'xml':
+                        result = response.responseXML;
+                        break;
+                    default:
+                        result = response.responseText;
+                        break;
+                }
+            }
+        }
+        return success;
+    },
+
+    onAjaxRequestException: function () {
+        Ext.emptyFn();
+    },
+
+    onApplicationCreated: function () {
+        var me = this;
+        me.setupRequestHooks();
+
+        if (me.requireLogin) {
+            me.doLogin();
+        } else {
+            Ext.onReady(me.loadApplication, me);
+        }
+
+        // add a listener for whenever any button in the map toggleGroup is toggled
+        me.control({
+            'button[toggleGroup=map]': {
+                toggle: me.onMapToolsToggle
+            }
+        });
+    },
+
+    /**
+     * Whenever any tools that are part of the 'map' toggleGroup are toggled
+     * we check to see if any tools are still active.
+     * As the 'pan' tool is simply a button with no associated tool we can exclude this
+     * from the search
+     * The defaultClickEnabled value is then used to check if the
+     * default CpsiMapview.plugin.FeatureInfoWindow tool should be active
+     * */
+    onMapToolsToggle: function () {
+
+        var buttonsInToggleGroup = Ext.ComponentQuery.query('button[toggleGroup=map][name!=pan]');
+        var pressedStates = Ext.Array.pluck(buttonsInToggleGroup, 'pressed');
+        var uniquePressedStates = Ext.Array.unique(pressedStates);
+        var activeTools = Ext.Array.contains(uniquePressedStates, true);
+
+        var map = BasiGX.util.Map.getMapComponent().map;
+        map.set('defaultClickEnabled', !activeTools);
+    },
+
+    /**
+     * Add hooks for all AJAX request to handle errors and logins
+     * */
+    setupRequestHooks: function () {
+
+        var me = this;
+
+        Ext.Ajax.on({
+            beforerequest: this.onAjaxBeforeRequest,
+            requestcomplete: this.onAjaxRequestComplete,
+            requesteexception: this.onAjaxRequestException,
+            scope: me
+        });
+    },
+
+    /**
+     * Open the login form when the application is opened. Attempt
+     * to login automatically if the user already has a cookie and token.
+     * If the form has already been created then simply show it.
+     * */
+    doLogin: function () {
+
+        var me = this;
+
+        if (!me.loginWindow) {
+            me.loginWindow = Ext.create('CpsiMapview.view.form.Login', {
+                viewModel: {
+                    tokenName: me.tokenName,
+                    serviceUrl: me.authenticationUrl,
+                    validateUrl: me.tokenValidationUrl,
+                    minimumRequiredRole: me.minimumRequiredRole
+                }
+            });
+            me.loginWindow.getController().tryAutomaticLogin();
+        } else {
+            me.loginWindow.show();
+        }
+    },
+
+    /**
+     * Get a value from the hostname in the browser
+     * using the supplied regex
+     * @param {any} regex
+     */
+    getUrlParameter: function (regex, hostname) {
+
+        var matches = [];
+        var m;
+
+        do {
+            m = regex.exec(hostname);
+            if (m) {
+                matches.push(m[1]);
+            }
+        } while (m);
+
+        var value;
+
+        if (matches.length > 0) {
+            value = matches[0];
+        }
+
+        return value;
+    },
+
+    /**
+     * When multiple sites are supported, lookup
+     * application settings from a store using the
+     * supplied key
+     * @param {any} storeKey
+     * @param {any} siteKey
+     */
+    getSiteSettings: function (storeKey, siteKey) {
+
+        var store = Ext.data.StoreManager.lookup(storeKey);
+        var idx = store.findExact('key', siteKey);
+        var rec = null;
+
+        if (idx !== -1) {
+            rec = store.getAt(idx);
+        }
+
+        return rec;
+    },
+
+
+    /**
+     * Loop through all remote stores in the custom lookupStores property
+     * and add a listener to keep track of then they are loaded
+     * */
+    loadAllStores: function () {
+
+        var me = this;
+
+        if (me.lookupStores.length === 0) {
+            return;
+        }
+
+        me.getMainView().mask('Loading...');
+
+        Ext.Array.each(me.lookupStores, function (storeClass) {
+            var store = Ext.create(storeClass);
+
+            if (store.autoLoad &amp;&amp; !store.isLoaded()) {
+                me.storeCounter++;
+
+                store.on({
+                    load: {
+                        fn: me.storeLoaded,
+                        scope: me,
+                        single: true
+                    }
+                });
+            }
+        });
+    },
+
+    /**
+     * Decrease the storeCounter property and
+     * if all stores are loaded then unmask the application
+     * */
+    storeLoaded: function () {
+
+        var me = this;
+        me.storeCounter--;
+
+        if (me.storeCounter == 0) {
+            me.getMainView().unmask();
+        }
+    },
+
+    /**
+     * Ask the use if they wish to refresh the browser following an application update
+     * */
+    onApplicationUpdated: function () {
+        Ext.Msg.confirm('Application Update', 'This application has an update, reload?',
+            function (choice) {
+                if (choice === 'yes') {
+                    window.location.reload();
+                }
+            }
+        );
+    },
+
+    /**
+    * Add the main view to the viewport and load all the application stores
+    * We don't want to show the viewport and load stores until the user is logged in
+    * so we use a similar approach to that described in the Sencha sample
+    * login app at https://docs.sencha.com/extjs/7.2.0/guides/tutorials/login_app/login_app.html
+    * */
+    loadApplication: function () {
+
+        var me = this;
+
+        if (!me.mainViewXType) {
+            Ext.Error.raise('No mainViewXType defined for the application');
+        }
+
+        // setting the mainview also creates a new instance of the component so pass in an xtype
+        me.setMainView({ xtype: me.mainViewXType });
+
+        me.loadAllStores();
+
+        // set a flag so we don't try and load the application again when a user logs in after
+        // their token has expired
+        me.applicationLoaded = true;
+    },
+
+    /**
+     * Common setup code prior to initializing the application
+     * */
+    beforeInit: function () {
+
+        var me = this;
+
+        // default timeout is 30000 (30 seconds) increase this to a minute
+        var timeout = 60000;
+        Ext.Ajax.setTimeout(timeout);
+        Ext.override(Ext.data.proxy.Ajax, { timeout: timeout });
+
+        // disable warnings about the map panel having no title
+        // https://docs.sencha.com/extjs/6.0.0/guides/upgrades_migrations/extjs_upgrade_guide.html#upgrades_migrations-_-extjs_upgrade_guide_-_aria_regions_should_have_a_title
+        Ext.enableAriaPanels = false;
+        Ext.ariaWarn = Ext.emptyFn;
+
+        Ext.GlobalEvents.on('login', me.onLogin, me);
+    }
+});
+</code></pre>
+        </article>
+    </section>
+
+
+
+
+</div>
+
+<nav>
+    <h2><a href="index.html">Home</a></h2><h3>Classes</h3><ul><li><a href="CpsiMapview.controller.LayerTreeController.html">LayerTreeController</a></li><li><a href="CpsiMapview.controller.button.TracingMixin.html">TracingMixin</a></li><li><a href="CpsiMapview.controller.form.LayerTreeFilter.html">LayerTreeFilter</a></li><li><a href="CpsiMapview.controller.form.Login.html">Login</a></li><li><a href="CpsiMapview.controller.panel.NumericAttributeSlider.html">NumericAttributeSlider</a></li><li><a href="CpsiMapview.data.model.LayerTreeNode.html">LayerTreeNode</a></li><li><a href="CpsiMapview.factory.Layer.html">Layer</a></li><li><a href="CpsiMapview.form.ControllerMixin.html">ControllerMixin</a></li><li><a href="CpsiMapview.form.HelpMixin.html">HelpMixin</a></li><li><a href="CpsiMapview.form.LayersMixin.html">LayersMixin</a></li><li><a href="CpsiMapview.form.RightInfoField.html">RightInfoField</a></li><li><a href="CpsiMapview.form.ValidationMessagesMixin.html">ValidationMessagesMixin</a></li><li><a href="CpsiMapview.form.ViewMixin.html">ViewMixin</a></li><li><a href="CpsiMapview.form.ViewModelMixin.html">ViewModelMixin</a></li><li><a href="CpsiMapview.form.field.Combo.html">Combo</a></li><li><a href="CpsiMapview.form.field.ComboLegacy.html">ComboLegacy</a></li><li><a href="CpsiMapview.model.fileupload.Attachment.html">Attachment</a></li><li><a href="CpsiMapview.plugin.ExpandPanel.html">ExpandPanel</a></li><li><a href="CpsiMapview.plugin.FeatureAttributeGrouping.html">FeatureAttributeGrouping</a></li><li><a href="CpsiMapview.plugin.TreeColumnContextMenu.html">TreeColumnContextMenu</a></li><li><a href="CpsiMapview.store.WfsFeatures.html">WfsFeatures</a></li><li><a href="CpsiMapview.util.ColumnMenuOrderMixin.html">ColumnMenuOrderMixin</a></li><li><a href="CpsiMapview.util.EditWindowOpenerMixin.html">EditWindowOpenerMixin</a></li><li><a href="CpsiMapview.util.Layer.html">Layer</a></li><li><a href="CpsiMapview.util.LayerTreeFilter.html">LayerTreeFilter</a></li><li><a href="CpsiMapview.util.Legend.html">Legend</a></li><li><a href="CpsiMapview.util.RoleManager.html">RoleManager</a></li><li><a href="CpsiMapview.util.Style.html">Style</a></li><li><a href="CpsiMapview.util.SwitchLayer.html">SwitchLayer</a></li><li><a href="CpsiMapview.util.Tracing.html">Tracing</a></li><li><a href="CpsiMapview.util.Turf.html">Turf</a></li><li><a href="CpsiMapview.util.WmsFilter.html">WmsFilter</a></li><li><a href="CpsiMapview.util.ZoomerMixin.html">ZoomerMixin</a></li><li><a href="CpsiMapview.view.button.DigitizeButton.html">DigitizeButton</a></li><li><a href="CpsiMapview.view.button.DrawingButton.html">DrawingButton</a></li><li><a href="CpsiMapview.view.button.FeatureSelectionButton.html">FeatureSelectionButton</a></li><li><a href="CpsiMapview.view.button.HelpButton.html">HelpButton</a></li><li><a href="CpsiMapview.view.button.LoginButton.html">LoginButton</a></li><li><a href="CpsiMapview.view.button.MinimizeAllButton.html">MinimizeAllButton</a></li><li><a href="CpsiMapview.view.button.SpatialQueryButton.html">SpatialQueryButton</a></li><li><a href="CpsiMapview.view.button.SplitByClickButton.html">SplitByClickButton</a></li><li><a href="CpsiMapview.view.button.StreetViewTool.html">StreetViewTool</a></li><li><a href="CpsiMapview.view.fileupload.FileGrid.html">FileGrid</a></li><li><a href="CpsiMapview.view.fileupload.FileGridController.html">FileGridController</a></li><li><a href="CpsiMapview.view.fileupload.FileUploadWindow.html">FileUploadWindow</a></li><li><a href="CpsiMapview.view.fileupload.FileUploadWindowController.html">FileUploadWindowController</a></li><li><a href="CpsiMapview.view.fileupload.Report.html">Report</a></li><li><a href="CpsiMapview.view.from.LayerTreeFilter.html">LayerTreeFilter</a></li><li><a href="CpsiMapview.view.grid.ItemDeleter.html">ItemDeleter</a></li><li><a href="CpsiMapview.view.menuitem.LayerFilterReset.html">LayerFilterReset</a></li><li><a href="CpsiMapview.view.menuitem.LayerGrid.html">LayerGrid</a></li><li><a href="CpsiMapview.view.menuitem.LayerHelp.html">LayerHelp</a></li><li><a href="CpsiMapview.view.menuitem.LayerLabels.html">LayerLabels</a></li><li><a href="CpsiMapview.view.menuitem.LayerMetadata.html">LayerMetadata</a></li><li><a href="CpsiMapview.view.menuitem.LayerOpacity.html">LayerOpacity</a></li><li><a href="CpsiMapview.view.menuitem.LayerRefresh.html">LayerRefresh</a></li><li><a href="CpsiMapview.view.menuitem.LayerStyleSwitcher.html">LayerStyleSwitcher</a></li><li><a href="CpsiMapview.view.panel.NumericAttributeSlider.html">NumericAttributeSlider</a></li><li><a href="CpsiMapview.view.toolbar.CircleSelectionToolbar.html">CircleSelectionToolbar</a></li><li><a href="CpsiMapview.view.toolbar.MinimizedWindows.html">MinimizedWindows</a></li><li><a href="CpsiMapview.view.toolbar.ParallelLineToolbar.html">ParallelLineToolbar</a></li><li><a href="CpsiMapview.view.window.MinimizableWindow.html">MinimizableWindow</a></li><li><a href="CpsiMapview.view.window.ParallelLineWindow.html">ParallelLineWindow</a></li></ul><h3>Events</h3><ul><li><a href="global.html#event:cmv-init-layersaddedFireswhenallinitiallayersfromtheconfighavebeencreatedandaddedtotheOLmap.">cmv-init-layersadded
+Fires when all initial layers from the config have been created and added to the OL map.</a></li><li><a href="global.html#event:cmv-mapclickFireswhentheOLmapisclicked.">cmv-mapclick
+Fires when the OL map is clicked.</a></li><li><a href="global.html#event:parallelLineCreatedFires,whenanewparallellinewascreated.">parallelLineCreated
+Fires, when a new parallel line was created.</a></li></ul><h3>Global</h3><ul><li><a href="global.html#TemplatefunctioncalledbeforedoingtheGetFeatureInforequestReturnfalseifyoudon'twanttomaketheGetFeatureInforequest.">Template function called before doing the GetFeatureInfo request
+Return false if you don't want to make the GetFeatureInfo request.</a></li><li><a href="global.html#beforeSave">beforeSave</a></li><li><a href="global.html#getErrors">getErrors</a></li><li><a href="global.html#onAfterSaveSucceded">onAfterSaveSucceded</a></li><li><a href="global.html#onChange">onChange</a></li><li><a href="global.html#onFocus">onFocus</a></li><li><a href="global.html#onGroupEditToggle">onGroupEditToggle</a></li><li><a href="global.html#rawToValue">rawToValue</a></li><li><a href="global.html#setValue">setValue</a></li><li><a href="global.html#storeConfig">storeConfig</a></li><li><a href="global.html#validate">validate</a></li></ul>
+</nav>
+
+<br class="clear">
+
+<footer>
+    Documentation generated by <a href="https://github.com/jsdoc/jsdoc">JSDoc 4.0.4</a> on Mon Dec 16 2024 16:38:08 GMT+0000 (Coordinated Universal Time)
+</footer>
+
+<script> prettyPrint(); </script>
+<script src="scripts/linenumber.js"> </script>
+</body>
+</html>

@@ -1,0 +1,313 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>JSDoc: Source: util/Layer.js</title>
+
+    <script src="scripts/prettify/prettify.js"> </script>
+    <script src="scripts/prettify/lang-css.js"> </script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <link type="text/css" rel="stylesheet" href="styles/prettify-tomorrow.css">
+    <link type="text/css" rel="stylesheet" href="styles/jsdoc-default.css">
+</head>
+
+<body>
+
+<div id="main">
+
+    <h1 class="page-title">Source: util/Layer.js</h1>
+
+    
+
+
+
+    
+    <section>
+        <article>
+            <pre class="prettyprint source linenums"><code>/**
+ * Util class for working with map layers
+ *
+ * @class CpsiMapview.util.Layer
+ */
+Ext.define('CpsiMapview.util.Layer', {
+    alternateClassName: 'LayerUtil',
+    requires: [
+        'GeoExt.util.OGCFilter',
+        'CpsiMapview.util.WmsFilter'
+    ],
+    singleton: true,
+
+    /**
+     * Update a vector tile layer parameter to be sent to the server
+     * With MapServer MVT layers use the WMS protocol, but in OpenLayers these
+     * parameters are added to a URL template
+     * @param {any} layer
+     * @param {any} newParams
+     */
+    updateVectorTileParameters: function (layer, newParams) {
+
+        var source = layer.getSource();
+        var params = CpsiMapview.util.WmsFilter.getWmsParams(layer);
+
+        Ext.apply(params, newParams);
+
+        var urlParts = source.getUrls()[0].split('?');
+
+        // use decodeURI to the template holders in the url e.g. {width} are not encoded to %7Bwidth%7D
+        var queryString = decodeURI(Ext.Object.toQueryString(params));
+        var newUrl = Ext.String.format('{0}?{1}', urlParts[0], queryString);
+
+        // don't use setUrl as this seems to replace the setTileUrlFunction function
+        // set in CpsiMapview.factory.Layer
+        source.urls[0] = newUrl;
+        source.refresh();
+    },
+
+    /**
+    * Executed when this menu item is clicked.
+    * Forces redraw of the connected layer.
+    */
+    layerRefresh: function (layer) {
+
+        var source = layer.getSource();
+
+        // mostly WMS layers
+        if (layer.get('isWms') === true) {
+            var params = source.getParams();
+            params.TIMESTAMP = Ext.Date.now();
+            source.updateParams(params);
+            source.refresh();
+        } else if (layer.get('isVt') === true) {
+            CpsiMapview.util.Layer.updateVectorTileParameters(layer, { TIMESTAMP: Ext.Date.now() });
+        } else if (layer.get('isWfs') === true) {
+            if (source instanceof ol.source.Cluster) {
+                // for clustered layers we need to get the original source - see #203
+                source = source.getSource();
+            }
+            // for WFS trigger reload of source
+            source.set('timestamp', Ext.Date.now());
+            source.refresh();
+        } else {
+            // only refresh for other layers and sources (to not loose data)
+            source.refresh();
+        }
+
+        // also refresh the layer node, which updates any legend which may be broken
+        // if a user's access token expires
+        var layerUtil = CpsiMapview.util.Layer;
+        layerUtil.updateLayerNodeUI(layer);
+    },
+
+    /**
+    * Update any associated layer tree node to indicate that the layer is filtered or unfiltered
+    * @param {any} layer
+    * @param {boolean} triggerUIUpdate
+    */
+    updateLayerNodeUI: function (layer, triggerUIUpdate) {
+        // default the triggerUIUpdate param to true if not set
+        if (typeof triggerUIUpdate === 'undefined') {
+            triggerUIUpdate = true;
+        }
+
+        // Get a reference to the layer trees
+        // we will only ever have one layer tree for an application
+
+        var treePanel = Ext.ComponentQuery.query('cmv_layertree:first')[0];
+
+        if (!treePanel) {
+            Ext.log.warn('No cmv_layertree found in the application (updateLayerNodeUI)');
+            return;
+        }
+
+        var node = treePanel.getNodeForLayer(layer);
+
+        if (!node) {
+            return;
+        }
+
+        var hasFilters = false;
+
+        if (layer.get('isWms') || layer.get('isVt')) {
+            var params = CpsiMapview.util.WmsFilter.getWmsParams(layer);
+            if (params.FILTER) {
+                hasFilters = true;
+            }
+        } else if (layer.get('isWfs') === true) {
+            var source = layer.getSource();
+            if (source instanceof ol.source.Cluster) {
+                // for clustered layers we need to get the original source - see #203
+                source = source.getSource();
+            }
+            hasFilters = !Ext.isEmpty(CpsiMapview.util.Layer.getWfsFilters(source));
+        } else {
+            Ext.log.warn('Layer type not recognized (updateLayerNodeUI)');
+        }
+
+        var originalGlyph = layer.get('_origTreeConf') ? layer.get('_origTreeConf').glyph : null;
+        var expandedGlyph = 'f0b0';
+        if (hasFilters) {
+            // only set the glyph and class if needed - better for performance
+            if (node.get('glyph') !== expandedGlyph) {
+                node.set('glyph', expandedGlyph);
+                node.addCls('cpsi-tree-node-filtered');
+            }
+        } else {
+            // only set the glyph and class if needed - better for performance
+            if (node.get('glyph') !== originalGlyph) {
+                // revert to the original glyph if set on the layer
+                node.set('glyph', originalGlyph);
+                node.removeCls('cpsi-tree-node-filtered');
+            }
+        }
+
+        if (triggerUIUpdate) {
+            node.triggerUIUpdate();
+        }
+    },
+
+    /**
+     * Convert an array of Ext.util.Filter into OGC filters
+     * taking into account when filters should be combined.
+     *
+     * For example when we use the cmv_feature_selection_btn a list of IDs with an IN filter is created
+     * we need to use OR when these are combined with a spatial filter
+     *
+     * @param {any} allFilters
+     *
+    * @returns {Array} An array of all filters associated with the source as OGC FES
+     *                 strings
+     */
+    convertAndCombineFilters: function (allFilters) {
+
+        allFilters = Ext.clone(allFilters); // make a copy so the original array is unaffected
+        var allOgcFilters = [];
+
+        var fidFilter = Ext.Array.findBy(allFilters, function (f) {
+            if (f.type === 'fid') {
+                return true;
+            }
+        });
+
+        // check for any polygons created using the grid tools to filter features
+        // spatially
+        var spatialFilter = Ext.Array.findBy(allFilters, function (f) {
+            if (f.type === 'spatial') {
+                return true;
+            }
+        });
+
+        // if we have a combination of fid and spatial filters then these should be combined
+        // as an OR query rather than AND to allow features to be selected outside the polygon
+
+        if (fidFilter &amp;&amp; spatialFilter) {
+            Ext.Array.remove(allFilters, fidFilter);
+            Ext.Array.remove(allFilters, spatialFilter);
+
+            var idOgcFilterBody = GeoExt.util.OGCFilter.getOgcFilterBodyFromExtJsFilterObject(fidFilter, '2.0.0');
+            var spatialOgcFilter = GeoExt.util.OGCFilter.getOgcFilterBodyFromExtJsFilterObject(spatialFilter, '2.0.0');
+
+            // now combine the fid and spatial filters with using OR rather than AND
+            allOgcFilters.push(GeoExt.util.OGCFilter.combineFilterBodies([idOgcFilterBody, spatialOgcFilter], 'Or', false, '2.0.0'));
+        }
+
+        // for the remaining property features set by the grid convert from ExtJS filters to OGC FES strings
+        Ext.each(allFilters, function (addFilter) {
+            if (typeof addFilter === 'string') {
+                // timeFilters have already been converted to OGC FEX strings
+                //&lt;debug>
+                Ext.Assert.truthy(Ext.String.startsWith(addFilter, '&lt;ogc:'));
+                //&lt;/debug>
+                allOgcFilters.push(addFilter);
+            } else {
+                var ogcUtil = GeoExt.util.OGCFilter;
+                var serializedFilter =
+                    ogcUtil.getOgcFilterBodyFromExtJsFilterObject(addFilter, '2.0.0');
+                allOgcFilters.push(serializedFilter);
+            }
+        });
+
+        return allOgcFilters;
+
+    },
+
+
+    /**
+    * Get all filters that can be associated with a WFS layer
+    * These include the timeslider, numeric sliders and
+    * also the various filters that can be set from the cmv_grid
+    * */
+    getWfsFilters: function (layerSource) {
+
+        var allFilters = [];
+
+        // get filters from the cmv_timeslider
+        var timeFilters = layerSource.get('timeFilters');
+        if (!Ext.isEmpty(timeFilters)) {
+            allFilters = Ext.Array.merge(allFilters, timeFilters);
+        }
+
+        // get any filters from the cmv_numericattributeslider
+
+        var numericFilters = layerSource.get('numericFilters');
+
+        if (!Ext.isEmpty(numericFilters)) {
+            numericFilters = BasiGX.util.WFS.unwrapFilter(numericFilters);
+            allFilters = Ext.Array.merge(allFilters, numericFilters);
+        }
+
+        // now check for all the filters that can be set by the grid
+
+        var additionalFilters = layerSource.get('additionalFilters');
+
+        if (!Ext.isEmpty(additionalFilters)) {
+            allFilters = Ext.Array.merge(allFilters, additionalFilters);
+        }
+
+        return allFilters;
+    },
+
+    /**
+    * Creates custom filters for a vector source based on
+    * all the components which can set filters on a source
+    *
+    *
+    * @param {ol.source.Vector}  Vector layer source
+    *
+    * @returns {Array} An array of all filters associated with the source as OGC FES
+    *                  strings
+    */
+    filterVectorSource: function (layerSource) {
+
+        var allFilters = CpsiMapview.util.Layer.getWfsFilters(layerSource);
+        return CpsiMapview.util.Layer.convertAndCombineFilters(allFilters);
+    }
+});
+</code></pre>
+        </article>
+    </section>
+
+
+
+
+</div>
+
+<nav>
+    <h2><a href="index.html">Home</a></h2><h3>Classes</h3><ul><li><a href="CpsiMapview.controller.LayerTreeController.html">LayerTreeController</a></li><li><a href="CpsiMapview.controller.button.TracingMixin.html">TracingMixin</a></li><li><a href="CpsiMapview.controller.form.LayerTreeFilter.html">LayerTreeFilter</a></li><li><a href="CpsiMapview.controller.form.Login.html">Login</a></li><li><a href="CpsiMapview.controller.panel.NumericAttributeSlider.html">NumericAttributeSlider</a></li><li><a href="CpsiMapview.data.model.LayerTreeNode.html">LayerTreeNode</a></li><li><a href="CpsiMapview.factory.Layer.html">Layer</a></li><li><a href="CpsiMapview.form.ControllerMixin.html">ControllerMixin</a></li><li><a href="CpsiMapview.form.HelpMixin.html">HelpMixin</a></li><li><a href="CpsiMapview.form.LayersMixin.html">LayersMixin</a></li><li><a href="CpsiMapview.form.RightInfoField.html">RightInfoField</a></li><li><a href="CpsiMapview.form.ValidationMessagesMixin.html">ValidationMessagesMixin</a></li><li><a href="CpsiMapview.form.ViewMixin.html">ViewMixin</a></li><li><a href="CpsiMapview.form.ViewModelMixin.html">ViewModelMixin</a></li><li><a href="CpsiMapview.form.field.Combo.html">Combo</a></li><li><a href="CpsiMapview.form.field.ComboLegacy.html">ComboLegacy</a></li><li><a href="CpsiMapview.model.fileupload.Attachment.html">Attachment</a></li><li><a href="CpsiMapview.plugin.ExpandPanel.html">ExpandPanel</a></li><li><a href="CpsiMapview.plugin.FeatureAttributeGrouping.html">FeatureAttributeGrouping</a></li><li><a href="CpsiMapview.plugin.TreeColumnContextMenu.html">TreeColumnContextMenu</a></li><li><a href="CpsiMapview.store.WfsFeatures.html">WfsFeatures</a></li><li><a href="CpsiMapview.util.ColumnMenuOrderMixin.html">ColumnMenuOrderMixin</a></li><li><a href="CpsiMapview.util.EditWindowOpenerMixin.html">EditWindowOpenerMixin</a></li><li><a href="CpsiMapview.util.Layer.html">Layer</a></li><li><a href="CpsiMapview.util.LayerTreeFilter.html">LayerTreeFilter</a></li><li><a href="CpsiMapview.util.Legend.html">Legend</a></li><li><a href="CpsiMapview.util.RoleManager.html">RoleManager</a></li><li><a href="CpsiMapview.util.Style.html">Style</a></li><li><a href="CpsiMapview.util.SwitchLayer.html">SwitchLayer</a></li><li><a href="CpsiMapview.util.Tracing.html">Tracing</a></li><li><a href="CpsiMapview.util.Turf.html">Turf</a></li><li><a href="CpsiMapview.util.WmsFilter.html">WmsFilter</a></li><li><a href="CpsiMapview.util.ZoomerMixin.html">ZoomerMixin</a></li><li><a href="CpsiMapview.view.button.DigitizeButton.html">DigitizeButton</a></li><li><a href="CpsiMapview.view.button.DrawingButton.html">DrawingButton</a></li><li><a href="CpsiMapview.view.button.FeatureSelectionButton.html">FeatureSelectionButton</a></li><li><a href="CpsiMapview.view.button.HelpButton.html">HelpButton</a></li><li><a href="CpsiMapview.view.button.LoginButton.html">LoginButton</a></li><li><a href="CpsiMapview.view.button.MinimizeAllButton.html">MinimizeAllButton</a></li><li><a href="CpsiMapview.view.button.SpatialQueryButton.html">SpatialQueryButton</a></li><li><a href="CpsiMapview.view.button.SplitByClickButton.html">SplitByClickButton</a></li><li><a href="CpsiMapview.view.button.StreetViewTool.html">StreetViewTool</a></li><li><a href="CpsiMapview.view.fileupload.FileGrid.html">FileGrid</a></li><li><a href="CpsiMapview.view.fileupload.FileGridController.html">FileGridController</a></li><li><a href="CpsiMapview.view.fileupload.FileUploadWindow.html">FileUploadWindow</a></li><li><a href="CpsiMapview.view.fileupload.FileUploadWindowController.html">FileUploadWindowController</a></li><li><a href="CpsiMapview.view.fileupload.Report.html">Report</a></li><li><a href="CpsiMapview.view.from.LayerTreeFilter.html">LayerTreeFilter</a></li><li><a href="CpsiMapview.view.grid.ItemDeleter.html">ItemDeleter</a></li><li><a href="CpsiMapview.view.menuitem.LayerFilterReset.html">LayerFilterReset</a></li><li><a href="CpsiMapview.view.menuitem.LayerGrid.html">LayerGrid</a></li><li><a href="CpsiMapview.view.menuitem.LayerHelp.html">LayerHelp</a></li><li><a href="CpsiMapview.view.menuitem.LayerLabels.html">LayerLabels</a></li><li><a href="CpsiMapview.view.menuitem.LayerMetadata.html">LayerMetadata</a></li><li><a href="CpsiMapview.view.menuitem.LayerOpacity.html">LayerOpacity</a></li><li><a href="CpsiMapview.view.menuitem.LayerRefresh.html">LayerRefresh</a></li><li><a href="CpsiMapview.view.menuitem.LayerStyleSwitcher.html">LayerStyleSwitcher</a></li><li><a href="CpsiMapview.view.panel.NumericAttributeSlider.html">NumericAttributeSlider</a></li><li><a href="CpsiMapview.view.toolbar.CircleSelectionToolbar.html">CircleSelectionToolbar</a></li><li><a href="CpsiMapview.view.toolbar.MinimizedWindows.html">MinimizedWindows</a></li><li><a href="CpsiMapview.view.toolbar.ParallelLineToolbar.html">ParallelLineToolbar</a></li><li><a href="CpsiMapview.view.window.MinimizableWindow.html">MinimizableWindow</a></li><li><a href="CpsiMapview.view.window.ParallelLineWindow.html">ParallelLineWindow</a></li></ul><h3>Events</h3><ul><li><a href="global.html#event:cmv-init-layersaddedFireswhenallinitiallayersfromtheconfighavebeencreatedandaddedtotheOLmap.">cmv-init-layersadded
+Fires when all initial layers from the config have been created and added to the OL map.</a></li><li><a href="global.html#event:cmv-mapclickFireswhentheOLmapisclicked.">cmv-mapclick
+Fires when the OL map is clicked.</a></li><li><a href="global.html#event:parallelLineCreatedFires,whenanewparallellinewascreated.">parallelLineCreated
+Fires, when a new parallel line was created.</a></li></ul><h3>Global</h3><ul><li><a href="global.html#TemplatefunctioncalledbeforedoingtheGetFeatureInforequestReturnfalseifyoudon'twanttomaketheGetFeatureInforequest.">Template function called before doing the GetFeatureInfo request
+Return false if you don't want to make the GetFeatureInfo request.</a></li><li><a href="global.html#beforeSave">beforeSave</a></li><li><a href="global.html#getErrors">getErrors</a></li><li><a href="global.html#onAfterSaveSucceded">onAfterSaveSucceded</a></li><li><a href="global.html#onChange">onChange</a></li><li><a href="global.html#onFocus">onFocus</a></li><li><a href="global.html#onGroupEditToggle">onGroupEditToggle</a></li><li><a href="global.html#rawToValue">rawToValue</a></li><li><a href="global.html#setValue">setValue</a></li><li><a href="global.html#storeConfig">storeConfig</a></li><li><a href="global.html#validate">validate</a></li></ul>
+</nav>
+
+<br class="clear">
+
+<footer>
+    Documentation generated by <a href="https://github.com/jsdoc/jsdoc">JSDoc 4.0.4</a> on Mon Dec 16 2024 16:38:08 GMT+0000 (Coordinated Universal Time)
+</footer>
+
+<script> prettyPrint(); </script>
+<script src="scripts/linenumber.js"> </script>
+</body>
+</html>

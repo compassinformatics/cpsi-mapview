@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>JSDoc: Source: view/layer/ToolTip.js</title>
+
+    <script src="scripts/prettify/prettify.js"> </script>
+    <script src="scripts/prettify/lang-css.js"> </script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <link type="text/css" rel="stylesheet" href="styles/prettify-tomorrow.css">
+    <link type="text/css" rel="stylesheet" href="styles/jsdoc-default.css">
+</head>
+
+<body>
+
+<div id="main">
+
+    <h1 class="page-title">Source: view/layer/ToolTip.js</h1>
+
+    
+
+
+
+    
+    <section>
+        <article>
+            <pre class="prettyprint source linenums"><code>/**
+ * Mouse tooltip for a vector layer to show layer/feature information on the
+ * map. For example show attributes when feature gets hovered with the mouse.
+ */
+Ext.define('CpsiMapview.view.layer.ToolTip', {
+    extend: 'Ext.tip.Tip',
+    xtype: 'cmv_layer_tooltip',
+    requires: [
+    ],
+
+    /** @cfg The offset from the event's mouse x-position */
+    offsetX: 10,
+
+    /** @cfg The offset from the event's mouse y-position */
+    offsetY: 10,
+
+    /**
+     * The tooltip configuration from the layer JSON-configuration
+     * @cfg {Object}
+     */
+    toolTipConfig: null,
+
+    /**
+     * Layer refrence for which this tooltip shows the content
+     * @cfg {ol.layer.Base}
+     */
+    layer: null,
+
+    /**
+     * Custom background color of this tooltip
+     * @property {String} Color
+     */
+    bgColor: null,
+
+    /**
+     * Custom text color of this tooltip
+     * @property {String} Color
+     */
+    textColor: null,
+
+    /**
+     * Custom bold font weight of this tooltip
+     * @property {Boolean} true=bold
+     */
+    bold: false,
+
+    /**
+     * Custom background opacity of this tooltip
+     * @property {Number} Opacity between 0 and 1
+     */
+    opacity: null,
+
+    statics: {
+        /**
+         * Hides all layer tooltips.
+         */
+        clear: function () {
+            var ttips = Ext.ComponentQuery.query('cmv_layer_tooltip');
+            Ext.each(ttips, function (tip) {
+                tip.hide();
+            });
+        }
+    },
+
+    constructor: function (config) {
+        var me = this;
+
+        config.style = {
+            backgroundColor: config.bgColor,
+            color: config.textColor,
+            fontWeight: config.bold ? 'bold' : undefined,
+            opacity: config.opacity
+        };
+
+        me.callParent([config]);
+    },
+
+    /**
+     * Draws a tooltip at the given event position.
+     * The content is derived from the #formatFunction.
+     *
+     * @param {ol.Feature} feature The feature to draw the tooltip for
+     * @param {ol.MapBrowserEvent} evt The MapBrowserEvent event of OpenLayers
+     */
+    draw: function (feature, evt) {
+        var me = this;
+        var featureCluster = feature.getProperties().features;
+
+        // care about clustered features
+        if (featureCluster) {
+            // in this case take the first feature in the cluster to define the
+            // tooltip text
+            if (featureCluster.length > 0) {
+                feature = featureCluster[0];
+            } else {
+                Ext.log.error('No cluster features found');
+            }
+        }
+
+        // check for layer's formatFunction
+        var html;
+        if (me.layer &amp;&amp; Ext.isFunction(me.layer.formatFunction)) {
+            // the layer has its own formatFunction, do not use the default one
+            html = me.layer.formatFunction(feature);
+        } else {
+            html = me.formatFunction(feature);
+        }
+
+        // set HTML content
+        me.setHtml(html);
+
+        // show tooltip near mouse pointer
+        var screenX = evt.originalEvent.pageX + me.offsetX;
+        var screenY = evt.originalEvent.pageY + me.offsetY;
+        me.showAt([screenX, screenY]);
+
+        // extjs has somehow problems with the very first render of the tooltip
+        if (me.__initialized === undefined) {
+            me.__initialized = true;
+            me.hide();
+            setTimeout(function () {
+                me.show();
+            }, 200);
+        }
+    },
+
+    /**
+     * Tranforms the feature's attributes to the wanted HTML structure shown in
+     * this tooltip.
+     * This function can be overridden if different HTML is needed for a custom
+     * layer.
+     * @param  {ol.Feature} feature The feature to get the HTML for
+     * @return {String}             HTML code as text
+     */
+    formatFunction: function (feature) {
+        var me = this;
+        var htmlParts = [];
+        var htmlPart;
+
+        Ext.each(me.toolTipConfig, function (tipConf) {
+            if (tipConf.thumbnail &amp;&amp; tipConf.property) {
+                var antiCache = new Date().getTime();
+                var onError = 'this.style.display =\'none\'';
+                var style = 'width:120px; height:90px;';
+                var url = Ext.String.format(tipConf.thumbnail, feature.get(tipConf.property));
+                htmlPart = Ext.String.format('&lt;img src="{0}?_ac={1}" onerror="{2}" style="{3}"/>',
+                    url, antiCache, onError, style);
+            } else {
+                var key = tipConf.alias || tipConf.property;
+                var value = feature.get(tipConf.property);
+                htmlPart = Ext.String.format('&lt;b>{0}: &lt;/b>{1}', key, value);
+            }
+
+            if (String(value) === '-999') {
+                // HACK
+                // -999 is the default value used for NULLs so WFS layers can
+                // work with MapInfo as TAB files don't allow NULL values
+                value = null;
+            }
+
+            htmlParts.push(htmlPart);
+        });
+
+        return htmlParts.join('&lt;br/>');
+    }
+});
+</code></pre>
+        </article>
+    </section>
+
+
+
+
+</div>
+
+<nav>
+    <h2><a href="index.html">Home</a></h2><h3>Classes</h3><ul><li><a href="CpsiMapview.controller.LayerTreeController.html">LayerTreeController</a></li><li><a href="CpsiMapview.controller.button.TracingMixin.html">TracingMixin</a></li><li><a href="CpsiMapview.controller.form.LayerTreeFilter.html">LayerTreeFilter</a></li><li><a href="CpsiMapview.controller.form.Login.html">Login</a></li><li><a href="CpsiMapview.controller.panel.NumericAttributeSlider.html">NumericAttributeSlider</a></li><li><a href="CpsiMapview.data.model.LayerTreeNode.html">LayerTreeNode</a></li><li><a href="CpsiMapview.factory.Layer.html">Layer</a></li><li><a href="CpsiMapview.form.ControllerMixin.html">ControllerMixin</a></li><li><a href="CpsiMapview.form.HelpMixin.html">HelpMixin</a></li><li><a href="CpsiMapview.form.LayersMixin.html">LayersMixin</a></li><li><a href="CpsiMapview.form.RightInfoField.html">RightInfoField</a></li><li><a href="CpsiMapview.form.ValidationMessagesMixin.html">ValidationMessagesMixin</a></li><li><a href="CpsiMapview.form.ViewMixin.html">ViewMixin</a></li><li><a href="CpsiMapview.form.ViewModelMixin.html">ViewModelMixin</a></li><li><a href="CpsiMapview.form.field.Combo.html">Combo</a></li><li><a href="CpsiMapview.form.field.ComboLegacy.html">ComboLegacy</a></li><li><a href="CpsiMapview.model.fileupload.Attachment.html">Attachment</a></li><li><a href="CpsiMapview.plugin.ExpandPanel.html">ExpandPanel</a></li><li><a href="CpsiMapview.plugin.FeatureAttributeGrouping.html">FeatureAttributeGrouping</a></li><li><a href="CpsiMapview.plugin.TreeColumnContextMenu.html">TreeColumnContextMenu</a></li><li><a href="CpsiMapview.store.WfsFeatures.html">WfsFeatures</a></li><li><a href="CpsiMapview.util.ColumnMenuOrderMixin.html">ColumnMenuOrderMixin</a></li><li><a href="CpsiMapview.util.EditWindowOpenerMixin.html">EditWindowOpenerMixin</a></li><li><a href="CpsiMapview.util.Layer.html">Layer</a></li><li><a href="CpsiMapview.util.LayerTreeFilter.html">LayerTreeFilter</a></li><li><a href="CpsiMapview.util.Legend.html">Legend</a></li><li><a href="CpsiMapview.util.RoleManager.html">RoleManager</a></li><li><a href="CpsiMapview.util.Style.html">Style</a></li><li><a href="CpsiMapview.util.SwitchLayer.html">SwitchLayer</a></li><li><a href="CpsiMapview.util.Tracing.html">Tracing</a></li><li><a href="CpsiMapview.util.Turf.html">Turf</a></li><li><a href="CpsiMapview.util.WmsFilter.html">WmsFilter</a></li><li><a href="CpsiMapview.util.ZoomerMixin.html">ZoomerMixin</a></li><li><a href="CpsiMapview.view.button.DigitizeButton.html">DigitizeButton</a></li><li><a href="CpsiMapview.view.button.DrawingButton.html">DrawingButton</a></li><li><a href="CpsiMapview.view.button.FeatureSelectionButton.html">FeatureSelectionButton</a></li><li><a href="CpsiMapview.view.button.HelpButton.html">HelpButton</a></li><li><a href="CpsiMapview.view.button.LoginButton.html">LoginButton</a></li><li><a href="CpsiMapview.view.button.MinimizeAllButton.html">MinimizeAllButton</a></li><li><a href="CpsiMapview.view.button.SpatialQueryButton.html">SpatialQueryButton</a></li><li><a href="CpsiMapview.view.button.SplitByClickButton.html">SplitByClickButton</a></li><li><a href="CpsiMapview.view.button.StreetViewTool.html">StreetViewTool</a></li><li><a href="CpsiMapview.view.fileupload.FileGrid.html">FileGrid</a></li><li><a href="CpsiMapview.view.fileupload.FileGridController.html">FileGridController</a></li><li><a href="CpsiMapview.view.fileupload.FileUploadWindow.html">FileUploadWindow</a></li><li><a href="CpsiMapview.view.fileupload.FileUploadWindowController.html">FileUploadWindowController</a></li><li><a href="CpsiMapview.view.fileupload.Report.html">Report</a></li><li><a href="CpsiMapview.view.from.LayerTreeFilter.html">LayerTreeFilter</a></li><li><a href="CpsiMapview.view.grid.ItemDeleter.html">ItemDeleter</a></li><li><a href="CpsiMapview.view.menuitem.LayerFilterReset.html">LayerFilterReset</a></li><li><a href="CpsiMapview.view.menuitem.LayerGrid.html">LayerGrid</a></li><li><a href="CpsiMapview.view.menuitem.LayerHelp.html">LayerHelp</a></li><li><a href="CpsiMapview.view.menuitem.LayerLabels.html">LayerLabels</a></li><li><a href="CpsiMapview.view.menuitem.LayerMetadata.html">LayerMetadata</a></li><li><a href="CpsiMapview.view.menuitem.LayerOpacity.html">LayerOpacity</a></li><li><a href="CpsiMapview.view.menuitem.LayerRefresh.html">LayerRefresh</a></li><li><a href="CpsiMapview.view.menuitem.LayerStyleSwitcher.html">LayerStyleSwitcher</a></li><li><a href="CpsiMapview.view.panel.NumericAttributeSlider.html">NumericAttributeSlider</a></li><li><a href="CpsiMapview.view.toolbar.CircleSelectionToolbar.html">CircleSelectionToolbar</a></li><li><a href="CpsiMapview.view.toolbar.MinimizedWindows.html">MinimizedWindows</a></li><li><a href="CpsiMapview.view.toolbar.ParallelLineToolbar.html">ParallelLineToolbar</a></li><li><a href="CpsiMapview.view.window.MinimizableWindow.html">MinimizableWindow</a></li><li><a href="CpsiMapview.view.window.ParallelLineWindow.html">ParallelLineWindow</a></li></ul><h3>Events</h3><ul><li><a href="global.html#event:cmv-init-layersaddedFireswhenallinitiallayersfromtheconfighavebeencreatedandaddedtotheOLmap.">cmv-init-layersadded
+Fires when all initial layers from the config have been created and added to the OL map.</a></li><li><a href="global.html#event:cmv-mapclickFireswhentheOLmapisclicked.">cmv-mapclick
+Fires when the OL map is clicked.</a></li><li><a href="global.html#event:parallelLineCreatedFires,whenanewparallellinewascreated.">parallelLineCreated
+Fires, when a new parallel line was created.</a></li></ul><h3>Global</h3><ul><li><a href="global.html#TemplatefunctioncalledbeforedoingtheGetFeatureInforequestReturnfalseifyoudon'twanttomaketheGetFeatureInforequest.">Template function called before doing the GetFeatureInfo request
+Return false if you don't want to make the GetFeatureInfo request.</a></li><li><a href="global.html#beforeSave">beforeSave</a></li><li><a href="global.html#getErrors">getErrors</a></li><li><a href="global.html#onAfterSaveSucceded">onAfterSaveSucceded</a></li><li><a href="global.html#onChange">onChange</a></li><li><a href="global.html#onFocus">onFocus</a></li><li><a href="global.html#onGroupEditToggle">onGroupEditToggle</a></li><li><a href="global.html#rawToValue">rawToValue</a></li><li><a href="global.html#setValue">setValue</a></li><li><a href="global.html#storeConfig">storeConfig</a></li><li><a href="global.html#validate">validate</a></li></ul>
+</nav>
+
+<br class="clear">
+
+<footer>
+    Documentation generated by <a href="https://github.com/jsdoc/jsdoc">JSDoc 4.0.4</a> on Mon Dec 16 2024 16:38:08 GMT+0000 (Coordinated Universal Time)
+</footer>
+
+<script> prettyPrint(); </script>
+<script src="scripts/linenumber.js"> </script>
+</body>
+</html>
