@@ -349,7 +349,7 @@ Ext.define('CpsiMapview.factory.Layer', {
         olSourceConf.params = Ext.apply(olSourceConf.params, serverOptions);
 
         if (!olSourceConf.params.LAYERS) {
-            Ext.log.warn('LAYERS parameter not set on WMS');
+            Ext.log.warn('LAYERS parameter not set on WMS for key: ' + layerConf.layerKey);
         }
 
         olSourceConf = Ext.apply(olSourceConf, olSourceProps);
