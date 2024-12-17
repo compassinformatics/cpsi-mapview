@@ -180,7 +180,7 @@ Ext.define('CpsiMapview.form.ViewMixin', {
         toggleGroup: 'map',
         apiUrl: '/WebServices/roadschedule/cutWithPolygon',
         resetOnToggle: false,
-        iconCls: 'x-fa fa-circle-thin',
+        iconCls: 'x-far fa-circle',
         listeners: {
             toggle: 'onDigitizingToolToggle'
         },
@@ -198,7 +198,7 @@ Ext.define('CpsiMapview.form.ViewMixin', {
         tooltip: 'Create points by clicking on the map',
         toggleGroup: 'map',
         resetOnToggle: false,
-        iconCls: 'x-fa fa-circle-thin',
+        iconCls: 'x-far fa-circle',
         bind: {
             drawLayer: '{resultLayer}',
             disabled: '{isLocked}',
