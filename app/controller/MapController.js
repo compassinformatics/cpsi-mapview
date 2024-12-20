@@ -122,9 +122,9 @@ Ext.define('CpsiMapview.controller.MapController', {
 
             // if the record is not already opened, create a new window and load the record
             if (win === null) {
-                win = Ext.create(editWindowClass);
                 modelPrototype.load(recId, {
                     success: function (rec) {
+                        win = Ext.create(editWindowClass);
                         var vm = win.getViewModel();
                         vm.set('currentRecord', rec);
                         win.show();
