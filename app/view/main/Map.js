@@ -16,7 +16,7 @@ Ext.define('CpsiMapview.view.main.Map', {
         'CpsiMapview.controller.MapController',
         'CpsiMapview.plugin.FeatureInfoWindow',
 
-        'BasiGX.util.Projection',
+        'BasiGX.store.Projections',
         'CpsiMapview.plugin.FeatureAttributeGrouping',
         'CpsiMapview.util.SwitchLayer'
     ],
@@ -223,6 +223,43 @@ Ext.define('CpsiMapview.view.main.Map', {
         proj4.defs('EPSG:102100', '+proj=merc +a=6378137 +b=6378137 +lat_ts=0.0 +lon_0=0.0 +x_0=0.0 +y_0=0 +k=1.0 +units=m +nadgrids=@null +wktext  +no_defs');
 
         ol.proj.proj4.register(proj4);
+
+        var projectionsStore = BasiGX.store.Projections;
+        // load proj4 settings into the global BasiGX.store.Projections store to avoid
+        // calls to epsg.io by BasiGX.view.panel.CoordinateMousePositionPanel
+        // see https://github.com/terrestris/BasiGX/pull/720
+        // for the formats below see the JSON returned by https://epsg.io/?q=4326&format=json
+        // however this will be deprecated on 1/2/2025, see https://github.com/terrestris/BasiGX/issues/753
+        projectionsStore.loadData([{
+            code: 4326,
+            name: 'WGS 84',
+            proj4: '+proj=longlat +datum=WGS84 +no_defs +type=crs',
+            unit: 'degree (supplier to define representation)',
+        }, {
+            code: 3857,
+            name: 'WGS 84 / Pseudo-Mercator',
+            proj4: '+proj=merc +a=6378137 +b=6378137 +lat_ts=0 +lon_0=0 +x_0=0 +y_0=0 +k=1 +units=m +nadgrids=@null +wktext +no_defs +type=crs',
+            unit: 'metre'
+        },
+        {
+            code: 29902,
+            name: 'TM65 / Irish Grid',
+            proj4: '+proj=tmerc +lat_0=53.5 +lon_0=-8 +k=1.000035 +x_0=200000 +y_0=250000 +a=6377340.189 +rf=299.3249646 +towgs84=482.5,-130.6,564.6,-1.042,-0.214,-0.631,8.15 +units=m +no_defs +type=crs',
+            unit: 'metre'
+        },
+        {
+            code: 2157,
+            name: 'IRENET95 / Irish Transverse Mercator',
+            proj4: '+proj=tmerc +lat_0=53.5 +lon_0=-8 +k=0.99982 +x_0=600000 +y_0=750000 +ellps=GRS80 +towgs84=0,0,0,0,0,0,0 +units=m +no_defs +type=crs',
+            unit: 'metre'
+        },
+        {
+            code: 27700,
+            name: 'OSGB36 / British National Grid',
+            proj4: '+proj=tmerc +lat_0=49 +lon_0=-2 +k=0.9996012717 +x_0=400000 +y_0=-100000 +ellps=airy +nadgrids=OSTN15_NTv2_OSGBtoETRS.gsb +units=m +no_defs +type=crs',
+            unit: 'metre'
+        }
+        ]);
 
         // use app settings when available for zoom and center
         var viewConfig = {};
