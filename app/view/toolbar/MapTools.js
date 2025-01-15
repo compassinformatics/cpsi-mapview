@@ -18,6 +18,7 @@ Ext.define('CpsiMapview.view.toolbar.MapTools', {
         'CpsiMapview.controller.toolbar.MapTools',
         'CpsiMapview.model.toolbar.MapToolsModel',
         'CpsiMapview.view.combo.Gazetteer',
+        'CpsiMapview.view.button.PermalinkButton',
         'CpsiMapview.view.button.StreetViewTool',
         'CpsiMapview.view.panel.TimeSlider',
         'CpsiMapview.view.panel.NumericAttributeSlider',
@@ -152,6 +153,9 @@ Ext.define('CpsiMapview.view.toolbar.MapTools', {
                         this.getController().onResponseFeatures();
                     }
                 }
+            }, {
+                xtype: 'cmv_permalink_button',
+                dialogWidth: 500
             }, {
                 xtype: 'cmv_streetview_tool',
                 toggleGroup: 'map',
