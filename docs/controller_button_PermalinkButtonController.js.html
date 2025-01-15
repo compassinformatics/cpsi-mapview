@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="utf-8">
-    <title>JSDoc: Source: util/ColumnMenuOrderMixin.js</title>
+    <title>JSDoc: Source: controller/button/PermalinkButtonController.js</title>
 
     <script src="scripts/prettify/prettify.js"> </script>
     <script src="scripts/prettify/lang-css.js"> </script>
@@ -17,7 +17,7 @@
 
 <div id="main">
 
-    <h1 class="page-title">Source: util/ColumnMenuOrderMixin.js</h1>
+    <h1 class="page-title">Source: controller/button/PermalinkButtonController.js</h1>
 
     
 
@@ -27,59 +27,48 @@
     <section>
         <article>
             <pre class="prettyprint source linenums"><code>/**
- * A mixin to order column selector menu alphabetically
- *
- * @class CpsiMapview.util.ColumnMenuOrderMixin
+ * This class is the controller for the {@link CpsiMapview.view.button.PermalinkButton} button.
  */
-Ext.define('CpsiMapview.util.ColumnMenuOrderMixin', {
-    extend: 'Ext.Mixin',
+Ext.define('CpsiMapview.controller.button.PermalinkButtonController', {
+    extend: 'Ext.app.ViewController',
 
-    mixinConfig: {
-        after: {
-            initItems: 'setup'
-        },
-        before: {
-            destroy: 'teardown'
-        }
-    },
-
-    setup: function () {
-        var me = this;
-        me.on('headermenucreate', this.onHeaderMenuCreate);
-    },
-
-    teardown: function () {
-        var me = this;
-        me.un('headermenucreate', this.onHeaderMenuCreate);
-    },
-
+    alias: 'controller.cmv_permalink_button',
     /**
-     * Sort the column names displayed when opening the submenu alphabetically
-     * @param {any} grid
-     * @param {any} menu
-     */
-    onHeaderMenuCreate: function (grid, menu) {
-        // Fired immediately after the column header menu is created.
-        var columnItems = menu.down('[itemId=columnItem]'),
-            menuItems = columnItems.menu.items.items;
+    * Zoom to a permalink
+    **/
+    onPermalinkClick: function () {
 
-        // Sorting by column's lowercase "text" in ascending order
-        menuItems.sort(function (item1, item2) {
-            var name1 = item1.text.toLowerCase(),
-                name2 = item2.text.toLowerCase();
-            if (name1 &lt; name2) //sort string ascending
-                return -1;
-            if (name1 > name2)
-                return 1;
-            return 0; //default return value (no sorting)
-        });
+        const me = this;
+        const defaultValue = window.location.href;
+        const dialogWidth = me.getView().dialogWidth;
+        const cfg = {
+            prompt: true,
+            title: 'Zoom to Permalink',
+            minWidth: dialogWidth,
+            message: 'Please enter the permalink below:',
+            buttons: Ext.Msg.OKCANCEL,
+            callback: function (btn, text) {
+                if (btn == 'ok') {
+                    var map = me.getView().up('cmv_map');
+                    var parts = text.split('#map='); // only get the permalink from the URL
+                    var permalink = null;
 
-        // update keys order as well otherwise it will have old
-        // menu item keys order and grouping by field starts creating a problem.
-        columnItems.menu.items.keys = menuItems.map(function (item) {
-            return item.id;
-        });
-    }
+                    if (parts.length === 2) {
+                        permalink = parts[1];
+                        map.mapCmp.applyState(
+                            map.permalinkProvider.readPermalinkHash(permalink)
+                        );
+                    }
+                }
+            },
+            scope: me,
+            multiline: false,
+            value: defaultValue
+        };
+
+        Ext.Msg.prompt(cfg);
+    },
+
 });
 </code></pre>
         </article>
