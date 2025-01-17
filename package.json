@@ -1,6 +1,6 @@
 {
   "name": "@compassinformatics/cpsi-mapview",
-  "version": "1.5.1",
+  "version": "1.5.3",
   "description": "An application using GeoExt and BasiGX",
   "directories": {
     "lib": "lib"
@@ -29,7 +29,7 @@
   "dependencies": {
     "@geoext/geoext": "github:geoext/geoext#v7.0.0",
     "@ogc-schemas/ogc-schemas": "^3.0.0",
-    "@terrestris/basigx": "5.0",
+    "@terrestris/basigx": "github:compassinformatics/basigx#master",
     "@turf/line-offset": "^7.1.0",
     "browserify": "^17.0.1",
     "font-gis": "^1.0.6",
