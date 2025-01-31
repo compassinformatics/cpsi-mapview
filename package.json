@@ -1,6 +1,6 @@
 {
   "name": "@compassinformatics/cpsi-mapview",
-  "version": "1.5.3",
+  "version": "1.5.4",
   "description": "An application using GeoExt and BasiGX",
   "directories": {
     "lib": "lib"
