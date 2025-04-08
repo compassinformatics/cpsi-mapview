@@ -186,12 +186,17 @@ Ext.define('CpsiMapview.controller.grid.GroupEditMixin', {
             buttons: Ext.Msg.YESNO,
             scope: me,
             fn: function (buttonId) {
+                var idProperty, serviceUrl;
+                var data = {};
 
                 if (buttonId == 'yes') {
+                    idProperty = activeHeader.groupEditIdProperty || me.getViewModel().get('idProperty');
 
-                    var data = {};
-                    var idProperty = me.getViewModel().get('idProperty');
-                    var serviceUrl = me.getViewModel().get('serviceUrl') + activeHeader.groupEditService;
+                    if (activeHeader.groupEditService.charAt(0) === '/') {
+                        serviceUrl = activeHeader.groupEditService;
+                    } else {
+                        serviceUrl = me.getViewModel().get('serviceUrl') + activeHeader.groupEditService;
+                    }
 
                     // first char to lower case to match backend naming
                     idProperty = idProperty[0].toLowerCase() + idProperty.slice(1);
