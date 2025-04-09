@@ -100,7 +100,11 @@ Ext.define('CpsiMapview.form.ViewModelMixin', {
                 },
                 get: function (data) {
                     var layer = data.resultLayer;
-                    return layer.get('selectStyle');
+                    if (layer) {
+                        return layer.get('selectStyle');
+                    } else {
+                        return null;
+                    }
                 }
             },
 
