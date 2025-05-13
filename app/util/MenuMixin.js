@@ -1,4 +1,4 @@
-﻿Ext.define('CpsiMapview.util.MenuMixin', {
+Ext.define('CpsiMapview.util.MenuMixin', {
     extend: 'Ext.Mixin',
     requires: [
         'BasiGX.util.Layer',
@@ -33,6 +33,13 @@
         if (!vm.get('currentRecord')) {
             // for a new window set the currentRecord to the model
             vm.set('currentRecord', record);
+        } else {
+            // we can destroy the record as it is already in the window
+            var currentRecord = vm.get('currentRecord');
+            if (currentRecord.getId() === record.getId()) {
+                // check again that the Ids match
+                record.destroy();
+            }
         }
 
         win.show();
