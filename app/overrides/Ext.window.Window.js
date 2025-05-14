@@ -6,7 +6,6 @@
  */
 Ext.override(Ext.window.Window, {
     createGhost: function () {
-
         // original function
         //var ghost = this.callParent(arguments);
 
@@ -15,8 +14,8 @@ Ext.override(Ext.window.Window, {
 
         //return ghost;
 
-        var ghost = this.callParent(arguments);
-        var me = this;
+        const ghost = this.callParent(arguments);
+        const me = this;
         ghost.x = me.getX();
         ghost.y = me.getY();
 

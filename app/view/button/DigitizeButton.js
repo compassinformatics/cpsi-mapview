@@ -71,9 +71,9 @@ Ext.define('CpsiMapview.view.button.DigitizeButton', {
         }),
 
         /**
-        * The default style to use for features drawn with the digitizing tools
-        * e.g. the polygons and circles used for selecting features
-        */
+         * The default style to use for features drawn with the digitizing tools
+         * e.g. the polygons and circles used for selecting features
+         */
         drawLayerStyle: null,
 
         /**
@@ -121,9 +121,9 @@ Ext.define('CpsiMapview.view.button.DigitizeButton', {
         drawLayer: null,
 
         /**
-        * Should the results and draw layers be reset if the
-        * tool is deactivated?
-        */
+         * Should the results and draw layers be reset if the
+         * tool is deactivated?
+         */
         resetOnToggle: true
     },
 

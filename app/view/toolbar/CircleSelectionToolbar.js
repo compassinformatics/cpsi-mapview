@@ -48,14 +48,16 @@ Ext.define('CpsiMapview.view.toolbar.CircleSelectionToolbar', {
                 change: 'onRadiusChange',
                 keypress: 'handleEnterKey'
             }
-        }, {
+        },
+        {
             xtype: 'button',
             text: 'Apply',
             handler: 'handleApply',
             bind: {
                 disabled: '{!radius}'
             }
-        }, {
+        },
+        {
             xtype: 'button',
             text: 'Cancel',
             handler: 'handleCancel'

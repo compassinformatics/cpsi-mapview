@@ -47,60 +47,65 @@ Ext.define('CpsiMapview.view.toolbar.ParallelLineToolbar', {
         offsetUnit: 'meters'
     },
 
-    items: [{
-        xtype: 'numberfield',
-        bind: {
-            fieldLabel: '{offsetLabel}',
-            value: '{offset}',
+    items: [
+        {
+            xtype: 'numberfield',
+            bind: {
+                fieldLabel: '{offsetLabel}',
+                value: '{offset}'
+            },
+            listeners: {
+                change: function () {
+                    const toolbar = this.up('cmv_parallel_line_toolbar');
+
+                    const vm = toolbar.getViewModel();
+                    if (!vm) {
+                        return;
+                    }
+                    const parallelFeature = vm.get('parallelFeature');
+                    if (!parallelFeature) {
+                        return;
+                    }
+
+                    toolbar.createParallelFeature();
+                }
+            }
         },
-        listeners: {
-            change: function () {
-                var toolbar = this.up('cmv_parallel_line_toolbar');
-
-                var vm = toolbar.getViewModel();
-                if (!vm) {
-                    return;
-                }
-                var parallelFeature = vm.get('parallelFeature');
-                if (!parallelFeature) {
-                    return;
-                }
-
+        {
+            iconCls: 'fg-copy-line',
+            bind: {
+                tooltip: '{parallelTooltip}',
+                disabled: '{!feature}'
+            },
+            handler: function () {
+                const toolbar = this.up('cmv_parallel_line_toolbar');
                 toolbar.createParallelFeature();
             }
         }
-    }, {
-        iconCls: 'fg-copy-line',
-        bind: {
-            tooltip: '{parallelTooltip}',
-            disabled: '{!feature}'
-        },
-        handler: function() {
-            var toolbar = this.up('cmv_parallel_line_toolbar');
-            toolbar.createParallelFeature();
-        }
-    }],
+    ],
 
     applyFeature: function (feature) {
         if (!feature) {
             return;
         }
-        var geometry = feature.getGeometry();
+        const geometry = feature.getGeometry();
         if (!geometry) {
             Ext.log.warn('Feature has no geometry.');
             return;
         }
 
-        var geomType = geometry.getType();
+        const geomType = geometry.getType();
         if (geomType !== 'LineString' && geomType !== 'MultiLineString') {
-            Ext.log.warn('Unsupported feature geometry. Geometry must be of type "LineString" or "MultiLineString".');
+            Ext.log.warn(
+                'Unsupported feature geometry. Geometry must be of type "LineString" or "MultiLineString".'
+            );
             return;
         }
         return feature;
     },
 
     updateFeature: function (newFeature) {
-        var vm = this.getViewModel();
+        const vm = this.getViewModel();
         if (!vm) {
             return;
         }
@@ -113,13 +118,19 @@ Ext.define('CpsiMapview.view.toolbar.ParallelLineToolbar', {
             Ext.log.warn('offsetUnit is empty or undefined');
             return;
         }
-        var supportedUnits = [
-            'degrees', 'radians', 'miles', 'kilometers', 'inches',
-            'yards', 'meters'
+        const supportedUnits = [
+            'degrees',
+            'radians',
+            'miles',
+            'kilometers',
+            'inches',
+            'yards',
+            'meters'
         ];
         if (supportedUnits.indexOf(offsetUnit) === -1) {
             Ext.log.warn(
-                'Provided offsetUnit not supported. Must be one of: ' + supportedUnits
+                'Provided offsetUnit not supported. Must be one of: ' +
+                    supportedUnits
             );
             return;
         }
@@ -133,29 +144,34 @@ Ext.define('CpsiMapview.view.toolbar.ParallelLineToolbar', {
      *
      * @returns {void}
      */
-    createParallelFeature: function() {
-        var vm = this.getViewModel();
+    createParallelFeature: function () {
+        const vm = this.getViewModel();
         if (!vm) {
             return;
         }
-        var feature = vm.get('feature');
+        const feature = vm.get('feature');
         if (!feature) {
             return;
         }
 
-        var offset = vm.get('offset');
+        const offset = vm.get('offset');
         if (offset === null) {
             return;
         }
 
-        var map = BasiGX.view.component.Map.guess().getMap();
+        const map = BasiGX.view.component.Map.guess().getMap();
         if (!map) {
             return;
         }
 
-        var offsetUnit = this.getOffsetUnit();
-        var turfUtil = CpsiMapview.util.Turf;
-        var parallelFeature = turfUtil.createParallelFeature(map, feature, offset, offsetUnit);
+        const offsetUnit = this.getOffsetUnit();
+        const turfUtil = CpsiMapview.util.Turf;
+        const parallelFeature = turfUtil.createParallelFeature(
+            map,
+            feature,
+            offset,
+            offsetUnit
+        );
         vm.set('parallelFeature', parallelFeature);
         this.fireEvent('parallelLineCreated', parallelFeature);
     }

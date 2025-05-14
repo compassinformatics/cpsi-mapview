@@ -8,13 +8,13 @@
      * @param {any} filter
      */
     setValue: function (filter) {
-        var me = this;
+        const me = this;
 
         // values are in the format {lt: Wed Oct 07 2020 00:00:00 GMT+0200 (Central European Summer Time)}
-        var key = Object.keys(filter)[0];
-        var val = filter[key];
+        const key = Object.keys(filter)[0];
+        let val = filter[key];
         if (val) {
-            if (me.getGridStore().remoteFilter === true ) {
+            if (me.getGridStore().remoteFilter === true) {
                 // we only want to convert to string when sending to mapserver
                 val = Ext.Date.format(val, me.dateFormat);
             }

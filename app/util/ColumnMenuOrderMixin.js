@@ -16,12 +16,12 @@ Ext.define('CpsiMapview.util.ColumnMenuOrderMixin', {
     },
 
     setup: function () {
-        var me = this;
+        const me = this;
         me.on('headermenucreate', this.onHeaderMenuCreate);
     },
 
     teardown: function () {
-        var me = this;
+        const me = this;
         me.un('headermenucreate', this.onHeaderMenuCreate);
     },
 
@@ -32,17 +32,17 @@ Ext.define('CpsiMapview.util.ColumnMenuOrderMixin', {
      */
     onHeaderMenuCreate: function (grid, menu) {
         // Fired immediately after the column header menu is created.
-        var columnItems = menu.down('[itemId=columnItem]'),
+        const columnItems = menu.down('[itemId=columnItem]'),
             menuItems = columnItems.menu.items.items;
 
         // Sorting by column's lowercase "text" in ascending order
         menuItems.sort(function (item1, item2) {
-            var name1 = item1.text.toLowerCase(),
+            const name1 = item1.text.toLowerCase(),
                 name2 = item2.text.toLowerCase();
-            if (name1 < name2) //sort string ascending
+            if (name1 < name2)
+                //sort string ascending
                 return -1;
-            if (name1 > name2)
-                return 1;
+            if (name1 > name2) return 1;
             return 0; //default return value (no sorting)
         });
 

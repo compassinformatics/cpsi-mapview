@@ -33,7 +33,7 @@ Ext.define('CpsiMapview.util.Style', {
                 points: 3,
                 radius: 5,
                 rotation: 0,
-                angle: 0,
+                angle: 0
             })
         });
     },
@@ -50,7 +50,7 @@ Ext.define('CpsiMapview.util.Style', {
                 }),
                 points: 4,
                 radius: 5,
-                angle: Math.PI / 4,
+                angle: Math.PI / 4
             })
         });
     },
@@ -67,7 +67,7 @@ Ext.define('CpsiMapview.util.Style', {
                 }),
                 points: 4,
                 radius: 10,
-                angle: Math.PI / 4,
+                angle: Math.PI / 4
             })
         });
     },
@@ -91,7 +91,7 @@ Ext.define('CpsiMapview.util.Style', {
                 points: 4,
                 radius: 10,
                 radius2: 0,
-                angle: 0,
+                angle: 0
             })
         });
     },
@@ -105,7 +105,7 @@ Ext.define('CpsiMapview.util.Style', {
                 points: 5,
                 radius: 10,
                 radius2: 0,
-                angle: 0,
+                angle: 0
             })
         });
     },
@@ -130,12 +130,12 @@ Ext.define('CpsiMapview.util.Style', {
             image: new ol.style.Circle({
                 radius: 3,
                 fill: new ol.style.Fill({
-                    color: 'white',
+                    color: 'white'
                 }),
                 stroke: new ol.style.Stroke({
                     color: 'black',
                     width: 1
-                }),
+                })
             })
         });
     },
@@ -157,20 +157,22 @@ Ext.define('CpsiMapview.util.Style', {
      * @returns {Object}
      */
     getStyleByName: function (layer, styleName) {
-
-        var styleObj = null;
+        let styleObj = null;
 
         if (Ext.isEmpty(layer.get('styles')) === false) {
             styleObj = layer.get('styles').find(function (style) {
                 return style.name === styleName;
             });
             if (!styleObj) {
-                Ext.log.warn('The style ' + styleName + ' was not found in the layer style configs');
+                Ext.log.warn(
+                    'The style ' +
+                        styleName +
+                        ' was not found in the layer style configs'
+                );
             }
         }
 
         return styleObj;
-
     },
 
     /**
@@ -183,9 +185,8 @@ Ext.define('CpsiMapview.util.Style', {
      * @return {String}            Human readable title
      */
     getLayerStyleTitle: function (layerStyleName, layer) {
-
-        var layerStyles = layer.get('styles');
-        var layerTitle = null;
+        const layerStyles = layer.get('styles');
+        let layerTitle = null;
 
         Ext.each(layerStyles, function (layerStyle) {
             // get the relevant style definition

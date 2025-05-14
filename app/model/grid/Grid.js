@@ -7,9 +7,7 @@ Ext.define('CpsiMapview.model.grid.Grid', {
     extend: 'Ext.app.ViewModel',
     alias: 'viewmodel.cmv_grid',
 
-    requires: [
-        'BasiGX.util.Map'
-    ],
+    requires: ['BasiGX.util.Map'],
 
     /**
      * The following should all be overridden in child classes
@@ -38,10 +36,14 @@ Ext.define('CpsiMapview.model.grid.Grid', {
             return false;
         },
         useSimpleSelection: function () {
-            return !this.get('allowFeatureSelection') && this.get('isSpatialGrid');
+            return (
+                !this.get('allowFeatureSelection') && this.get('isSpatialGrid')
+            );
         },
         useAdvancedSelection: function () {
-            return this.get('allowFeatureSelection') && this.get('isSpatialGrid');
+            return (
+                this.get('allowFeatureSelection') && this.get('isSpatialGrid')
+            );
         }
     }
 });

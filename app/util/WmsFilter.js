@@ -19,12 +19,11 @@ Ext.define('CpsiMapview.util.WmsFilter', {
      * @param {any} layer
      */
     getWmsParams: function (layer) {
-
-        var wmsParams;
-        var wmsSource = layer.getSource();
+        let wmsParams;
+        const wmsSource = layer.getSource();
 
         if (layer.get('isVt') === true) {
-            var urlParts = wmsSource.getUrls()[0].split('?');
+            const urlParts = wmsSource.getUrls()[0].split('?');
             wmsParams = Ext.Object.fromQueryString(urlParts[1]);
         } else {
             wmsParams = wmsSource.getParams();
@@ -38,28 +37,28 @@ Ext.define('CpsiMapview.util.WmsFilter', {
      * @param {any} wmsParams
      */
     getWmsFilters: function (wmsParams) {
-
-        var filters = wmsParams.FILTER || [];
+        const filters = wmsParams.FILTER || [];
         // split the list based on filters in brackets e.g. (filter1)(filter2)
-        return Ext.isArray(filters) ? filters : filters.split(/(\(.*?\))/).filter(Boolean);
+        return Ext.isArray(filters)
+            ? filters
+            : filters.split(/(\(.*?\))/).filter(Boolean);
     },
 
     /**
-    * Executed when this menu item is clicked.
-    * Forces redraw of the connected layer.
-    */
+     * Executed when this menu item is clicked.
+     * Forces redraw of the connected layer.
+     */
     getWmsFilterString: function (wmsParams) {
+        const layers = wmsParams.LAYERS || [];
+        const layerList = Ext.isArray(layers) ? layers : layers.split(',');
 
-        var layers = wmsParams.LAYERS || [];
-        var layerList = Ext.isArray(layers) ? layers : layers.split(',');
-
-        var wmsFilterUtil = CpsiMapview.util.WmsFilter;
-        var originalFilters = wmsFilterUtil.getWmsFilters(wmsParams);
+        const wmsFilterUtil = CpsiMapview.util.WmsFilter;
+        const originalFilters = wmsFilterUtil.getWmsFilters(wmsParams);
 
         // every layer item requires a filter - duplicate the first filter
         // for the layer labels
-        var firstFilter;
-        var finalFilters = [];
+        let firstFilter;
+        const finalFilters = [];
 
         if (originalFilters.length > 0) {
             firstFilter = originalFilters[0];
@@ -79,14 +78,18 @@ Ext.define('CpsiMapview.util.WmsFilter', {
         Ext.Assert.truthy(finalFilters.length <= 2);
         //</debug>
 
-        var wmsFilterString = finalFilters.map(function (filter) {
-            // wrap each filter in brackets
-            if (Ext.String.startsWith(filter, '(') === false &&
-                Ext.String.endsWith(filter, ')') === false) {
-                filter = '(' + filter + ')';
-            }
-            return filter;
-        }).join('');
+        const wmsFilterString = finalFilters
+            .map(function (filter) {
+                // wrap each filter in brackets
+                if (
+                    Ext.String.startsWith(filter, '(') === false &&
+                    Ext.String.endsWith(filter, ')') === false
+                ) {
+                    filter = '(' + filter + ')';
+                }
+                return filter;
+            })
+            .join('');
 
         return wmsFilterString;
     }

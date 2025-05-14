@@ -4,16 +4,14 @@
 Ext.define('CpsiMapview.controller.button.LoginButtonController', {
     extend: 'Ext.app.ViewController',
 
-    requires: [
-        'CpsiMapview.view.form.Login'
-    ],
+    requires: ['CpsiMapview.view.form.Login'],
 
     alias: 'controller.cmv_login_button',
 
     /**
-    * The prefix used in the cookie for any browser-based
-    * user roles
-    * */
+     * The prefix used in the cookie for any browser-based
+     * user roles
+     * */
     displayRolePrefixes: ['Browser_'],
 
     /**
@@ -21,14 +19,15 @@ Ext.define('CpsiMapview.controller.button.LoginButtonController', {
      * the login form
      * */
     onClick: function () {
-
-        var app = Ext.getApplication ? Ext.getApplication() : Ext.app.Application.instance;
-        var loginWin;
+        const app = Ext.getApplication
+            ? Ext.getApplication()
+            : Ext.app.Application.instance;
+        let loginWin;
 
         if (app && app.loginWindow) {
             loginWin = app.loginWindow;
         } else {
-            var viewModel = {};
+            let viewModel = {};
             if (app) {
                 viewModel = {
                     tokenName: app.tokenName,
@@ -53,15 +52,17 @@ Ext.define('CpsiMapview.controller.button.LoginButtonController', {
      * and return as a formatted string
      * */
     getLoginDetails: function () {
-
-        var me = this;
-        var app = Ext.getApplication ? Ext.getApplication() : Ext.app.Application.instance;
-        var userName = Ext.util.Cookies.get('username');
-        var roles = Ext.util.Cookies.get('roles');
-        var displayRolePrefixes = (app && app.displayRolePrefixes) || me.displayRolePrefixes;
+        const me = this;
+        const app = Ext.getApplication
+            ? Ext.getApplication()
+            : Ext.app.Application.instance;
+        const userName = Ext.util.Cookies.get('username');
+        let roles = Ext.util.Cookies.get('roles');
+        const displayRolePrefixes =
+            (app && app.displayRolePrefixes) || me.displayRolePrefixes;
         if (roles) {
             roles = roles.split(',');
-            var displayRoles = [];
+            const displayRoles = [];
 
             Ext.Array.each(roles, function (r) {
                 Ext.Array.each(displayRolePrefixes, function (prefix) {
@@ -74,7 +75,11 @@ Ext.define('CpsiMapview.controller.button.LoginButtonController', {
             displayRoles.sort();
             roles = displayRoles.join('<br />');
         }
-        return Ext.String.format('Username: <b>{0}</b><br />User Roles: <br /><br />{1}', userName, roles);
+        return Ext.String.format(
+            'Username: <b>{0}</b><br />User Roles: <br /><br />{1}',
+            userName,
+            roles
+        );
     },
 
     /**
@@ -83,8 +88,7 @@ Ext.define('CpsiMapview.controller.button.LoginButtonController', {
      * and {@link CpsiMapview.controller.form.Login#logout}
      * */
     init: function () {
-
-        var me = this;
+        const me = this;
 
         Ext.GlobalEvents.on('login', function () {
             me.getViewModel().set('loggedIn', true);
@@ -94,5 +98,4 @@ Ext.define('CpsiMapview.controller.button.LoginButtonController', {
             me.getViewModel().set('loggedIn', false);
         });
     }
-
 });

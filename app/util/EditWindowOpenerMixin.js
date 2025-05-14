@@ -13,10 +13,11 @@ Ext.define('CpsiMapview.util.EditWindowOpenerMixin', {
      * @param {any} editWindowType
      */
     getExistingEditingFormWindow: function (recId, editWindowType) {
-
-        var windowXType = Ext.ClassManager.get(editWindowType).prototype.getXType();
-        var existingWindows = Ext.ComponentQuery.query(windowXType);
-        var rec, recordWindow = null;
+        const windowXType =
+            Ext.ClassManager.get(editWindowType).prototype.getXType();
+        const existingWindows = Ext.ComponentQuery.query(windowXType);
+        let rec,
+            recordWindow = null;
 
         Ext.each(existingWindows, function (w) {
             rec = w.getViewModel().get('currentRecord');
@@ -38,12 +39,13 @@ Ext.define('CpsiMapview.util.EditWindowOpenerMixin', {
      * @param {any} editWindowType the window in which to open the model
      */
     getEditingFormWindow: function (record, editWindowType) {
-
-        var me = this;
-        var recId = record.getId();
-        var recordWindow = me.getExistingEditingFormWindow(recId, editWindowType);
+        const me = this;
+        const recId = record.getId();
+        const recordWindow = me.getExistingEditingFormWindow(
+            recId,
+            editWindowType
+        );
 
         return recordWindow || Ext.create(editWindowType);
     }
-
 });

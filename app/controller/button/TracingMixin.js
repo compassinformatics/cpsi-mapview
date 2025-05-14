@@ -9,10 +9,7 @@
 Ext.define('CpsiMapview.controller.button.TracingMixin', {
     extend: 'Ext.Mixin',
 
-    requires: [
-        'BasiGX.util.Layer',
-        'CpsiMapview.util.Tracing'
-    ],
+    requires: ['BasiGX.util.Layer', 'CpsiMapview.util.Tracing'],
 
     /**
      * The style of the preview line during tracing.
@@ -20,7 +17,7 @@ Ext.define('CpsiMapview.controller.button.TracingMixin', {
     previewStyle: new ol.style.Style({
         stroke: new ol.style.Stroke({
             color: 'rgba(255, 0, 0, 1)',
-            width: 10,
+            width: 10
         })
     }),
 
@@ -41,8 +38,12 @@ Ext.define('CpsiMapview.controller.button.TracingMixin', {
      * @param {ol.interaction.Draw} drawInteraction draw interaction to attach the tracing on
      * @param {Boolean} [showTraceableEdges=false] If the traceable edges shall be shown (useful for debugging)
      */
-    initTracing: function (tracingLayerKeys, drawInteraction, showTraceableEdges) {
-        var me = this;
+    initTracing: function (
+        tracingLayerKeys,
+        drawInteraction,
+        showTraceableEdges
+    ) {
+        const me = this;
 
         if (me.getView()) {
             me.getView().fireEvent('tracingstart');
@@ -68,7 +69,7 @@ Ext.define('CpsiMapview.controller.button.TracingMixin', {
         // get tracing layers
         me.tracingLayers = [];
         Ext.each(tracingLayerKeys, function (key) {
-            var foundLayers = BasiGX.util.Layer.getLayersBy('layerKey', key);
+            const foundLayers = BasiGX.util.Layer.getLayersBy('layerKey', key);
             if (foundLayers.length > 0) {
                 me.tracingLayers.push(foundLayers[0]);
             }
@@ -79,11 +80,11 @@ Ext.define('CpsiMapview.controller.button.TracingMixin', {
             hitTolerance: 10,
             layerFilter: function (layer) {
                 return Ext.Array.contains(me.tracingLayers, layer);
-            },
+            }
         };
 
         me.tracingFeature = new ol.Feature({
-            geometry: new ol.geom.LineString([]),
+            geometry: new ol.geom.LineString([])
         });
         me.tracingFeatureArray = [];
         me.tracingStartPoint = null;
@@ -92,7 +93,7 @@ Ext.define('CpsiMapview.controller.button.TracingMixin', {
         // For debugging the traceable edges can be displayed
         me.tracingVector = new ol.layer.Vector({
             source: new ol.source.Vector({
-                features: [me.tracingFeature],
+                features: [me.tracingFeature]
             }),
             style: new ol.style.Style({
                 stroke: new ol.style.Stroke({
@@ -110,12 +111,12 @@ Ext.define('CpsiMapview.controller.button.TracingMixin', {
 
         // the visible tracing line while editing
         me.previewLine = new ol.Feature({
-            geometry: new ol.geom.LineString([]),
+            geometry: new ol.geom.LineString([])
         });
 
         me.previewVector = new ol.layer.Vector({
             source: new ol.source.Vector({
-                features: [me.previewLine],
+                features: [me.previewLine]
             }),
             style: me.previewStyle
         });
@@ -133,7 +134,7 @@ Ext.define('CpsiMapview.controller.button.TracingMixin', {
      * Sets the variable 'me.tracingActive' to true.
      */
     onTracingDrawStart: function () {
-        var me = this;
+        const me = this;
         me.tracingActive = true;
     },
 
@@ -141,7 +142,7 @@ Ext.define('CpsiMapview.controller.button.TracingMixin', {
      * Sets the variable 'me.tracingActive' to false.
      */
     onTracingDrawEnd: function () {
-        var me = this;
+        const me = this;
         me.tracingActive = false;
         // Clear previous tracingFeature data
         me.tracingFeature.getGeometry().setCoordinates([]);
@@ -153,7 +154,7 @@ Ext.define('CpsiMapview.controller.button.TracingMixin', {
      * Remove listeners and layers
      */
     cleanupTracing: function () {
-        var me = this;
+        const me = this;
 
         // nothing to cleanup if tracing has not been initialised
         if (!me.tracingDrawInteraction) {
@@ -177,9 +178,9 @@ Ext.define('CpsiMapview.controller.button.TracingMixin', {
      * And passes them down to the next interaction
      */
     trackSnappedCoords: function () {
-        var me = this;
-        var interactions = me.map.getInteractions();
-        var lastSnapInteractionIndex;
+        const me = this;
+        const interactions = me.map.getInteractions();
+        let lastSnapInteractionIndex;
 
         me.getSnapCoordinateInteraction = new ol.interaction.Interaction({
             handleEvent: function (e) {
@@ -194,7 +195,10 @@ Ext.define('CpsiMapview.controller.button.TracingMixin', {
             }
         });
 
-        interactions.insertAt(lastSnapInteractionIndex, me.getSnapCoordinateInteraction);
+        interactions.insertAt(
+            lastSnapInteractionIndex,
+            me.getSnapCoordinateInteraction
+        );
     },
 
     /**
@@ -203,27 +207,33 @@ Ext.define('CpsiMapview.controller.button.TracingMixin', {
      * @param {Event} event The OpenLayers click event.
      */
     onTracingMapClick: function (event) {
-        var me = this;
+        const me = this;
 
         // Ignore the event if drawing is finished
         if (!me.tracingActive) {
             return;
         }
 
-        var hit = false;
+        let hit = false;
         me.map.forEachFeatureAtPixel(
             event.pixel,
             function (feature) {
-                if (me.tracingUtil.lineStringPopulated(me.tracingFeature) && !me.tracingFeatureArray.includes(feature)) {
+                if (
+                    me.tracingUtil.lineStringPopulated(me.tracingFeature) &&
+                    !me.tracingFeatureArray.includes(feature)
+                ) {
                     return;
                 }
 
                 hit = true;
 
                 // second click on the tracing feature: append the ring coordinates
-                if (me.tracingUtil.lineStringPopulated(me.tracingFeature) && me.tracingFeatureArray.includes(feature)) {
+                if (
+                    me.tracingUtil.lineStringPopulated(me.tracingFeature) &&
+                    me.tracingFeatureArray.includes(feature)
+                ) {
                     me.tracingEndPoint = me.lastSnappedCoord;
-                    var appendCoords = me.tracingUtil.getPartialSegmentCoords(
+                    const appendCoords = me.tracingUtil.getPartialSegmentCoords(
                         me.tracingFeature,
                         me.tracingStartPoint,
                         me.tracingEndPoint
@@ -243,13 +253,11 @@ Ext.define('CpsiMapview.controller.button.TracingMixin', {
                     me.previewLine.getGeometry().setCoordinates([]);
                 }
 
-                var geom = feature.clone().getGeometry();
+                const geom = feature.clone().getGeometry();
                 // start tracing on the feature ring
-                var coords = geom.getCoordinates();
+                const coords = geom.getCoordinates();
 
-                me.tracingFeature.getGeometry().setCoordinates(
-                    coords
-                );
+                me.tracingFeature.getGeometry().setCoordinates(coords);
                 me.tracingFeatureArray.push(feature);
                 me.tracingStartPoint = me.lastSnappedCoord;
             },
@@ -270,52 +278,75 @@ Ext.define('CpsiMapview.controller.button.TracingMixin', {
      * @param {Event} event The OpenLayers move event
      */
     onTracingPointerMove: function (event) {
-        var me = this;
-        var pixel = event.pixel;
+        const me = this;
+        const pixel = event.pixel;
 
-        if (me.tracingUtil.lineStringPopulated(me.tracingFeature) && me.tracingActive) {
-            var coordOnFoundFeature = null;
+        if (
+            me.tracingUtil.lineStringPopulated(me.tracingFeature) &&
+            me.tracingActive
+        ) {
+            let coordOnFoundFeature = null;
             me.map.forEachFeatureAtPixel(
                 pixel,
                 function (foundFeature) {
-
                     // find coordinate on found feature
                     if (me.tracingFeatureArray.includes(foundFeature)) {
-                        coordOnFoundFeature = me.map.getCoordinateFromPixel(pixel);
+                        coordOnFoundFeature =
+                            me.map.getCoordinateFromPixel(pixel);
                     }
 
                     if (me.tracingFeatureArray.includes(foundFeature)) {
                         me.updateTraceableFeature(foundFeature);
-
                     } else {
                         // new feature found that needs to be added to tracingfeature
 
-                        var foundGeom = foundFeature.getGeometry();
-                        var tracingGeom = me.tracingFeature.getGeometry();
+                        const foundGeom = foundFeature.getGeometry();
+                        const tracingGeom = me.tracingFeature.getGeometry();
 
-                        var touchingStartEnd = me.tracingUtil.linesTouchAtStartEndPoint(foundGeom, tracingGeom);
+                        const touchingStartEnd =
+                            me.tracingUtil.linesTouchAtStartEndPoint(
+                                foundGeom,
+                                tracingGeom
+                            );
 
                         // TODO: the cases where lines touch at interior points only work in some cases
                         //       it might fail in some edge cases, also tracing consecutively on many
                         //       features does not work
-                        var tracingInteriorTouchesFoundFeatureStartEnd = me.tracingUtil.lineInteriorTouchesLineStartEnd(tracingGeom, foundGeom);
-                        var tracingStartEndTouchesFoundInterior = me.tracingUtil.lineStartEndTouchesLineInterior(tracingGeom, foundGeom);
+                        const tracingInteriorTouchesFoundFeatureStartEnd =
+                            me.tracingUtil.lineInteriorTouchesLineStartEnd(
+                                tracingGeom,
+                                foundGeom
+                            );
+                        const tracingStartEndTouchesFoundInterior =
+                            me.tracingUtil.lineStartEndTouchesLineInterior(
+                                tracingGeom,
+                                foundGeom
+                            );
 
                         if (touchingStartEnd) {
                             me.setNewTracingOnStartEndTouch(foundFeature);
                         } else if (tracingInteriorTouchesFoundFeatureStartEnd) {
-                            me.setNewTracingOnInteriorStartEndTouch(foundFeature, tracingInteriorTouchesFoundFeatureStartEnd);
+                            me.setNewTracingOnInteriorStartEndTouch(
+                                foundFeature,
+                                tracingInteriorTouchesFoundFeatureStartEnd
+                            );
                         } else if (tracingStartEndTouchesFoundInterior) {
-                            me.setNewTracingOnStartEndInteriorTouch(foundFeature, tracingStartEndTouchesFoundInterior, pixel);
+                            me.setNewTracingOnStartEndInteriorTouch(
+                                foundFeature,
+                                tracingStartEndTouchesFoundInterior,
+                                pixel
+                            );
                         }
                     }
                 },
                 me.forEachFeatureOptions
             );
 
-            var previewCoords = [];
+            let previewCoords = [];
             if (coordOnFoundFeature) {
-                me.tracingEndPoint = me.tracingFeature.getGeometry().getClosestPoint(coordOnFoundFeature);
+                me.tracingEndPoint = me.tracingFeature
+                    .getGeometry()
+                    .getClosestPoint(coordOnFoundFeature);
                 previewCoords = me.tracingUtil.getPartialSegmentCoords(
                     me.tracingFeature,
                     me.tracingStartPoint,
@@ -332,30 +363,34 @@ Ext.define('CpsiMapview.controller.button.TracingMixin', {
      * @param {ol.Feature} foundFeature The hovered feature found in the tracing feature array
      */
     updateTraceableFeature: function (foundFeature) {
-        var me = this;
+        const me = this;
 
         // check if found feature is last of array
-        var index = me.tracingFeatureArray.indexOf(foundFeature);
+        const index = me.tracingFeatureArray.indexOf(foundFeature);
         if (index !== 0 && (!index || index === -1)) {
-            Ext.Logger.error('The found feature must be in the found features array.');
+            Ext.Logger.error(
+                'The found feature must be in the found features array.'
+            );
             return;
         }
-        var notLastFeature = (index !== (me.tracingFeatureArray.length - 1));
+        const notLastFeature = index !== me.tracingFeatureArray.length - 1;
 
         if (notLastFeature) {
-
             // remove all features after hovered feature
             me.tracingFeatureArray = me.tracingFeatureArray.slice(0, index + 1);
             // update coordinates of tracingFeature
-            var updatedCoords = [];
+            let updatedCoords = [];
             Ext.each(me.tracingFeatureArray, function (f) {
-                var geom = f.getGeometry();
-                var coords = geom.getCoordinates();
+                const geom = f.getGeometry();
+                const coords = geom.getCoordinates();
 
                 if (updatedCoords && updatedCoords.length === 0) {
                     updatedCoords = coords;
                 } else {
-                    updatedCoords = me.tracingUtil.concatLineCoords(updatedCoords, coords);
+                    updatedCoords = me.tracingUtil.concatLineCoords(
+                        updatedCoords,
+                        coords
+                    );
                 }
             });
 
@@ -372,14 +407,14 @@ Ext.define('CpsiMapview.controller.button.TracingMixin', {
      * @param {ol.Feature} foundFeature The hovered feature to set as new tracing feature
      */
     setNewTracingOnStartEndTouch: function (foundFeature) {
-        var me = this;
-        var foundGeom = foundFeature.getGeometry();
-        var tracingGeom = me.tracingFeature.getGeometry();
-        var tracingCoords = tracingGeom.getCoordinates();
+        const me = this;
+        const foundGeom = foundFeature.getGeometry();
+        const tracingGeom = me.tracingFeature.getGeometry();
+        const tracingCoords = tracingGeom.getCoordinates();
 
-        var coords = foundGeom.getCoordinates();
+        const coords = foundGeom.getCoordinates();
 
-        var resultCoords = me.tracingUtil.concatLineCoords(
+        const resultCoords = me.tracingUtil.concatLineCoords(
             tracingCoords,
             coords
         );
@@ -396,26 +431,44 @@ Ext.define('CpsiMapview.controller.button.TracingMixin', {
      * @param {ol.Feature} foundFeature The hovered feature to set as new tracing feature
      * @param {ol.coordinate.Coordinate} touchCoordinate The coordinate of the touching point
      */
-    setNewTracingOnInteriorStartEndTouch: function (foundFeature, touchCoordinate) {
-        var me = this;
-        var tracingGeom = me.tracingFeature.getGeometry();
-        var tracingCoords = tracingGeom.getCoordinates();
+    setNewTracingOnInteriorStartEndTouch: function (
+        foundFeature,
+        touchCoordinate
+    ) {
+        const me = this;
+        const tracingGeom = me.tracingFeature.getGeometry();
+        const tracingCoords = tracingGeom.getCoordinates();
 
-        var touchingIndex = me.tracingUtil.getCoordIndex(tracingCoords, touchCoordinate);
+        const touchingIndex = me.tracingUtil.getCoordIndex(
+            tracingCoords,
+            touchCoordinate
+        );
 
-        var foundSplitPoint = me.tracingUtil.getClosestCoordinateToPoint(tracingCoords, me.tracingStartPoint);
-        var startingPointIndex = me.tracingUtil.getCoordIndex(tracingCoords, foundSplitPoint);
+        const foundSplitPoint = me.tracingUtil.getClosestCoordinateToPoint(
+            tracingCoords,
+            me.tracingStartPoint
+        );
+        const startingPointIndex = me.tracingUtil.getCoordIndex(
+            tracingCoords,
+            foundSplitPoint
+        );
 
         // we cut the tracing feature by the split point
         // we have to take the order into account
-        var partUntilIntersection;
+        let partUntilIntersection;
         if (touchingIndex < startingPointIndex) {
-            partUntilIntersection = tracingCoords.slice(touchingIndex, tracingCoords.length);
+            partUntilIntersection = tracingCoords.slice(
+                touchingIndex,
+                tracingCoords.length
+            );
         } else {
             partUntilIntersection = tracingCoords.slice(0, touchingIndex + 1);
         }
 
-        var newTracingCoords = me.tracingUtil.concatLineCoords(partUntilIntersection, foundFeature.getGeometry().getCoordinates());
+        const newTracingCoords = me.tracingUtil.concatLineCoords(
+            partUntilIntersection,
+            foundFeature.getGeometry().getCoordinates()
+        );
 
         me.tracingFeature.getGeometry().setCoordinates(newTracingCoords);
         me.tracingFeatureArray.push(foundFeature);
@@ -428,29 +481,48 @@ Ext.define('CpsiMapview.controller.button.TracingMixin', {
      * @param {ol.coordinate.Coordinate} touchCoordinate The coordinate of the touching point
      * @param {ol.pixel} pixel The pixel the user hovered on
      */
-    setNewTracingOnStartEndInteriorTouch: function (foundFeature, touchCoordinate, pixel){
-        var me = this;
-        var foundGeom = foundFeature.getGeometry();
-        var tracingGeom = me.tracingFeature.getGeometry();
-        var tracingCoords = tracingGeom.getCoordinates();
+    setNewTracingOnStartEndInteriorTouch: function (
+        foundFeature,
+        touchCoordinate,
+        pixel
+    ) {
+        const me = this;
+        const foundGeom = foundFeature.getGeometry();
+        const tracingGeom = me.tracingFeature.getGeometry();
+        const tracingCoords = tracingGeom.getCoordinates();
 
-        var touchingIndex = me.tracingUtil.getCoordIndex(foundGeom.getCoordinates(), touchCoordinate);
+        const touchingIndex = me.tracingUtil.getCoordIndex(
+            foundGeom.getCoordinates(),
+            touchCoordinate
+        );
 
-        var hoverCoord = me.map.getCoordinateFromPixel(pixel);
-        var foundSplitPoint = me.tracingUtil.getClosestCoordinateToPoint(foundGeom.getCoordinates(), hoverCoord);
-        var hoverIndex = me.tracingUtil.getCoordIndex(foundGeom.getCoordinates(), foundSplitPoint);
+        const hoverCoord = me.map.getCoordinateFromPixel(pixel);
+        const foundSplitPoint = me.tracingUtil.getClosestCoordinateToPoint(
+            foundGeom.getCoordinates(),
+            hoverCoord
+        );
+        const hoverIndex = me.tracingUtil.getCoordIndex(
+            foundGeom.getCoordinates(),
+            foundSplitPoint
+        );
 
         // we cut the tracing feature by the split point
         // we have to take the order into account
-        var foundCoords = foundGeom.getCoordinates();
-        var partUntilIntersection;
+        const foundCoords = foundGeom.getCoordinates();
+        let partUntilIntersection;
         if (hoverIndex >= touchingIndex) {
-            partUntilIntersection = foundCoords.slice(touchingIndex, foundCoords.length);
+            partUntilIntersection = foundCoords.slice(
+                touchingIndex,
+                foundCoords.length
+            );
         } else {
             partUntilIntersection = foundCoords.slice(0, touchingIndex + 1);
         }
 
-        var newTracingCoords = me.tracingUtil.concatLineCoords(partUntilIntersection, tracingCoords);
+        const newTracingCoords = me.tracingUtil.concatLineCoords(
+            partUntilIntersection,
+            tracingCoords
+        );
 
         me.tracingFeature.getGeometry().setCoordinates(newTracingCoords);
         me.tracingFeatureArray.push(foundFeature);

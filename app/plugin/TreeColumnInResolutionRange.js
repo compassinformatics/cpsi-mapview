@@ -17,20 +17,22 @@ Ext.define('CpsiMapview.plugin.TreeColumnInResolutionRange', {
      *     for
      * @private
      */
-    init: function(column) {
-        var me = this;
+    init: function (column) {
+        const me = this;
         if (!(column instanceof Ext.grid.column.Column)) {
-            Ext.log.warn('Plugin shall only be applied to instances of' +
-                  ' Ext.grid.column.Column');
+            Ext.log.warn(
+                'Plugin shall only be applied to instances of' +
+                    ' Ext.grid.column.Column'
+            );
             return;
         }
-        var mapComponent = BasiGX.util.Map.getMapComponent();
+        const mapComponent = BasiGX.util.Map.getMapComponent();
         mapComponent.getStore().setChangeLayerFilterFn(me.changeLayerFilterFn);
 
-        var map = mapComponent.getMap();
-        var mapView = map.getView();
+        const map = mapComponent.getMap();
+        const mapView = map.getView();
 
-        mapView.on('change:resolution', function() {
+        mapView.on('change:resolution', function () {
             me.updateTreeNode(mapView);
         });
 
@@ -51,7 +53,7 @@ Ext.define('CpsiMapview.plugin.TreeColumnInResolutionRange', {
      * @private
      */
     changeLayerFilterFn: function (record) {
-        var layer = this;
+        const layer = this;
         return layer.id === record.getOlLayer().id;
     },
 
@@ -60,23 +62,28 @@ Ext.define('CpsiMapview.plugin.TreeColumnInResolutionRange', {
      * @param {ol.View} mapView The OL map view
      */
     updateTreeNode: function (mapView) {
-        var me = this;
-        var unit = mapView.getProjection().getUnits();
-        var resolution = mapView.getResolution();
-        var treepanel = me.cmp.up('treepanel');
-        var nodeStore = treepanel.getStore();
-        var treeNodes = nodeStore.getData();
+        const me = this;
+        const unit = mapView.getProjection().getUnits();
+        const resolution = mapView.getResolution();
+        const treepanel = me.cmp.up('treepanel');
+        const nodeStore = treepanel.getStore();
+        const treeNodes = nodeStore.getData();
         Ext.each(treeNodes.items, function (node) {
-            var inRange = me.layerInResolutionRange(node.getOlLayer(), resolution);
+            const inRange = me.layerInResolutionRange(
+                node.getOlLayer(),
+                resolution
+            );
             node[inRange ? 'removeCls' : 'addCls']('cpsi-tree-node-disabled');
-            var descriptionBefore = node.getOlLayer().get('description');
-            var description = me.getTooltipText(node, inRange, unit);
-            var changed = description !== descriptionBefore;
-            var layer = node.getOlLayer();
+            const descriptionBefore = node.getOlLayer().get('description');
+            const description = me.getTooltipText(node, inRange, unit);
+            const changed = description !== descriptionBefore;
+            const layer = node.getOlLayer();
             if (layer) {
                 layer.set('description', description);
             } else {
-                Ext.log.warn('No layer associated with the tree node ' + node.get('text'));
+                Ext.log.warn(
+                    'No layer associated with the tree node ' + node.get('text')
+                );
             }
 
             if (changed) {
@@ -101,10 +108,10 @@ Ext.define('CpsiMapview.plugin.TreeColumnInResolutionRange', {
             // false, since we cannot sanely determine a correct answer.
             return false;
         }
-        var layerMinRes = layer.getMinResolution(); // default: 0 if unset
-        var layerMaxRes = layer.getMaxResolution(); // default: Infinity if unset
+        const layerMinRes = layer.getMinResolution(); // default: 0 if unset
+        const layerMaxRes = layer.getMaxResolution(); // default: Infinity if unset
         // minimum resolution is inclusive, maximum resolution exclusive
-        var within = currentRes >= layerMinRes && currentRes < layerMaxRes;
+        const within = currentRes >= layerMinRes && currentRes < layerMaxRes;
         return within;
     },
 
@@ -118,7 +125,7 @@ Ext.define('CpsiMapview.plugin.TreeColumnInResolutionRange', {
      * @returns {String} The toolip text valid for current range
      */
     getTooltipText: function (node, inRange, unit) {
-        var staticMe = CpsiMapview.plugin.TreeColumnInResolutionRange;
+        const staticMe = CpsiMapview.plugin.TreeColumnInResolutionRange;
         if (!Ext.isDefined(node.originalQtip)) {
             node.originalQtip = node.getOlLayer().get('description') || '';
         }
@@ -127,13 +134,16 @@ Ext.define('CpsiMapview.plugin.TreeColumnInResolutionRange', {
             return node.originalQtip.length > 0 ? node.originalQtip : undefined;
         }
 
-        var currentTip = node.getOlLayer().get('description');
-        if (currentTip && (currentTip.indexOf(staticMe.LINE_BREAK) > -1 ||
-            currentTip.indexOf('Visible') > -1)) {
+        const currentTip = node.getOlLayer().get('description');
+        if (
+            currentTip &&
+            (currentTip.indexOf(staticMe.LINE_BREAK) > -1 ||
+                currentTip.indexOf('Visible') > -1)
+        ) {
             return currentTip;
         }
 
-        var description = this.enhanceTooltip(node.getOlLayer(), unit);
+        const description = this.enhanceTooltip(node.getOlLayer(), unit);
         return description;
     },
 
@@ -145,10 +155,18 @@ Ext.define('CpsiMapview.plugin.TreeColumnInResolutionRange', {
      * @returns {String} The enhanced toolip text
      */
     enhanceTooltip: function (layer, unit) {
-        var staticMe = CpsiMapview.plugin.TreeColumnInResolutionRange;
-        var scale = '', maxScale, minScale;
-        maxScale = BasiGX.util.Map.getScaleForResolution(layer.getMaxResolution(), unit);
-        minScale = BasiGX.util.Map.getScaleForResolution(layer.getMinResolution(), unit);
+        const staticMe = CpsiMapview.plugin.TreeColumnInResolutionRange;
+        let scale = '',
+            maxScale,
+            minScale;
+        maxScale = BasiGX.util.Map.getScaleForResolution(
+            layer.getMaxResolution(),
+            unit
+        );
+        minScale = BasiGX.util.Map.getScaleForResolution(
+            layer.getMinResolution(),
+            unit
+        );
         if (maxScale) {
             // round to nearest 10
             maxScale = Math.round(maxScale / 10) * 10;
@@ -161,18 +179,27 @@ Ext.define('CpsiMapview.plugin.TreeColumnInResolutionRange', {
         }
 
         if (maxScale && minScale) {
-            scale = Ext.String.format('Visible between <b>1:{0}</b> and <b>1:{1}</b>', minScale, maxScale);
+            scale = Ext.String.format(
+                'Visible between <b>1:{0}</b> and <b>1:{1}</b>',
+                minScale,
+                maxScale
+            );
         } else {
             if (maxScale) {
-                scale = Ext.String.format('Visible at <b>1:{0}</b> and above', maxScale);
+                scale = Ext.String.format(
+                    'Visible at <b>1:{0}</b> and above',
+                    maxScale
+                );
             }
             if (minScale) {
-                scale = Ext.String.format('Visible at <b>1:{0}<b> and below', minScale);
+                scale = Ext.String.format(
+                    'Visible at <b>1:{0}<b> and below',
+                    minScale
+                );
             }
         }
-        return layer.get('description') ?
-            (layer.get('description').trim() + staticMe.LINE_BREAK + scale) :
-            scale;
+        return layer.get('description')
+            ? layer.get('description').trim() + staticMe.LINE_BREAK + scale
+            : scale;
     }
-
 });

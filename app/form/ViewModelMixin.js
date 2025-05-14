@@ -7,9 +7,7 @@
 Ext.define('CpsiMapview.form.ViewModelMixin', {
     extend: 'Ext.Mixin',
 
-    requires: [
-        'BasiGX.util.Map'
-    ],
+    requires: ['BasiGX.util.Map'],
 
     mixinConfig: {
         before: {
@@ -24,8 +22,8 @@ Ext.define('CpsiMapview.form.ViewModelMixin', {
      * Destroy the currently associated record
      * */
     destroyCurrentRecord: function () {
-        var me = this;
-        var rec = me.get('currentRecord');
+        const me = this;
+        const rec = me.get('currentRecord');
         rec.destroy();
     },
 
@@ -41,24 +39,21 @@ Ext.define('CpsiMapview.form.ViewModelMixin', {
     },
 
     onInitConfig: function () {
-        var me = this;
+        const me = this;
         // add the currentRecord property which is used for all data entry forms
         me.set({
-            'currentRecord': null,
-            'timestamp': Ext.Date.now()
+            currentRecord: null,
+            timestamp: Ext.Date.now()
         });
     },
 
     config: {
-
         formulas: {
-
             map: function () {
-                var cmp = BasiGX.util.Map.getMapComponent();
+                const cmp = BasiGX.util.Map.getMapComponent();
                 if (cmp) {
                     return cmp.getMap();
-                }
-                else {
+                } else {
                     return null;
                 }
             },
@@ -68,10 +63,10 @@ Ext.define('CpsiMapview.form.ViewModelMixin', {
                     currentRecord: '{currentRecord}'
                 },
                 get: function () {
-                    var me = this;
-                    var storeName = me.get('featureStoreName');
-                    var currentRecord = me.get('currentRecord');
-                    var fs = me.getFeatureStore(currentRecord, storeName);
+                    const me = this;
+                    const storeName = me.get('featureStoreName');
+                    const currentRecord = me.get('currentRecord');
+                    const fs = me.getFeatureStore(currentRecord, storeName);
                     if (fs) {
                         return fs.layer;
                     }
@@ -83,11 +78,10 @@ Ext.define('CpsiMapview.form.ViewModelMixin', {
                     currentRecord: '{currentRecord}'
                 },
                 get: function () {
-
-                    var me = this;
-                    var storeName = me.get('polygonStoreName');
-                    var currentRecord = me.get('currentRecord');
-                    var fs = me.getFeatureStore(currentRecord, storeName);
+                    const me = this;
+                    const storeName = me.get('polygonStoreName');
+                    const currentRecord = me.get('currentRecord');
+                    const fs = me.getFeatureStore(currentRecord, storeName);
                     if (fs) {
                         return fs.layer;
                     }
@@ -99,7 +93,7 @@ Ext.define('CpsiMapview.form.ViewModelMixin', {
                     resultLayer: '{resultLayer}'
                 },
                 get: function (data) {
-                    var layer = data.resultLayer;
+                    const layer = data.resultLayer;
                     if (layer) {
                         return layer.get('selectStyle');
                     } else {
@@ -109,8 +103,8 @@ Ext.define('CpsiMapview.form.ViewModelMixin', {
             },
 
             /**
-            * This is overwritten in most of the ViewModels that use this mixin
-            */
+             * This is overwritten in most of the ViewModels that use this mixin
+             */
             valid: function () {
                 return true;
             },
@@ -122,10 +116,15 @@ Ext.define('CpsiMapview.form.ViewModelMixin', {
                     isValid: '{valid}'
                 },
                 get: function (data) {
-                    var ret = data.isValid;
-                    ret = ret && (data.isLocked !== true);
+                    let ret = data.isValid;
+                    ret = ret && data.isLocked !== true;
                     if (this.getFormulas().belongsToRoleReadWrite) {
-                        ret = ret && this.getFormulas().belongsToRoleReadWrite.call(this, this.getFormulaFn);
+                        ret =
+                            ret &&
+                            this.getFormulas().belongsToRoleReadWrite.call(
+                                this,
+                                this.getFormulaFn
+                            );
                     }
                     return ret;
                 }
@@ -137,9 +136,14 @@ Ext.define('CpsiMapview.form.ViewModelMixin', {
                     phantom: '{currentRecord.phantom}'
                 },
                 get: function (data) {
-                    var ret = (data.isLocked !== true) && !data.phantom;
+                    let ret = data.isLocked !== true && !data.phantom;
                     if (this.getFormulas().belongsToRoleReadWrite) {
-                        ret = ret && this.getFormulas().belongsToRoleReadWrite.call(this, this.getFormulaFn);
+                        ret =
+                            ret &&
+                            this.getFormulas().belongsToRoleReadWrite.call(
+                                this,
+                                this.getFormulaFn
+                            );
                     }
                     return ret;
                 }

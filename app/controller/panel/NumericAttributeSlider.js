@@ -13,7 +13,7 @@ Ext.define('CpsiMapview.controller.panel.NumericAttributeSlider', {
     /**
      * Initially filter if enabled.
      */
-    initSlider: function() {
+    initSlider: function () {
         if (this.getView().getEnabled()) {
             this.applySliderEffects();
         }
@@ -22,7 +22,7 @@ Ext.define('CpsiMapview.controller.panel.NumericAttributeSlider', {
     /**
      * Returns those layers that the slider will affect.
      */
-    getAffectedLayers: function() {
+    getAffectedLayers: function () {
         return BasiGX.util.Layer.getLayersBy('isNumericDependent', true);
     },
 
@@ -31,9 +31,9 @@ Ext.define('CpsiMapview.controller.panel.NumericAttributeSlider', {
      * lower value, and the second is at least equally big.
      * @param {number[]} values
      */
-    orderValues: function(values) {
-        var lower = Math.min(values[0], values[1]);
-        var upper = Math.max(values[0], values[1]);
+    orderValues: function (values) {
+        const lower = Math.min(values[0], values[1]);
+        const upper = Math.max(values[0], values[1]);
         return [lower, upper];
     },
 
@@ -41,15 +41,16 @@ Ext.define('CpsiMapview.controller.panel.NumericAttributeSlider', {
      * Returns the current range of the slider as tooltip.
      * @param {Ext.slider.Thumb} thumb
      */
-    getTipText: function(thumb) {
-        var slider = thumb.slider;
-        var draggedValue = thumb.value;
-        var thumbIdx = thumb.index;
-        var otherThumb = slider.thumbs[thumbIdx == 0 ? 1 : 0];
-        var lowerThumb = otherThumb.value <= draggedValue ? otherThumb : thumb;
-        var upperThumb = lowerThumb === thumb ? otherThumb : thumb;
-        var lower = lowerThumb.value;
-        var upper = upperThumb.value;
+    getTipText: function (thumb) {
+        const slider = thumb.slider;
+        const draggedValue = thumb.value;
+        const thumbIdx = thumb.index;
+        const otherThumb = slider.thumbs[thumbIdx == 0 ? 1 : 0];
+        const lowerThumb =
+            otherThumb.value <= draggedValue ? otherThumb : thumb;
+        const upperThumb = lowerThumb === thumb ? otherThumb : thumb;
+        let lower = lowerThumb.value;
+        let upper = upperThumb.value;
         if (lower === draggedValue) {
             lower = '<strong>' + lower + '</strong>';
         }
@@ -64,12 +65,12 @@ Ext.define('CpsiMapview.controller.panel.NumericAttributeSlider', {
      * @param {Ext.form.field.Checkbox} cb
      * @param {boolean} checked
      */
-    onCheckChange: function(cb, checked) {
-        var slider = cb.up().down('multislider');
-        if(slider) {
+    onCheckChange: function (cb, checked) {
+        const slider = cb.up().down('multislider');
+        if (slider) {
             slider.setDisabled(!checked);
         }
-        if(checked) {
+        if (checked) {
             this.applySliderEffects();
         } else {
             this.removeSliderEffects();
@@ -79,26 +80,34 @@ Ext.define('CpsiMapview.controller.panel.NumericAttributeSlider', {
     /**
      * Applies the effect of the slider, e.g. filters by the numeric values.
      */
-    applySliderEffects: function() {
-        var me = this;
-        var view = me.getView();
-        var slider = view.down('multislider');
-        var orderedVals = me.orderValues(slider.getValues());
-        var layers = me.getAffectedLayers();
-        var fieldName = view.getNumericField();
+    applySliderEffects: function () {
+        const me = this;
+        const view = me.getView();
+        const slider = view.down('multislider');
+        const orderedVals = me.orderValues(slider.getValues());
+        const layers = me.getAffectedLayers();
+        const fieldName = view.getNumericField();
         // between-filter is also inclusive
-        var gteFilter = GeoExt.util.OGCFilter.getOgcFilter(
-            fieldName, 'gte', orderedVals[0], '2.0.0'
+        const gteFilter = GeoExt.util.OGCFilter.getOgcFilter(
+            fieldName,
+            'gte',
+            orderedVals[0],
+            '2.0.0'
         );
-        var lteFilter = GeoExt.util.OGCFilter.getOgcFilter(
-            fieldName, 'lte', orderedVals[1], '2.0.0'
+        const lteFilter = GeoExt.util.OGCFilter.getOgcFilter(
+            fieldName,
+            'lte',
+            orderedVals[1],
+            '2.0.0'
         );
-        var combined = GeoExt.util.OGCFilter.combineFilters(
-            [gteFilter, lteFilter], 'And', false
+        const combined = GeoExt.util.OGCFilter.combineFilters(
+            [gteFilter, lteFilter],
+            'And',
+            false
         );
 
-        Ext.each(layers, function(layer) {
-            var source = layer.getSource();
+        Ext.each(layers, function (layer) {
+            let source = layer.getSource();
             if (source instanceof ol.source.Cluster) {
                 source = source.getSource();
             }
@@ -111,7 +120,7 @@ Ext.define('CpsiMapview.controller.panel.NumericAttributeSlider', {
                 // same goes for the case when we remove the filter, see below.
                 // …Replace any existing filters for now
                 source.updateParams({
-                    'FILTER': combined
+                    FILTER: combined
                 });
             }
         });
@@ -122,9 +131,9 @@ Ext.define('CpsiMapview.controller.panel.NumericAttributeSlider', {
      */
     removeSliderEffects: function () {
         this.getAffectedLayers();
-        var layers = this.getAffectedLayers();
-        Ext.each(layers, function(layer) {
-            var source = layer.getSource();
+        const layers = this.getAffectedLayers();
+        Ext.each(layers, function (layer) {
+            let source = layer.getSource();
             if (source instanceof ol.source.Cluster) {
                 source = source.getSource();
             }
@@ -135,7 +144,7 @@ Ext.define('CpsiMapview.controller.panel.NumericAttributeSlider', {
             } else if (layer.get('isWms')) {
                 // …unset any existing filters for now
                 source.updateParams({
-                    'FILTER': undefined
+                    FILTER: undefined
                 });
             }
         });

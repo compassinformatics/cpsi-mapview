@@ -20,14 +20,19 @@ Ext.define('CpsiMapview.util.FileUploadViewModelMixin', {
                     phantom: '{currentRecord.phantom}'
                 },
                 get: function (data) {
-                    var ret = (data.isLocked !== true);
-                    ret = ret && (data.phantom !== true);
+                    let ret = data.isLocked !== true;
+                    ret = ret && data.phantom !== true;
                     if (!this.getFormulas().belongsToRoleReadWrite) {
                         Ext.log({
                             msg: 'CpsiMapview.util.FileUploadViewModelMixin should be mixed into a viewmodel that implements role checks formulas'
                         });
                     } else {
-                        ret = ret && this.getFormulas().belongsToRoleReadWrite.call(this, this.formulaFn);
+                        ret =
+                            ret &&
+                            this.getFormulas().belongsToRoleReadWrite.call(
+                                this,
+                                this.formulaFn
+                            );
                     }
                     return ret;
                 }
@@ -40,14 +45,19 @@ Ext.define('CpsiMapview.util.FileUploadViewModelMixin', {
                     phantom: '{currentRecord.phantom}'
                 },
                 get: function (data) {
-                    var ret = (data.isLocked !== true) && !data.phantom;
-                    ret = ret && (data.phantom !== true);
+                    let ret = data.isLocked !== true && !data.phantom;
+                    ret = ret && data.phantom !== true;
                     if (!this.getFormulas().belongsToRoleReadWrite) {
                         Ext.log({
                             msg: 'CpsiMapview.util.FileUploadViewModelMixin should be mixed into a viewmodel that implements role checks formulas'
                         });
                     } else {
-                        ret = ret && this.getFormulas().belongsToRoleReadWrite.call(this, this.formulaFn);
+                        ret =
+                            ret &&
+                            this.getFormulas().belongsToRoleReadWrite.call(
+                                this,
+                                this.formulaFn
+                            );
                     }
                     return ret;
                 }

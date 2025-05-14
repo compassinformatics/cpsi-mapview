@@ -8,9 +8,7 @@ Ext.define('CpsiMapview.view.button.PermalinkButton', {
     extend: 'Ext.button.Button',
     xtype: 'cmv_permalink_button',
 
-    requires: [
-        'CpsiMapview.controller.button.PermalinkButtonController'
-    ],
+    requires: ['CpsiMapview.controller.button.PermalinkButtonController'],
 
     tooltip: 'Zoom to a Permalink',
 
@@ -30,11 +28,10 @@ Ext.define('CpsiMapview.view.button.PermalinkButton', {
     name: 'permalinkButton',
 
     config: {
-
         /**
          * Width of the associated Ext.Msg.prompt dialog
          */
-        dialogWidth: 400,
+        dialogWidth: 400
     },
     /**
      * Register the listeners and redirect them

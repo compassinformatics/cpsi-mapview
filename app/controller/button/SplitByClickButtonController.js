@@ -26,8 +26,8 @@ Ext.define('CpsiMapview.controller.button.SplitByClickButtonController', {
      */
     resultLayer: null,
 
-    constructor: function() {
-        var me = this;
+    constructor: function () {
+        const me = this;
         me.splitOnClickedPosition = me.splitOnClickedPosition.bind(me);
 
         me.callParent(arguments);
@@ -37,8 +37,8 @@ Ext.define('CpsiMapview.controller.button.SplitByClickButtonController', {
      * Set the layer used to store features returned by the split service
      * @param {ol.Layer} layer
      */
-    setResultLayer: function(layer) {
-        var me = this;
+    setResultLayer: function (layer) {
+        const me = this;
 
         if (!me.map) {
             return;
@@ -51,7 +51,6 @@ Ext.define('CpsiMapview.controller.button.SplitByClickButtonController', {
         me.resultLayer = layer;
     },
 
-
     /**
      * Main handler which activates or deactivates the click listener for the
      * map.
@@ -59,9 +58,9 @@ Ext.define('CpsiMapview.controller.button.SplitByClickButtonController', {
      * @param {Ext.button.Button} btn The button that has been pressed
      * @param {boolean} pressed The toggle state of the button
      */
-    onToggle: function(btn, pressed) {
-        var me = this;
-        var view = me.getView();
+    onToggle: function (btn, pressed) {
+        const me = this;
+        const view = me.getView();
 
         // guess the map if not given
         if (!me.map) {
@@ -87,21 +86,29 @@ Ext.define('CpsiMapview.controller.button.SplitByClickButtonController', {
      * @param {Event} evt OpenLayers click event
      * @returns {Ext.Promise<any|undefined>}
      */
-    splitOnClickedPosition: function(evt) {
-        var me = this;
-        var map = me.map;
-        var proj = map.getView().getProjection().getCode();
-        var coordinates = evt.coordinate;
-        var point = new ol.Feature(new ol.geom.Point(coordinates));
-        var extent = point.getGeometry().getExtent();
-        var associatedWin = this.getView().up('window');
-        var associatedVm = associatedWin.getViewModel();
-        var parentId = associatedVm.get('currentRecord.publicPrivateSplitId');
-        var buffered = ol.extent.buffer(extent, me.getView().getPointExtentBuffer());
+    splitOnClickedPosition: function (evt) {
+        const me = this;
+        const map = me.map;
+        const proj = map.getView().getProjection().getCode();
+        const coordinates = evt.coordinate;
+        const point = new ol.Feature(new ol.geom.Point(coordinates));
+        const extent = point.getGeometry().getExtent();
+        const associatedWin = this.getView().up('window');
+        const associatedVm = associatedWin.getViewModel();
+        const parentId = associatedVm.get('currentRecord.publicPrivateSplitId');
+        const buffered = ol.extent.buffer(
+            extent,
+            me.getView().getPointExtentBuffer()
+        );
         // transform to ITM since this projection is expected by backend.
-        var bufferedITM = ol.proj.transformExtent(buffered, proj, 'EPSG:2157');
-        var bboxSearchParam = '&bbox=' + encodeURIComponent(bufferedITM.join(','));
-        var idParam = 'publicPrivateSplitId=';
+        const bufferedITM = ol.proj.transformExtent(
+            buffered,
+            proj,
+            'EPSG:2157'
+        );
+        const bboxSearchParam =
+            '&bbox=' + encodeURIComponent(bufferedITM.join(','));
+        let idParam = 'publicPrivateSplitId=';
 
         if (isNaN(parentId)) {
             // we're going to create a new split
@@ -110,9 +117,10 @@ Ext.define('CpsiMapview.controller.button.SplitByClickButtonController', {
             // we're going to edit the existing one
             idParam += parentId;
         }
-        var searchParams = idParam + bboxSearchParam;
+        const searchParams = idParam + bboxSearchParam;
 
-        return me.doAjaxRequest(searchParams)
+        return me
+            .doAjaxRequest(searchParams)
             .then(me.parseSplitResponse.bind(me))
             .then(me.handleFinalResult.bind(me));
     },
@@ -123,38 +131,49 @@ Ext.define('CpsiMapview.controller.button.SplitByClickButtonController', {
      * @param {XMLHttpRequest} response
      * @returns {ol.Feature[]}
      */
-    parseSplitResponse: function(response) {
+    parseSplitResponse: function (response) {
         if (response) {
-            var json;
+            let json;
 
             if (!Ext.isEmpty(response.responseText)) {
-
                 try {
                     json = Ext.decode(response.responseText);
                 } catch (e) {
-                    BasiGX.error('Could not parse the response: ' +
-                        response.responseText);
+                    BasiGX.error(
+                        'Could not parse the response: ' + response.responseText
+                    );
+                    Ext.log.error(e);
                     return;
                 }
 
                 if (json.success && json.data) {
-                    var existingPpSplitId = json.data.existingPublicPrivateSplitId;
+                    const existingPpSplitId =
+                        json.data.existingPublicPrivateSplitId;
                     if (existingPpSplitId !== null) {
                         this.handleExistingSplit(existingPpSplitId);
                     } else {
-                        var splitEdgeFeats = json.data.splitEdgeFeatures;
-                        if (splitEdgeFeats.features && splitEdgeFeats.features.length === 2) {
-                            var format = new ol.format.GeoJSON();
-                            return format.readFeaturesFromObject(splitEdgeFeats);
+                        const splitEdgeFeats = json.data.splitEdgeFeatures;
+                        if (
+                            splitEdgeFeats.features &&
+                            splitEdgeFeats.features.length === 2
+                        ) {
+                            const format = new ol.format.GeoJSON();
+                            return format.readFeaturesFromObject(
+                                splitEdgeFeats
+                            );
                         }
                     }
                 } else {
-                    BasiGX.error('Could not perform the split: ' +
-                        (json.message ? json.message : JSON.stringify(json)));
+                    BasiGX.error(
+                        'Could not perform the split: ' +
+                            (json.message ? json.message : JSON.stringify(json))
+                    );
                 }
             } else {
-                BasiGX.error('Could not perform the split: ' +
-                    (json.message ? json.message : JSON.stringify(json)));
+                BasiGX.error(
+                    'Could not perform the split: ' +
+                        (json.message ? json.message : JSON.stringify(json))
+                );
             }
         } else {
             BasiGX.error('Response was empty');
@@ -169,11 +188,12 @@ Ext.define('CpsiMapview.controller.button.SplitByClickButtonController', {
      *   appended to the request url
      * @returns {Ext.request.Base}
      */
-    doAjaxRequest: function(searchParams) {
-        var me = this;
-        var mapComponent = me.mapComponent || BasiGX.util.Map.getMapComponent();
-        var view = me.getView();
-        var url = view.getApiUrl();
+    doAjaxRequest: function (searchParams) {
+        const me = this;
+        const mapComponent =
+            me.mapComponent || BasiGX.util.Map.getMapComponent();
+        const view = me.getView();
+        let url = view.getApiUrl();
 
         if (!url) {
             Ext.log.warn('No API URL passed - split is not possible.');
@@ -186,22 +206,27 @@ Ext.define('CpsiMapview.controller.button.SplitByClickButtonController', {
 
         mapComponent.setLoading(true);
 
-        return new Ext.Promise(function(resolve) {
+        return new Ext.Promise(function (resolve) {
             Ext.Ajax.request({
                 url: url,
                 method: 'GET',
-                success: function(response) {
+                success: function (response) {
                     mapComponent.setLoading(false);
                     resolve(response);
                 },
-                failure: function(response) {
+                failure: function (response) {
                     mapComponent.setLoading(false);
 
                     if (response.aborted !== true) {
-                        var errorMessage = 'Error while requesting the API endpoint';
+                        let errorMessage =
+                            'Error while requesting the API endpoint';
 
-                        if (response.responseText && response.responseText.message) {
-                            errorMessage += ': ' + response.responseText.message;
+                        if (
+                            response.responseText &&
+                            response.responseText.message
+                        ) {
+                            errorMessage +=
+                                ': ' + response.responseText.message;
                         }
 
                         BasiGX.error(errorMessage);
@@ -216,16 +241,16 @@ Ext.define('CpsiMapview.controller.button.SplitByClickButtonController', {
      * opened for edit.
      * @param {number} splitId
      */
-    handleExistingSplit: function(splitId) {
-
-        var msg = 'This edge has already been split. Open existing split record?';
-        var me = this;
+    handleExistingSplit: function (splitId) {
+        const msg =
+            'This edge has already been split. Open existing split record?';
+        const me = this;
 
         BasiGX.confirm(msg, {
             title: 'Open Existing Split?',
-            fn: function(buttonId) {
+            fn: function (buttonId) {
                 if (buttonId === 'yes') {
-                    var win = me.getView().up('window');
+                    const win = me.getView().up('window');
                     win.fireEvent('splitedgesupdate', splitId);
                 }
             }
@@ -238,10 +263,10 @@ Ext.define('CpsiMapview.controller.button.SplitByClickButtonController', {
      *
      * @param {undefined|ol.Feature[]} features The features returned from the API.
      */
-    handleFinalResult: function(features) {
+    handleFinalResult: function (features) {
         if (features) {
-            var me = this;
-            var resultSource = me.resultLayer.getSource();
+            const me = this;
+            const resultSource = me.resultLayer.getSource();
             resultSource.clear();
             resultSource.addFeatures(features);
         }
@@ -250,10 +275,9 @@ Ext.define('CpsiMapview.controller.button.SplitByClickButtonController', {
     /**
      * Remove the result layer when this component gets destroyed.
      */
-    onBeforeDestroy: function() {
-
-        var me = this;
-        var btn = me.getView();
+    onBeforeDestroy: function () {
+        const me = this;
+        const btn = me.getView();
 
         // detoggle button
         me.onToggle(btn, false);
@@ -261,6 +285,5 @@ Ext.define('CpsiMapview.controller.button.SplitByClickButtonController', {
         if (me.resultLayer) {
             me.map.removeLayer(me.resultLayer);
         }
-
     }
 });

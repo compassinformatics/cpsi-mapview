@@ -4,9 +4,7 @@
 Ext.define('CpsiMapview.model.button.LoginButton', {
     extend: 'Ext.app.ViewModel',
 
-    requires: [
-        'Ext.util.Cookies'
-    ],
+    requires: ['Ext.util.Cookies'],
 
     alias: 'viewmodel.cmv_login_button',
 
@@ -15,11 +13,9 @@ Ext.define('CpsiMapview.model.button.LoginButton', {
     },
 
     formulas: {
-
         tooltip: function (get) {
-
-            var tooltip = '';
-            var me = this;
+            let tooltip = '';
+            const me = this;
 
             if (get('loggedIn')) {
                 tooltip = me.getView().getController().getLoginDetails();
@@ -44,5 +40,4 @@ Ext.define('CpsiMapview.model.button.LoginButton', {
             }
         }
     }
-
 });

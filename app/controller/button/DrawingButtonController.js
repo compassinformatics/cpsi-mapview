@@ -14,9 +14,7 @@ Ext.define('CpsiMapview.controller.button.DrawingButtonController', {
 
     alias: 'controller.cmv_drawing_button',
 
-    mixins: [
-        'CpsiMapview.controller.button.TracingMixin'
-    ],
+    mixins: ['CpsiMapview.controller.button.TracingMixin'],
 
     /**
      * The OpenLayers map. If not given, will be auto-detected
@@ -65,7 +63,7 @@ Ext.define('CpsiMapview.controller.button.DrawingButtonController', {
     //blockedEventHandling: false,
 
     constructor: function () {
-        var me = this;
+        const me = this;
         me.handleDrawStart = me.handleDrawStart.bind(me);
         me.handleDrawEnd = me.handleDrawEnd.bind(me);
         me.handleModifyEnd = me.handleModifyEnd.bind(me);
@@ -79,7 +77,7 @@ Ext.define('CpsiMapview.controller.button.DrawingButtonController', {
      * @param {any} layer
      */
     setDrawLayer: function (layer) {
-        var me = this;
+        const me = this;
 
         if (!me.map) {
             return;
@@ -101,22 +99,24 @@ Ext.define('CpsiMapview.controller.button.DrawingButtonController', {
      * @param {any} layer
      */
     setDrawInteraction: function (layer) {
-
-        var me = this;
-        var view = me.getView();
+        const me = this;
+        const view = me.getView();
 
         if (me.drawInteraction) {
             me.map.removeInteraction(me.drawInteraction);
         }
 
-        var drawCondition = function (evt) {
+        const drawCondition = function (evt) {
             // the draw interaction does not work with the singleClick condition.
-            return ol.events.condition.primaryAction(evt) && ol.events.condition.noModifierKeys(evt);
+            return (
+                ol.events.condition.primaryAction(evt) &&
+                ol.events.condition.noModifierKeys(evt)
+            );
         };
 
-        var source = layer.getSource();
-        var collection = source.getFeaturesCollection();
-        var drawInteractionConfig = {
+        const source = layer.getSource();
+        const collection = source.getFeaturesCollection();
+        const drawInteractionConfig = {
             type: 'LineString',
             features: collection,
             condition: drawCondition,
@@ -135,26 +135,26 @@ Ext.define('CpsiMapview.controller.button.DrawingButtonController', {
      * Prepare the styles retrieved from config.
      */
     prepareDrawingStyles: function () {
-        var me = this;
-        var view = me.getView();
+        const me = this;
+        const view = me.getView();
 
         // ensure styles are applied at right conditions
         view.getDrawBeforeEditingPoint().setGeometry(function (feature) {
-            var geom = feature.getGeometry();
+            const geom = feature.getGeometry();
             if (!me.currentlyDrawing) {
                 return geom;
             }
         });
         view.getDrawStyleStartPoint().setGeometry(function (feature) {
-            var geom = feature.getGeometry();
-            var coords = geom.getCoordinates();
-            var firstCoord = coords[0];
+            const geom = feature.getGeometry();
+            const coords = geom.getCoordinates();
+            const firstCoord = coords[0];
             return new ol.geom.Point(firstCoord);
         });
         view.getDrawStyleEndPoint().setGeometry(function (feature) {
-            var coords = feature.getGeometry().getCoordinates();
+            const coords = feature.getGeometry().getCoordinates();
             if (coords.length > 1) {
-                var lastCoord = coords[coords.length - 1];
+                const lastCoord = coords[coords.length - 1];
                 return new ol.geom.Point(lastCoord);
             }
         });
@@ -170,20 +170,20 @@ Ext.define('CpsiMapview.controller.button.DrawingButtonController', {
      * @returns {Function} The style function for the drawn feature.
      */
     getDrawStyleFunction: function () {
-        var me = this;
-        var view = me.getView();
+        const me = this;
+        const view = me.getView();
 
         return function (feature) {
-            var coordinate = feature.getGeometry().getCoordinates();
-            var pixel = me.map.getPixelFromCoordinate(coordinate);
+            const coordinate = feature.getGeometry().getCoordinates();
+            const pixel = me.map.getPixelFromCoordinate(coordinate);
 
             // remember if we have hit a referenced layer
 
-            var node, edge, polygon, self;
+            let node, edge, polygon, self;
 
             me.map.forEachFeatureAtPixel(pixel, function (foundFeature, layer) {
                 if (layer) {
-                    var key = layer.get('layerKey');
+                    const key = layer.get('layerKey');
                     if (key === view.getNodeLayerKey()) {
                         node = foundFeature;
                     } else if (key === view.getEdgeLayerKey()) {
@@ -204,27 +204,27 @@ Ext.define('CpsiMapview.controller.button.DrawingButtonController', {
                     // Prepare style for vertices of snapped edge
                     // we create a MultiPoint from the edge's vertices
                     // and set it as geometry in our style function
-                    var geom = edge.getGeometry();
-                    var coords = [];
+                    const geom = edge.getGeometry();
+                    let coords = [];
                     if (geom.getType() === 'MultiLineString') {
                         // use all vertices of containing LineStrings
-                        var lineStrings = geom.getLineStrings();
+                        const lineStrings = geom.getLineStrings();
                         Ext.each(lineStrings, function (lineString) {
-                            var lineStringCoords = lineString.getCoordinates();
+                            const lineStringCoords =
+                                lineString.getCoordinates();
                             coords = coords.concat(lineStringCoords);
                         });
                     } else {
                         coords = geom.getCoordinates();
                     }
-                    var verticesMultiPoint = new ol.geom.MultiPoint(coords);
-                    var snappedEdgeVertexStyle = view.getSnappedEdgeVertexStyle().clone();
+                    const verticesMultiPoint = new ol.geom.MultiPoint(coords);
+                    const snappedEdgeVertexStyle = view
+                        .getSnappedEdgeVertexStyle()
+                        .clone();
                     snappedEdgeVertexStyle.setGeometry(verticesMultiPoint);
 
                     // combine style for snapped point and vertices of snapped edge
-                    return [
-                        snappedEdgeVertexStyle,
-                        view.getSnappedEdgeStyle()
-                    ];
+                    return [snappedEdgeVertexStyle, view.getSnappedEdgeStyle()];
                 } else {
                     return view.getSnappedEdgeStyle();
                 }
@@ -246,31 +246,34 @@ Ext.define('CpsiMapview.controller.button.DrawingButtonController', {
      * @param {any} layer
      */
     setModifyInteraction: function (layer) {
-
-        var me = this;
+        const me = this;
 
         if (me.modifyInteraction) {
             me.map.removeInteraction(me.modifyInteraction);
         }
 
-        var condition = function (evt) {
+        const condition = function (evt) {
             // only allow modifying when the CTRL key is pressed, otherwise we cannot add new line
             // segments once the first feature is drawn
-            return ol.events.condition.primaryAction(evt) && ol.events.condition.platformModifierKeyOnly(evt);
+            return (
+                ol.events.condition.primaryAction(evt) &&
+                ol.events.condition.platformModifierKeyOnly(evt)
+            );
         };
 
         // create the modify interaction
-        var modifyInteractionConfig = {
+        const modifyInteractionConfig = {
             features: layer.getSource().getFeaturesCollection(),
             condition: condition,
             // intentionally pass empty style, because modify style is
             // done in the draw interaction
             style: new ol.style.Style({})
         };
-        me.modifyInteraction = new ol.interaction.Modify(modifyInteractionConfig);
+        me.modifyInteraction = new ol.interaction.Modify(
+            modifyInteractionConfig
+        );
         me.map.addInteraction(me.modifyInteraction);
         me.modifyInteraction.on('modifyend', me.handleModifyEnd);
-
     },
 
     /**
@@ -278,8 +281,7 @@ Ext.define('CpsiMapview.controller.button.DrawingButtonController', {
      * @param {any} layer
      */
     setSnapInteraction: function (drawLayer) {
-
-        var me = this;
+        const me = this;
 
         if (me.snapInteraction) {
             me.map.removeInteraction(me.snapInteraction);
@@ -288,11 +290,11 @@ Ext.define('CpsiMapview.controller.button.DrawingButtonController', {
         // unbind any previous layer event listeners
         me.unBindLayerListeners();
 
-        var snapCollection = new ol.Collection([], {
+        const snapCollection = new ol.Collection([], {
             unique: true
         });
 
-        var fc = drawLayer.getSource().getFeaturesCollection();
+        const fc = drawLayer.getSource().getFeaturesCollection();
 
         fc.on('add', function (evt) {
             snapCollection.push(evt.element);
@@ -306,7 +308,7 @@ Ext.define('CpsiMapview.controller.button.DrawingButtonController', {
         // by the Collection if trying to add a duplicate feature, but still maintains
         // a unique collection of features. Used as an alternative to .extend but ensures
         // any potential errors related to unique features are handled / suppressed.
-        var addUniqueFeaturesToCollection = function (collection, features) {
+        const addUniqueFeaturesToCollection = function (collection, features) {
             Ext.Array.each(features, function (f) {
                 // eslint-disable-next-line
                 try { collection.push(f); } catch (e) { }
@@ -314,8 +316,12 @@ Ext.define('CpsiMapview.controller.button.DrawingButtonController', {
         };
 
         // Checks if a feature exists in layers other than the current layer
-        var isFeatureInOtherLayers = function (allLayers, currentLayer, feature) {
-            var found = false;
+        const isFeatureInOtherLayers = function (
+            allLayers,
+            currentLayer,
+            feature
+        ) {
+            let found = false;
             Ext.Array.each(allLayers, function (layer) {
                 if (layer !== currentLayer) {
                     if (layer.getSource().hasFeature(feature)) {
@@ -327,15 +333,15 @@ Ext.define('CpsiMapview.controller.button.DrawingButtonController', {
         };
 
         // get the layers to snap to
-        var view = me.getView();
-        var layerKeys = view.getSnappingLayerKeys();
-        var allowSnapToHiddenFeatures = view.getAllowSnapToHiddenFeatures();
-        var layers = Ext.Array.map(layerKeys, function (key) {
+        const view = me.getView();
+        const layerKeys = view.getSnappingLayerKeys();
+        const allowSnapToHiddenFeatures = view.getAllowSnapToHiddenFeatures();
+        const layers = Ext.Array.map(layerKeys, function (key) {
             return BasiGX.util.Layer.getLayersBy('layerKey', key)[0];
         });
 
         Ext.Array.each(layers, function (layer) {
-            var feats = layer.getSource().getFeatures(); // these are standard WFS layers so we use getSource without getFeaturesCollection here
+            const feats = layer.getSource().getFeatures(); // these are standard WFS layers so we use getSource without getFeaturesCollection here
             // add inital features to the snap collection, if the layer is visible
             // or if allowSnapToHiddenFeatures is enabled
             if (layer.getVisible() || allowSnapToHiddenFeatures) {
@@ -343,23 +349,32 @@ Ext.define('CpsiMapview.controller.button.DrawingButtonController', {
             }
 
             // Update the snapCollection on addfeature or removefeature
-            var addFeatureKey = layer.getSource().on('addfeature', function (evt) {
-                if (layer.getVisible() || allowSnapToHiddenFeatures) {
-                    addUniqueFeaturesToCollection(snapCollection, [evt.feature]);
-                }
-            });
+            const addFeatureKey = layer
+                .getSource()
+                .on('addfeature', function (evt) {
+                    if (layer.getVisible() || allowSnapToHiddenFeatures) {
+                        addUniqueFeaturesToCollection(snapCollection, [
+                            evt.feature
+                        ]);
+                    }
+                });
 
-            var removefeatureKey = layer.getSource().on('removefeature', function (evt) {
-                if (!isFeatureInOtherLayers(layers, layer, evt.feature)) {
-                    snapCollection.remove(evt.feature);
-                }
-            });
+            const removefeatureKey = layer
+                .getSource()
+                .on('removefeature', function (evt) {
+                    if (!isFeatureInOtherLayers(layers, layer, evt.feature)) {
+                        snapCollection.remove(evt.feature);
+                    }
+                });
 
             // Update the snapCollection on layer visibility change
             // only handle layer visible change event if snapping to hidden features is disabled
+
+            let changeVisibleKey = null;
+
             if (!allowSnapToHiddenFeatures) {
-                var changeVisibleKey = layer.on('change:visible', function () {
-                    var features = layer.getSource().getFeatures();
+                changeVisibleKey = layer.on('change:visible', function () {
+                    const features = layer.getSource().getFeatures();
                     if (layer.getVisible()) {
                         addUniqueFeaturesToCollection(snapCollection, features);
                     } else {
@@ -372,7 +387,11 @@ Ext.define('CpsiMapview.controller.button.DrawingButtonController', {
                 });
             }
 
-            me.listenerKeys.push(addFeatureKey, removefeatureKey, changeVisibleKey);
+            me.listenerKeys.push(addFeatureKey, removefeatureKey);
+
+            if (changeVisibleKey) {
+                me.listenerKeys.push(changeVisibleKey);
+            }
         });
 
         // vector tile sources cannot be used for snapping as they
@@ -383,24 +402,24 @@ Ext.define('CpsiMapview.controller.button.DrawingButtonController', {
             features: snapCollection
         });
         me.map.addInteraction(me.snapInteraction);
-
     },
 
     getSnappedEdge: function (coord, searchLayer) {
+        const me = this;
+        const extent = me.getBufferedCoordExtent(coord);
 
-        var me = this;
-        var extent = me.getBufferedCoordExtent(coord);
-
-        var features = [];
+        const features = [];
         // find all intersecting edges
         // https://openlayers.org/en/latest/apidoc/module-ol_source_Vector-VectorSource.html
-        searchLayer.getSource().forEachFeatureIntersectingExtent(extent, function (feat) {
-            features.push(feat);
-        });
+        searchLayer
+            .getSource()
+            .forEachFeatureIntersectingExtent(extent, function (feat) {
+                features.push(feat);
+            });
 
         if (features.length > 0) {
-            var selectedFeat = null;
-            var parentRec = me.getView().getParentRecord();
+            let selectedFeat = null;
+            const parentRec = me.getView().getParentRecord();
             if (parentRec) {
                 features.forEach(function (feat) {
                     if (feat.getId() !== parentRec.getId()) {
@@ -423,18 +442,15 @@ Ext.define('CpsiMapview.controller.button.DrawingButtonController', {
     },
 
     getBufferedCoordExtent: function (coord) {
-
-        var me = this;
-        var extent = ol.extent.boundingExtent([coord]); // still a single point
-        var buffer = me.map.getView().getResolution() * 3; // use a 3 pixel tolerance for snapping
+        const me = this;
+        const extent = ol.extent.boundingExtent([coord]); // still a single point
+        const buffer = me.map.getView().getResolution() * 3; // use a 3 pixel tolerance for snapping
         return ol.extent.buffer(extent, buffer); // buffer the point as it may have snapped to a different feature than the nodes/edges
-
     },
 
     getSnappedFeatureId: function (coord, searchLayer) {
-
-        var me = this;
-        var feat = me.getSnappedEdge(coord, searchLayer);
+        const me = this;
+        const feat = me.getSnappedEdge(coord, searchLayer);
 
         if (feat) {
             // this requires all GeoJSON features used for the layer to have an id property
@@ -455,23 +471,33 @@ Ext.define('CpsiMapview.controller.button.DrawingButtonController', {
      * @param {any} newGeom
      */
     mergeLineStrings: function (origGeom, newGeom) {
-        var newGeomFirstCoord = newGeom.getFirstCoordinate();
-        var matchesFirstCoord = Ext.Array.equals(origGeom.getFirstCoordinate(), newGeomFirstCoord);
-        var matchesLastCoord = Ext.Array.equals(origGeom.getLastCoordinate(), newGeomFirstCoord);
+        const newGeomFirstCoord = newGeom.getFirstCoordinate();
+        const matchesFirstCoord = Ext.Array.equals(
+            origGeom.getFirstCoordinate(),
+            newGeomFirstCoord
+        );
+        const matchesLastCoord = Ext.Array.equals(
+            origGeom.getLastCoordinate(),
+            newGeomFirstCoord
+        );
 
         if (matchesFirstCoord || matchesLastCoord) {
-            var origCoords = origGeom.getCoordinates();
+            const origCoords = origGeom.getCoordinates();
             // if drawing in continued from the start point of the original,
             // the original needs to be reversed to we end up with correct
             // start and end points
             if (matchesFirstCoord) {
                 origCoords.reverse();
             }
-            var newCoords = newGeom.getCoordinates();
+            const newCoords = newGeom.getCoordinates();
             newGeom.setCoordinates(origCoords.concat(newCoords));
         } else {
             Ext.log('Start / End coordinates differ');
-            Ext.log('origGeom start/end coords: ', origGeom.getFirstCoordinate(), origGeom.getLastCoordinate());
+            Ext.log(
+                'origGeom start/end coords: ',
+                origGeom.getFirstCoordinate(),
+                origGeom.getLastCoordinate()
+            );
             Ext.log('newGeom start coord: ', newGeom.getFirstCoordinate());
         }
 
@@ -482,7 +508,7 @@ Ext.define('CpsiMapview.controller.button.DrawingButtonController', {
      * Handles the drawstart event
      */
     handleDrawStart: function () {
-        var me = this;
+        const me = this;
         me.currentlyDrawing = true;
     },
 
@@ -491,12 +517,12 @@ Ext.define('CpsiMapview.controller.button.DrawingButtonController', {
      * @param {ol.interaction.Draw.Event} evt The OpenLayers draw event containing the features
      */
     handleDrawEnd: function (evt) {
-        var me = this;
-        var feature = evt.feature;
-        var newGeom = feature.getGeometry();
+        const me = this;
+        const feature = evt.feature;
+        const newGeom = feature.getGeometry();
 
-        var drawSource = me.drawLayer.getSource();
-        var currentFeature = drawSource.getFeaturesCollection().item(0);
+        const drawSource = me.drawLayer.getSource();
+        const currentFeature = drawSource.getFeaturesCollection().item(0);
 
         if (currentFeature) {
             // merge all linestrings to a single linestring
@@ -513,12 +539,12 @@ Ext.define('CpsiMapview.controller.button.DrawingButtonController', {
     },
 
     /**
-    * Handles the modifyend event
-    * @param {ol.interaction.Draw.Event} evt The OpenLayers draw event containing the features
-    */
+     * Handles the modifyend event
+     * @param {ol.interaction.Draw.Event} evt The OpenLayers draw event containing the features
+     */
     handleModifyEnd: function (evt) {
-        var me = this;
-        var feature = evt.features.item(0);
+        const me = this;
+        const feature = evt.features.item(0);
         me.calculateLineIntersections(feature);
     },
 
@@ -532,34 +558,40 @@ Ext.define('CpsiMapview.controller.button.DrawingButtonController', {
      * @returns {Number}
      */
     getNodeIdFromSnappedEdge: function (edgesLayer, edgeLayerConfig, coord) {
-        var me = this;
-        var nodeId;
+        const me = this;
+        let nodeId;
 
         // check to see if the coord snaps to the start of any edges
-        var edge = me.getSnappedEdge(coord, edgesLayer);
+        const edge = me.getSnappedEdge(coord, edgesLayer);
         if (!edge) {
             return null;
         }
 
-        var inputPoint = new ol.geom.Point(coord);
+        const inputPoint = new ol.geom.Point(coord);
 
-        var startCoord = edge.getGeometry().getFirstCoordinate();
-        var startExtent = me.getBufferedCoordExtent(startCoord);
-        var startDistance = null;
+        const startCoord = edge.getGeometry().getFirstCoordinate();
+        const startExtent = me.getBufferedCoordExtent(startCoord);
+        let startDistance = null;
 
         if (inputPoint.intersectsExtent(startExtent)) {
             nodeId = edge.get(edgeLayerConfig.startNodeProperty);
-            startDistance = new ol.geom.LineString([coord, startCoord]).getLength();
+            startDistance = new ol.geom.LineString([
+                coord,
+                startCoord
+            ]).getLength();
         }
 
-        var endCoord = edge.getGeometry().getLastCoordinate();
-        var endExtent = me.getBufferedCoordExtent(endCoord);
+        const endCoord = edge.getGeometry().getLastCoordinate();
+        const endExtent = me.getBufferedCoordExtent(endCoord);
 
         if (inputPoint.intersectsExtent(endExtent)) {
-            var endNodeId = edge.get(edgeLayerConfig.endNodeProperty);
+            const endNodeId = edge.get(edgeLayerConfig.endNodeProperty);
             if (startDistance !== null) {
                 // if an input coord snaps to both ends of the line, then take the closest end
-                var endDistance = new ol.geom.LineString([coord, endCoord]).getLength();
+                const endDistance = new ol.geom.LineString([
+                    coord,
+                    endCoord
+                ]).getLength();
                 if (endDistance < startDistance) {
                     nodeId = endNodeId;
                 }
@@ -573,12 +605,13 @@ Ext.define('CpsiMapview.controller.button.DrawingButtonController', {
 
         //<debug>
         if (!nodeId) {
-            Ext.log.warn('A coordinate snapped to an edge, but no nodeId was found. Check the edgeLayerConfig');
+            Ext.log.warn(
+                'A coordinate snapped to an edge, but no nodeId was found. Check the edgeLayerConfig'
+            );
         }
         //</debug>
 
         return nodeId;
-
     },
 
     /**
@@ -586,25 +619,27 @@ Ext.define('CpsiMapview.controller.button.DrawingButtonController', {
      * @param {any} newGeom
      */
     calculateLineIntersections: function (feature) {
+        const me = this;
+        const view = me.getView();
 
-        var me = this;
-        var view = me.getView();
+        const newGeom = feature.getGeometry();
 
-        var newGeom = feature.getGeometry();
+        const startCoord = newGeom.getFirstCoordinate();
+        const endCoord = newGeom.getLastCoordinate();
 
-        var startCoord = newGeom.getFirstCoordinate();
-        var endCoord = newGeom.getLastCoordinate();
-
-        var foundFeatAtStart = false;
-        var foundFeatAtEnd = false;
+        let foundFeatAtStart = false;
+        let foundFeatAtEnd = false;
 
         // get any nodes that the line snaps to
-        var nodeLayerKey = view.getNodeLayerKey();
-        var startNodeId = null;
-        var endNodeId = null;
+        const nodeLayerKey = view.getNodeLayerKey();
+        let startNodeId = null;
+        let endNodeId = null;
 
         if (nodeLayerKey) {
-            var nodeLayer = BasiGX.util.Layer.getLayersBy('layerKey', nodeLayerKey)[0];
+            const nodeLayer = BasiGX.util.Layer.getLayersBy(
+                'layerKey',
+                nodeLayerKey
+            )[0];
             startNodeId = me.getSnappedFeatureId(startCoord, nodeLayer);
             endNodeId = me.getSnappedFeatureId(endCoord, nodeLayer);
 
@@ -612,28 +647,39 @@ Ext.define('CpsiMapview.controller.button.DrawingButtonController', {
             foundFeatAtEnd = endNodeId ? true : false;
         }
 
-        var edgeLayerKey = view.getEdgeLayerKey();
-        var edgesLayer;
+        const edgeLayerKey = view.getEdgeLayerKey();
+        let edgesLayer;
 
         if (edgeLayerKey) {
-            edgesLayer = BasiGX.util.Layer.getLayersBy('layerKey', edgeLayerKey)[0];
+            edgesLayer = BasiGX.util.Layer.getLayersBy(
+                'layerKey',
+                edgeLayerKey
+            )[0];
         }
 
         // if the edge layer has been configured with to and from node fields
         // we will check if the feature snaps at the start or end of edges
 
-        var edgeLayerConfig = view.getEdgeLayerConfig();
+        const edgeLayerConfig = view.getEdgeLayerConfig();
 
         if (edgesLayer && edgeLayerConfig) {
-            var nodeId;
-            nodeId = me.getNodeIdFromSnappedEdge(edgesLayer, edgeLayerConfig, startCoord);
+            let nodeId;
+            nodeId = me.getNodeIdFromSnappedEdge(
+                edgesLayer,
+                edgeLayerConfig,
+                startCoord
+            );
 
             if (nodeId) {
                 startNodeId = nodeId;
                 foundFeatAtStart = true;
             }
 
-            nodeId = me.getNodeIdFromSnappedEdge(edgesLayer, edgeLayerConfig, endCoord);
+            nodeId = me.getNodeIdFromSnappedEdge(
+                edgesLayer,
+                edgeLayerConfig,
+                endCoord
+            );
 
             if (nodeId) {
                 endNodeId = nodeId;
@@ -644,12 +690,10 @@ Ext.define('CpsiMapview.controller.button.DrawingButtonController', {
         // now check for any edges at both ends, but only in the case
         // where there are no start and end nodes
 
-
-        var startEdgeId = null;
-        var endEdgeId = null;
+        let startEdgeId = null;
+        let endEdgeId = null;
 
         if (edgesLayer) {
-
             if (!foundFeatAtStart) {
                 startEdgeId = me.getSnappedFeatureId(startCoord, edgesLayer);
                 foundFeatAtStart = startEdgeId ? true : false;
@@ -664,15 +708,21 @@ Ext.define('CpsiMapview.controller.button.DrawingButtonController', {
         // finally we will check if we have snapped to a polygon edge
         // this will allow us to create continua based on points around the polygon edge
 
-        var polygonLayerKey = view.getPolygonLayerKey();
-        var startPolygonId = null;
-        var endPolygonId = null;
+        const polygonLayerKey = view.getPolygonLayerKey();
+        let startPolygonId = null;
+        let endPolygonId = null;
 
         if (polygonLayerKey) {
-            var polygonsLayer = BasiGX.util.Layer.getLayersBy('layerKey', polygonLayerKey)[0];
+            const polygonsLayer = BasiGX.util.Layer.getLayersBy(
+                'layerKey',
+                polygonLayerKey
+            )[0];
 
             if (!foundFeatAtStart) {
-                startPolygonId = me.getSnappedFeatureId(startCoord, polygonsLayer);
+                startPolygonId = me.getSnappedFeatureId(
+                    startCoord,
+                    polygonsLayer
+                );
             }
 
             if (!foundFeatAtEnd) {
@@ -680,7 +730,7 @@ Ext.define('CpsiMapview.controller.button.DrawingButtonController', {
             }
         }
 
-        var result = {
+        const result = {
             startNodeId: startNodeId,
             endNodeId: endNodeId,
             startCoord: startCoord,
@@ -692,13 +742,12 @@ Ext.define('CpsiMapview.controller.button.DrawingButtonController', {
         };
 
         // fire an event when the drawing is complete
-        var drawSource = me.drawLayer.getSource();
+        const drawSource = me.drawLayer.getSource();
         drawSource.dispatchEvent({ type: 'localdrawend', result: result });
     },
 
     handleKeyPress: function (evt) {
-
-        var me = this; // bound to the controller in the constructor
+        const me = this; // bound to the controller in the constructor
 
         // use DEL to remove last point
         if (evt.keyCode == 46) {
@@ -721,8 +770,8 @@ Ext.define('CpsiMapview.controller.button.DrawingButtonController', {
      * @param {boolean} pressed The toggle state of the button
      */
     onToggle: function (btn, pressed) {
-        var me = this;
-        var view = me.getView();
+        const me = this;
+        const view = me.getView();
 
         // guess the map if not given
         if (!me.map) {
@@ -746,7 +795,7 @@ Ext.define('CpsiMapview.controller.button.DrawingButtonController', {
                 view.getDrawBeforeEditingPoint(),
                 view.getDrawStyleStartPoint(),
                 view.getDrawStyleLine(),
-                view.getDrawStyleEndPoint(),
+                view.getDrawStyleEndPoint()
             ];
             me.drawLayer.setStyle(me.defaultDrawStyle);
 
@@ -755,15 +804,12 @@ Ext.define('CpsiMapview.controller.button.DrawingButtonController', {
             me.setSnapInteraction(me.drawLayer);
         }
 
-        var viewPort = me.map.getViewport();
+        const viewPort = me.map.getViewport();
 
         if (pressed) {
-            var tracingLayerKeys = view.getTracingLayerKeys();
+            const tracingLayerKeys = view.getTracingLayerKeys();
 
-            me.initTracing(
-                tracingLayerKeys,
-                me.drawInteraction
-            );
+            me.initTracing(tracingLayerKeys, me.drawInteraction);
             me.drawInteraction.setActive(true);
             me.modifyInteraction.setActive(true);
             me.snapInteraction.setActive(true);
@@ -785,7 +831,7 @@ Ext.define('CpsiMapview.controller.button.DrawingButtonController', {
      * @param {ol.coordinate.Coordinate[]} appendCoords The new coordinates
      */
     handleTracingResult: function (appendCoords) {
-        var me = this;
+        const me = this;
         me.drawInteraction.removeLastPoint();
         me.drawInteraction.appendCoordinates(appendCoords);
     },
@@ -798,24 +844,29 @@ Ext.define('CpsiMapview.controller.button.DrawingButtonController', {
         // suppress default browser behaviour
         evt.preventDefault();
 
-        var me = this.scope;
+        const me = this.scope;
 
-        var menuItems = [{
-            text: 'Clear All',
-            handler: function () {
-                try {
-                    me.drawLayer.getSource().getFeaturesCollection().clear();
-                } catch (error) {
-                    // sometimes get an error here when trying to clear the features collection
-                    // Cannot read properties of null (reading 'findIndexBy')
-                    // TODO debug - seems to occur after the layer is reloaded, so we may need to
-                    // update the collection on reload? the source still has the same ol_uid
-                    Ext.log.error(error);
+        const menuItems = [
+            {
+                text: 'Clear All',
+                handler: function () {
+                    try {
+                        me.drawLayer
+                            .getSource()
+                            .getFeaturesCollection()
+                            .clear();
+                    } catch (error) {
+                        // sometimes get an error here when trying to clear the features collection
+                        // Cannot read properties of null (reading 'findIndexBy')
+                        // TODO debug - seems to occur after the layer is reloaded, so we may need to
+                        // update the collection on reload? the source still has the same ol_uid
+                        Ext.log.error(error);
+                    }
                 }
             }
-        }];
+        ];
 
-        var menu = Ext.create('Ext.menu.Menu', {
+        const menu = Ext.create('Ext.menu.Menu', {
             width: 100,
             plain: true,
             renderTo: Ext.getBody(),
@@ -828,9 +879,8 @@ Ext.define('CpsiMapview.controller.button.DrawingButtonController', {
      * Remove the interaction when this component gets destroyed
      */
     onBeforeDestroy: function () {
-
-        var me = this;
-        var btn = me.getView();
+        const me = this;
+        const btn = me.getView();
 
         // detoggle button
         me.onToggle(btn, false);
@@ -839,7 +889,6 @@ Ext.define('CpsiMapview.controller.button.DrawingButtonController', {
         // is updated in CpsiMapview.util.ApplicationMixin to re-enable clicks
         btn.pressed = false;
         btn.fireEvent('toggle');
-
 
         if (me.drawInteraction) {
             me.map.removeInteraction(me.drawInteraction);
@@ -873,8 +922,7 @@ Ext.define('CpsiMapview.controller.button.DrawingButtonController', {
     },
 
     init: function () {
-
-        var me = this;
+        const me = this;
 
         // create an object for the contextmenu eventhandler
         // so it can be removed correctly

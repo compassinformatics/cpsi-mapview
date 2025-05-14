@@ -24,22 +24,25 @@ Ext.define('CpsiMapview.view.window.ParallelLineWindow', {
 
     layer: null,
 
-    items: [{
-        xtype: 'button',
-        text: 'Select Feature (example button)',
-        enableToggle: true,
-        listeners: {
-            toggle: 'onSelectFeatureToggle'
-        }
-    }, {
-        xtype: 'cmv_parallel_line_toolbar',
-        bind: {
-            feature: '{selectedFeature}'
+    items: [
+        {
+            xtype: 'button',
+            text: 'Select Feature (example button)',
+            enableToggle: true,
+            listeners: {
+                toggle: 'onSelectFeatureToggle'
+            }
         },
-        listeners: {
-            parallelLineCreated: 'onParallelLineCreated'
+        {
+            xtype: 'cmv_parallel_line_toolbar',
+            bind: {
+                feature: '{selectedFeature}'
+            },
+            listeners: {
+                parallelLineCreated: 'onParallelLineCreated'
+            }
         }
-    }],
+    ],
 
     listeners: {
         beforedestroy: 'onBeforeDestroy'

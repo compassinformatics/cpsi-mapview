@@ -24,11 +24,11 @@ Ext.define('CpsiMapview.view.button.SpatialQueryButton', {
          * @param {String} layerKey layerKey property of the layer
          */
         findAssociatedPermanentLayer: function (map, layerKey) {
-            var layers = map.getLayers().getArray();
-            var associatedPermanentLayer = layers.find(function (layer) {
-                var isSpatialQueryLayer = layer.get('isSpatialQueryLayer');
-                var associatedLayerKey = layer.get('associatedLayerKey');
-                return isSpatialQueryLayer && (associatedLayerKey === layerKey);
+            const layers = map.getLayers().getArray();
+            const associatedPermanentLayer = layers.find(function (layer) {
+                const isSpatialQueryLayer = layer.get('isSpatialQueryLayer');
+                const associatedLayerKey = layer.get('associatedLayerKey');
+                return isSpatialQueryLayer && associatedLayerKey === layerKey;
             });
             return associatedPermanentLayer;
         },
@@ -40,7 +40,11 @@ Ext.define('CpsiMapview.view.button.SpatialQueryButton', {
          * @param {String} layerKey layerKey property of the layer
          */
         clearAssociatedPermanentLayer: function (map, layerKey) {
-            var associatedPermanentLayer = CpsiMapview.view.button.SpatialQueryButton.findAssociatedPermanentLayer(map, layerKey);
+            const associatedPermanentLayer =
+                CpsiMapview.view.button.SpatialQueryButton.findAssociatedPermanentLayer(
+                    map,
+                    layerKey
+                );
             if (associatedPermanentLayer !== undefined) {
                 associatedPermanentLayer.getSource().clear();
             }
@@ -53,7 +57,11 @@ Ext.define('CpsiMapview.view.button.SpatialQueryButton', {
          * @param {String} layerKey layerKey property of the layer
          */
         showAssociatedPermanentLayer: function (map, layerKey) {
-            var associatedPermanentLayer = CpsiMapview.view.button.SpatialQueryButton.findAssociatedPermanentLayer(map, layerKey);
+            const associatedPermanentLayer =
+                CpsiMapview.view.button.SpatialQueryButton.findAssociatedPermanentLayer(
+                    map,
+                    layerKey
+                );
             if (associatedPermanentLayer !== undefined) {
                 associatedPermanentLayer.setVisible(true);
             }
@@ -66,11 +74,15 @@ Ext.define('CpsiMapview.view.button.SpatialQueryButton', {
          * @param {String} layerKey layerKey property of the layer
          */
         hideAssociatedPermanentLayer: function (map, layerKey) {
-            var associatedPermanentLayer = CpsiMapview.view.button.SpatialQueryButton.findAssociatedPermanentLayer(map, layerKey);
+            const associatedPermanentLayer =
+                CpsiMapview.view.button.SpatialQueryButton.findAssociatedPermanentLayer(
+                    map,
+                    layerKey
+                );
             if (associatedPermanentLayer !== undefined) {
                 associatedPermanentLayer.setVisible(false);
             }
-        },
+        }
     },
 
     config: {
@@ -152,10 +164,9 @@ Ext.define('CpsiMapview.view.button.SpatialQueryButton', {
     },
 
     /**
-    * If set to true a Wfs GetFeatures request will be automatically triggered
-    *
-    * @cfg {Boolean} triggerWfsRequest Whether or not to trigger a Wfs GetFeatures request
-    */
+     * If set to true a Wfs GetFeatures request will be automatically triggered
+     *
+     * @cfg {Boolean} triggerWfsRequest Whether or not to trigger a Wfs GetFeatures request
+     */
     triggerWfsRequest: true
-
 });

@@ -31,10 +31,9 @@ Ext.define('CpsiMapview.form.LayersMixin', {
      * @param {boolean} show
      */
     toggleLayerVisibility: function (show) {
+        const vm = this.getView().getViewModel();
 
-        var vm = this.getView().getViewModel();
-
-        var layer = vm.get('resultLayer');
+        const layer = vm.get('resultLayer');
 
         if (layer) {
             layer.setVisible(show);
@@ -42,7 +41,7 @@ Ext.define('CpsiMapview.form.LayersMixin', {
 
         // if the form also has a polygon layer for selection
         // then hide this also
-        var polygonLayer = vm.get('polygonLayer');
+        const polygonLayer = vm.get('polygonLayer');
 
         if (polygonLayer) {
             polygonLayer.setVisible(show);
@@ -54,8 +53,8 @@ Ext.define('CpsiMapview.form.LayersMixin', {
      * form is hidden
      */
     onWindowHide: function () {
-        var me = this;
-        var win = me.getView();
+        const me = this;
+        const win = me.getView();
 
         if (win.isMinimized === false) {
             me.toggleLayerVisibility(false);

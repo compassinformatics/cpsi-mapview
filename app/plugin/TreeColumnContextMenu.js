@@ -35,8 +35,8 @@ Ext.define('CpsiMapview.plugin.TreeColumnContextMenu', {
      * @return {Ext.menu.Menu} The menu holding all configured items / tools
      */
     createContextUi: function (layerTreeNode) {
-        var me = this;
-        var menuItems = [];
+        const me = this;
+        const menuItems = [];
 
         // create all menu items / tools
         Ext.each(me.menuItems, function (menuItem) {
@@ -47,13 +47,12 @@ Ext.define('CpsiMapview.plugin.TreeColumnContextMenu', {
         });
 
         // create the menu and hide if empty
-        var emptyMenu = menuItems.length === 0;
-        var menu = Ext.create('Ext.menu.Menu', {
+        const emptyMenu = menuItems.length === 0;
+        const menu = Ext.create('Ext.menu.Menu', {
             items: menuItems,
             hidden: emptyMenu
         });
 
         return menu;
     }
-
 });

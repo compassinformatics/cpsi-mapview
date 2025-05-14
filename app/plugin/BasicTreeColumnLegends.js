@@ -39,35 +39,35 @@ Ext.define('CpsiMapview.plugin.BasicTreeColumnLegends', {
      * The context for methods available in the template
      */
     valueReplacementContext: {
-        hasLegend: function(rec) {
-            var isChecked = rec.get('checked');
-            var layer = rec.data;
+        hasLegend: function (rec) {
+            const isChecked = rec.get('checked');
+            const layer = rec.data;
             return isChecked && !(layer instanceof ol.layer.Group);
         },
-        getLegendHtml: function(rec) {
-            var staticMe = CpsiMapview.plugin.BasicTreeColumnLegends;
-            var layer = rec.data;
-            var layerKey = layer.get('layerKey');
+        getLegendHtml: function (rec) {
+            const staticMe = CpsiMapview.plugin.BasicTreeColumnLegends;
+            const layer = rec.data;
+            let layerKey = layer.get('layerKey');
 
             // a layer can have different legends for different styles
             // ensure each of these are cached
             if (layer.getSource && layer.getSource().getParams) {
-                var styles = layer.getSource().getParams().STYLES;
+                const styles = layer.getSource().getParams().STYLES;
                 if (styles) {
-                    layerKey += '_' +  styles.toUpperCase();
+                    layerKey += '_' + styles.toUpperCase();
                 }
             } else {
                 // for WFS we also use the WMS legend so make sure we create a cache
                 // key for these or it will always use just the layerKey
-                var activatedStyle = layer.get('activatedStyle');
+                const activatedStyle = layer.get('activatedStyle');
                 if (activatedStyle) {
                     layerKey += '_' + activatedStyle.toUpperCase();
                 }
             }
 
-            var legendUrl = layer.get('legendUrl');
-            var w = layer.get('legendWidth');
-            var h = layer.get('legendHeight');
+            let legendUrl = layer.get('legendUrl');
+            let w = layer.get('legendWidth');
+            let h = layer.get('legendHeight');
 
             if (!legendUrl) {
                 legendUrl = LegendUtil.createGetLegendGraphicUrl(layer);
@@ -83,7 +83,8 @@ Ext.define('CpsiMapview.plugin.BasicTreeColumnLegends', {
                 w = h = 1;
             }
 
-            var legendDataUrl = CpsiMapview.view.LayerTree.legendImgLookup[layerKey];
+            const legendDataUrl =
+                CpsiMapview.view.LayerTree.legendImgLookup[layerKey];
             if (!legendDataUrl) {
                 // load the legend image and cache it in an static lookup for later re-use
                 // without any server request
@@ -92,14 +93,13 @@ Ext.define('CpsiMapview.plugin.BasicTreeColumnLegends', {
                 // since getLegendHtml is executed several times for one refresh due to
                 // unknown reasons
                 // Flag set / reset in LegendUtil.getLegendImgHtmlTpl
-                var isLoading = LegendUtil['legendLoading_' + layerKey];
+                const isLoading = LegendUtil['legendLoading_' + layerKey];
                 if (isLoading) {
                     // skip loading
                     return LegendUtil.getLegendImgHtmlTpl(legendUrl, w, h);
                 }
 
                 LegendUtil.cacheLegendImgAsDataUrl(legendUrl, layerKey);
-
             } else {
                 legendUrl = legendDataUrl;
             }
@@ -109,40 +109,41 @@ Ext.define('CpsiMapview.plugin.BasicTreeColumnLegends', {
     },
 
     statics: {
-        transparentGif: 'data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP' +
+        transparentGif:
+            'data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP' +
             '///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7',
-        checkCleanup: function(img) {
-            var staticMe = CpsiMapview.plugin.BasicTreeColumnLegends;
-            var el = Ext.get(img);
-            var w = parseInt(el.getAttribute('width'), 10);
-            var h = parseInt(el.getAttribute('height'), 10);
-            var src = el.getAttribute('src');
-            if(w === 1 && h === 1 && src === staticMe.transparentGif) {
-                var parent = Ext.get(img.parentNode);
-                var removeElems = parent.query('br, img');
-                Ext.each(removeElems, function(removeElem) {
+        checkCleanup: function (img) {
+            const staticMe = CpsiMapview.plugin.BasicTreeColumnLegends;
+            const el = Ext.get(img);
+            const w = parseInt(el.getAttribute('width'), 10);
+            const h = parseInt(el.getAttribute('height'), 10);
+            const src = el.getAttribute('src');
+            if (w === 1 && h === 1 && src === staticMe.transparentGif) {
+                const parent = Ext.get(img.parentNode);
+                const removeElems = parent.query('br, img');
+                Ext.each(removeElems, function (removeElem) {
                     Ext.get(removeElem).destroy();
                 });
             }
         }
     },
 
-    init: function(column) {
-        var me = this;
+    init: function (column) {
+        const me = this;
         if (!(column instanceof Ext.grid.column.Column)) {
-            Ext.log.warn('Plugin shall only be applied to instances of' +
-                    ' Ext.grid.column.Column');
+            Ext.log.warn(
+                'Plugin shall only be applied to instances of' +
+                    ' Ext.grid.column.Column'
+            );
             return;
         }
-        var valuePlaceHolderRegExp = /\{value\}/g;
-        var replacementTpl = me.valueReplacementTpl.join('');
-        var newCellTpl = me.originalCellTpl.replace(
-            valuePlaceHolderRegExp, replacementTpl
+        const valuePlaceHolderRegExp = /\{value\}/g;
+        const replacementTpl = me.valueReplacementTpl.join('');
+        const newCellTpl = me.originalCellTpl.replace(
+            valuePlaceHolderRegExp,
+            replacementTpl
         );
 
-        column.cellTpl = [
-            newCellTpl,
-            me.valueReplacementContext
-        ];
+        column.cellTpl = [newCellTpl, me.valueReplacementContext];
     }
 });

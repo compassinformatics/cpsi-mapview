@@ -5,13 +5,11 @@ Ext.define('CpsiMapview.view.header.Panel', {
     extend: 'Ext.panel.Panel',
     xtype: 'cmv_header',
 
-    requires: [
-    ],
+    requires: [],
 
     region: 'north',
 
     height: 50,
 
     html: '<img src="https://dummyimage.com/300x48/5fa2dd/fff&text=Logo">'
-
 });

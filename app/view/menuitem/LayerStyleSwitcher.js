@@ -21,26 +21,28 @@ Ext.define('CpsiMapview.view.menuitem.LayerStyleSwitcher', {
      */
     text: 'Styles',
 
-
     /**
      * @private
      */
     initComponent: function () {
-        var me = this;
-        var allow = false;
+        const me = this;
+        let allow = false;
 
         if (me.layer) {
             allow = me.layer.get('styles');
         }
 
         if (allow) {
-            var radioGroup = Ext.create('CpsiMapview.view.layer.StyleSwitcherRadioGroup', {
-                layer: me.layer,
-                renderedBelowTreeNode: false,
-                listeners: {
-                    'cmv-layer-style-change': me.onLayerStyleChange
+            const radioGroup = Ext.create(
+                'CpsiMapview.view.layer.StyleSwitcherRadioGroup',
+                {
+                    layer: me.layer,
+                    renderedBelowTreeNode: false,
+                    listeners: {
+                        'cmv-layer-style-change': me.onLayerStyleChange
+                    }
                 }
-            });
+            );
 
             me.menu = {
                 plain: true,
@@ -63,7 +65,7 @@ Ext.define('CpsiMapview.view.menuitem.LayerStyleSwitcher', {
      * @param {ol.layer.Base} layer The layer where the style changed
      */
     onLayerStyleChange: function (radioGrp, newStyle, newStyleTitle, layer) {
-        var layerTree = Ext.ComponentQuery.query('cmv_layertree')[0];
+        const layerTree = Ext.ComponentQuery.query('cmv_layertree')[0];
         if (layerTree) {
             layerTree.refreshLayerNodeText(layer);
         }

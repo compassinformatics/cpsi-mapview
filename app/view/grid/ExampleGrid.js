@@ -38,10 +38,12 @@ Ext.define('CpsiMapview.store.GridExample', {
     layerOptions: {
         name: 'GridExampleLayer'
     },
-    sorters: [{
-        property: 'osm_id',
-        direction: 'ASC'
-    }]
+    sorters: [
+        {
+            property: 'osm_id',
+            direction: 'ASC'
+        }
+    ]
 });
 
 // create the view model
@@ -54,7 +56,8 @@ Ext.define('CpsiMapview.view.grid.ExampleGridModel', {
         allowFeatureSelection: true, // allow the additional selection by point
         gridStoreType: 'GridExample',
         gridLayerName: 'GridExampleLayer', // TODO this is duplicated in layerOptions above
-        helpUrl: 'https://github.com/compassinformatics/cpsi-mapview/blob/master/app/view/grid/ExampleGrid.js'
+        helpUrl:
+            'https://github.com/compassinformatics/cpsi-mapview/blob/master/app/view/grid/ExampleGrid.js'
     }
 });
 

@@ -21,25 +21,27 @@ Ext.define('CpsiMapview.view.menuitem.LayerOpacity', {
      */
     text: 'Opacity',
 
-
     /**
      * @private
      */
     initComponent: function () {
-        var me = this;
-        var allowOpacitySlider = false;
+        const me = this;
+        let allowOpacitySlider = false;
 
         if (me.layer) {
             allowOpacitySlider = me.layer.get('opacitySlider');
         }
 
-        var opacitySlider = Ext.create('Ext.slider.Single', {
+        const opacitySlider = Ext.create('Ext.slider.Single', {
             width: 200,
             value: me.layer.getOpacity() * 100,
             minValue: 0,
             maxValue: 100,
             tipText: function (thumb) {
-                return Ext.String.format('<div>Visibility: {0}%</div>', thumb.value);
+                return Ext.String.format(
+                    '<div>Visibility: {0}%</div>',
+                    thumb.value
+                );
             },
             listeners: {
                 change: me.onOpacityChange,
@@ -63,20 +65,19 @@ Ext.define('CpsiMapview.view.menuitem.LayerOpacity', {
      * @param  {Number} newValue The new value which the slider has been changed to.
      */
     onOpacityChange: function (slider, newValue) {
-        var me = this;
-        var opac = newValue / 100;
+        const me = this;
+        const opac = newValue / 100;
 
         me.layer.setOpacity(opac);
 
         // treat vector tile layers as a special case since setOpacity has no effect
         // on them, see https://github.com/openlayers/openlayers/issues/4758
         if (me.layer.get('isVt')) {
-            var setLayerOpacity = function(evt) {
+            const setLayerOpacity = function (evt) {
                 evt.context.globalAlpha = opac;
             };
             me.layer.on('prerender', setLayerOpacity);
             CpsiMapview.view.main.Map.guess().olMap.render();
         }
-
     }
 });

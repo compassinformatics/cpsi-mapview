@@ -4,35 +4,41 @@ Ext.define('CpsiMapview.controller.grid.GroupEditMixin', {
     mixinConfig: {
         on: {
             init: function () {
-                var me = this;
-                var view = this.getView();
+                const me = this;
+                const view = this.getView();
 
                 view.on('beforerender', function (grid) {
-                    var dropdownMenu = grid.headerCt.getMenu();
+                    const dropdownMenu = grid.headerCt.getMenu();
                     dropdownMenu.on({
                         beforeshow: me.onHeaderMenuBeforeShow,
                         scope: me
                     });
 
                     // Add custom menu items to the default grid menu
-                    dropdownMenu.insert(dropdownMenu.items.length - 2, [{
-                        itemId: 'groupEditorMenuItem',
-                        text: 'Group Edit',
-                        tooltip: 'Group Edit mode must be enabled to use this menu. If you do not see the Group Edit button, you may not have sufficient permissions for grid editing.',
-                        bind: {
-                            disabled: '{!isGroupEditingEnabled}'
+                    dropdownMenu.insert(dropdownMenu.items.length - 2, [
+                        {
+                            itemId: 'groupEditorMenuItem',
+                            text: 'Group Edit',
+                            tooltip:
+                                'Group Edit mode must be enabled to use this menu. If you do not see the Group Edit button, you may not have sufficient permissions for grid editing.',
+                            bind: {
+                                disabled: '{!isGroupEditingEnabled}'
+                            }
                         }
-                    }]);
+                    ]);
                 });
 
                 // Hide the checkbox selection column on initial load
                 view.on('render', function (grid) {
-                    var c = grid.columnManager.getFirst();
+                    const c = grid.columnManager.getFirst();
                     if (c) c.hide();
                 });
 
                 view.on('staterestore', function (grid, state) {
-                    grid.getViewModel().set('isGroupEditingEnabled', state.isGroupEditingEnabled);
+                    grid.getViewModel().set(
+                        'isGroupEditingEnabled',
+                        state.isGroupEditingEnabled
+                    );
                 });
             }
         }
@@ -46,7 +52,7 @@ Ext.define('CpsiMapview.controller.grid.GroupEditMixin', {
      * @param {any} state
      */
     onGroupEditToggle: function (btn, state) {
-        var grid = this.getView();
+        const grid = this.getView();
         grid.getViewModel().set('isGroupEditingEnabled', state);
         if (state) {
             grid.columnManager.getFirst().show();
@@ -57,14 +63,14 @@ Ext.define('CpsiMapview.controller.grid.GroupEditMixin', {
     },
 
     onHeaderMenuBeforeShow: function (menu) {
-        var me = this;
-        var menuItem = menu.down('#groupEditorMenuItem');
+        const me = this;
+        const menuItem = menu.down('#groupEditorMenuItem');
 
         // check if it is a column that can be bulk edited
         if (!menu.activeHeader.groupEditable) {
             menuItem.hide(); // simply hide the menu if it is not editable
         } else {
-            var newMenu = menuItem.menu;
+            let newMenu = menuItem.menu;
 
             if (newMenu) {
                 newMenu.removeAll();
@@ -72,25 +78,24 @@ Ext.define('CpsiMapview.controller.grid.GroupEditMixin', {
                 newMenu = menuItem.menu = Ext.create('Ext.menu.Menu');
             }
 
-            var newMenuItems = me.createGroupEditMenuItems(menu);
+            const newMenuItems = me.createGroupEditMenuItems(menu);
             newMenu.add(newMenuItems);
             menuItem.show();
         }
     },
 
     createGroupEditMenuItems: function (menu) {
-        var me = this;
-        var grid = me.getView();
-        var newMenuItem;
-        var newMenuItems = [];
-        var activeHeader = menu.activeHeader;
-        var filterType = activeHeader.filter.type || '';
+        const me = this;
+        const grid = me.getView();
+        let newMenuItem;
+        const newMenuItems = [];
+        const activeHeader = menu.activeHeader;
+        const filterType = activeHeader.filter.type || '';
         switch (filterType.toLowerCase()) {
-            case 'list':
-                var ff = menu.down('#filters');
+            case 'list': {
+                const ff = menu.down('#filters');
                 // create menu options based on the filter options
                 Ext.each(ff.menu.items.items, function (item) {
-
                     if (item.value === -1) {
                         // don not create a "No Data" option
                         // but continue creating the other items
@@ -104,9 +109,11 @@ Ext.define('CpsiMapview.controller.grid.GroupEditMixin', {
                             event.stopPropagation();
 
                             // get the list of Ids that will be updated
-                            var list = grid.selModel.getSelection().map(function (x) {
-                                return x.id;
-                            });
+                            const list = grid.selModel
+                                .getSelection()
+                                .map(function (x) {
+                                    return x.id;
+                                });
 
                             me.onGroupUpdate(activeHeader, list, item.value);
                         }
@@ -115,11 +122,15 @@ Ext.define('CpsiMapview.controller.grid.GroupEditMixin', {
                     newMenuItems.push(newMenuItem);
                 });
                 break;
-            case 'boolean':
+            }
+            case 'boolean': {
                 // create menu options for true and false
-                var trueText = activeHeader.trueText || 'true';
-                var falseText = activeHeader.falseText || 'false';
-                var items = [{ text: trueText, value: true }, { text: falseText, value: false }];
+                const trueText = activeHeader.trueText || 'true';
+                const falseText = activeHeader.falseText || 'false';
+                const items = [
+                    { text: trueText, value: true },
+                    { text: falseText, value: false }
+                ];
 
                 Ext.each(items, function (item) {
                     newMenuItem = {
@@ -129,9 +140,11 @@ Ext.define('CpsiMapview.controller.grid.GroupEditMixin', {
                             event.stopPropagation();
 
                             // get the list of Ids that will be updated
-                            var list = grid.selModel.getSelection().map(function (x) {
-                                return x.id;
-                            });
+                            const list = grid.selModel
+                                .getSelection()
+                                .map(function (x) {
+                                    return x.id;
+                                });
 
                             me.onGroupUpdate(activeHeader, list, item.value);
                         }
@@ -140,6 +153,7 @@ Ext.define('CpsiMapview.controller.grid.GroupEditMixin', {
                     newMenuItems.push(newMenuItem);
                 });
                 break;
+            }
             case 'number':
                 newMenuItem = {
                     xtype: 'numberfield',
@@ -154,13 +168,22 @@ Ext.define('CpsiMapview.controller.grid.GroupEditMixin', {
                     enableKeyEvents: true,
                     listeners: {
                         keypress: function (textField, event) {
-                            if (event.keyCode === Ext.event.Event.ENTER && textField.isValid()) {
+                            if (
+                                event.keyCode === Ext.event.Event.ENTER &&
+                                textField.isValid()
+                            ) {
                                 event.stopPropagation();
                                 // get the list of Ids that will be updated
-                                var list = grid.selModel.getSelection().map(function (x) {
-                                    return x.id;
-                                });
-                                me.onGroupUpdate(activeHeader, list, textField.getValue());
+                                const list = grid.selModel
+                                    .getSelection()
+                                    .map(function (x) {
+                                        return x.id;
+                                    });
+                                me.onGroupUpdate(
+                                    activeHeader,
+                                    list,
+                                    textField.getValue()
+                                );
                             }
                         },
                         scope: me
@@ -169,7 +192,11 @@ Ext.define('CpsiMapview.controller.grid.GroupEditMixin', {
                 newMenuItems.push(newMenuItem);
                 break;
             default:
-                Ext.log.error('Filter type "' + filterType.toLowerCase() + '" not supported');
+                Ext.log.error(
+                    'Filter type "' +
+                        filterType.toLowerCase() +
+                        '" not supported'
+                );
                 break;
         }
 
@@ -177,29 +204,36 @@ Ext.define('CpsiMapview.controller.grid.GroupEditMixin', {
     },
 
     onGroupUpdate: function (activeHeader, selectedIDs, newValue) {
-
-        var me = this;
+        const me = this;
 
         Ext.Msg.show({
             title: 'Group editing',
-            message: 'You are about to update ' + selectedIDs.length + ' selected items, do you want to proceed?',
+            message:
+                'You are about to update ' +
+                selectedIDs.length +
+                ' selected items, do you want to proceed?',
             buttons: Ext.Msg.YESNO,
             scope: me,
             fn: function (buttonId) {
-                var idProperty, serviceUrl;
-                var data = {};
+                let idProperty, serviceUrl;
+                const data = {};
 
                 if (buttonId == 'yes') {
-                    idProperty = activeHeader.groupEditIdProperty || me.getViewModel().get('idProperty');
+                    idProperty =
+                        activeHeader.groupEditIdProperty ||
+                        me.getViewModel().get('idProperty');
 
                     if (activeHeader.groupEditService.charAt(0) === '/') {
                         serviceUrl = activeHeader.groupEditService;
                     } else {
-                        serviceUrl = me.getViewModel().get('serviceUrl') + activeHeader.groupEditService;
+                        serviceUrl =
+                            me.getViewModel().get('serviceUrl') +
+                            activeHeader.groupEditService;
                     }
 
                     // first char to lower case to match backend naming
-                    idProperty = idProperty[0].toLowerCase() + idProperty.slice(1);
+                    idProperty =
+                        idProperty[0].toLowerCase() + idProperty.slice(1);
                     data[idProperty] = selectedIDs;
                     data[activeHeader.groupEditDataProp] = newValue;
 
@@ -208,18 +242,20 @@ Ext.define('CpsiMapview.controller.grid.GroupEditMixin', {
                         method: 'POST',
                         jsonData: data,
                         success: function (response) {
-                            var resp = Ext.decode(response.responseText);
+                            const resp = Ext.decode(response.responseText);
                             if (resp.success === true) {
                                 // trigger a refresh of all related layers and stores, including the grid itself
                                 // as defined by syncLayerKeys and syncStoreIds in the model
-                                var clearPaging = false;
+                                const clearPaging = false;
                                 me.refreshStore(clearPaging);
-                                var force = true;
+                                const force = true;
                                 me.updateAssociatedLayers(force);
                             } else {
                                 Ext.Msg.show({
                                     title: 'Error',
-                                    message: 'Error updating the selected records: ' + resp.message,
+                                    message:
+                                        'Error updating the selected records: ' +
+                                        resp.message,
                                     buttons: Ext.Msg.OK,
                                     icon: Ext.window.MessageBox.ERROR
                                 });
@@ -228,7 +264,9 @@ Ext.define('CpsiMapview.controller.grid.GroupEditMixin', {
                         failure: function () {
                             Ext.Msg.show({
                                 title: 'Error',
-                                message: 'Error connecting to the update service ' + serviceUrl,
+                                message:
+                                    'Error connecting to the update service ' +
+                                    serviceUrl,
                                 buttons: Ext.Msg.OK,
                                 icon: Ext.window.MessageBox.ERROR
                             });
@@ -238,5 +276,4 @@ Ext.define('CpsiMapview.controller.grid.GroupEditMixin', {
             }
         });
     }
-
 });

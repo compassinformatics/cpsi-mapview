@@ -27,22 +27,19 @@ Ext.define('CpsiMapview.model.FeatureStoreMixin', {
 
     /**
      * Return the extent of all features associated with the model
-    */
+     */
     getRecordBounds: function () {
-
-        var bounds, layerExtent;
-        var me = this;
+        let bounds, layerExtent;
+        const me = this;
 
         if (me.featureStores) {
             Ext.Object.each(me.featureStores, function (key, fs) {
-
                 if (fs.layer.getSource().getFeatures().length > 0) {
                     layerExtent = fs.layer.getSource().getExtent();
 
                     if (bounds) {
                         ol.extent.extend(bounds, layerExtent);
-                    }
-                    else {
+                    } else {
                         bounds = layerExtent;
                     }
                 }
@@ -66,17 +63,15 @@ Ext.define('CpsiMapview.model.FeatureStoreMixin', {
      * @return {GeoExt.data.store.Features} The new feature store
      */
     createFeatureStore: function (field) {
+        const me = this;
 
-        var me = this;
+        const cfg = field.featureStoreConfig || {};
+        const featModel = cfg.model || 'GeoExt.data.model.Feature';
 
-        var cfg = field.featureStoreConfig || {};
-        var featModel = cfg.model || 'GeoExt.data.model.Feature';
+        const style = field.createStyle();
+        const selectStyle = field.createSelectStyle();
 
-
-        var style = field.createStyle();
-        var selectStyle = field.createSelectStyle();
-
-        var vectorLayer = new ol.layer.Vector({
+        const vectorLayer = new ol.layer.Vector({
             source: new ol.source.Vector({
                 features: new ol.Collection()
             }),
@@ -85,13 +80,13 @@ Ext.define('CpsiMapview.model.FeatureStoreMixin', {
         });
 
         // add a vector layer that will be linked to the store
-        var mapCmp = BasiGX.util.Map.getMapComponent();
+        const mapCmp = BasiGX.util.Map.getMapComponent();
 
         if (mapCmp) {
             mapCmp.getMap().addLayer(vectorLayer);
         }
 
-        var filters = [];
+        const filters = [];
 
         if (field.defaultFeatureFilter) {
             filters.push(field.defaultFeatureFilter);
@@ -119,10 +114,10 @@ Ext.define('CpsiMapview.model.FeatureStoreMixin', {
     },
 
     updateAssociatedField: function (store, field) {
-        var me = this;
-        var features = store.getRange(); // get all features in the store
+        const me = this;
+        const features = store.getRange(); // get all features in the store
         // check if we are in an edit session set in the convert function of CpsiMapview.field.Feature
-        var dirty = !me.editing;
+        const dirty = !me.editing;
         me.set(field.name, features, { convert: false, dirty: dirty });
     },
 
@@ -130,12 +125,11 @@ Ext.define('CpsiMapview.model.FeatureStoreMixin', {
      * Clean up all the layer stores and layers created by the mixin
      **/
     destroyFeatureStores: function () {
-        var me = this;
+        const me = this;
 
         if (me.featureStores) {
             Ext.Object.each(me.featureStores, function (key, fs) {
-
-                var mapCmp = BasiGX.util.Map.getMapComponent();
+                const mapCmp = BasiGX.util.Map.getMapComponent();
 
                 if (mapCmp) {
                     mapCmp.getMap().removeLayer(fs.layer);
@@ -152,7 +146,7 @@ Ext.define('CpsiMapview.model.FeatureStoreMixin', {
      * constructor so that the featurestore is ready when any convert functions are run.
      **/
     createFeatureStores: function () {
-        var me = this;
+        const me = this;
 
         if (!me.featureStores) {
             me.featureStores = {};
@@ -160,18 +154,15 @@ Ext.define('CpsiMapview.model.FeatureStoreMixin', {
 
         Ext.each(me.getFields(), function (f) {
             switch (true) {
-                case (f.type === 'feature' || f.superclass.type == 'feature'):
-                case (f.type === 'line' || f.superclass.type == 'line'):
-                case (f.type === 'polygon' || f.superclass.type == 'polygon'):
-                case (f.type === 'point' || f.superclass.type == 'point'):
-
+                case f.type === 'feature' || f.superclass.type == 'feature':
+                case f.type === 'line' || f.superclass.type == 'line':
+                case f.type === 'polygon' || f.superclass.type == 'polygon':
+                case f.type === 'point' || f.superclass.type == 'point':
                     me.featureStores[f.name] = me.createFeatureStore(f);
                     break;
                 default:
                     break;
             }
-
         });
     }
-
 });

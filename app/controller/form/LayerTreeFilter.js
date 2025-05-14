@@ -8,9 +8,7 @@ Ext.define('CpsiMapview.controller.form.LayerTreeFilter', {
 
     alias: 'controller.cmv_layertreefilter',
 
-    requires: [
-        'CpsiMapview.util.LayerTreeFilter'
-    ],
+    requires: ['CpsiMapview.util.LayerTreeFilter'],
 
     /**
      * Clears the textfield for filtering the layer tree.
@@ -18,16 +16,16 @@ Ext.define('CpsiMapview.controller.form.LayerTreeFilter', {
      * @param {Ext.form.field.Text } textField
      */
     clearText: function (textField) {
-        var me = this;
-        var view = me.getView();
+        const me = this;
+        const view = me.getView();
 
         textField.setValue('');
 
-        var tree = Ext.ComponentQuery.query('cmv_layertree')[0];
+        const tree = Ext.ComponentQuery.query('cmv_layertree')[0];
         if (!tree) {
             return;
         }
-        var store = tree.getStore();
+        const store = tree.getStore();
         if (!store) {
             return;
         }
@@ -41,23 +39,23 @@ Ext.define('CpsiMapview.controller.form.LayerTreeFilter', {
      *
      * @return {void}
      */
-    updateFilter: function() {
-        var me = this;
-        var view = me.getView();
-        var vm = view.getViewModel();
-        var LayerTreeFilterUtil = CpsiMapview.util.LayerTreeFilter;
+    updateFilter: function () {
+        const me = this;
+        const view = me.getView();
+        const vm = view.getViewModel();
+        const LayerTreeFilterUtil = CpsiMapview.util.LayerTreeFilter;
 
-        var tree = Ext.ComponentQuery.query('cmv_layertree')[0];
+        const tree = Ext.ComponentQuery.query('cmv_layertree')[0];
         if (!tree) {
             return;
         }
-        var store = tree.getStore();
+        const store = tree.getStore();
         if (!store) {
             return;
         }
 
         store.removeFilter(view.FILTER_ID);
-        var filter = LayerTreeFilterUtil.createLayerTreeFilter(
+        const filter = LayerTreeFilterUtil.createLayerTreeFilter(
             view.FILTER_ID,
             vm.get('hideInvisibleLayers'),
             vm.get('searchText'),
@@ -73,10 +71,10 @@ Ext.define('CpsiMapview.controller.form.LayerTreeFilter', {
      * @param {string} searchText The search text.
      * @return  {void}
      */
-    onSearchTextChange: function(textfield, searchText) {
-        var treeFilter = textfield.up('cmv_layertreefilter');
-        var vm = treeFilter.getViewModel();
-        var ctrl = treeFilter.getController();
+    onSearchTextChange: function (textfield, searchText) {
+        const treeFilter = textfield.up('cmv_layertreefilter');
+        const vm = treeFilter.getViewModel();
+        const ctrl = treeFilter.getController();
         if (!vm || !ctrl) {
             return;
         }
@@ -91,10 +89,10 @@ Ext.define('CpsiMapview.controller.form.LayerTreeFilter', {
      * @param {boolean} checked True, if checked. False otherwise.
      * @return {void}
      */
-    onCheckboxChange: function(cb, checked) {
-        var treeFilter = cb.up('cmv_layertreefilter');
-        var vm = treeFilter.getViewModel();
-        var ctrl = treeFilter.getController();
+    onCheckboxChange: function (cb, checked) {
+        const treeFilter = cb.up('cmv_layertreefilter');
+        const vm = treeFilter.getViewModel();
+        const ctrl = treeFilter.getController();
         if (!vm || !ctrl) {
             return;
         }

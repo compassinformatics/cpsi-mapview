@@ -12,9 +12,9 @@ Ext.define('CpsiMapview.form.field.ComboLegacy', {
     legacyPostfix: ' - Legacy',
 
     /**
-    * Prevent selection of isLegacy, but only if it is
-    * a user initiated change
-    **/
+     * Prevent selection of isLegacy, but only if it is
+     * a user initiated change
+     **/
     listeners: {
         focus: function (combo) {
             combo.__isUserInteracting = true;
@@ -35,21 +35,30 @@ Ext.define('CpsiMapview.form.field.ComboLegacy', {
      * and associated fiddle https://fiddle.sencha.com/#fiddle/14ud&view/editor
      **/
     initComponent: function () {
-        var me = this;
-        var itemTemplate = Ext.String.format(
+        const me = this;
+        const itemTemplate = Ext.String.format(
             '<tpl for=".">' +
-            '<tpl if="isLegacy === true">' +
-            '<li role="option" class="' + Ext.baseCSSPrefix + 'boundlist-item ' +
-            Ext.baseCSSPrefix + 'item-disabled ' +
-            Ext.baseCSSPrefix + 'boundlist-item-legacy"> ' +
-            '{{0}}' + me.legacyPostfix +
-            '</li>' +
-            '<tpl else>' +
-            '<li role="option" class="' + Ext.baseCSSPrefix + 'boundlist-item">' +
-            '{{0}}' +
-            '</li>' +
-            '</tpl>' +
-            '</tpl>', me.displayField);
+                '<tpl if="isLegacy === true">' +
+                '<li role="option" class="' +
+                Ext.baseCSSPrefix +
+                'boundlist-item ' +
+                Ext.baseCSSPrefix +
+                'item-disabled ' +
+                Ext.baseCSSPrefix +
+                'boundlist-item-legacy"> ' +
+                '{{0}}' +
+                me.legacyPostfix +
+                '</li>' +
+                '<tpl else>' +
+                '<li role="option" class="' +
+                Ext.baseCSSPrefix +
+                'boundlist-item">' +
+                '{{0}}' +
+                '</li>' +
+                '</tpl>' +
+                '</tpl>',
+            me.displayField
+        );
 
         me.tpl = itemTemplate;
         me.callParent(arguments);

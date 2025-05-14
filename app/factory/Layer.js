@@ -28,9 +28,8 @@ Ext.define('CpsiMapview.factory.Layer', {
      * @return {ol.layer.Base} OL layer object
      */
     createLayer: function (layerConf) {
-
-        var layerType = layerConf.layerType;
-        var mapLayer;
+        const layerType = layerConf.layerType;
+        let mapLayer;
 
         switch (layerType) {
             case 'wms':
@@ -52,16 +51,28 @@ Ext.define('CpsiMapview.factory.Layer', {
                 mapLayer = LayerFactory.createBing(layerConf, 'Aerial');
                 break;
             case 'google_roadmap':
-                mapLayer = LayerFactory.createGoogle(layerConf, 'google.maps.MapTypeId.ROADMAP');
+                mapLayer = LayerFactory.createGoogle(
+                    layerConf,
+                    'google.maps.MapTypeId.ROADMAP'
+                );
                 break;
             case 'google_terrain':
-                mapLayer = LayerFactory.createGoogle(layerConf, 'google.maps.MapTypeId.TERRAIN');
+                mapLayer = LayerFactory.createGoogle(
+                    layerConf,
+                    'google.maps.MapTypeId.TERRAIN'
+                );
                 break;
             case 'google_hybrid':
-                mapLayer = LayerFactory.createGoogle(layerConf, 'google.maps.MapTypeId.HYBRID');
+                mapLayer = LayerFactory.createGoogle(
+                    layerConf,
+                    'google.maps.MapTypeId.HYBRID'
+                );
                 break;
             case 'google_satellite':
-                mapLayer = LayerFactory.createGoogle(layerConf, 'google.maps.MapTypeId.SATELLITE');
+                mapLayer = LayerFactory.createGoogle(
+                    layerConf,
+                    'google.maps.MapTypeId.SATELLITE'
+                );
                 break;
             case 'nasa':
                 mapLayer = LayerFactory.createNasa(layerConf);
@@ -97,7 +108,8 @@ Ext.define('CpsiMapview.factory.Layer', {
             if (layerConf.isBaseLayer) {
                 mapLayer.set('isBaseLayer', true);
                 mapLayer.on(
-                    'change:visible', LayerFactory.ensureOnlyOneBaseLayerVisible
+                    'change:visible',
+                    LayerFactory.ensureOnlyOneBaseLayerVisible
                 );
             }
             // assign relevant legend properties
@@ -107,12 +119,12 @@ Ext.define('CpsiMapview.factory.Layer', {
             mapLayer.set('layerKey', layerConf.layerKey);
 
             // indicator if a refresh option is offered in layer context menu
-            var allowRefresh = layerConf.refreshLayerOption !== false;
+            const allowRefresh = layerConf.refreshLayerOption !== false;
             mapLayer.set('refreshLayerOption', allowRefresh);
             // indicator if a label option is drawn in layer context menu for wms layers
             mapLayer.set('labelClassName', layerConf.labelClassName);
             // indicator if an opacity slider is offered in layer context menu
-            var allowOpacitySlider = layerConf.opacitySlider !== false;
+            const allowOpacitySlider = layerConf.opacitySlider !== false;
             mapLayer.set('opacitySlider', allowOpacitySlider);
             // the xtype of any associated grid
             mapLayer.set('gridXType', layerConf.gridXType);
@@ -140,9 +152,9 @@ Ext.define('CpsiMapview.factory.Layer', {
      * @param {ol.Object.Event} evt The event which contains the layer.
      */
     ensureOnlyOneBaseLayerVisible: function (evt) {
-        var changedLayer = evt.target;
+        const changedLayer = evt.target;
         if (changedLayer.get('isBaseLayer') && changedLayer.getVisible()) {
-            var allLayers = BasiGX.util.Layer.getAllLayers();
+            const allLayers = BasiGX.util.Layer.getAllLayers();
             Ext.each(allLayers, function (layer) {
                 if (!layer.get('isBaseLayer') || layer.id === changedLayer.id) {
                     return;
@@ -152,7 +164,6 @@ Ext.define('CpsiMapview.factory.Layer', {
                 }
             });
         }
-
     },
 
     createEmptyLayer: function (layerConf) {
@@ -170,26 +181,33 @@ Ext.define('CpsiMapview.factory.Layer', {
         // compute switch resolution when layer is
         // initialised the first time
         if (!layerConf.switchResolution) {
-
             // compute resolution from scale
-            var unit = BasiGX.util.Map.getMapComponent().getView().getProjection().getUnits();
-            var vectorFeaturesMinScale = layerConf.vectorFeaturesMinScale;
-            var switchResolution = BasiGX.util.Map.getResolutionForScale(vectorFeaturesMinScale, unit);
+            const unit = BasiGX.util.Map.getMapComponent()
+                .getView()
+                .getProjection()
+                .getUnits();
+            const vectorFeaturesMinScale = layerConf.vectorFeaturesMinScale;
+            const switchResolution = BasiGX.util.Map.getResolutionForScale(
+                vectorFeaturesMinScale,
+                unit
+            );
 
             // add computed switch resolution to layerConf
             layerConf.switchResolution = switchResolution;
         }
 
         // create layer depending on the resolution
-        var mapPanel = CpsiMapview.view.main.Map.guess();
-        var resolution = mapPanel.olMap.getView().getResolution();
+        const mapPanel = CpsiMapview.view.main.Map.guess();
+        const resolution = mapPanel.olMap.getView().getResolution();
 
-        var resultLayer;
-        var olVisibility = { openLayers: { visibility: layerConf.visibility } };
-        var switchLayerUtil = CpsiMapview.util.SwitchLayer;
+        let resultLayer;
+        const olVisibility = {
+            openLayers: { visibility: layerConf.visibility }
+        };
+        const switchLayerUtil = CpsiMapview.util.SwitchLayer;
 
         if (resolution < layerConf.switchResolution) {
-            var confBelowSwitchResolution = layerConf.layers[1];
+            const confBelowSwitchResolution = layerConf.layers[1];
             // apply overall visibility to sub layer
             Ext.Object.merge(confBelowSwitchResolution, olVisibility);
             resultLayer = LayerFactory.createLayer(confBelowSwitchResolution);
@@ -198,7 +216,7 @@ Ext.define('CpsiMapview.factory.Layer', {
                 switchLayerUtil.switchStates.BELOW_SWITCH_RESOLUTION
             );
         } else {
-            var confAboveSwitchResolution = layerConf.layers[0];
+            const confAboveSwitchResolution = layerConf.layers[0];
             // apply overall visibility to sub layer
             Ext.Object.merge(confAboveSwitchResolution, olVisibility);
             resultLayer = LayerFactory.createLayer(confAboveSwitchResolution);
@@ -225,27 +243,29 @@ Ext.define('CpsiMapview.factory.Layer', {
      * @param {any} src
      */
     imageLoadFunction: function (image, src) {
-        var img = image.getImage();
+        const img = image.getImage();
         if (typeof window.btoa === 'function') {
             // base64 encoding function is available in IE10+
-            var urlArray = src.split('?');
-            var url = urlArray[0];
-            var params = urlArray[1];
+            const urlArray = src.split('?');
+            const url = urlArray[0];
+            const params = urlArray[1];
 
-            var xhr = new XMLHttpRequest();
+            const xhr = new XMLHttpRequest();
             xhr.onload = function () {
                 if (this.status === 200) {
-
-                    var type = xhr.getResponseHeader('content-type');
+                    const type = xhr.getResponseHeader('content-type');
                     if (type.indexOf('image') === 0) {
-                        var uInt8Array = new Uint8Array(this.response); //TODO Uint8Array is only available in IE10+
-                        var i = uInt8Array.length;
-                        var binaryString = new Array(i);
+                        const uInt8Array = new Uint8Array(this.response); //TODO Uint8Array is only available in IE10+
+                        let i = uInt8Array.length;
+                        const binaryString = new Array(i);
                         while (i--) {
-                            binaryString[i] = String.fromCharCode(uInt8Array[i]);
+                            binaryString[i] = String.fromCharCode(
+                                uInt8Array[i]
+                            );
                         }
-                        var data = binaryString.join('');
-                        img.src = 'data:' + type + ';base64,' + window.btoa(data);
+                        const data = binaryString.join('');
+                        img.src =
+                            'data:' + type + ';base64,' + window.btoa(data);
                     } else {
                         // trigger an error so the loading bar is reset
                         // see https://github.com/openlayers/openlayers/issues/10868#issuecomment-608424234
@@ -255,14 +275,20 @@ Ext.define('CpsiMapview.factory.Layer', {
                         // MapServer returns errors as 'text/html'
                         if (type.indexOf('text/html') === 0) {
                             if ('TextDecoder' in window) {
-                                Ext.Logger.warn(new TextDecoder('utf-8').decode(this.response));
+                                Ext.Logger.warn(
+                                    new TextDecoder('utf-8').decode(
+                                        this.response
+                                    )
+                                );
                             }
                         }
 
                         if (type.indexOf('application/json') === 0) {
-                            var result = JSON.parse(new TextDecoder('utf-8').decode(this.response));
+                            const result = JSON.parse(
+                                new TextDecoder('utf-8').decode(this.response)
+                            );
                             if (result.success !== true) {
-                                var app = Ext.getApplication();
+                                const app = Ext.getApplication();
                                 switch (result.errorCode) {
                                     case app.errorCode.UserTokenExpired:
                                     case app.errorCode.CookieHeaderMissing:
@@ -280,14 +306,16 @@ Ext.define('CpsiMapview.factory.Layer', {
                 }
             };
             xhr.open('POST', url, true);
-            xhr.setRequestHeader('Content-type', 'application/x-www-form-urlencoded');
+            xhr.setRequestHeader(
+                'Content-type',
+                'application/x-www-form-urlencoded'
+            );
             xhr.responseType = 'arraybuffer';
             xhr.send(params);
         } else {
             img.src = src;
         }
     },
-
 
     /**
      * Creates an OGC WMS layer
@@ -296,15 +324,14 @@ Ext.define('CpsiMapview.factory.Layer', {
      * @return {ol.layer.Tile}    WMS layer
      */
     createWms: function (layerConf) {
-
-        var me = this;
-        var layer;
-        var singleTile = layerConf.openLayers.singleTile;
+        const me = this;
+        let layer;
+        const singleTile = layerConf.openLayers.singleTile;
         // transform OL2 properties to current ones supported by OL >=v3
-        var olSourceProps = me.ol2PropsToOlSourceProps(layerConf.openLayers);
-        var olLayerProps = me.ol2PropsToOlLayerProps(layerConf.openLayers);
+        const olSourceProps = me.ol2PropsToOlSourceProps(layerConf.openLayers);
+        const olLayerProps = me.ol2PropsToOlLayerProps(layerConf.openLayers);
 
-        var serverOptions = {};
+        const serverOptions = {};
 
         // force all keys to be uppercase
         Ext.Object.each(layerConf.serverOptions, function (key, value) {
@@ -313,24 +340,25 @@ Ext.define('CpsiMapview.factory.Layer', {
 
         // derive STYLES parameter: either directly set in serverOptions or we
         // we take the first of a possible SLD style list
-        var styles = serverOptions.STYLES || '';
-        var activatedStyle;
+        let styles = serverOptions.STYLES || '';
+        let activatedStyle;
         if (Ext.isArray(layerConf.styles) && layerConf.styles.length) {
             // check if first possible SLD style list is an object (with STYLES
             // name and UI alias) or if the STYLES name is directly provided.
-            var firstStyle = layerConf.styles[0];
-            var stylesWmsParam =
-                Ext.isObject(firstStyle) ? firstStyle.name : firstStyle;
+            const firstStyle = layerConf.styles[0];
+            const stylesWmsParam = Ext.isObject(firstStyle)
+                ? firstStyle.name
+                : firstStyle;
             styles = stylesWmsParam;
             activatedStyle = stylesWmsParam;
         }
 
-        var olSourceConf = {
+        let olSourceConf = {
             url: layerConf.url,
             params: {
-                'STYLES': styles,
-                'TRANSPARENT': true,
-                'TILED': !singleTile
+                STYLES: styles,
+                TRANSPARENT: true,
+                TILED: !singleTile
             },
             ratio: singleTile ? 1 : undefined,
             crossOrigin: 'anonymous'
@@ -339,7 +367,7 @@ Ext.define('CpsiMapview.factory.Layer', {
         // by default WMS layers are requested using GET, but can be configured
         // to use POST to allow for filters that will not fit in the querystring
 
-        var usePost = false;
+        let usePost = false;
         if (layerConf.requestMethod === 'POST') {
             usePost = true;
             olSourceConf.imageLoadFunction = me.imageLoadFunction;
@@ -349,12 +377,14 @@ Ext.define('CpsiMapview.factory.Layer', {
         olSourceConf.params = Ext.apply(olSourceConf.params, serverOptions);
 
         if (!olSourceConf.params.LAYERS) {
-            Ext.log.warn('LAYERS parameter not set on WMS for key: ' + layerConf.layerKey);
+            Ext.log.warn(
+                'LAYERS parameter not set on WMS for key: ' + layerConf.layerKey
+            );
         }
 
         olSourceConf = Ext.apply(olSourceConf, olSourceProps);
 
-        var olLayerConf = {
+        let olLayerConf = {
             name: layerConf.text,
             isTimeDependent: !!layerConf.timeitem,
             dateFormat: layerConf.dateFormat,
@@ -369,11 +399,11 @@ Ext.define('CpsiMapview.factory.Layer', {
         olLayerConf = Ext.apply(olLayerConf, olLayerProps);
 
         if (singleTile) {
-
             if (layerConf.debounce !== undefined) {
-                var blankSrc = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII=';
-                var currentImgElement;
-                var task = new Ext.util.DelayedTask();
+                const blankSrc =
+                    'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII=';
+                let currentImgElement;
+                const task = new Ext.util.DelayedTask();
                 olSourceConf.imageLoadFunction = function (image, src) {
                     if (currentImgElement) {
                         currentImgElement.src = blankSrc;
@@ -387,7 +417,7 @@ Ext.define('CpsiMapview.factory.Layer', {
                             currentImgElement.src = src;
                         }
                         currentImgElement = undefined;
-                        task.delay(layerConf.debounce, function () { });
+                        task.delay(layerConf.debounce, function () {});
                     } else {
                         task.delay(layerConf.debounce, function () {
                             if (usePost) {
@@ -403,9 +433,7 @@ Ext.define('CpsiMapview.factory.Layer', {
 
             olLayerConf.source = new ol.source.ImageWMS(olSourceConf);
             layer = new ol.layer.Image(olLayerConf);
-
         } else {
-
             olLayerConf.source = new ol.source.TileWMS(olSourceConf);
             layer = new ol.layer.Tile(olLayerConf);
         }
@@ -420,28 +448,32 @@ Ext.define('CpsiMapview.factory.Layer', {
      * @return {ol.layer.Vector}  WFS layer
      */
     createWfs: function (layerConf) {
-        var baseUrl = layerConf.url;
+        const baseUrl = layerConf.url;
         // transform OL2 properties to current ones supported by OL >=v3
-        var olSourceProps = this.ol2PropsToOlSourceProps(layerConf.openLayers);
-        var olLayerProps = this.ol2PropsToOlLayerProps(layerConf.openLayers);
+        const olSourceProps = this.ol2PropsToOlSourceProps(
+            layerConf.openLayers
+        );
+        const olLayerProps = this.ol2PropsToOlLayerProps(layerConf.openLayers);
 
-        var srid = 'EPSG:3857';
-        var mapPanel = CpsiMapview.view.main.Map.guess();
+        let srid = 'EPSG:3857';
+        const mapPanel = CpsiMapview.view.main.Map.guess();
         if (mapPanel && mapPanel.olMap) {
             srid = mapPanel.olMap.getView().getProjection().getCode();
         }
 
-        var featureType = layerConf.featureType;
-        var useBbox = true;
+        const featureType = layerConf.featureType;
+        let useBbox = true;
 
         if (Ext.isEmpty(layerConf.useBbox) === false) {
             useBbox = layerConf.useBbox;
         }
 
-        var geomFieldName = layerConf.geomFieldName ? layerConf.geomFieldName : 'geometry';
-        var serverOptions = layerConf.serverOptions || {};
+        const geomFieldName = layerConf.geomFieldName
+            ? layerConf.geomFieldName
+            : 'geometry';
+        const serverOptions = layerConf.serverOptions || {};
 
-        var params = {
+        const params = {
             SERVICE: 'WFS',
             REQUEST: 'GetFeature',
             VERSION: '1.1.0',
@@ -460,19 +492,24 @@ Ext.define('CpsiMapview.factory.Layer', {
             }
         });
 
-        var olSourceConf = {
+        let olSourceConf = {
             format: new ol.format.GeoJSON(),
             strategy: ol.loadingstrategy.bbox
         };
         olSourceConf = Ext.apply(olSourceConf, olSourceProps);
 
-        var vectorSource = new ol.source.Vector(olSourceConf);
+        const vectorSource = new ol.source.Vector(olSourceConf);
 
         // Dynamically generate the propertyNames to request based on initial propertyname config and props referenced in tooltipsConfig
         // But only if serverOptions.propertyname has been set
-        var parsedPropertyNames = Ext.Array.clean((serverOptions.propertyname || '').split(','));
+        const parsedPropertyNames = Ext.Array.clean(
+            (serverOptions.propertyname || '').split(',')
+        );
         if (parsedPropertyNames.length) {
-            var propertyNames = LayerFactory.buildRequiredPropertyNames(parsedPropertyNames, layerConf.tooltipsConfig);
+            const propertyNames = LayerFactory.buildRequiredPropertyNames(
+                parsedPropertyNames,
+                layerConf.tooltipsConfig
+            );
             vectorSource.set('propertyNames', propertyNames);
             // keep track of property names defined in the original config and always add them to the request
             // to ensure scenarios where those properties are needed outside of the style and tooltip that they are present
@@ -486,32 +523,41 @@ Ext.define('CpsiMapview.factory.Layer', {
 
         // add any configured filters for the WFS layer
         if (layerConf.filters) {
-            var filters = [];
+            const filters = [];
             Ext.each(layerConf.filters, function (filter) {
                 filters.push(new Ext.util.Filter(filter));
             });
             vectorSource.set('additionalFilters', filters);
         }
 
-        var loaderFn = function (extent) {
-            var layerSource = this;
+        const loaderFn = function (extent) {
+            const layerSource = this;
             vectorSource.dispatchEvent('vectorloadstart');
             // Get propertyNames and build the propertyNameParamObject. Omit the PROPERTYNAME key if propertyNames is empty
             // so that request will not have the PROPERTYNAME param meaning all fields will be returned
-            var propertyNameParamObject = {};
-            var propertyNames = Ext.Array.merge(vectorSource.get('propertyNames'), vectorSource.get('originalPropertyNames'));
+            const propertyNameParamObject = {};
+            const propertyNames = Ext.Array.merge(
+                vectorSource.get('propertyNames'),
+                vectorSource.get('originalPropertyNames')
+            );
             if (propertyNames.length) {
-                propertyNameParamObject['PROPERTYNAME'] = propertyNames.join(',');
+                propertyNameParamObject['PROPERTYNAME'] =
+                    propertyNames.join(',');
             }
-            var baseUrlWithParams = Ext.String.urlAppend(baseUrl, Ext.Object.toQueryString(Ext.merge({}, params, propertyNameParamObject)));
+            const baseUrlWithParams = Ext.String.urlAppend(
+                baseUrl,
+                Ext.Object.toQueryString(
+                    Ext.merge({}, params, propertyNameParamObject)
+                )
+            );
 
-            var allFilters = CpsiMapview.util.Layer.filterVectorSource(layerSource);
+            const allFilters =
+                CpsiMapview.util.Layer.filterVectorSource(layerSource);
 
             // we can skip applying the bbox for a layer if required
             // by default all layers will use a spatial filter
             if (useBbox) {
-
-                var bboxFilter = Ext.String.format(
+                const bboxFilter = Ext.String.format(
                     GeoExt.util.OGCFilter.spatialFilterBBoxTpl,
                     geomFieldName,
                     params.SRSNAME,
@@ -525,30 +571,37 @@ Ext.define('CpsiMapview.factory.Layer', {
             }
 
             // merge all filters to OGC compliant AND filter
-            var filter = GeoExt.util.OGCFilter.combineFilters(allFilters, 'And', false, params.VERSION);
-            var reqUrl = Ext.String.urlAppend(
-                baseUrlWithParams, 'FILTER=' + encodeURIComponent(filter)
+            const filter = GeoExt.util.OGCFilter.combineFilters(
+                allFilters,
+                'And',
+                false,
+                params.VERSION
+            );
+            let reqUrl = Ext.String.urlAppend(
+                baseUrlWithParams,
+                'FILTER=' + encodeURIComponent(filter)
             );
 
             // add a timestamp parameter to the URL is set on the source
             // so that we can bypass the browser cache if required
-            var ts = vectorSource.get('timestamp');
+            const ts = vectorSource.get('timestamp');
             if (ts) {
-                reqUrl = Ext.String.urlAppend(
-                    reqUrl, 'TIMESTAMP=' + ts
-                );
+                reqUrl = Ext.String.urlAppend(reqUrl, 'TIMESTAMP=' + ts);
             }
             // once the url is built we need to isolate the parameters element
             // so we can send as request body and send as POST,
             // otherwise the request url is too long.
-            var urlArray = reqUrl.split('?');
-            var urlpost = urlArray[0];
-            var queryParams = urlArray[1];
+            const urlArray = reqUrl.split('?');
+            const urlpost = urlArray[0];
+            const queryParams = urlArray[1];
 
-            var xhr = new XMLHttpRequest();
+            const xhr = new XMLHttpRequest();
             xhr.open('POST', urlpost);
-            xhr.setRequestHeader('Content-type', 'application/x-www-form-urlencoded');
-            var onError = function () {
+            xhr.setRequestHeader(
+                'Content-type',
+                'application/x-www-form-urlencoded'
+            );
+            const onError = function () {
                 vectorSource.removeLoadedExtent(extent);
                 vectorSource.dispatchEvent('vectorloaderror');
             };
@@ -556,8 +609,8 @@ Ext.define('CpsiMapview.factory.Layer', {
             xhr.onload = function () {
                 if (xhr.status == 200) {
                     // check the request returns the same type as the vectorSource
-                    var contentType = xhr.getResponseHeader('Content-Type');
-                    var format = vectorSource.getFormat();
+                    const contentType = xhr.getResponseHeader('Content-Type');
+                    const format = vectorSource.getFormat();
 
                     // on occasion a WFS response from MapServer is empty with no error
                     // but with HTTP status 200 (for unknown reasons)
@@ -566,7 +619,7 @@ Ext.define('CpsiMapview.factory.Layer', {
                         onError();
                     } else {
                         if (contentType.indexOf('application/json') !== -1) {
-                            var features = format.readFeatures(
+                            const features = format.readFeatures(
                                 xhr.responseText
                             );
                             vectorSource.addFeatures(features);
@@ -587,10 +640,10 @@ Ext.define('CpsiMapview.factory.Layer', {
 
         // by default use clustering, however we may want to deactivate this for
         // line features
-        var noCluster = layerConf.noCluster || false;
-        var clusterSource;
+        const noCluster = layerConf.noCluster || false;
+        let clusterSource;
         if (!noCluster) {
-            var clusterSourceConf = {
+            let clusterSourceConf = {
                 distance: 5,
                 source: vectorSource
             };
@@ -598,16 +651,16 @@ Ext.define('CpsiMapview.factory.Layer', {
             clusterSource = new ol.source.Cluster(clusterSourceConf);
         }
 
-        var namespaceDefinitions = layerConf.namespaceDefinitions;
+        const namespaceDefinitions = layerConf.namespaceDefinitions;
         if (namespaceDefinitions) {
             Ext.iterate(namespaceDefinitions, function (prefix, uri) {
                 BasiGX.util.Namespace.namespaces[prefix] = uri;
             });
         }
 
-        var styleConfigs = this.createStyleConfigs(layerConf);
+        const styleConfigs = this.createStyleConfigs(layerConf);
 
-        var olLayerConf = {
+        let olLayerConf = {
             name: layerConf.text,
             source: clusterSource ? clusterSource : vectorSource,
             toolTipConfig: layerConf.tooltipsConfig,
@@ -626,18 +679,16 @@ Ext.define('CpsiMapview.factory.Layer', {
             idProperty: layerConf.idProperty
         };
         olLayerConf = Ext.apply(olLayerConf, olLayerProps);
-        var wfsLayer = new ol.layer.Vector(olLayerConf);
+        const wfsLayer = new ol.layer.Vector(olLayerConf);
 
         if (!Ext.isEmpty(styleConfigs)) {
             wfsLayer.set('activatedStyle', styleConfigs[0].name);
         }
 
         // load and parse style and apply it to layer
-        vectorSource.once(
-            'vectorloadstart', function () {
-                LayerFactory.loadSld(wfsLayer);
-            }
-        );
+        vectorSource.once('vectorloadstart', function () {
+            LayerFactory.loadSld(wfsLayer);
+        });
 
         if (layerConf.tooltipsConfig) {
             // create a custom tooltip for this layer
@@ -656,9 +707,11 @@ Ext.define('CpsiMapview.factory.Layer', {
      */
     createBing: function (layerConf, type) {
         // transform OL2 properties to current ones supported by OL >=v3
-        var olSourceProps = this.ol2PropsToOlSourceProps(layerConf.openLayers);
-        var olLayerProps = this.ol2PropsToOlLayerProps(layerConf.openLayers);
-        var olSourceConf = {
+        const olSourceProps = this.ol2PropsToOlSourceProps(
+            layerConf.openLayers
+        );
+        const olLayerProps = this.ol2PropsToOlLayerProps(layerConf.openLayers);
+        let olSourceConf = {
             key: layerConf.token,
             imagerySet: type
             // use maxZoom 19 to see stretched tiles instead of the BingMaps
@@ -667,7 +720,7 @@ Ext.define('CpsiMapview.factory.Layer', {
         };
         olSourceConf = Ext.apply(olSourceConf, olSourceProps);
 
-        var olLayerConf = {
+        let olLayerConf = {
             name: layerConf.text,
             preload: Infinity,
             source: new ol.source.BingMaps(olSourceConf)
@@ -683,8 +736,7 @@ Ext.define('CpsiMapview.factory.Layer', {
      * is used, an array of consistent style config objects is created on a layer
      */
     createStyleConfigs: function (layerConf) {
-
-        var styleConfigs = [];
+        const styleConfigs = [];
 
         // if an array of style objects is not set then we create an array
         // with a single entry
@@ -701,18 +753,22 @@ Ext.define('CpsiMapview.factory.Layer', {
         // so this URL is identical for all styles in a WFS
         // vector tiles have a WMS-style URL with placeholders so we need to contruct the GetStyles
         // request differently
-        var layerUrl;
+        let layerUrl;
         if (layerConf.layerType === 'vtwms') {
-            layerUrl = layerConf.baseurl + 'version=1.3.0&request=GetStyles&service=WMS&layers=' + layerConf.layerIdentificationName;
+            layerUrl =
+                layerConf.baseurl +
+                'version=1.3.0&request=GetStyles&service=WMS&layers=' +
+                layerConf.layerIdentificationName;
         } else {
-            layerUrl = layerConf.url + 'version=1.3.0&request=GetStyles&service=WMS&layers=' + layerConf.featureType;
+            layerUrl =
+                layerConf.url +
+                'version=1.3.0&request=GetStyles&service=WMS&layers=' +
+                layerConf.featureType;
         }
-
 
         // styleCfg can be a string (with a name) or an object
         Ext.Array.each(layerConf.styles, function (styleCfg) {
-
-            var styleName, labelRule;
+            let styleName, labelRule;
             if (Ext.isObject(styleCfg)) {
                 styleName = styleCfg.name;
                 labelRule = styleCfg.labelRule ? styleCfg.labelRule : '';
@@ -739,26 +795,30 @@ Ext.define('CpsiMapview.factory.Layer', {
      */
     createXyz: function (layerConf) {
         // transform OL2 properties to current ones supported by OL >=v3
-        var olSourceProps = this.ol2PropsToOlSourceProps(layerConf.openLayers);
-        var olLayerProps = this.ol2PropsToOlLayerProps(layerConf.openLayers);
+        const olSourceProps = this.ol2PropsToOlSourceProps(
+            layerConf.openLayers
+        );
+        const olLayerProps = this.ol2PropsToOlLayerProps(layerConf.openLayers);
 
-        var olSourceConf = {
+        let olSourceConf = {
             url: layerConf.url
         };
 
         olSourceConf = Ext.apply(olSourceConf, olSourceProps);
 
         if (olSourceConf.tileGrid) {
-            olSourceConf.tileGrid = new ol.tilegrid.TileGrid(olSourceConf.tileGrid);
+            olSourceConf.tileGrid = new ol.tilegrid.TileGrid(
+                olSourceConf.tileGrid
+            );
         }
 
-        var olLayerConf = {
+        let olLayerConf = {
             name: layerConf.text,
             source: new ol.source.XYZ(olSourceConf)
         };
         olLayerConf = Ext.apply(olLayerConf, olLayerProps);
 
-        var layer = new ol.layer.Tile(olLayerConf);
+        const layer = new ol.layer.Tile(olLayerConf);
 
         return layer;
     },
@@ -771,13 +831,15 @@ Ext.define('CpsiMapview.factory.Layer', {
      */
     createOsm: function (layerConf) {
         // transform OL2 properties to current ones supported by OL >=v3
-        var olSourceProps = this.ol2PropsToOlSourceProps(layerConf.openLayers);
-        var olLayerProps = this.ol2PropsToOlLayerProps(layerConf.openLayers);
+        const olSourceProps = this.ol2PropsToOlSourceProps(
+            layerConf.openLayers
+        );
+        const olLayerProps = this.ol2PropsToOlLayerProps(layerConf.openLayers);
 
-        var olSourceConf = {};
+        let olSourceConf = {};
         olSourceConf = Ext.apply(olSourceConf, olSourceProps);
 
-        var olLayerConf = {
+        let olLayerConf = {
             name: layerConf.text,
             source: new ol.source.OSM(olSourceConf)
         };
@@ -787,7 +849,6 @@ Ext.define('CpsiMapview.factory.Layer', {
     },
 
     createGoogle: function (layerConf, layerType) {
-
         Ext.log.info('Not implemented yet', layerConf, layerType);
     },
 
@@ -798,7 +859,7 @@ Ext.define('CpsiMapview.factory.Layer', {
      * @return {ol.layer.Tile}     World Wind (BlueMarble-200412) layer
      */
     createNasa: function (layerConf) {
-        var nasaWms = this.createWms({
+        const nasaWms = this.createWms({
             url: 'https://worldwind25.arc.nasa.gov/wms?',
             serverOptions: {
                 layers: 'BlueMarble-200412'
@@ -825,31 +886,30 @@ Ext.define('CpsiMapview.factory.Layer', {
      * @return {ol.layer.Tile}     ArcGIS REST layer
      */
     createArcGisRest: function (layerConf) {
-        var layer;
-        var singleTile = layerConf.openLayers.singleTile;
+        let layer;
+        const singleTile = layerConf.openLayers.singleTile;
         // transform OL2 properties to current ones supported by OL >=v3
-        var olSourceProps = this.ol2PropsToOlSourceProps(layerConf.openLayers);
-        var olLayerProps = this.ol2PropsToOlLayerProps(layerConf.openLayers);
+        const olSourceProps = this.ol2PropsToOlSourceProps(
+            layerConf.openLayers
+        );
+        const olLayerProps = this.ol2PropsToOlLayerProps(layerConf.openLayers);
 
-        var olSourceConf = {
+        let olSourceConf = {
             url: layerConf.url,
             params: layerConf.serverOptions || {},
             ratio: singleTile ? 1 : undefined
         };
         olSourceConf = Ext.apply(olSourceConf, olSourceProps);
 
-        var olLayerConf = {
+        let olLayerConf = {
             name: layerConf.text
         };
         olLayerConf = Ext.apply(olLayerConf, olLayerProps);
 
         if (singleTile) {
-
             olLayerConf.source = new ol.source.ImageArcGISRest(olSourceConf);
             layer = new ol.layer.Image(olLayerConf);
-
         } else {
-
             olLayerConf.source = new ol.source.TileArcGISRest(olSourceConf);
             layer = new ol.layer.Tile(olLayerConf);
         }
@@ -868,29 +928,33 @@ Ext.define('CpsiMapview.factory.Layer', {
      * @return {ol.layer.VectorTile}  Vector Tile layer
      */
     createVectorTilesLayer: function (layerConf) {
-
         // transform OL2 properties to current ones supported by OL >=v3
-        var olSourceProps = this.ol2PropsToOlSourceProps(layerConf.openLayers);
-        var olLayerProps = this.ol2PropsToOlLayerProps(layerConf.openLayers);
+        const olSourceProps = this.ol2PropsToOlSourceProps(
+            layerConf.openLayers
+        );
+        const olLayerProps = this.ol2PropsToOlLayerProps(layerConf.openLayers);
 
         // check for correct OL format and use 'MVT' as fallback
-        var format = layerConf.format;
+        let format = layerConf.format;
         if (!ol.format[format]) {
             format = 'MVT';
-            Ext.Logger.warn('Unsupported format for Vector Tiles layer "' +
-                layerConf.text + '" given in config. Will use "MVT" ' +
-                'as fallback.');
+            Ext.Logger.warn(
+                'Unsupported format for Vector Tiles layer "' +
+                    layerConf.text +
+                    '" given in config. Will use "MVT" ' +
+                    'as fallback.'
+            );
         }
 
-        var olSourceConf = {
+        let olSourceConf = {
             format: new ol.format[format](),
             url: layerConf.url
         };
         olSourceConf = Ext.apply(olSourceConf, olSourceProps);
-        var styleConfigs = this.createStyleConfigs(layerConf);
-        var vectorSource = new ol.source.VectorTile(olSourceConf);
+        const styleConfigs = this.createStyleConfigs(layerConf);
+        const vectorSource = new ol.source.VectorTile(olSourceConf);
 
-        var olLayerConf = {
+        let olLayerConf = {
             name: layerConf.text,
             declutter: true,
             source: vectorSource,
@@ -902,7 +966,7 @@ Ext.define('CpsiMapview.factory.Layer', {
         };
         olLayerConf = Ext.apply(olLayerConf, olLayerProps);
 
-        var vtLayer = new ol.layer.VectorTile(olLayerConf);
+        const vtLayer = new ol.layer.VectorTile(olLayerConf);
 
         // derive SLD to style Vector Tiles:
         // we take the first of a possible SLD style list
@@ -912,11 +976,9 @@ Ext.define('CpsiMapview.factory.Layer', {
         }
 
         // load and parse style and apply it to layer
-        vectorSource.once(
-            'tileloadstart', function () {
-                LayerFactory.loadSld(vtLayer);
-            }
-        );
+        vectorSource.once('tileloadstart', function () {
+            LayerFactory.loadSld(vtLayer);
+        });
 
         if (layerConf.tooltipsConfig) {
             // enable map tooltips for this layer
@@ -942,30 +1004,37 @@ Ext.define('CpsiMapview.factory.Layer', {
      * @return {ol.layer.VectorTile}  Vector Tile layer
      */
     createVectorTilesWmsLayer: function (layerConf) {
-        var vtLayer = LayerFactory.createVectorTilesLayer(layerConf);
-        var source = vtLayer.getSource();
+        const vtLayer = LayerFactory.createVectorTilesLayer(layerConf);
+        const source = vtLayer.getSource();
 
         // apply a custom tileUrlFunction in order to create a valid URL
         // to retrieve the Vector Tiles via WMS facade
         source.setTileUrlFunction(function (coord) {
-            var filters = CpsiMapview.util.Layer.filterVectorSource(source);
-            var ogcFilter = null;
+            const filters = CpsiMapview.util.Layer.filterVectorSource(source);
+            let ogcFilter = null;
 
             // merge all filters to OGC compliant AND filter
             if (filters.length > 0) {
-                ogcFilter = GeoExt.util.OGCFilter.combineFilters(filters, 'And', false, '2.0.0');
+                ogcFilter = GeoExt.util.OGCFilter.combineFilters(
+                    filters,
+                    'And',
+                    false,
+                    '2.0.0'
+                );
             }
 
-            var bbox = source.getTileGrid().getTileCoordExtent(coord);
-            var tileSize = source.getTileGrid().getTileSize(coord);
-            var url = source.getUrls()[0]
+            const bbox = source.getTileGrid().getTileCoordExtent(coord);
+            const tileSize = source.getTileGrid().getTileSize(coord);
+            let url = source
+                .getUrls()[0]
                 .replace('BBOX={bbox}', 'BBOX=' + bbox.toString())
                 .replace('WIDTH={width}', 'WIDTH=' + tileSize)
                 .replace('HEIGHT={height}', 'HEIGHT=' + tileSize);
 
             if (ogcFilter) {
                 url = Ext.String.urlAppend(
-                    url, 'FILTER=' + encodeURIComponent(ogcFilter)
+                    url,
+                    'FILTER=' + encodeURIComponent(ogcFilter)
                 );
             }
             return url;
@@ -981,20 +1050,22 @@ Ext.define('CpsiMapview.factory.Layer', {
      * @return {Object}         OL (>=v3) layer config
      */
     ol2PropsToOlLayerProps: function (ol2Conf) {
-        var map = BasiGX.util.Map.getMapComponent().getMap();
-        var units = map.getView().getProjection().getUnits();
+        const map = BasiGX.util.Map.getMapComponent().getMap();
+        const units = map.getView().getProjection().getUnits();
 
         // min. and max. resolution detection:
         // either directly given in config or indirectly by scale or we leave it
         // unset
-        var minRes = ol2Conf.minResolution ||
+        const minRes =
+            ol2Conf.minResolution ||
             BasiGX.util.Map.getResolutionForScale(ol2Conf.minScale, units) ||
             undefined;
-        var maxRes = ol2Conf.maxResolution ||
+        const maxRes =
+            ol2Conf.maxResolution ||
             BasiGX.util.Map.getResolutionForScale(ol2Conf.maxScale, units) ||
             undefined;
 
-        var olProps = {
+        const olProps = {
             opacity: ol2Conf.opacity,
             visible: ol2Conf.visibility,
             extent: ol2Conf.extent, // undefined if not set
@@ -1011,7 +1082,7 @@ Ext.define('CpsiMapview.factory.Layer', {
      * @return {Object}         OL (>=v3) source config
      */
     ol2PropsToOlSourceProps: function (ol2Conf) {
-        var olSourceProps = {
+        const olSourceProps = {
             attributions: ol2Conf.attribution,
             projection: ol2Conf.projection,
             transition: ol2Conf.transitionEffect === null ? 0 : undefined,
@@ -1028,17 +1099,15 @@ Ext.define('CpsiMapview.factory.Layer', {
      * remove the UserStyles from the XML doc we don't want before parsing
      */
     removeUnusedUserStyleNodes: function (sldXmlDoc, style, labelsActive) {
-
-        var userStyles = Ext.DomQuery.select('UserStyle', sldXmlDoc);
-        var labelRuleFound = false;
+        const userStyles = Ext.DomQuery.select('UserStyle', sldXmlDoc);
+        let labelRuleFound = false;
 
         Ext.Array.each(userStyles, function (userStyle) {
-
-            var userStyleName = '';
+            let userStyleName = '';
 
             // Get the immediate child nodes named <se:Name>
-            var childNodes = Array.prototype.slice.call(userStyle.children);
-            var nameNodes = childNodes.filter(function (child) {
+            const childNodes = Array.prototype.slice.call(userStyle.children);
+            const nameNodes = childNodes.filter(function (child) {
                 return child.nodeName === 'se:Name';
             });
 
@@ -1046,7 +1115,7 @@ Ext.define('CpsiMapview.factory.Layer', {
                 userStyleName = nameNodes[0].textContent;
             }
 
-            var keepNode = false;
+            let keepNode = false;
 
             // if no UserStyle name is set then it will be displayed
             if (userStyleName === style.name || !userStyleName) {
@@ -1065,7 +1134,11 @@ Ext.define('CpsiMapview.factory.Layer', {
 
         if (labelsActive && !labelRuleFound) {
             //<debug>
-            Ext.log.warn('Labels are set on the layer but the label UserStyle ' + style.labelRule + ' was not found');
+            Ext.log.warn(
+                'Labels are set on the layer but the label UserStyle ' +
+                    style.labelRule +
+                    ' was not found'
+            );
             //</debug>
         }
 
@@ -1073,50 +1146,72 @@ Ext.define('CpsiMapview.factory.Layer', {
     },
 
     applySldToLayer: function (mapLayer, sldXmlDoc, style) {
-
-        var me = this;
-        var labelsActive = mapLayer.get('labelsActive');
-        sldXmlDoc = me.removeUnusedUserStyleNodes(sldXmlDoc, style, labelsActive);
-        var sldXmlString = new XMLSerializer().serializeToString(sldXmlDoc);
+        const me = this;
+        const labelsActive = mapLayer.get('labelsActive');
+        sldXmlDoc = me.removeUnusedUserStyleNodes(
+            sldXmlDoc,
+            style,
+            labelsActive
+        );
+        const sldXmlString = new XMLSerializer().serializeToString(sldXmlDoc);
 
         // assume SLD 1.1.0 until https://github.com/geostyler/geostyler-sld-parser/issues/696 is implemented
-        var sldParser = new GeoStylerSLDParser.SldStyleParser({ sldVersion: '1.1.0' });
-        var olParser = new GeoStylerOpenlayersParser.OlStyleParser(ol);
-        sldParser.readStyle(sldXmlString)
-            .then(function (gs) {
+        const sldParser = new GeoStylerSLDParser.SldStyleParser({
+            sldVersion: '1.1.0'
+        });
+        const olParser = new GeoStylerOpenlayersParser.OlStyleParser(ol);
+        sldParser.readStyle(sldXmlString).then(
+            function (gs) {
                 if (gs.errors) {
-                    Ext.log.warn('Errors parsing the SLD file "' + style.sldUrl + '". ' + gs.errors);
+                    Ext.log.warn(
+                        'Errors parsing the SLD file "' +
+                            style.sldUrl +
+                            '". ' +
+                            gs.errors
+                    );
                     return;
                 }
 
                 olParser.writeStyle(gs.output).then(function (olStyleFunc) {
-
                     if (olStyleFunc.errors) {
-                        Ext.log.warn('Errors writing the OpenLayers style "' + style.sldUrl + '". ' + olStyleFunc.errors);
+                        Ext.log.warn(
+                            'Errors writing the OpenLayers style "' +
+                                style.sldUrl +
+                                '". ' +
+                                olStyleFunc.errors
+                        );
                         return;
                     }
 
-                    var source = mapLayer.getSource();
+                    const source = mapLayer.getSource();
                     if (source instanceof ol.source.Cluster) {
                         // for clustered features add an additional style
                         // for any grouped features
 
-                        var styleCache = {}; // cache styles per featCount
-                        var styleFuncWrapper = function (feature, resolution) {
-                            var featCount = feature.get('features').length;
-                            var style;
+                        const styleCache = {}; // cache styles per featCount
+                        const styleFuncWrapper = function (
+                            feature,
+                            resolution
+                        ) {
+                            const featCount = feature.get('features').length;
+                            let style;
 
                             if (featCount === 1) {
                                 // call the standard style function
-                                var feat = feature.get('features')[0];
+                                const feat = feature.get('features')[0];
 
                                 if (typeof olStyleFunc.output === 'function') {
-                                    style = olStyleFunc.output(feat, resolution);
+                                    style = olStyleFunc.output(
+                                        feat,
+                                        resolution
+                                    );
                                 } else {
                                     //<debug>
                                     // if there is one rule then an ol.style.Style is returned
                                     // rather than a function
-                                    Ext.Assert.truthy(typeof olStyleFunc.output === 'object');
+                                    Ext.Assert.truthy(
+                                        typeof olStyleFunc.output === 'object'
+                                    );
                                     //</debug>
                                     style = olStyleFunc.output;
                                 }
@@ -1124,7 +1219,10 @@ Ext.define('CpsiMapview.factory.Layer', {
                                 // use a clustered style
                                 style = styleCache[featCount];
                                 if (!style) {
-                                    style = CpsiMapview.util.Style.createClusterStyle(featCount);
+                                    style =
+                                        CpsiMapview.util.Style.createClusterStyle(
+                                            featCount
+                                        );
                                     styleCache[featCount] = style;
                                 }
                             }
@@ -1152,15 +1250,26 @@ Ext.define('CpsiMapview.factory.Layer', {
                         return;
                     }
 
-                    var currentPropertyNames = Ext.Array.merge(source.get('propertyNames'), source.get('originalPropertyNames'));
-                    var stylePropertyNames = LayerFactory.getPropertyNamesInSLD(sldXmlDoc);
-                    var hasStyleExtraPropertyNames = Ext.Array.some(stylePropertyNames, function (prop) {
-                        return currentPropertyNames.indexOf(prop) === -1;
-                    });
+                    const currentPropertyNames = Ext.Array.merge(
+                        source.get('propertyNames'),
+                        source.get('originalPropertyNames')
+                    );
+                    const stylePropertyNames =
+                        LayerFactory.getPropertyNamesInSLD(sldXmlDoc);
+                    const hasStyleExtraPropertyNames = Ext.Array.some(
+                        stylePropertyNames,
+                        function (prop) {
+                            return currentPropertyNames.indexOf(prop) === -1;
+                        }
+                    );
 
                     if (hasStyleExtraPropertyNames) {
-                        var propertyNames = LayerFactory.buildRequiredPropertyNames(stylePropertyNames, mapLayer.get('toolTipConfig'));
-                        var xhr = source.get('xhr');
+                        const propertyNames =
+                            LayerFactory.buildRequiredPropertyNames(
+                                stylePropertyNames,
+                                mapLayer.get('toolTipConfig')
+                            );
+                        const xhr = source.get('xhr');
 
                         source.set('propertyNames', propertyNames);
 
@@ -1177,11 +1286,16 @@ Ext.define('CpsiMapview.factory.Layer', {
                         source.refresh();
                     }
                 });
-            }, function () {
+            },
+            function () {
                 // rejection
-                Ext.log.warn('Could not parse SLD ' + style.sldUrl +
-                    '! Default OL style will be applied.');
-            });
+                Ext.log.warn(
+                    'Could not parse SLD ' +
+                        style.sldUrl +
+                        '! Default OL style will be applied.'
+                );
+            }
+        );
     },
 
     /**
@@ -1192,9 +1306,8 @@ Ext.define('CpsiMapview.factory.Layer', {
      * @param  {String} sldUrl   The URL to the SLD
      */
     loadSld: function (mapLayer) {
-
-        var me = this;
-        var styles = mapLayer.get('styles');
+        const me = this;
+        const styles = mapLayer.get('styles');
         if (Ext.isEmpty(styles)) {
             // no styles set on the layer
             return;
@@ -1202,32 +1315,38 @@ Ext.define('CpsiMapview.factory.Layer', {
 
         // if there is no activated style we display all styles in the SLD file
         // this will be the case where there is only a single style for a layer
-        var activatedStyle = mapLayer.get('activatedStyle');
+        const activatedStyle = mapLayer.get('activatedStyle');
 
         if (!activatedStyle) {
             //<debug>
-            Ext.log.warn('No activatedStyle set on layer with multiple styles: ' + mapLayer.get('layerKey'));
+            Ext.log.warn(
+                'No activatedStyle set on layer with multiple styles: ' +
+                    mapLayer.get('layerKey')
+            );
             //</debug>
             return;
         }
 
-        var style = styles.find(function (style) {
+        const style = styles.find(function (style) {
             return style.name === activatedStyle;
         });
 
-        var sldUrl = style.sldUrl;
+        const sldUrl = style.sldUrl;
 
         Ext.Ajax.request({
             url: sldUrl,
             method: 'GET',
             disableCaching: false,
             success: function (response) {
-                var sldXmlDoc = response.responseXML;
+                const sldXmlDoc = response.responseXML;
                 me.applySldToLayer(mapLayer, sldXmlDoc, style);
             },
             failure: function () {
-                Ext.log.warn('Could not load SLD ' + sldUrl +
-                    '! Default OL style will be applied.');
+                Ext.log.warn(
+                    'Could not load SLD ' +
+                        sldUrl +
+                        '! Default OL style will be applied.'
+                );
             }
         });
     },
@@ -1240,9 +1359,9 @@ Ext.define('CpsiMapview.factory.Layer', {
      * @param  {ol.layer.Vector | ol.layer.VectorTile} layer The layer to enable map tooltips for
      */
     registerLayerTooltip: function (layer) {
-        var mapPanel = CpsiMapview.view.main.Map.guess();
+        const mapPanel = CpsiMapview.view.main.Map.guess();
         // create a custom tooltip for this layer
-        var toolTip = Ext.create('CpsiMapview.view.layer.ToolTip', {
+        const toolTip = Ext.create('CpsiMapview.view.layer.ToolTip', {
             toolTipConfig: layer.get('toolTipConfig'),
             layer: layer
         });
@@ -1252,9 +1371,11 @@ Ext.define('CpsiMapview.factory.Layer', {
         mapPanel.on('cmv-map-pointerrest', function (hoveredObjs, evt) {
             // show tooltip with feature attribute information
             Ext.each(hoveredObjs, function (hoveredObj) {
-                if (hoveredObj.layer &&
+                if (
+                    hoveredObj.layer &&
                     hoveredObj.layer.id === layer.id &&
-                    hoveredObj.layer.toolTip) {
+                    hoveredObj.layer.toolTip
+                ) {
                     hoveredObj.layer.toolTip.draw(hoveredObj.feature, evt);
                 }
             });
@@ -1278,8 +1399,11 @@ Ext.define('CpsiMapview.factory.Layer', {
      * @param  {string[]} currentPropertyNames Array of property names
      * @param  {Object} tooltipsConfig tooltipsConfig object
      */
-    buildRequiredPropertyNames: function (currentPropertyNames, tooltipsConfig) {
-        var props = Ext.Array.clean(currentPropertyNames);
+    buildRequiredPropertyNames: function (
+        currentPropertyNames,
+        tooltipsConfig
+    ) {
+        const props = Ext.Array.clean(currentPropertyNames);
 
         // add properties defined in tooltip config to the props array
         Ext.each(tooltipsConfig || [], function (config) {
@@ -1296,13 +1420,15 @@ Ext.define('CpsiMapview.factory.Layer', {
      * @param  {Document} xmlDoc Parsed SLD XML
      */
     getPropertyNamesInSLD: function (xmlDoc) {
-        var nameSpacedPropertyNameNodes = Ext.DomQuery.select('ogc\\:PropertyName', xmlDoc);
-        var propertyNameNodes = Ext.DomQuery.select('PropertyName', xmlDoc);
-        var props = Ext.Array.merge(
+        const nameSpacedPropertyNameNodes = Ext.DomQuery.select(
+            'ogc\\:PropertyName',
+            xmlDoc
+        );
+        const propertyNameNodes = Ext.DomQuery.select('PropertyName', xmlDoc);
+        const props = Ext.Array.merge(
             Ext.Array.pluck(nameSpacedPropertyNameNodes, 'textContent'),
             Ext.Array.pluck(propertyNameNodes, 'textContent')
         );
         return Ext.Array.clean(props);
     }
-
 });

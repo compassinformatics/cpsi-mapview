@@ -4,9 +4,7 @@
  * @class CpsiMapview.util.Tracing
  */
 Ext.define('CpsiMapview.util.Tracing', {
-
     statics: {
-
         /**
          * Compute the modulo for negative values.
          *
@@ -34,16 +32,16 @@ Ext.define('CpsiMapview.util.Tracing', {
             if (!feature) {
                 return;
             }
-            var geom = feature.getGeometry();
+            const geom = feature.getGeometry();
             if (!geom) {
                 return;
             }
 
-            var type = geom.getType();
+            const type = geom.getType();
             if (type != 'LineString') {
                 return;
             }
-            var coords = geom.getCoordinates();
+            const coords = geom.getCoordinates();
             if (!coords) {
                 return;
             }
@@ -60,7 +58,7 @@ Ext.define('CpsiMapview.util.Tracing', {
          */
         // TODO: use Ext.Array.reduce instead of Ext.Array.findBy you can omit the second loop
         getCoordIndex: function (coordinateArray, coordToFind) {
-            var found = Ext.Array.findBy(coordinateArray, function (c) {
+            const found = Ext.Array.findBy(coordinateArray, function (c) {
                 return Ext.Array.equals(c, coordToFind);
             });
             return coordinateArray.indexOf(found);
@@ -75,16 +73,16 @@ Ext.define('CpsiMapview.util.Tracing', {
          * @returns {Boolean} If lines are touching.
          */
         linesTouchAtStartEndPoint: function (lineA, lineB) {
-            var firstA = lineA.getFirstCoordinate();
-            var lastA = lineA.getLastCoordinate();
+            const firstA = lineA.getFirstCoordinate();
+            const lastA = lineA.getLastCoordinate();
 
-            var firstB = lineB.getFirstCoordinate();
-            var lastB = lineB.getLastCoordinate();
+            const firstB = lineB.getFirstCoordinate();
+            const lastB = lineB.getLastCoordinate();
 
-            var endStart = Ext.Array.equals(lastA, firstB);
-            var endEnd = Ext.Array.equals(lastA, lastB);
-            var startStart = Ext.Array.equals(firstA, firstB);
-            var startEnd = Ext.Array.equals(firstA, lastB);
+            const endStart = Ext.Array.equals(lastA, firstB);
+            const endEnd = Ext.Array.equals(lastA, lastB);
+            const startStart = Ext.Array.equals(firstA, firstB);
+            const startEnd = Ext.Array.equals(firstA, lastB);
             return endStart || endEnd || startStart || startEnd;
         },
 
@@ -97,9 +95,8 @@ Ext.define('CpsiMapview.util.Tracing', {
          * @returns {ol.coordinate.Coordinate} The touching coordinate or null
          */
         lineInteriorTouchesLineStartEnd: function (lineA, lineB) {
-
-            var firstB = lineB.getFirstCoordinate();
-            var lastB = lineB.getLastCoordinate();
+            const firstB = lineB.getFirstCoordinate();
+            const lastB = lineB.getLastCoordinate();
 
             if (lineA.intersectsCoordinate(firstB)) {
                 return firstB;
@@ -108,7 +105,6 @@ Ext.define('CpsiMapview.util.Tracing', {
             if (lineA.intersectsCoordinate(lastB)) {
                 return lastB;
             }
-
         },
 
         /**
@@ -120,8 +116,8 @@ Ext.define('CpsiMapview.util.Tracing', {
          * @returns {ol.coordinate.Coordinate} The touching coordinate
          */
         lineStartEndTouchesLineInterior: function (lineA, lineB) {
-            var firstA = lineA.getFirstCoordinate();
-            var lastA = lineA.getLastCoordinate();
+            const firstA = lineA.getFirstCoordinate();
+            const lastA = lineA.getLastCoordinate();
 
             if (lineB.intersectsCoordinate(firstA)) {
                 return firstA;
@@ -129,7 +125,6 @@ Ext.define('CpsiMapview.util.Tracing', {
             if (lineB.intersectsCoordinate(lastA)) {
                 return lastA;
             }
-
         },
 
         /**
@@ -157,12 +152,15 @@ Ext.define('CpsiMapview.util.Tracing', {
          *
          * @returns {ol.coordinate.Coordinate} The found coordinate
          */
-        getClosestCoordinateToPoint: function (coordinateArray, pointCoordinate) {
-            var staticMe = CpsiMapview.util.Tracing;
+        getClosestCoordinateToPoint: function (
+            coordinateArray,
+            pointCoordinate
+        ) {
+            const staticMe = CpsiMapview.util.Tracing;
 
-            var found, length;
+            let found, length;
             Ext.each(coordinateArray, function (c) {
-                var tmpLength = staticMe.computeLength(c, pointCoordinate);
+                const tmpLength = staticMe.computeLength(c, pointCoordinate);
                 if (!length || tmpLength < length) {
                     length = tmpLength;
                     found = c;
@@ -184,12 +182,14 @@ Ext.define('CpsiMapview.util.Tracing', {
          * @returns {Boolean} If coordinate c is on the [a, b] segment
          */
         coordIsOnSegment: function (c, a, b) {
-            var staticMe = CpsiMapview.util.Tracing;
+            const staticMe = CpsiMapview.util.Tracing;
 
-            var lengthAc = staticMe.computeLength(a, c);
-            var lengthAb = staticMe.computeLength(a, b);
-            var dot =
-                ((c[0] - a[0]) * (b[0] - a[0]) + (c[1] - a[1]) * (b[1] - a[1])) / lengthAb;
+            const lengthAc = staticMe.computeLength(a, c);
+            const lengthAb = staticMe.computeLength(a, b);
+            const dot =
+                ((c[0] - a[0]) * (b[0] - a[0]) +
+                    (c[1] - a[1]) * (b[1] - a[1])) /
+                lengthAb;
             return Math.abs(lengthAc - dot) < 1e-6 && lengthAc < lengthAb;
         },
 
@@ -202,8 +202,7 @@ Ext.define('CpsiMapview.util.Tracing', {
          * @returns {ol.coordinate.Coordinate[]} The combined coordinate array if input arrays are touching, empty array otherwise
          */
         concatLineCoords: function (aLineCoords, bLineCoords) {
-
-            var inputValid =
+            const inputValid =
                 Ext.isArray(aLineCoords) &&
                 aLineCoords.length >= 2 &&
                 Ext.isArray(bLineCoords) &&
@@ -213,38 +212,37 @@ Ext.define('CpsiMapview.util.Tracing', {
                 return;
             }
 
-            var aFirst = aLineCoords[0];
-            var aLast = aLineCoords[aLineCoords.length - 1];
+            const aFirst = aLineCoords[0];
+            const aLast = aLineCoords[aLineCoords.length - 1];
 
-            var bFirst = bLineCoords[0];
-            var bLast = bLineCoords[bLineCoords.length - 1];
+            const bFirst = bLineCoords[0];
+            const bLast = bLineCoords[bLineCoords.length - 1];
 
-            var lastFirst = Ext.Array.equals(aLast, bFirst);
-            var lastLast = Ext.Array.equals(aLast, bLast);
-            var firstFirst = Ext.Array.equals(aFirst, bFirst);
-            var firstLast = Ext.Array.equals(aFirst, bLast);
+            const lastFirst = Ext.Array.equals(aLast, bFirst);
+            const lastLast = Ext.Array.equals(aLast, bLast);
+            const firstFirst = Ext.Array.equals(aFirst, bFirst);
+            const firstLast = Ext.Array.equals(aFirst, bLast);
 
             if (lastLast) {
                 // reverse second array
                 bLineCoords.reverse();
-
             } else if (firstFirst) {
                 // reverse first array
                 aLineCoords.reverse();
-
             } else if (firstLast) {
                 // reverse both arrays
                 aLineCoords.reverse();
                 bLineCoords.reverse();
-
             } else if (!lastFirst) {
                 // lines do not touch
-                Ext.Logger.warn('Cannot concat lines, because they do not touch.');
+                Ext.Logger.warn(
+                    'Cannot concat lines, because they do not touch.'
+                );
                 return undefined;
             }
             // remove intersecting vertex
             aLineCoords.pop();
-            var resultCoords = aLineCoords.concat(bLineCoords);
+            const resultCoords = aLineCoords.concat(bLineCoords);
             return resultCoords;
         },
 
@@ -264,9 +262,9 @@ Ext.define('CpsiMapview.util.Tracing', {
          * @returns {ol.coordinate.Coordinate[]} The coordinates of the traced segment.
          */
         getPartialSegmentCoords: function (feature, startPoint, endPoint) {
-            var staticMe = CpsiMapview.util.Tracing;
-            var geometry = feature.getGeometry();
-            var ringCoords;
+            const staticMe = CpsiMapview.util.Tracing;
+            let geometry = feature.getGeometry();
+            let ringCoords;
             if (geometry.getType() === 'MultiPolygon') {
                 geometry = geometry.getPolygon(0);
                 ringCoords = geometry.getLinearRing().getCoordinates();
@@ -275,17 +273,22 @@ Ext.define('CpsiMapview.util.Tracing', {
             } else if (geometry.getType() === 'LineString') {
                 ringCoords = geometry.getCoordinates();
             } else {
-                Ext.Logger.warn('Tracing only works for LineString, Polygon and MultiPolygon');
+                Ext.Logger.warn(
+                    'Tracing only works for LineString, Polygon and MultiPolygon'
+                );
                 return;
             }
 
-            var i,
+            let i,
                 pointA,
                 pointB,
                 startSegmentIndex = -1;
             for (i = 0; i < ringCoords.length; i++) {
                 pointA = ringCoords[i];
-                pointB = ringCoords[staticMe.computeModulo(i + 1, ringCoords.length)];
+                pointB =
+                    ringCoords[
+                        staticMe.computeModulo(i + 1, ringCoords.length)
+                    ];
 
                 // check if this is the start segment dot product
                 if (staticMe.coordIsOnSegment(startPoint, pointA, pointB)) {
@@ -294,18 +297,29 @@ Ext.define('CpsiMapview.util.Tracing', {
                 }
             }
 
-            var cwCoordinates = [];
-            var cwLength = 0;
-            var ccwCoordinates = [];
-            var ccwLength = 0;
+            const cwCoordinates = [];
+            let cwLength = 0;
+            const ccwCoordinates = [];
+            let ccwLength = 0;
 
             // build clockwise coordinates
             for (i = 0; i < ringCoords.length; i++) {
                 pointA =
                     i === 0
                         ? startPoint
-                        : ringCoords[staticMe.computeModulo(i + startSegmentIndex, ringCoords.length)];
-                pointB = ringCoords[staticMe.computeModulo(i + startSegmentIndex + 1, ringCoords.length)];
+                        : ringCoords[
+                              staticMe.computeModulo(
+                                  i + startSegmentIndex,
+                                  ringCoords.length
+                              )
+                          ];
+                pointB =
+                    ringCoords[
+                        staticMe.computeModulo(
+                            i + startSegmentIndex + 1,
+                            ringCoords.length
+                        )
+                    ];
                 cwCoordinates.push(pointA);
 
                 if (staticMe.coordIsOnSegment(endPoint, pointA, pointB)) {
@@ -319,11 +333,22 @@ Ext.define('CpsiMapview.util.Tracing', {
 
             // build counter-clockwise coordinates
             for (i = 0; i < ringCoords.length; i++) {
-                pointA = ringCoords[staticMe.computeModulo(startSegmentIndex - i, ringCoords.length)];
+                pointA =
+                    ringCoords[
+                        staticMe.computeModulo(
+                            startSegmentIndex - i,
+                            ringCoords.length
+                        )
+                    ];
                 pointB =
                     i === 0
                         ? startPoint
-                        : ringCoords[staticMe.computeModulo(startSegmentIndex - i + 1, ringCoords.length)];
+                        : ringCoords[
+                              staticMe.computeModulo(
+                                  startSegmentIndex - i + 1,
+                                  ringCoords.length
+                              )
+                          ];
                 ccwCoordinates.push(pointB);
 
                 if (staticMe.coordIsOnSegment(endPoint, pointA, pointB)) {
@@ -338,6 +363,5 @@ Ext.define('CpsiMapview.util.Tracing', {
             // keep the shortest path
             return ccwLength < cwLength ? ccwCoordinates : cwCoordinates;
         }
-
     }
 });

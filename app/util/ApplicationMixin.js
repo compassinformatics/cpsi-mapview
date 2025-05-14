@@ -1,4 +1,3 @@
-
 /**
  * A mapview Application mixin containing generic functions that can be reused
  * between applications
@@ -6,10 +5,7 @@
 Ext.define('CpsiMapview.util.ApplicationMixin', {
     extend: 'Ext.Mixin',
 
-    requires: [
-        'Ext.window.MessageBox',
-        'CpsiMapview.view.form.Login'
-    ],
+    requires: ['Ext.window.MessageBox', 'CpsiMapview.view.form.Login'],
 
     // see https://docs.sencha.com/extjs/6.7.0/classic/Ext.app.Application.html#cfg-quickTips
     quickTips: false,
@@ -44,28 +40,28 @@ Ext.define('CpsiMapview.util.ApplicationMixin', {
     },
 
     /**
-    * A counter property to keep track of how many stores need to
-    * be loaded before the application can become active
-    */
+     * A counter property to keep track of how many stores need to
+     * be loaded before the application can become active
+     */
     storeCounter: 0,
 
     /**
-    * A flag to indicate if the viewport and stores have been loaded
-    * for the application
-    */
+     * A flag to indicate if the viewport and stores have been loaded
+     * for the application
+     */
     applicationLoaded: false,
 
     /**
-    * Custom property to list all stores that should be loaded as soon as a user logs in
-    */
+     * Custom property to list all stores that should be loaded as soon as a user logs in
+     */
     lookupStores: [],
 
     mixinConfig: {
         after: {
             constructor: 'onApplicationCreated',
             onAppUpdate: 'onApplicationUpdated'
-        }, before:
-        {
+        },
+        before: {
             init: 'beforeInit'
         }
     },
@@ -126,8 +122,7 @@ Ext.define('CpsiMapview.util.ApplicationMixin', {
      * @param {any} loginData
      */
     onLogin: function (loginData) {
-
-        var me = this;
+        const me = this;
 
         if (me.applicationLoaded === false) {
             me.loadApplication();
@@ -142,23 +137,25 @@ Ext.define('CpsiMapview.util.ApplicationMixin', {
     },
 
     onAjaxRequestComplete: function (connection, response) {
+        const me = this;
 
-        var me = this;
+        const msg = 'The operation failed.';
+        let result;
+        const requestUrl = response.request.url;
+        const success = response.status === 200;
 
-        var msg = 'The operation failed.';
-        var result;
-        var requestUrl = response.request.url;
-        var success = response.status === 200;
-
-        var urlTest = function (url) {
-            var ignoreCase = true;
+        const urlTest = function (url) {
+            const ignoreCase = true;
             return Ext.String.startsWith(requestUrl, url, ignoreCase);
         };
 
         if (Ext.Array.some(me.serviceUrls, urlTest) === true) {
             if (Ext.Array.some(me.excludedUrls, urlTest) === false) {
-
-                var responseType = response.responseType ? response.responseType : response.getResponseHeader ? response.getResponseHeader('content-type') : null;
+                let responseType = response.responseType
+                    ? response.responseType
+                    : response.getResponseHeader
+                      ? response.getResponseHeader('content-type')
+                      : null;
 
                 // check for geojson (coming from MapServer)
                 if (responseType && responseType.includes('subtype=geojson')) {
@@ -168,7 +165,8 @@ Ext.define('CpsiMapview.util.ApplicationMixin', {
                 // form submissions (i.e. attachments upload) return bogus responses with no content-type
                 // we can try and parse the response to see if it is valid JSON
                 if (responseType === null) {
-                    if (Ext.JSON.decode(response.responseText, true)) { // pass true to avoid errors
+                    if (Ext.JSON.decode(response.responseText, true)) {
+                        // pass true to avoid errors
                         responseType = 'json';
                     }
                 }
@@ -178,8 +176,7 @@ Ext.define('CpsiMapview.util.ApplicationMixin', {
                     case 'application/json':
                         if (response.responseJson) {
                             result = response.responseJson;
-                        }
-                        else {
+                        } else {
                             result = JSON.parse(response.responseText);
                         }
 
@@ -196,7 +193,10 @@ Ext.define('CpsiMapview.util.ApplicationMixin', {
                                     break;
                                 default:
                                     //<debug>
-                                    Ext.log.error(requestUrl, result.message ? result.message : msg);
+                                    Ext.log.error(
+                                        requestUrl,
+                                        result.message ? result.message : msg
+                                    );
                                     //</debug>
                                     break;
                             }
@@ -221,7 +221,7 @@ Ext.define('CpsiMapview.util.ApplicationMixin', {
     },
 
     onApplicationCreated: function () {
-        var me = this;
+        const me = this;
         me.setupRequestHooks();
 
         if (me.requireLogin) {
@@ -247,13 +247,14 @@ Ext.define('CpsiMapview.util.ApplicationMixin', {
      * default CpsiMapview.plugin.FeatureInfoWindow tool should be active
      * */
     onMapToolsToggle: function () {
+        const buttonsInToggleGroup = Ext.ComponentQuery.query(
+            'button[toggleGroup=map][name!=pan]'
+        );
+        const pressedStates = Ext.Array.pluck(buttonsInToggleGroup, 'pressed');
+        const uniquePressedStates = Ext.Array.unique(pressedStates);
+        const activeTools = Ext.Array.contains(uniquePressedStates, true);
 
-        var buttonsInToggleGroup = Ext.ComponentQuery.query('button[toggleGroup=map][name!=pan]');
-        var pressedStates = Ext.Array.pluck(buttonsInToggleGroup, 'pressed');
-        var uniquePressedStates = Ext.Array.unique(pressedStates);
-        var activeTools = Ext.Array.contains(uniquePressedStates, true);
-
-        var map = BasiGX.util.Map.getMapComponent().map;
+        const map = BasiGX.util.Map.getMapComponent().map;
         map.set('defaultClickEnabled', !activeTools);
     },
 
@@ -261,8 +262,7 @@ Ext.define('CpsiMapview.util.ApplicationMixin', {
      * Add hooks for all AJAX request to handle errors and logins
      * */
     setupRequestHooks: function () {
-
-        var me = this;
+        const me = this;
 
         Ext.Ajax.on({
             beforerequest: this.onAjaxBeforeRequest,
@@ -278,8 +278,7 @@ Ext.define('CpsiMapview.util.ApplicationMixin', {
      * If the form has already been created then simply show it.
      * */
     doLogin: function () {
-
-        var me = this;
+        const me = this;
 
         if (!me.loginWindow) {
             me.loginWindow = Ext.create('CpsiMapview.view.form.Login', {
@@ -302,9 +301,8 @@ Ext.define('CpsiMapview.util.ApplicationMixin', {
      * @param {any} regex
      */
     getUrlParameter: function (regex, hostname) {
-
-        var matches = [];
-        var m;
+        const matches = [];
+        let m;
 
         do {
             m = regex.exec(hostname);
@@ -313,7 +311,7 @@ Ext.define('CpsiMapview.util.ApplicationMixin', {
             }
         } while (m);
 
-        var value;
+        let value;
 
         if (matches.length > 0) {
             value = matches[0];
@@ -330,10 +328,9 @@ Ext.define('CpsiMapview.util.ApplicationMixin', {
      * @param {any} siteKey
      */
     getSiteSettings: function (storeKey, siteKey) {
-
-        var store = Ext.data.StoreManager.lookup(storeKey);
-        var idx = store.findExact('key', siteKey);
-        var rec = null;
+        const store = Ext.data.StoreManager.lookup(storeKey);
+        const idx = store.findExact('key', siteKey);
+        let rec = null;
 
         if (idx !== -1) {
             rec = store.getAt(idx);
@@ -342,14 +339,12 @@ Ext.define('CpsiMapview.util.ApplicationMixin', {
         return rec;
     },
 
-
     /**
      * Loop through all remote stores in the custom lookupStores property
      * and add a listener to keep track of then they are loaded
      * */
     loadAllStores: function () {
-
-        var me = this;
+        const me = this;
 
         if (me.lookupStores.length === 0) {
             return;
@@ -358,7 +353,7 @@ Ext.define('CpsiMapview.util.ApplicationMixin', {
         me.getMainView().mask('Loading...');
 
         Ext.Array.each(me.lookupStores, function (storeClass) {
-            var store = Ext.create(storeClass);
+            const store = Ext.create(storeClass);
 
             if (store.autoLoad && !store.isLoaded()) {
                 me.storeCounter++;
@@ -379,8 +374,7 @@ Ext.define('CpsiMapview.util.ApplicationMixin', {
      * if all stores are loaded then unmask the application
      * */
     storeLoaded: function () {
-
-        var me = this;
+        const me = this;
         me.storeCounter--;
 
         if (me.storeCounter == 0) {
@@ -392,7 +386,9 @@ Ext.define('CpsiMapview.util.ApplicationMixin', {
      * Ask the use if they wish to refresh the browser following an application update
      * */
     onApplicationUpdated: function () {
-        Ext.Msg.confirm('Application Update', 'This application has an update, reload?',
+        Ext.Msg.confirm(
+            'Application Update',
+            'This application has an update, reload?',
             function (choice) {
                 if (choice === 'yes') {
                     window.location.reload();
@@ -402,14 +398,13 @@ Ext.define('CpsiMapview.util.ApplicationMixin', {
     },
 
     /**
-    * Add the main view to the viewport and load all the application stores
-    * We don't want to show the viewport and load stores until the user is logged in
-    * so we use a similar approach to that described in the Sencha sample
-    * login app at https://docs.sencha.com/extjs/7.2.0/guides/tutorials/login_app/login_app.html
-    * */
+     * Add the main view to the viewport and load all the application stores
+     * We don't want to show the viewport and load stores until the user is logged in
+     * so we use a similar approach to that described in the Sencha sample
+     * login app at https://docs.sencha.com/extjs/7.2.0/guides/tutorials/login_app/login_app.html
+     * */
     loadApplication: function () {
-
-        var me = this;
+        const me = this;
 
         if (!me.mainViewXType) {
             Ext.Error.raise('No mainViewXType defined for the application');
@@ -429,11 +424,10 @@ Ext.define('CpsiMapview.util.ApplicationMixin', {
      * Common setup code prior to initializing the application
      * */
     beforeInit: function () {
-
-        var me = this;
+        const me = this;
 
         // default timeout is 30000 (30 seconds) increase this to a minute
-        var timeout = 60000;
+        const timeout = 60000;
         Ext.Ajax.setTimeout(timeout);
         Ext.override(Ext.data.proxy.Ajax, { timeout: timeout });
 

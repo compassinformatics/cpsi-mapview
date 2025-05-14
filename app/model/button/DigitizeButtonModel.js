@@ -7,6 +7,6 @@ Ext.define('CpsiMapview.model.button.DigitizeButtonModel', {
     alias: 'viewmodel.cmv_digitize_button',
 
     data: {
-        tooltip: 'Digitize a new point',
+        tooltip: 'Digitize a new point'
     }
 });

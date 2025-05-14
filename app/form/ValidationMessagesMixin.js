@@ -8,8 +8,7 @@ Ext.define('CpsiMapview.form.ValidationMessagesMixin', {
     extend: 'Ext.Mixin',
 
     checkValid: function (rec) {
-
-        var me = this;
+        const me = this;
 
         if (!rec) {
             return false;
@@ -24,9 +23,8 @@ Ext.define('CpsiMapview.form.ValidationMessagesMixin', {
     },
 
     updateValidationMessages: function (rec) {
-
-        var me = this;
-        var view = me.getView();
+        const me = this;
+        let view = me.getView();
 
         // if a control is in a grid, or sub-component
         // ensure the parent window is set as the view
@@ -40,7 +38,7 @@ Ext.define('CpsiMapview.form.ValidationMessagesMixin', {
             }
         }
 
-        var saveButton = view.down('#saveButton');
+        const saveButton = view.down('#saveButton');
 
         if (!saveButton) {
             //<debug>
@@ -51,15 +49,15 @@ Ext.define('CpsiMapview.form.ValidationMessagesMixin', {
 
         // force re-validation - the model may not have been updated
         // but a related model e.g. a column may have been
-        var refresh = true;
+        const refresh = true;
         rec.getValidation(refresh);
 
         if (rec.isValid() === false) {
             // console.log(rec.validation.data);
             // create some validation messages
 
-            var d = rec.getValidation().getData();
-            var errors = [];
+            const d = rec.getValidation().getData();
+            const errors = [];
 
             Ext.Object.each(d, function (key, value) {
                 if (value !== true) {

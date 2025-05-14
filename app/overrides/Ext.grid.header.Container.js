@@ -1,10 +1,9 @@
-﻿Ext.override(Ext.grid.header.Container, {
+Ext.override(Ext.grid.header.Container, {
     getHeaderMenu: function () {
-        var menu = this.getMenu(),
-            item;
+        const menu = this.getMenu();
 
         if (menu) {
-            item = menu.child('#columnItem');
+            const item = menu.child('#columnItem');
             // no check to see if item is null here
             // TypeError: Cannot read properties of null (reading 'menu')
             // so move within guard block
@@ -17,5 +16,5 @@
         }
 
         return null;
-    },
+    }
 });

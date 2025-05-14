@@ -1,5 +1,5 @@
 /**
-* This class is the controller for the button 'SpatialQueryButton'
+ * This class is the controller for the button 'SpatialQueryButton'
  */
 Ext.define('CpsiMapview.controller.button.SpatialQueryButtonController', {
     extend: 'Ext.app.ViewController',
@@ -44,8 +44,8 @@ Ext.define('CpsiMapview.controller.button.SpatialQueryButtonController', {
     permanentLayerCreatedByTool: false,
 
     /**
-    * The OpenLayers map. If not given, will be auto-detected
-    */
+     * The OpenLayers map. If not given, will be auto-detected
+     */
     map: null,
 
     /**
@@ -53,12 +53,14 @@ Ext.define('CpsiMapview.controller.button.SpatialQueryButtonController', {
      */
     mapComponent: null,
 
-
     constructor: function () {
-        var me = this;
-        me.getFeaturesFromSourceAndTriggerWfs = me.getFeaturesFromSourceAndTriggerWfs.bind(me);
-        me.getGeometryFromPolygonAndTriggerWfs = me.getGeometryFromPolygonAndTriggerWfs.bind(me);
-        me.onQueryLayerVisibilityChange = me.onQueryLayerVisibilityChange.bind(me);
+        const me = this;
+        me.getFeaturesFromSourceAndTriggerWfs =
+            me.getFeaturesFromSourceAndTriggerWfs.bind(me);
+        me.getGeometryFromPolygonAndTriggerWfs =
+            me.getGeometryFromPolygonAndTriggerWfs.bind(me);
+        me.onQueryLayerVisibilityChange =
+            me.onQueryLayerVisibilityChange.bind(me);
         me.callParent(arguments);
     },
 
@@ -66,15 +68,19 @@ Ext.define('CpsiMapview.controller.button.SpatialQueryButtonController', {
      * Function to determine the query layer if not yet defined in class
      */
     findQueryLayer: function () {
-        var me = this;
-        var view = me.getView();
+        const me = this;
+        const view = me.getView();
         if (!view.queryLayer && view.queryLayerName) {
-            view.queryLayer = BasiGX.util.Layer.
-                getLayerByName(view.queryLayerName);
+            view.queryLayer = BasiGX.util.Layer.getLayerByName(
+                view.queryLayerName
+            );
         }
 
         if (!view.queryLayer) {
-            Ext.Logger.warn('No queryLayer found in the map for the SpatialQueryButton with the name: ' + view.queryLayerName);
+            Ext.Logger.warn(
+                'No queryLayer found in the map for the SpatialQueryButton with the name: ' +
+                    view.queryLayerName
+            );
         }
     },
 
@@ -86,8 +92,8 @@ Ext.define('CpsiMapview.controller.button.SpatialQueryButtonController', {
      * @param {Boolean} pressed The toggle state.
      */
     onSpatialQueryBtnToggle: function (btn, pressed) {
-        var me = this;
-        var view = me.getView();
+        const me = this;
+        const view = me.getView();
 
         if (view.map && view.map instanceof ol.Map) {
             me.map = view.map;
@@ -100,18 +106,24 @@ Ext.define('CpsiMapview.controller.button.SpatialQueryButtonController', {
             me.findQueryLayer();
         }
 
-        var geometryFunction;
-        var type = view.drawGeometryType;
+        let geometryFunction;
+        let type = view.drawGeometryType;
         if (view.spatialOperator === 'bbox') {
             type = 'Circle';
             geometryFunction = ol.interaction.Draw.createBox();
         }
 
-        var vectorLayerKey = view.getVectorLayerKey();
-        me.permanentLayer = CpsiMapview.view.button.SpatialQueryButton.findAssociatedPermanentLayer(me.map, vectorLayerKey);
+        const vectorLayerKey = view.getVectorLayerKey();
+        me.permanentLayer =
+            CpsiMapview.view.button.SpatialQueryButton.findAssociatedPermanentLayer(
+                me.map,
+                vectorLayerKey
+            );
         if (me.permanentLayer === undefined) {
             me.permanentLayerCreatedByTool = true; // add flag indicating the tool will handle the destruction of the layer
-            me.permanentLayer = new ol.layer.Vector({ source: new ol.source.Vector() });
+            me.permanentLayer = new ol.layer.Vector({
+                source: new ol.source.Vector()
+            });
             me.permanentLayer.set('associatedLayerKey', vectorLayerKey);
             me.permanentLayer.set('isSpatialQueryLayer', true);
             me.permanentLayer.set('name', vectorLayerKey + '_spatialfilter');
@@ -119,7 +131,7 @@ Ext.define('CpsiMapview.controller.button.SpatialQueryButtonController', {
             me.connectQueryLayer();
         }
 
-        var permanentLayerSource = me.permanentLayer.getSource();
+        const permanentLayerSource = me.permanentLayer.getSource();
         if (!me.drawQueryInteraction) {
             if (view.displayPermanently) {
                 me.map.addLayer(me.permanentLayer);
@@ -148,25 +160,47 @@ Ext.define('CpsiMapview.controller.button.SpatialQueryButtonController', {
         }
         if (pressed) {
             me.drawQueryInteraction.setActive(true);
-            me.map.getViewport().addEventListener('contextmenu', me.contextHandler);
+            me.map
+                .getViewport()
+                .addEventListener('contextmenu', me.contextHandler);
             if (view.displayPermanently) {
                 me.modifiyQueryInteraction.setActive(true);
                 me.snapQueryInteraction.setActive(true);
-                me.drawQueryInteraction.on('drawend', me.getFeaturesFromSourceAndTriggerWfs);
-                me.modifiyQueryInteraction.on('modifyend', me.getFeaturesFromSourceAndTriggerWfs);
+                me.drawQueryInteraction.on(
+                    'drawend',
+                    me.getFeaturesFromSourceAndTriggerWfs
+                );
+                me.modifiyQueryInteraction.on(
+                    'modifyend',
+                    me.getFeaturesFromSourceAndTriggerWfs
+                );
             } else {
-                view.queryFeatures.on('add', me.getGeometryFromPolygonAndTriggerWfs);
+                view.queryFeatures.on(
+                    'add',
+                    me.getGeometryFromPolygonAndTriggerWfs
+                );
             }
         } else {
             me.drawQueryInteraction.setActive(false);
-            me.map.getViewport().removeEventListener('contextmenu', me.contextHandler);
+            me.map
+                .getViewport()
+                .removeEventListener('contextmenu', me.contextHandler);
             if (view.displayPermanently) {
                 me.modifiyQueryInteraction.setActive(false);
                 me.snapQueryInteraction.setActive(false);
-                me.drawQueryInteraction.un('drawend', me.getFeaturesFromSourceAndTriggerWfs);
-                me.modifiyQueryInteraction.un('modifyend', me.getFeaturesFromSourceAndTriggerWfs);
+                me.drawQueryInteraction.un(
+                    'drawend',
+                    me.getFeaturesFromSourceAndTriggerWfs
+                );
+                me.modifiyQueryInteraction.un(
+                    'modifyend',
+                    me.getFeaturesFromSourceAndTriggerWfs
+                );
             } else {
-                view.queryFeatures.un('add', me.getGeometryFromPolygonAndTriggerWfs);
+                view.queryFeatures.un(
+                    'add',
+                    me.getGeometryFromPolygonAndTriggerWfs
+                );
             }
         }
     },
@@ -179,29 +213,32 @@ Ext.define('CpsiMapview.controller.button.SpatialQueryButtonController', {
         // suppress default browser behaviour
         evt.preventDefault();
 
-        var me = this.scope;
+        const me = this.scope;
 
-        var menu = Ext.create('Ext.menu.Menu', {
+        const menu = Ext.create('Ext.menu.Menu', {
             width: 100,
             plain: true,
             renderTo: Ext.getBody(),
-            items: [{
-                text: 'Clear Feature',
-                scope: me,
-                handler: function () {
-                    var view = me.getView();
-                    // remove the spatial filter on the layer by firing an event
-                    view.fireEvent('cmv-spatial-query-filter', null);
-                    // now remove the polygon from the layer
-                    me.onClearAssociatedPermanentLayer();
+            items: [
+                {
+                    text: 'Clear Feature',
+                    scope: me,
+                    handler: function () {
+                        const view = me.getView();
+                        // remove the spatial filter on the layer by firing an event
+                        view.fireEvent('cmv-spatial-query-filter', null);
+                        // now remove the polygon from the layer
+                        me.onClearAssociatedPermanentLayer();
+                    }
+                },
+                {
+                    text: 'Cancel Drawing',
+                    scope: me,
+                    handler: function () {
+                        me.drawQueryInteraction.abortDrawing();
+                    }
                 }
-            }, {
-                text: 'Cancel Drawing',
-                scope: me,
-                handler: function () {
-                    me.drawQueryInteraction.abortDrawing();
-                }
-            }]
+            ]
         });
         menu.showAt(evt.pageX, evt.pageY);
     },
@@ -212,14 +249,17 @@ Ext.define('CpsiMapview.controller.button.SpatialQueryButtonController', {
      * changes accordingly.
      */
     connectQueryLayer: function () {
-        var me = this;
-        var view = me.getView();
-        var layerKey = view.getVectorLayerKey();
+        const me = this;
+        const view = me.getView();
+        const layerKey = view.getVectorLayerKey();
         if (!layerKey) {
             return;
         }
         if (view.queryLayer) {
-            view.queryLayer.on('change:visible', me.onQueryLayerVisibilityChange);
+            view.queryLayer.on(
+                'change:visible',
+                me.onQueryLayerVisibilityChange
+            );
         }
     },
 
@@ -229,8 +269,8 @@ Ext.define('CpsiMapview.controller.button.SpatialQueryButtonController', {
      * @param {ol.Object.event} evt change:visible event of layer
      */
     onQueryLayerVisibilityChange: function (evt) {
-        var me = this;
-        var visible = evt.target.getVisible();
+        const me = this;
+        const visible = evt.target.getVisible();
         if (visible) {
             me.onShowAssociatedPermanentLayer();
         } else {
@@ -239,33 +279,38 @@ Ext.define('CpsiMapview.controller.button.SpatialQueryButtonController', {
     },
 
     /**
-    * Creates a Filter object from the passed geometry and queryLayer
-    *
-    * @param  {ol.geom.Geometry} geometry The geometry
-    * @return {Ext.util.Filter}       A filter spatial
-    * @private
-    */
+     * Creates a Filter object from the passed geometry and queryLayer
+     *
+     * @param  {ol.geom.Geometry} geometry The geometry
+     * @return {Ext.util.Filter}       A filter spatial
+     * @private
+     */
     createSpatialFilter: function (geometry) {
-        var me = this;
-        var filter = null;
+        const me = this;
+        let filter = null;
 
-        var view = me.getView();
+        const view = me.getView();
         if (!view.queryLayer) {
             return;
         }
 
-        var mapComp = me.mapComponent || BasiGX.util.Map.getMapComponent();
-        var projString = mapComp.getMap().getView().getProjection().getCode();
-        var geomFieldName = view.queryLayer.get('geomFieldName') ||
+        const mapComp = me.mapComponent || BasiGX.util.Map.getMapComponent();
+        const projString = mapComp.getMap().getView().getProjection().getCode();
+        const geomFieldName =
+            view.queryLayer.get('geomFieldName') ||
             view.queryLayer.getSource().get('geomFieldName') ||
             'the_geom';
 
         if (!Ext.isEmpty(geometry)) {
-            filter = GeoExt.util.OGCFilter.createSpatialFilter(view.spatialOperator, geomFieldName, geometry, projString);
+            filter = GeoExt.util.OGCFilter.createSpatialFilter(
+                view.spatialOperator,
+                geomFieldName,
+                geometry,
+                projString
+            );
         }
 
         return filter;
-
     },
 
     /**
@@ -273,8 +318,8 @@ Ext.define('CpsiMapview.controller.button.SpatialQueryButtonController', {
      * @param {ol.Object.event} evt ol modifyend or drawend event
      */
     getFeaturesFromSourceAndTriggerWfs: function (evt) {
-        var me = this;
-        var feature;
+        const me = this;
+        let feature;
         if (evt.type === 'modifyend') {
             // We expect to only have one existing feature in source.
             // In case multiple features exist, we only use the one
@@ -285,7 +330,7 @@ Ext.define('CpsiMapview.controller.button.SpatialQueryButtonController', {
             me.permanentLayer.getSource().clear();
             feature = evt.feature;
         }
-        var fakeEvent = { element: feature };
+        const fakeEvent = { element: feature };
         me.getGeometryFromPolygonAndTriggerWfs(fakeEvent);
     },
 
@@ -295,11 +340,11 @@ Ext.define('CpsiMapview.controller.button.SpatialQueryButtonController', {
      * @param {Ext.Event} evt The add-Event containing drawn feature
      */
     getGeometryFromPolygonAndTriggerWfs: function (evt) {
-        var me = this;
-        var geometry = evt.element.getGeometry();
-        var view = me.getView();
+        const me = this;
+        const geometry = evt.element.getGeometry();
+        const view = me.getView();
 
-        var filter = me.createSpatialFilter(geometry);
+        const filter = me.createSpatialFilter(geometry);
         view.fireEvent('cmv-spatial-query-filter', filter);
         if (view.triggerWfsRequest === true) {
             this.buildAndRequestQuery(geometry);
@@ -312,30 +357,38 @@ Ext.define('CpsiMapview.controller.button.SpatialQueryButtonController', {
      * @param {ol.geom.Geometry} geometry The geometry
      */
     buildAndRequestQuery: function (geometry) {
-        var me = this;
-        var view = me.getView();
+        const me = this;
+        const view = me.getView();
         if (!view.queryLayer) {
             return;
         }
 
-        var mapComp = me.mapComponent || BasiGX.util.Map.getMapComponent();
+        const mapComp = me.mapComponent || BasiGX.util.Map.getMapComponent();
 
-        var projString = mapComp.getMap().getView().getProjection().getCode();
-        var geomFieldName = view.queryLayer.get('geomFieldName') ||
+        const projString = mapComp.getMap().getView().getProjection().getCode();
+        const geomFieldName =
+            view.queryLayer.get('geomFieldName') ||
             view.queryLayer.getSource().get('geomFieldName') ||
             'the_geom';
-        var url = view.queryLayer.get('url') ||
+        const url =
+            view.queryLayer.get('url') ||
             view.queryLayer.getSource().getUrl() ||
             view.queryLayer.getSource().getUrls()[0];
 
-        var featureType = view.queryLayer.get('featureType') ||
+        const featureType =
+            view.queryLayer.get('featureType') ||
             BasiGX.util.Object.layersFromParams(
                 view.queryLayer.getSource().getParams()
             );
 
         if (!Ext.isEmpty(geometry)) {
-            var filter = GeoExt.util.OGCFilter.getOgcFilter(
-                geomFieldName, view.spatialOperator, geometry, '1.1.0', projString);
+            const filter = GeoExt.util.OGCFilter.getOgcFilter(
+                geomFieldName,
+                view.spatialOperator,
+                geometry,
+                '1.1.0',
+                projString
+            );
 
             mapComp.setLoading(true);
             BasiGX.util.WFS.executeWfsGetFeature(
@@ -361,18 +414,18 @@ Ext.define('CpsiMapview.controller.button.SpatialQueryButtonController', {
      * @param {XMLHttpRequest.response} response The response of the AJAX call.
      */
     onWfsExecuteSuccess: function (response) {
-        var me = this;
-        var view = me.getView();
-        var mapComp = me.mapComponent || BasiGX.util.Map.getMapComponent();
+        const me = this;
+        const view = me.getView();
+        const mapComp = me.mapComponent || BasiGX.util.Map.getMapComponent();
         mapComp.setLoading(false);
-        var wfsResponse = response.responseText;
+        const wfsResponse = response.responseText;
         if (wfsResponse.indexOf('Exception') > 0) {
             // something got wrong and we probably have an exception, that we
             // try to handle...
             BasiGX.util.WFS.handleWfsExecuteException(wfsResponse);
-            view.fireEvent('cmv-spatial-query-error', decodedResponse);
+            view.fireEvent('cmv-spatial-query-error', wfsResponse);
         } else {
-            var decodedResponse = Ext.decode(wfsResponse);
+            const decodedResponse = Ext.decode(wfsResponse);
             view.fireEvent('cmv-spatial-query-success', decodedResponse);
         }
     },
@@ -383,13 +436,13 @@ Ext.define('CpsiMapview.controller.button.SpatialQueryButtonController', {
      * @param {XMLHttpRequest.response} response The response of the AJAX call.
      */
     onWfsExecuteFailure: function (response) {
-        var me = this;
-        var view = me.getView();
-        var responseTxt;
+        const me = this;
+        const view = me.getView();
+        let responseTxt;
         if (response && response.responseText) {
             responseTxt = response.responseText;
         }
-        var mapComp = me.mapComponent || BasiGX.util.Map.getMapComponent();
+        const mapComp = me.mapComponent || BasiGX.util.Map.getMapComponent();
         mapComp.setLoading(false);
         view.fireEvent('cmv-spatial-query-error', responseTxt);
     },
@@ -398,50 +451,59 @@ Ext.define('CpsiMapview.controller.button.SpatialQueryButtonController', {
      * Handles clearing the permanentLayer of the instance.
      */
     onClearAssociatedPermanentLayer: function () {
-        var me = this;
-        var layerKey = me.getView().getVectorLayerKey();
+        const me = this;
+        const layerKey = me.getView().getVectorLayerKey();
         if (!me.map) {
             return;
         }
         if (!layerKey) {
             return;
         }
-        CpsiMapview.view.button.SpatialQueryButton.clearAssociatedPermanentLayer(me.map, layerKey);
+        CpsiMapview.view.button.SpatialQueryButton.clearAssociatedPermanentLayer(
+            me.map,
+            layerKey
+        );
     },
 
     /**
      * Handles showing the permanentLayer of the instance.
      */
     onShowAssociatedPermanentLayer: function () {
-        var me = this;
-        var layerKey = me.getView().getVectorLayerKey();
+        const me = this;
+        const layerKey = me.getView().getVectorLayerKey();
         if (!me.map) {
             return;
         }
         if (!layerKey) {
             return;
         }
-        CpsiMapview.view.button.SpatialQueryButton.showAssociatedPermanentLayer(me.map, layerKey);
+        CpsiMapview.view.button.SpatialQueryButton.showAssociatedPermanentLayer(
+            me.map,
+            layerKey
+        );
     },
 
     /**
      * Handles hiding the permanentLayer of the instance.
      */
     onHideAssociatedPermanentLayer: function () {
-        var me = this;
-        var layerKey = me.getView().getVectorLayerKey();
+        const me = this;
+        const layerKey = me.getView().getVectorLayerKey();
         if (!me.map) {
             return;
         }
         if (!layerKey) {
             return;
         }
-        CpsiMapview.view.button.SpatialQueryButton.hideAssociatedPermanentLayer(me.map, layerKey);
+        CpsiMapview.view.button.SpatialQueryButton.hideAssociatedPermanentLayer(
+            me.map,
+            layerKey
+        );
     },
 
     onBeforeDestroy: function () {
-        var me = this;
-        var view = me.getView();
+        const me = this;
+        const view = me.getView();
 
         // detoggle button
         me.onSpatialQueryBtnToggle(view, false);
@@ -464,8 +526,7 @@ Ext.define('CpsiMapview.controller.button.SpatialQueryButtonController', {
     },
 
     init: function () {
-
-        var me = this;
+        const me = this;
 
         // create an object for the contextmenu eventhandler
         // so it can be removed correctly

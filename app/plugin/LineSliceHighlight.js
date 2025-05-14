@@ -28,23 +28,30 @@ Ext.define('CpsiMapview.plugin.LineSliceHighlight', {
      * @returns {ol.geom.LineString}
      */
     calculateSlice: function (geometry, start, end) {
-        var length = 0;
-        var coordinates = [];
+        let length = 0;
+        const coordinates = [];
         geometry.forEachSegment(function (a, b) {
-            var segment = new ol.geom.LineString([a, b]);
-            var segmentLength = ol.sphere.getLength(segment);
+            const segment = new ol.geom.LineString([a, b]);
+            const segmentLength = ol.sphere.getLength(segment);
             if (length <= start && start < length + segmentLength) {
                 // start is in this segment
-                coordinates.push(segment.getCoordinateAt((start - length) / segmentLength));
+                coordinates.push(
+                    segment.getCoordinateAt((start - length) / segmentLength)
+                );
             }
-            if (start <= length + segmentLength && length + segmentLength <= end) {
+            if (
+                start <= length + segmentLength &&
+                length + segmentLength <= end
+            ) {
                 // the endpoint of the segment is between start and end
                 // openlayers forEachSegment reuses the arrays for the coordinates so it needs to be cloned
                 coordinates.push(b.slice());
             }
             if (length <= end && end < length + segmentLength) {
                 // end is in this segment
-                coordinates.push(segment.getCoordinateAt((end - length) / segmentLength));
+                coordinates.push(
+                    segment.getCoordinateAt((end - length) / segmentLength)
+                );
             }
 
             length += segmentLength;
@@ -59,7 +66,7 @@ Ext.define('CpsiMapview.plugin.LineSliceHighlight', {
      * @param {number} end
      */
     highlightSlice: function (geometry, start, end) {
-        var map = BasiGX.util.Map.getMapComponent().map;
+        const map = BasiGX.util.Map.getMapComponent().map;
 
         if (!this.layer) {
             this.layer = new ol.layer.Vector({
@@ -71,7 +78,9 @@ Ext.define('CpsiMapview.plugin.LineSliceHighlight', {
             this.layer.getSource().clear();
         }
 
-        var feature = new ol.Feature(this.calculateSlice(geometry, start, end));
+        const feature = new ol.Feature(
+            this.calculateSlice(geometry, start, end)
+        );
 
         this.layer.getSource().addFeature(feature);
     },

@@ -46,7 +46,8 @@ Ext.define('CpsiMapview.view.grid.Grid', {
         store: '{gridstore}'
     },
 
-    viewConfig: {  //this config is passed to the view
+    viewConfig: {
+        //this config is passed to the view
         loadingText: 'Loading records',
         enableTextSelection: true
         //loadMask: {
@@ -97,163 +98,176 @@ Ext.define('CpsiMapview.view.grid.Grid', {
     /**
      * Collection of tools and buttons at the top of the grid
      */
-    dockedItems: [{
-        xtype: 'toolbar',
-        dock: 'top',
-        items: [{
-            xtype: 'button',
-            text: 'Clear Filters',
-            tooltip: 'Remove all field and spatial filters set on the grid',
-            iconCls: 'x-fa fa-filter',
-            handler: 'clearFilters',
-            bind: {
-                hidden: '{!clearFiltersVisible}'
-            }
-        },
+    dockedItems: [
         {
-            xtype: 'button',
-            text: 'Clear Sorting',
-            tooltip: 'Clear any custom sorting of the grid',
-            iconCls: 'x-fa fa-align-justify',
-            handler: 'onClearSort'
-        },
-        {
-            xtype: 'button',
-            text: 'Apply Preset Filters',
-            tooltip: 'Re-apply any default filters that have been configured for the grid',
-            iconCls: 'x-fa fa-star',
-            handler: 'applyPresetFilters',
-            bind: {
-                hidden: '{!usePresetFilters}'
-            }
-        },
-        '->',
-        {
-            xtype: 'buttongroup',
-            bind: {
-                hidden: '{!useSimpleSelection}'
-            },
-            items: [{
-                xtype: 'cmv_spatial_query_button',
-                drawGeometryType: 'Polygon',
-                text: 'Select by Shape',
-                spatialOperator: 'intersect',
-                toggleGroup: 'map',
-                triggerWfsRequest: false,
-                displayPermanently: true,
-                iconCls: 'x-fa fa-pencil-alt',
-                listeners: {
-                    'cmv-spatial-query-filter': 'onSpatialFilter'
-                }
-            },
-            {
-                xtype: 'button',
-                text: 'Clear',
-                tooltip: 'Clear the spatial filter',
-                iconCls: 'x-fa fa-times-circle',
-                handler: 'onClearSpatialFilter'
-            }]
-        },
-
-        {
-            xtype: 'buttongroup', // segmentedbutton does not support toggleGroup
-            bind: {
-                hidden: '{!useAdvancedSelection}'
-            },
+            xtype: 'toolbar',
+            dock: 'top',
             items: [
                 {
-                    xtype: 'cmv_spatial_query_button',
-                    drawGeometryType: 'Polygon',
-                    text: 'Select by Shape',
-                    spatialOperator: 'intersect',
-                    toggleGroup: 'map',
-                    triggerWfsRequest: false,
-                    displayPermanently: true,
-                    iconCls: 'x-fa fa-pencil-alt',
-                    listeners: {
-                        'cmv-spatial-query-filter': 'onSpatialFilter'
+                    xtype: 'button',
+                    text: 'Clear Filters',
+                    tooltip:
+                        'Remove all field and spatial filters set on the grid',
+                    iconCls: 'x-fa fa-filter',
+                    handler: 'clearFilters',
+                    bind: {
+                        hidden: '{!clearFiltersVisible}'
                     }
                 },
                 {
                     xtype: 'button',
-                    text: 'Clear',
-                    tooltip: 'Clear the spatial filter',
-                    iconCls: 'x-fa fa-times-circle',
-                    handler: 'onClearSpatialFilter'
+                    text: 'Clear Sorting',
+                    tooltip: 'Clear any custom sorting of the grid',
+                    iconCls: 'x-fa fa-align-justify',
+                    handler: 'onClearSort'
                 },
                 {
-                    xtype: 'cmv_feature_selection_button',
-                    triggerWfsRequest: false,
-                    allowMultiple: true,
-                    toggleGroup: 'map',
+                    xtype: 'button',
+                    text: 'Apply Preset Filters',
+                    tooltip:
+                        'Re-apply any default filters that have been configured for the grid',
+                    iconCls: 'x-fa fa-star',
+                    handler: 'applyPresetFilters',
                     bind: {
-                        vectorLayerKey: '{featureSelectionLayerKey}'
-                    },
-                    iconCls: 'x-fa fa-mouse-pointer',
-                    listeners: {
-                        'cmv-reset-grid-filters': 'resetFilters',
-                        'cmv-id-filter-set': 'onIdFilterSet'
+                        hidden: '{!usePresetFilters}'
                     }
+                },
+                '->',
+                {
+                    xtype: 'buttongroup',
+                    bind: {
+                        hidden: '{!useSimpleSelection}'
+                    },
+                    items: [
+                        {
+                            xtype: 'cmv_spatial_query_button',
+                            drawGeometryType: 'Polygon',
+                            text: 'Select by Shape',
+                            spatialOperator: 'intersect',
+                            toggleGroup: 'map',
+                            triggerWfsRequest: false,
+                            displayPermanently: true,
+                            iconCls: 'x-fa fa-pencil-alt',
+                            listeners: {
+                                'cmv-spatial-query-filter': 'onSpatialFilter'
+                            }
+                        },
+                        {
+                            xtype: 'button',
+                            text: 'Clear',
+                            tooltip: 'Clear the spatial filter',
+                            iconCls: 'x-fa fa-times-circle',
+                            handler: 'onClearSpatialFilter'
+                        }
+                    ]
+                },
+
+                {
+                    xtype: 'buttongroup', // segmentedbutton does not support toggleGroup
+                    bind: {
+                        hidden: '{!useAdvancedSelection}'
+                    },
+                    items: [
+                        {
+                            xtype: 'cmv_spatial_query_button',
+                            drawGeometryType: 'Polygon',
+                            text: 'Select by Shape',
+                            spatialOperator: 'intersect',
+                            toggleGroup: 'map',
+                            triggerWfsRequest: false,
+                            displayPermanently: true,
+                            iconCls: 'x-fa fa-pencil-alt',
+                            listeners: {
+                                'cmv-spatial-query-filter': 'onSpatialFilter'
+                            }
+                        },
+                        {
+                            xtype: 'button',
+                            text: 'Clear',
+                            tooltip: 'Clear the spatial filter',
+                            iconCls: 'x-fa fa-times-circle',
+                            handler: 'onClearSpatialFilter'
+                        },
+                        {
+                            xtype: 'cmv_feature_selection_button',
+                            triggerWfsRequest: false,
+                            allowMultiple: true,
+                            toggleGroup: 'map',
+                            bind: {
+                                vectorLayerKey: '{featureSelectionLayerKey}'
+                            },
+                            iconCls: 'x-fa fa-mouse-pointer',
+                            listeners: {
+                                'cmv-reset-grid-filters': 'resetFilters',
+                                'cmv-id-filter-set': 'onIdFilterSet'
+                            }
+                        }
+                    ]
+                },
+                {
+                    xtype: 'button',
+                    bind: {
+                        pressed: '{isGroupEditingEnabled}',
+                        hidden: '{!isGroupEditingVisible}'
+                    },
+                    text: 'Group Edit',
+                    enableToggle: true,
+                    iconCls: 'x-fa fa-pencil-alt',
+                    tooltip: 'Update a field in the grid for multiple records',
+                    toggleHandler: 'onGroupEditToggle'
+                },
+                {
+                    xtype: 'button',
+                    text: 'Export to Excel',
+                    iconCls: 'x-far fa-file-excel',
+                    tooltip:
+                        'Export the records that are visible in the grid to an Excel file',
+                    handler: 'exportToExcel',
+                    bind: {
+                        hidden: '{!exportExcelVisible}'
+                    }
+                },
+                {
+                    xtype: 'button',
+                    text: 'Data Exports',
+                    tooltip: 'Export all records in the grid to a zip file',
+                    bind: {
+                        hidden: '{!exportShapefileVisible}'
+                    },
+                    menu: [
+                        {
+                            text: 'Export to Shapefile',
+                            iconCls: 'fg-shape-file',
+                            handler: 'exportToShapefile'
+                        },
+                        {
+                            text: 'Export to Excel',
+                            iconCls: 'x-fa fa-file-excel',
+                            handler: 'exportToServerExcel'
+                        }
+                    ]
                 }
             ]
         },
         {
-            xtype: 'button',
-            bind: {
-                pressed: '{isGroupEditingEnabled}',
-                hidden: '{!isGroupEditingVisible}'
-            },
-            text: 'Group Edit',
-            enableToggle: true,
-            iconCls: 'x-fa fa-pencil-alt',
-            tooltip: 'Update a field in the grid for multiple records',
-            toggleHandler: 'onGroupEditToggle'
-        },
-        {
-            xtype: 'button',
-            text: 'Export to Excel',
-            iconCls: 'x-far fa-file-excel',
-            tooltip: 'Export the records that are visible in the grid to an Excel file',
-            handler: 'exportToExcel',
-            bind: {
-                hidden: '{!exportExcelVisible}'
-            }
-        },
-        {
-            xtype: 'button',
-            text: 'Data Exports',
-            tooltip: 'Export all records in the grid to a zip file',
-            bind: {
-                hidden: '{!exportShapefileVisible}'
-            },
-            menu: [{
-                text: 'Export to Shapefile',
-                iconCls: 'fg-shape-file',
-                handler: 'exportToShapefile'
-            }, {
-                text: 'Export to Excel',
-                iconCls: 'x-fa fa-file-excel',
-                handler: 'exportToServerExcel'
-            }]
-        }]
-    },
-    {
-        xtype: 'toolbar',
-        dock: 'bottom',
-        items: [
-            {
-                xtype: 'gx_wfspaging_toolbar',
-                displayInfo: true,
-                bind: {
-                    store: '{gridstore}'
+            xtype: 'toolbar',
+            dock: 'bottom',
+            items: [
+                {
+                    xtype: 'gx_wfspaging_toolbar',
+                    displayInfo: true,
+                    bind: {
+                        store: '{gridstore}'
+                    }
+                },
+                {
+                    xtype: 'checkbox',
+                    itemId: 'pagingCheckbox',
+                    checked: true,
+                    boxLabel: 'Page Records?',
+                    handler: 'togglePaging'
                 }
-            },
-            {
-                xtype: 'checkbox',
-                itemId: 'pagingCheckbox',
-                checked: true,
-                boxLabel: 'Page Records?',
-                handler: 'togglePaging'
-            }]
-    }]
+            ]
+        }
+    ]
 });

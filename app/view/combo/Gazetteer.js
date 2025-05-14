@@ -41,7 +41,7 @@ Ext.define('CpsiMapview.view.combo.Gazetteer', {
      * @private
      */
     initComponent: function () {
-        var me = this;
+        const me = this;
 
         // Enable the proxying of key events for the HTML input field
         me.enableKeyEvents = true;
@@ -67,22 +67,21 @@ Ext.define('CpsiMapview.view.combo.Gazetteer', {
 
         me.on({
             keyup: function () {
-                var val = me.getRawValue();
+                const val = me.getRawValue();
 
                 if (Ext.isEmpty(val)) {
                     me.removeLocationFeature();
                 }
-
             },
             beforequery: function () {
-                var val = this.getRawValue();
+                const val = this.getRawValue();
 
                 // clear any previous query feature
                 me.removeLocationFeature();
 
                 if (val) {
                     // only trigger a request if text has been entered
-                    var url = me.url + encodeURIComponent(val.trim());
+                    const url = me.url + encodeURIComponent(val.trim());
                     me.getStore().getProxy().setUrl(url);
                     return true;
                 } else {
@@ -94,7 +93,6 @@ Ext.define('CpsiMapview.view.combo.Gazetteer', {
                 me.locationLayer.set('layerKey', me.id);
             }
         });
-
     },
 
     /**
@@ -107,13 +105,12 @@ Ext.define('CpsiMapview.view.combo.Gazetteer', {
      * @return {ol.Extent}          The created ol.Extent
      */
     convertToExtent: function (v, rec) {
+        const me = this;
 
-        var me = this;
-
-        var minx = rec.get('minX' + me.fieldNameSuffix);
-        var miny = rec.get('minY' + me.fieldNameSuffix);
-        var maxx = rec.get('maxX' + me.fieldNameSuffix);
-        var maxy = rec.get('maxY' + me.fieldNameSuffix);
+        const minx = rec.get('minX' + me.fieldNameSuffix);
+        const miny = rec.get('minY' + me.fieldNameSuffix);
+        const maxx = rec.get('maxX' + me.fieldNameSuffix);
+        const maxy = rec.get('maxY' + me.fieldNameSuffix);
 
         return [minx, miny, maxx, maxy];
     }

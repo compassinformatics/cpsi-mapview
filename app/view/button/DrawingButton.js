@@ -32,7 +32,6 @@ Ext.define('CpsiMapview.view.button.DrawingButton', {
     iconCls: 'x-fa fa-pencil-alt',
 
     config: {
-
         /**
          * Set a layer to store the features drawn by a user (points, polygons_
          * If not set a layer will be created and added to the map automatically
@@ -144,9 +143,9 @@ Ext.define('CpsiMapview.view.button.DrawingButton', {
         allowSnapToHiddenFeatures: false,
 
         /**
-        * The ExtJS record associated with the tool (if any), that can be used to apply snapping logic
-        */
-        parentRecord: null,
+         * The ExtJS record associated with the tool (if any), that can be used to apply snapping logic
+         */
+        parentRecord: null
     },
 
     /**

@@ -21,7 +21,7 @@ Ext.define('CpsiMapview.view.LayerTree', {
         'CpsiMapview.controller.LayerTreeController',
         'CpsiMapview.view.window.MinimizableWindow',
         'CpsiMapview.view.addWms.AddWmsForm',
-        'CpsiMapview.view.addArcGISRest.AddArcGISRestForm',
+        'CpsiMapview.view.addArcGISRest.AddArcGISRestForm'
     ],
 
     controller: 'cmv_layertree',
@@ -32,7 +32,7 @@ Ext.define('CpsiMapview.view.LayerTree', {
 
     listeners: {
         'cmv-init-layertree': 'filterLayersByRole',
-        'afteritemexpand': 'updateExpandedItemChildNodesUI',
+        afteritemexpand: 'updateExpandedItemChildNodesUI'
     },
 
     // So that instantiation works without errors, might be changed during
@@ -44,16 +44,18 @@ Ext.define('CpsiMapview.view.LayerTree', {
     },
     config: {
         /**
-        * The window configuration used for the Add WMS button
-        * Any xtypes used should be added to the requires property
-        */
+         * The window configuration used for the Add WMS button
+         * Any xtypes used should be added to the requires property
+         */
         addWmsWindowConfig: {
             xtype: 'cmv_minimizable_window',
             title: 'Add External Map Layer',
             closeAction: 'hide',
-            items: [{
-                xtype: 'cmv_add_wms_form'
-            }]
+            items: [
+                {
+                    xtype: 'cmv_add_wms_form'
+                }
+            ]
         },
 
         /**
@@ -65,9 +67,11 @@ Ext.define('CpsiMapview.view.LayerTree', {
             title: 'Add ArcGIS REST Map Layer',
             layout: 'anchor',
             closeAction: 'hide',
-            items: [{
-                xtype: 'cmv_add_arcgisrest_form'
-            }]
+            items: [
+                {
+                    xtype: 'cmv_add_arcgisrest_form'
+                }
+            ]
         },
 
         /**
@@ -84,21 +88,24 @@ Ext.define('CpsiMapview.view.LayerTree', {
     header: {
         dock: 'bottom'
     },
-    tools: [{
-        xtype: 'button',
-        text: 'Add External Map Layer',
-        enableToggle: true,
-        listeners: {
-            toggle: 'onAddWmsToggle'
+    tools: [
+        {
+            xtype: 'button',
+            text: 'Add External Map Layer',
+            enableToggle: true,
+            listeners: {
+                toggle: 'onAddWmsToggle'
+            }
+        },
+        {
+            xtype: 'button',
+            text: 'Add ArcGIS REST Layer',
+            enableToggle: true,
+            listeners: {
+                toggle: 'onAddArcGISRestToggle'
+            }
         }
-    }, {
-        xtype: 'button',
-        text: 'Add ArcGIS REST Layer',
-        enableToggle: true,
-        listeners: {
-            toggle: 'onAddArcGISRestToggle'
-        }
-    }],
+    ],
     columns: {
         header: false,
         items: [
@@ -106,22 +113,26 @@ Ext.define('CpsiMapview.view.LayerTree', {
                 xtype: 'treecolumn',
                 dataIndex: 'text',
                 flex: 1,
-                plugins: [{
-                    ptype: 'cmv_basic_tree_column_legend'
-                }, {
-                    ptype: 'cmv_tree_column_context_menu',
-                    menuItems: [
-                        'cmv_menuitem_layerrefresh',
-                        'cmv_menuitem_layerlabels',
-                        'cmv_menuitem_layeropacity',
-                        'cmv_menuitem_layergrid',
-                        'cmv_menuitem_layermetadata',
-                        'cmv_menuitem_layerfilterreset',
-                        'cmv_menuitem_layerhelp'
-                    ]
-                }, {
-                    ptype: 'cmv_tree_inresolutionrange'
-                }]
+                plugins: [
+                    {
+                        ptype: 'cmv_basic_tree_column_legend'
+                    },
+                    {
+                        ptype: 'cmv_tree_column_context_menu',
+                        menuItems: [
+                            'cmv_menuitem_layerrefresh',
+                            'cmv_menuitem_layerlabels',
+                            'cmv_menuitem_layeropacity',
+                            'cmv_menuitem_layergrid',
+                            'cmv_menuitem_layermetadata',
+                            'cmv_menuitem_layerfilterreset',
+                            'cmv_menuitem_layerhelp'
+                        ]
+                    },
+                    {
+                        ptype: 'cmv_tree_inresolutionrange'
+                    }
+                ]
             }
         ]
     },
@@ -130,12 +141,14 @@ Ext.define('CpsiMapview.view.LayerTree', {
      * @private
      */
     initComponent: function () {
-        var me = this;
+        const me = this;
 
         // decide where to render style switcher radio groups
         if (me.styleSwitcherBelowNode) {
             // add plugin to render style switcher permanently below tree nodes
-            me.columns.items[0].plugins.push({ ptype: 'cmv_tree_column_style_switcher' });
+            me.columns.items[0].plugins.push({
+                ptype: 'cmv_tree_column_style_switcher'
+            });
         } else {
             // add context menu item showing the style switcher
             Ext.each(me.columns.items[0].plugins, function (plugin) {
@@ -154,7 +167,7 @@ Ext.define('CpsiMapview.view.LayerTree', {
      * @param  {ol.layer.Base} layer The layer to update in the tree
      */
     updateLayerNodeUi: function (layer) {
-        var node = this.getNodeForLayer(layer);
+        const node = this.getNodeForLayer(layer);
         if (node) {
             node.triggerUIUpdate();
         }
@@ -166,7 +179,7 @@ Ext.define('CpsiMapview.view.LayerTree', {
      * @param {ol.layer.Base} layer The layer to update the node text
      */
     refreshLayerNodeText: function (layer) {
-        var node = this.getNodeForLayer(layer);
+        const node = this.getNodeForLayer(layer);
         if (node) {
             node.set('text', node.get('text'));
         }
@@ -179,12 +192,15 @@ Ext.define('CpsiMapview.view.LayerTree', {
      * @param  {ol.layer.Base} layer The layer to update in the tree
      */
     getNodeForLayer: function (layer) {
-        var me = this;
-        var treeStore = me.getView().getStore();
-        var foundNode = undefined;
+        const me = this;
+        const treeStore = me.getView().getStore();
+        let foundNode = undefined;
 
         treeStore.each(function (node) {
-            if (node.getOlLayer() && node.getOlLayer().get('layerKey') === layer.get('layerKey')) {
+            if (
+                node.getOlLayer() &&
+                node.getOlLayer().get('layerKey') === layer.get('layerKey')
+            ) {
                 foundNode = node;
                 return false;
             }

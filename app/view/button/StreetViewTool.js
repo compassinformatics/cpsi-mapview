@@ -7,9 +7,7 @@ Ext.define('CpsiMapview.view.button.StreetViewTool', {
     extend: 'Ext.button.Button',
     xtype: 'cmv_streetview_tool',
 
-    requires: [
-        'CpsiMapview.controller.button.StreetViewTool'
-    ],
+    requires: ['CpsiMapview.controller.button.StreetViewTool'],
 
     /**
      * The controller for this class.

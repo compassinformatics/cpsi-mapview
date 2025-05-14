@@ -38,14 +38,16 @@ Ext.define('CpsiMapview.view.window.MinimizableWindow', {
      */
     minimizeTo: null,
 
-    tools: [{
-        type: 'help',
-        tooltip: 'Get Help',
-        callback: 'onHelp',
-        bind: {
-            hidden: '{!helpUrl}'
+    tools: [
+        {
+            type: 'help',
+            tooltip: 'Get Help',
+            callback: 'onHelp',
+            bind: {
+                hidden: '{!helpUrl}'
+            }
         }
-    }],
+    ],
 
     listeners: {
         minimize: 'onMinimize',

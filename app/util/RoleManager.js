@@ -12,14 +12,12 @@ Ext.define('CpsiMapview.util.RoleManager', {
      * @param {any} role
      */
     checkRole: function (role) {
-
-        var hasRole = false;
-        var roles = Ext.util.Cookies.get('roles');
+        let hasRole = false;
+        const roles = Ext.util.Cookies.get('roles');
 
         if (roles) {
             // create a list of roles and check for the role name
-            if (roles.split(',').indexOf(role) >= 0)
-                hasRole = true;
+            if (roles.split(',').indexOf(role) >= 0) hasRole = true;
         }
 
         return hasRole;
@@ -32,10 +30,10 @@ Ext.define('CpsiMapview.util.RoleManager', {
      * @return {Boolean} True, if user has at least one of the required roles. False, otherwise.
      */
     hasAtLeastOneRequiredRole: function (requiredRoles) {
-        var result = false;
-        Ext.each(requiredRoles, function(role){
-            var userHasRole = CpsiMapview.util.RoleManager.checkRole(role);
-            if (userHasRole){
+        let result = false;
+        Ext.each(requiredRoles, function (role) {
+            const userHasRole = CpsiMapview.util.RoleManager.checkRole(role);
+            if (userHasRole) {
                 result = true;
             }
         });

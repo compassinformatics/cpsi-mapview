@@ -2,7 +2,6 @@
  * Static util class for HTML related operations.
  */
 Ext.define('CpsiMapview.util.Html', {
-
     statics: {
         /**
          * Add events to HTML elements in a cross browser compatible manor.
@@ -15,14 +14,16 @@ Ext.define('CpsiMapview.util.Html', {
          *     the passed `htmlElement`.
          */
         addEvent: function (htmlElement, eventName, eventFunction) {
-            if (htmlElement.addEventListener) { // Modern
+            if (htmlElement.addEventListener) {
+                // Modern
                 htmlElement.addEventListener(eventName, eventFunction, false);
-            } else if (htmlElement.attachEvent) { // Internet Explorer
+            } else if (htmlElement.attachEvent) {
+                // Internet Explorer
                 htmlElement.attachEvent('on' + eventName, eventFunction);
-            } else { // others
+            } else {
+                // others
                 htmlElement['on' + eventName] = eventFunction;
             }
         }
     }
-
 });

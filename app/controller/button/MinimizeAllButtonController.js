@@ -7,7 +7,7 @@ Ext.define('CpsiMapview.controller.button.MinimizeAllButtonController', {
     alias: 'controller.cmv_minimize_all_button',
 
     onClick: function () {
-        var windows = Ext.ComponentQuery.query('cmv_minimizable_window');
+        const windows = Ext.ComponentQuery.query('cmv_minimizable_window');
         Ext.Array.forEach(windows, function (win) {
             if (win.isVisible()) {
                 win.minimize();

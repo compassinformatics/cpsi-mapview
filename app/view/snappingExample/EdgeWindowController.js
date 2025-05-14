@@ -9,10 +9,10 @@
     // or the function won't be called
     listen: {
         component: {
-            'field': {
+            field: {
                 change: 'onFieldChanged' // listen to all field change events to update button
             },
-            'cmv_edgewindow': {
+            cmv_edgewindow: {
                 savesucceeded: 'onAfterSaveSucceded'
             }
         }
@@ -22,36 +22,51 @@
      * Function to call prior to saving - confirm with the user that they want to create new nodes
      * */
     beforeSave: function () {
+        const me = this;
+        const rec = me.getViewModel().get('currentRecord');
 
-        var me = this;
-        var rec = me.getViewModel().get('currentRecord');
+        let noStartFeature = false;
 
-        var noStartFeature = false;
-
-        if (!rec.get('startNodeId') && !rec.get('startEdgeId') && !rec.get('startPolygonId')) {
+        if (
+            !rec.get('startNodeId') &&
+            !rec.get('startEdgeId') &&
+            !rec.get('startPolygonId')
+        ) {
             noStartFeature = true;
-            Ext.Msg.confirm('Create new Source', 'No feature is connected at the start of the edge. Are you sure you want to create a new source?',
+            Ext.Msg.confirm(
+                'Create new Source',
+                'No feature is connected at the start of the edge. Are you sure you want to create a new source?',
                 function (buttonId) {
                     if (buttonId == 'yes') {
                         // call saveRecord directly as beforeSave returns a value instantly
                         me.saveRecord();
                     }
-                });
+                }
+            );
             return false;
         }
 
-        if (!rec.get('endNodeId') && !rec.get('endEdgeId') && !rec.get('endPolygonId')) {
-
+        if (
+            !rec.get('endNodeId') &&
+            !rec.get('endEdgeId') &&
+            !rec.get('endPolygonId')
+        ) {
             if (noStartFeature === true) {
-                Ext.Msg.alert('No Attached Features', 'No features are attached at the start or end of this line!');
+                Ext.Msg.alert(
+                    'No Attached Features',
+                    'No features are attached at the start or end of this line!'
+                );
             }
 
-            Ext.Msg.confirm('Create new Source', 'No feature is connected at the end of the edge. Are you sure you want to create a new source?',
+            Ext.Msg.confirm(
+                'Create new Source',
+                'No feature is connected at the end of the edge. Are you sure you want to create a new source?',
                 function (buttonId) {
                     if (buttonId == 'yes') {
                         me.saveRecord();
                     }
-                });
+                }
+            );
             return false;
         }
 
@@ -63,8 +78,8 @@
      * wiping out previous edges
      * */
     onAfterSaveSucceded: function () {
-        var me = this;
-        var win = me.getView();
+        const me = this;
+        const win = me.getView();
         win.close();
     }
 });

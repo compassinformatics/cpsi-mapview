@@ -4,8 +4,7 @@
  **/
 Ext.override(Ext.grid.column.Column, {
     initRenderData: function () {
-
-        var me = this;
+        const me = this;
 
         if (Ext.isEmpty(me.tooltip)) {
             // remove any HTML tags and whitespace so icons don't break the tooltips

@@ -1,4 +1,4 @@
-﻿/**
+/**
  * Controller for the window used to add new attachments
  *
  * File uploads are not performed using normal 'Ajax' techniques, that is they are
@@ -26,28 +26,27 @@ Ext.define('CpsiMapview.view.fileupload.FileUploadWindowController', {
     extend: 'Ext.app.ViewController',
     alias: 'controller.cmv_fileuploadwindowcontroller',
 
-    requires: [
-        'CpsiMapview.model.fileupload.Attachment'
-    ],
+    requires: ['CpsiMapview.model.fileupload.Attachment'],
 
     getAttachmentUploadUrl: function () {
-
-        var me = this;
-        var parentRecord = me.getViewModel().getData().currentRecord;
-        var serviceUrl = parentRecord.proxy.url;
-        return Ext.String.format('{0}/{1}/attachment', serviceUrl, parentRecord.getId());
+        const me = this;
+        const parentRecord = me.getViewModel().getData().currentRecord;
+        const serviceUrl = parentRecord.proxy.url;
+        return Ext.String.format(
+            '{0}/{1}/attachment',
+            serviceUrl,
+            parentRecord.getId()
+        );
     },
 
     /**
      * Save the attachment to the server
      */
     onAttachmentSave: function () {
-
-        var me = this;
-        var form = me.getView().down('form');
+        const me = this;
+        const form = me.getView().down('form');
 
         if (form.isValid()) {
-
             form.submit({
                 clientValidation: true,
                 url: me.getAttachmentUploadUrl(),
@@ -56,7 +55,7 @@ Ext.define('CpsiMapview.view.fileupload.FileUploadWindowController', {
                 // the following is ignored for a form submission request
                 // adding into an options object is also ignored
                 headers: {
-                    'Accept': 'application/json'
+                    Accept: 'application/json'
                 },
                 success: me.onSuccess,
                 failure: me.onFailure
@@ -72,14 +71,13 @@ Ext.define('CpsiMapview.view.fileupload.FileUploadWindowController', {
      * @param {any} action
      */
     onSuccess: function (form, action) {
-
-        var me = this;
-        var formValues = form.getFieldValues();
+        const me = this;
+        const formValues = form.getFieldValues();
         // create a new object containing the attributes of the attachment
         // after it was successfully associated
         // with the parent object. This record can then be added to a store
 
-        var newAttachment = CpsiMapview.model.fileupload.Attachment.create({
+        const newAttachment = CpsiMapview.model.fileupload.Attachment.create({
             attachmentId: action.result.data.attachmentId,
             name: formValues.documentName,
             description: formValues.documentDescription,
@@ -91,21 +89,29 @@ Ext.define('CpsiMapview.view.fileupload.FileUploadWindowController', {
         });
 
         // now update the attachment URLs so it can be deleted
-        var parentRecord = me.getViewModel().getData().currentRecord;
-        var serviceUrl = parentRecord.proxy.url;
+        const parentRecord = me.getViewModel().getData().currentRecord;
+        const serviceUrl = parentRecord.proxy.url;
         newAttachment.updateAttachmentUrls(serviceUrl);
 
         // now show a message box to show the file was successfully uploaded
 
-        var parentType = me.getViewModel().getData().parentType;
-        var msg = Ext.String.format('The file {0} has been associated with the {1}', formValues.documentName, parentType);
+        const parentType = me.getViewModel().getData().parentType;
+        const msg = Ext.String.format(
+            'The file {0} has been associated with the {1}',
+            formValues.documentName,
+            parentType
+        );
 
-        var vw = me.getView();
-        Ext.Msg.alert('Success', msg, function () {
-            vw.fireEvent('fileadded', newAttachment);
-            vw.close();
-        }, me);
-
+        const vw = me.getView();
+        Ext.Msg.alert(
+            'Success',
+            msg,
+            function () {
+                vw.fireEvent('fileadded', newAttachment);
+                vw.close();
+            },
+            me
+        );
     },
 
     /**
@@ -124,24 +130,27 @@ Ext.define('CpsiMapview.view.fileupload.FileUploadWindowController', {
      * @param {any} action
      */
     onFailure: function (form, action) {
-
         switch (action.failureType) {
             case Ext.form.Action.CLIENT_INVALID:
-                Ext.Msg.alert('Failure', 'Form fields may not be submitted with invalid values');
+                Ext.Msg.alert(
+                    'Failure',
+                    'Form fields may not be submitted with invalid values'
+                );
                 break;
             case Ext.form.Action.CONNECT_FAILURE:
                 Ext.Msg.alert('Failure', 'Ajax communication failed');
                 break;
-            case Ext.form.Action.SERVER_INVALID:
+            case Ext.form.Action.SERVER_INVALID: {
                 // the header for errors should be html/text
                 // however 404 errors or non-JSON errors will produce a huge error box
-                var txt = action.response.responseText;
+                const txt = action.response.responseText;
                 if (Ext.JSON.decode(txt, true) === null) {
                     // display any non-JSON errors
                     // JSON errors will be handled in CpsiMapview.util.ApplicationMixin
                     Ext.Msg.alert('Server Error', txt);
                 }
                 break;
+            }
             default:
                 break;
         }

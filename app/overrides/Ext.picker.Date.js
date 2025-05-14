@@ -1,5 +1,4 @@
 ﻿Ext.override(Ext.picker.Date, {
-
     setValue: function (value) {
         if (Ext.isString(value)) {
             // as the date needs to be formatted as a string to send to the server

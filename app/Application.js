@@ -6,9 +6,7 @@
 Ext.define('CpsiMapview.Application', {
     extend: 'Ext.app.Application',
 
-    requires: [
-        'CpsiMapview.view.main.Main'
-    ],
+    requires: ['CpsiMapview.view.main.Main'],
 
     mainViewXType: 'cmv_main',
 
@@ -43,25 +41,24 @@ Ext.define('CpsiMapview.Application', {
     },
 
     rewriteRemoveServiceRequests: function (options) {
-
-        var me = this;
-        var hostname = window.location.hostname;
-        var regex = /compassinformatics.github.io/g; // /localhost/g;
-        var m = regex.exec(hostname);
-        var serviceUrl = options.url;
+        const me = this;
+        const hostname = window.location.hostname;
+        const regex = /compassinformatics.github.io/g; // /localhost/g;
+        const m = regex.exec(hostname);
+        let serviceUrl = options.url;
 
         if (m) {
-            var serviceUrls = ['/WebServices', '/pmspy'];
+            const serviceUrls = ['/WebServices', '/pmspy'];
 
-            var urlTest = function (url) {
-                var ignoreCase = true;
+            const urlTest = function (url) {
+                const ignoreCase = true;
                 return Ext.String.startsWith(serviceUrl, url, ignoreCase);
             };
 
             if (Ext.Array.some(serviceUrls, urlTest) === true) {
-                var tokenValue = Ext.util.Cookies.get(me.tokenName);
+                const tokenValue = Ext.util.Cookies.get(me.tokenName);
                 if (tokenValue) {
-                    var token = Ext.String.format('token={0}', tokenValue);
+                    const token = Ext.String.format('token={0}', tokenValue);
                     serviceUrl = Ext.String.urlAppend(serviceUrl, token);
                 }
                 serviceUrl = 'https://pmstipperarydev.compass.ie' + serviceUrl;
@@ -72,7 +69,7 @@ Ext.define('CpsiMapview.Application', {
     },
 
     onAjaxBeforeRequest: function (conn, options) {
-        var me = this;
+        const me = this;
         if (options.url) {
             me.rewriteRemoveServiceRequests(options);
         }
