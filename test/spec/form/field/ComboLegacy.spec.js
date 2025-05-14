@@ -1,5 +1,4 @@
 describe('CpsiMapview.form.field.ComboLegacy', function () {
-
     Ext.Loader.syncRequire(['CpsiMapview.form.field.ComboLegacy']);
 
     it('is defined', function () {
@@ -7,8 +6,7 @@ describe('CpsiMapview.form.field.ComboLegacy', function () {
     });
 
     it('can be instantiated', function () {
-        var inst = Ext.create('CpsiMapview.form.field.ComboLegacy');
+        const inst = Ext.create('CpsiMapview.form.field.ComboLegacy');
         expect(inst).to.be.a(CpsiMapview.form.field.ComboLegacy);
     });
-
 });

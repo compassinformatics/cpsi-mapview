@@ -6,9 +6,7 @@ Ext.define('CpsiMapview.controller.TestGroupEditController', {
 
 Ext.define('CpsiMapview.view.TestGroupEditGrid', {
     extend: 'CpsiMapview.view.grid.Grid',
-    requires: [
-        'CpsiMapview.controller.TestGroupEditController'
-    ],
+    requires: ['CpsiMapview.controller.TestGroupEditController'],
     controller: 'test_groupeditgrid',
     // Added for Group Edit
     selModel: {
@@ -20,7 +18,8 @@ Ext.define('CpsiMapview.view.TestGroupEditGrid', {
                 color: '#0ff'
             })
         })
-    }, columns: {
+    },
+    columns: {
         items: [
             {
                 text: '<i class="x-fa fa-pencil"></i> Editable?',
@@ -34,30 +33,30 @@ Ext.define('CpsiMapview.view.TestGroupEditGrid', {
                 groupEditService: 'myGroupEditService',
                 groupEditDataProp: 'myEditableProperty',
                 filter: {
-                    type: 'boolean',
-                },
+                    type: 'boolean'
+                }
             }
         ]
     }
 });
 
-
 describe('CpsiMapview.controller.grid.GroupEditMixin', function () {
-
     Ext.Loader.syncRequire(['CpsiMapview.controller.grid.GroupEditMixin']);
 
     describe('Basics', function () {
         it('is defined', function () {
-            expect(CpsiMapview.controller.grid.GroupEditMixin).not.to.be(undefined);
+            expect(CpsiMapview.controller.grid.GroupEditMixin).not.to.be(
+                undefined
+            );
         });
 
         it('can be created', function () {
-            var mixin = new CpsiMapview.controller.grid.GroupEditMixin();
+            const mixin = new CpsiMapview.controller.grid.GroupEditMixin();
             expect(mixin).to.not.be(undefined);
         });
 
         it('example can be created', function () {
-            var grid = new CpsiMapview.view.TestGroupEditGrid();
+            const grid = new CpsiMapview.view.TestGroupEditGrid();
             expect(grid).not.to.be(undefined);
         });
     });

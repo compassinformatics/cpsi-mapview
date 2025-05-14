@@ -1,5 +1,4 @@
 describe('CpsiMapview.form.RightInfoField', function () {
-
     Ext.Loader.syncRequire(['CpsiMapview.form.RightInfoField']);
 
     it('is defined', function () {
@@ -7,7 +6,7 @@ describe('CpsiMapview.form.RightInfoField', function () {
     });
 
     it('can be instantiated', function () {
-        var inst = Ext.create('CpsiMapview.form.RightInfoField', {
+        const inst = Ext.create('CpsiMapview.form.RightInfoField', {
             field: {
                 infoIconTooltip: null
             }
@@ -16,10 +15,8 @@ describe('CpsiMapview.form.RightInfoField', function () {
         expect(inst.toolTip).to.be('&nbsp;');
     });
 
-
     it('can be instantiated as an xtype', function () {
-
-        var panel = Ext.create('Ext.panel.Panel', {
+        const panel = Ext.create('Ext.panel.Panel', {
             items: [
                 {
                     xtype: 'cmv_rightinfofield',
@@ -32,17 +29,15 @@ describe('CpsiMapview.form.RightInfoField', function () {
             ]
         });
 
-        var infoField = panel.down('cmv_rightinfofield');
+        const infoField = panel.down('cmv_rightinfofield');
         expect(infoField.toolTip).to.be('This is a test');
-
     });
 
     it('can update the tooltip', function () {
-
         Ext.tip.QuickTipManager.init(); // TODO this does not seems to enable tooltips in the tests
         Ext.tip.QuickTipManager.enable();
 
-        var panel = Ext.create('Ext.panel.Panel', {
+        const panel = Ext.create('Ext.panel.Panel', {
             items: [
                 {
                     xtype: 'cmv_rightinfofield',
@@ -55,10 +50,9 @@ describe('CpsiMapview.form.RightInfoField', function () {
             ]
         });
 
-        var infoField = panel.down('cmv_rightinfofield');
+        const infoField = panel.down('cmv_rightinfofield');
         expect(infoField.toolTip).to.be('This is a test');
         infoField.setInfoIconTooltip('Updated');
         expect(infoField.toolTip).to.be('Updated');
-
     });
 });

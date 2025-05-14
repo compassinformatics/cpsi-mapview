@@ -1,5 +1,4 @@
 describe('CpsiMapview.controller.button.TracingMixin', function () {
-
     Ext.Loader.syncRequire(['CpsiMapview.controller.button.TracingMixin']);
 
     it('is defined', function () {
@@ -7,7 +6,7 @@ describe('CpsiMapview.controller.button.TracingMixin', function () {
     });
 
     it('can be instantiated', function () {
-        var inst = Ext.create('CpsiMapview.controller.button.TracingMixin');
+        const inst = Ext.create('CpsiMapview.controller.button.TracingMixin');
         expect(inst).to.be.a(CpsiMapview.controller.button.TracingMixin);
     });
 });

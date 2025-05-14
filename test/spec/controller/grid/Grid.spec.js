@@ -1,5 +1,4 @@
 describe('CpsiMapview.controller.grid.Grid', function () {
-
     Ext.Loader.syncRequire(['CpsiMapview.controller.grid.Grid']);
 
     describe('Basics', function () {
@@ -8,14 +7,14 @@ describe('CpsiMapview.controller.grid.Grid', function () {
         });
 
         it('can be created', function () {
-            var ctrl = new CpsiMapview.controller.grid.Grid();
+            const ctrl = new CpsiMapview.controller.grid.Grid();
             expect(ctrl).to.not.be(undefined);
         });
     });
 
     describe('Advanced', function () {
-        var view;
-        var ctrl;
+        let view;
+        let ctrl;
 
         beforeEach(function () {
             view = Ext.create('CpsiMapview.view.grid.Grid', {
@@ -30,8 +29,9 @@ describe('CpsiMapview.controller.grid.Grid', function () {
 
         it('Orders column selector dropdown alphabetically', function () {
             view.on('headermenucreate', function (grid, menu) {
-                var menuItems = menu.down('[itemId=columnItem]').menu.items.items;
-                var orderedTitles = menuItems.map(function (item) {
+                const menuItems = menu.down('[itemId=columnItem]').menu.items
+                    .items;
+                const orderedTitles = menuItems.map(function (item) {
                     return item.text;
                 });
 
@@ -41,21 +41,25 @@ describe('CpsiMapview.controller.grid.Grid', function () {
             });
 
             // set fixture columns
-            view.setColumns([{
-                text: 'Test1'
-            }, {
-                text: 'Test3'
-            }, {
-                text: 'Test2'
-            }]);
+            view.setColumns([
+                {
+                    text: 'Test1'
+                },
+                {
+                    text: 'Test3'
+                },
+                {
+                    text: 'Test2'
+                }
+            ]);
 
             // trigger the headermenucreate event by clicking a column header dropdown icon
             view.getEl().down('.x-column-header-trigger').dom.click();
         });
 
         it('Gets visible columns, adds Id prop and any extra propertyNames', function () {
-            var store = view.getStore();
-            var vm = ctrl.getViewModel();
+            const store = view.getStore();
+            const vm = ctrl.getViewModel();
 
             vm.set('extraPropertyNames', ['Extra']);
 
@@ -63,17 +67,21 @@ describe('CpsiMapview.controller.grid.Grid', function () {
             store.isEmptyStore = false;
 
             // set fixture columns
-            view.setColumns([{
-                text: 'Test1',
-                dataIndex: 'Test1',
-            }, {
-                text: 'Test2',
-                dataIndex: 'Test2',
-                hidden: true,
-            }, {
-                text: 'Test3',
-                dataIndex: 'Test3',
-            }]);
+            view.setColumns([
+                {
+                    text: 'Test1',
+                    dataIndex: 'Test1'
+                },
+                {
+                    text: 'Test2',
+                    dataIndex: 'Test2',
+                    hidden: true
+                },
+                {
+                    text: 'Test3',
+                    dataIndex: 'Test3'
+                }
+            ]);
 
             ctrl.getVisibleColumns();
 
@@ -84,15 +92,16 @@ describe('CpsiMapview.controller.grid.Grid', function () {
         });
 
         it('spatial filter is cleared', function (done) {
-
-            var spatialQueryButton = view.down('cmv_spatial_query_button');
-            var polygonCoords = [
+            const spatialQueryButton = view.down('cmv_spatial_query_button');
+            const polygonCoords = [
                 [0, 0],
                 [10, 10],
                 [20, 0]
             ];
-            var polygon = new ol.geom.Polygon([polygonCoords]);
-            var filter = spatialQueryButton.getController().createSpatialFilter(polygon);
+            const polygon = new ol.geom.Polygon([polygonCoords]);
+            const filter = spatialQueryButton
+                .getController()
+                .createSpatialFilter(polygon);
             ctrl.spatialFilter = filter;
             spatialQueryButton.on('clearAssociatedPermanentLayer', function () {
                 expect(ctrl.spatialFilter).to.be(null);

@@ -3,9 +3,7 @@ Ext.define('CpsiMapview.model.LineFeatureExample', {
     mixins: {
         features: 'CpsiMapview.model.FeatureStoreMixin'
     },
-    requires: [
-        'CpsiMapview.field.Line'
-    ],
+    requires: ['CpsiMapview.field.Line'],
     fields: [
         {
             name: 'id',
@@ -25,15 +23,14 @@ Ext.define('CpsiMapview.model.LineFeatureExample', {
 });
 
 describe('CpsiMapview.field.Line', function () {
-
-    var model;
-    var fld;
-    var store;
-    var source;
+    let model;
+    let fld;
+    let store;
+    let source;
 
     beforeEach(function () {
-
-        var data = '{ "type": "FeatureCollection", "features": [' +
+        const data =
+            '{ "type": "FeatureCollection", "features": [' +
             '{ "type": "Feature", "properties": null, "geometry":' +
             '{ "type": "Point", "coordinates": [1, 1] }},' +
             '{ "type": "Feature", "properties": null, "geometry":' +
@@ -66,35 +63,34 @@ describe('CpsiMapview.field.Line', function () {
     });
 
     it('can get attributes', function () {
-        var recs = fld.getFeatureAttributes(store);
+        const recs = fld.getFeatureAttributes(store);
         expect(recs.length).to.be(4);
         //console.log(recs[0]);
     });
 
     it('can serialize', function () {
-        var recs = fld.serialize(null, model);
+        const recs = fld.serialize(null, model);
         expect(recs.length).to.be(4);
     });
 
     it('can create point and line style', function () {
-        var style = fld.createPointLineStyle('blue', 'green');
+        const style = fld.createPointLineStyle('blue', 'green');
         expect(style.getImage().getStroke().getColor()).to.be('blue');
         expect(style.getStroke().getColor()).to.be('blue');
         expect(style.getImage().getFill().getColor()).to.be('green');
     });
 
     it('can create style', function () {
-        var style = fld.createStyle();
+        const style = fld.createStyle();
         expect(style.getImage().getStroke().getColor()).to.be('green');
         expect(style.getStroke().getColor()).to.be('green');
         expect(style.getImage().getFill().getColor()).to.be('yellow');
     });
 
     it('can create select style', function () {
-        var style = fld.createSelectStyle();
+        const style = fld.createSelectStyle();
         expect(style.getImage().getStroke().getColor()).to.be('purple');
         expect(style.getStroke().getColor()).to.be('purple');
         expect(style.getImage().getFill().getColor()).to.be('black');
     });
-
 });

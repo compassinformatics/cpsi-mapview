@@ -1,5 +1,4 @@
 describe('CpsiMapview.form.field.Combo', function () {
-
     Ext.Loader.syncRequire(['CpsiMapview.form.field.Combo']);
 
     it('is defined', function () {
@@ -7,8 +6,7 @@ describe('CpsiMapview.form.field.Combo', function () {
     });
 
     it('can be instantiated', function () {
-        var inst = Ext.create('CpsiMapview.form.field.Combo');
+        const inst = Ext.create('CpsiMapview.form.field.Combo');
         expect(inst).to.be.a(CpsiMapview.form.field.Combo);
     });
-
 });

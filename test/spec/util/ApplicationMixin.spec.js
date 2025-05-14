@@ -1,7 +1,10 @@
-Ext.Loader.syncRequire(['CpsiMapview.util.ApplicationMixin', 'CpsiMapview.view.main.Main']);
+Ext.Loader.syncRequire([
+    'CpsiMapview.util.ApplicationMixin',
+    'CpsiMapview.view.main.Main'
+]);
 
 describe('CpsiMapview.util.ApplicationMixin', function () {
-    var mixin = CpsiMapview.util.ApplicationMixin;
+    const mixin = CpsiMapview.util.ApplicationMixin;
 
     describe('Basics', function () {
         it('is defined', function () {
@@ -10,11 +13,9 @@ describe('CpsiMapview.util.ApplicationMixin', function () {
     });
 
     describe('Functions', function () {
-
-        var mixin;
+        let mixin;
 
         beforeEach(function () {
-
             mixin = new CpsiMapview.util.ApplicationMixin();
 
             // mock the required Ext.application functions
@@ -25,8 +26,8 @@ describe('CpsiMapview.util.ApplicationMixin', function () {
                 return {
                     mask: Ext.emptyFn,
                     unmask: Ext.emptyFn
-                }
-            }
+                };
+            };
             mixin.mainViewXType = 'cmv_main'; // as it is a mixin we can't set this property in the constructor
         });
 
@@ -42,7 +43,7 @@ describe('CpsiMapview.util.ApplicationMixin', function () {
 
         it('#storeLoaded', function () {
             mixin.storeCounter = 1;
-            mixin.storeLoaded()
+            mixin.storeLoaded();
             expect(mixin.storeCounter).to.be(0);
         });
 
@@ -52,27 +53,23 @@ describe('CpsiMapview.util.ApplicationMixin', function () {
             expect(mixin.applicationLoaded).to.be(true);
         });
 
-        // commented out as Ext.Msg is undefined when running the tests
-        xit('#onApplicationUpdated', function () {
-            expect(mixin.onApplicationUpdated()).to.be(undefined);
-        });
-
         it('#getSiteSettings', function () {
-
-            var myStore = Ext.create('Ext.data.ArrayStore', {
+            Ext.create('Ext.data.ArrayStore', {
                 storeId: 'test',
                 fields: ['id', 'key'],
-                data: [[1, 'key1'], [2, 'key2']]
+                data: [
+                    [1, 'key1'],
+                    [2, 'key2']
+                ]
             });
-            var rec = mixin.getSiteSettings('test', 'key1');
+            const rec = mixin.getSiteSettings('test', 'key1');
             expect(rec.get('id')).to.be(1);
         });
 
         it('#getUrlParameter', function () {
-
-            var regex = /prefix\s*(.*?)\s*-postfix.mysite.ie/g;
-            var hostname = 'prefixsubsite-postfix.mysite.ie';
-            var value = mixin.getUrlParameter(regex, hostname);
+            const regex = /prefix\s*(.*?)\s*-postfix.mysite.ie/g;
+            const hostname = 'prefixsubsite-postfix.mysite.ie';
+            const value = mixin.getUrlParameter(regex, hostname);
             expect(value).to.be('subsite');
         });
 
@@ -96,7 +93,7 @@ describe('CpsiMapview.util.ApplicationMixin', function () {
 
         it('#onLogin', function () {
             expect(mixin.applicationLoaded).to.be(false);
-            var loginData = {
+            const loginData = {
                 key: 'value'
             };
             mixin.onLogin(loginData);
@@ -104,16 +101,15 @@ describe('CpsiMapview.util.ApplicationMixin', function () {
         });
 
         it('#onAjaxRequestComplete', function () {
-
-            var response = {
+            const response = {
                 request: {
                     url: '/test'
                 },
                 status: 200,
-                responseType:'application/json'
+                responseType: 'application/json'
             };
 
-            var success = mixin.onAjaxRequestComplete(null, response);
+            const success = mixin.onAjaxRequestComplete(null, response);
 
             expect(success).to.be(true);
         });
@@ -129,23 +125,22 @@ describe('CpsiMapview.util.ApplicationMixin', function () {
         });
 
         it('#getResourcePaths can be overridden', function (done) {
-            mixin.getResourcePaths = function() {
-                return new Ext.Promise(function(resolve) {
+            mixin.getResourcePaths = function () {
+                return new Ext.Promise(function (resolve) {
                     resolve({
                         layerConfig: 'custom/default.json',
                         treeConfig: 'custom/tree.json'
                     });
                 });
-            }
+            };
 
             mixin.getResourcePaths().then(function (data) {
                 expect(data).to.eql({
                     layerConfig: 'custom/default.json',
                     treeConfig: 'custom/tree.json'
                 });
-                done()
+                done();
             });
         });
     });
-
 });

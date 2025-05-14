@@ -1,24 +1,28 @@
 describe('CpsiMapview.controller.button.DigitizeButtonController', function () {
-
-    Ext.Loader.syncRequire(['CpsiMapview.controller.button.DigitizeButtonController']);
+    Ext.Loader.syncRequire([
+        'CpsiMapview.controller.button.DigitizeButtonController'
+    ]);
 
     describe('Basics', function () {
         it('is defined', function () {
-            expect(CpsiMapview.controller.button.DigitizeButtonController).not.to.be(undefined);
+            expect(
+                CpsiMapview.controller.button.DigitizeButtonController
+            ).not.to.be(undefined);
         });
 
         it('can be created', function () {
-            var ctrl = new CpsiMapview.controller.button.DigitizeButtonController();
+            const ctrl =
+                new CpsiMapview.controller.button.DigitizeButtonController();
             expect(ctrl).to.not.be(undefined);
         });
 
         describe('Can handle service results', function () {
-
-            var resultLayer, ctrl;
+            let ctrl;
 
             beforeEach(function () {
-
-                var btn = new CpsiMapview.view.button.DigitizeButton({ type: 'Point' });
+                const btn = new CpsiMapview.view.button.DigitizeButton({
+                    type: 'Point'
+                });
 
                 ctrl = btn.getController();
                 ctrl.resultLayer = new ol.layer.Vector({
@@ -29,8 +33,9 @@ describe('CpsiMapview.controller.button.DigitizeButtonController', function () {
             });
 
             it('#parseNetsolverResponse handles valid response', function () {
-                var response = {
-                    responseText: '{"data":{"type":"FeatureCollection","features":[' +
+                const response = {
+                    responseText:
+                        '{"data":{"type":"FeatureCollection","features":[' +
                         '{"type":"Feature","geometry":{"type":"LineString","coordinates":[[0,0],[1,1]]},"properties":{}}],' +
                         '"crs":{"type":"name","properties":{"name":"EPSG: 3857"}},"bbox":null},"message":"","success":true}'
                 };
@@ -38,7 +43,7 @@ describe('CpsiMapview.controller.button.DigitizeButtonController', function () {
             });
 
             it('#parseNetsolverResponse handles empty response', function () {
-                var response = {
+                const response = {
                     responseText: '{"data":null,"message":"","success":true}'
                 };
 
@@ -46,10 +51,12 @@ describe('CpsiMapview.controller.button.DigitizeButtonController', function () {
             });
 
             it('#handleFinalResult fires events', function (done) {
-
-                var features = [
+                const features = [
                     new ol.Feature({
-                        geometry: new ol.geom.LineString([[0, 0], [1, 1]]),
+                        geometry: new ol.geom.LineString([
+                            [0, 0],
+                            [1, 1]
+                        ]),
                         length: 10
                     }),
                     new ol.Feature({
@@ -58,16 +65,18 @@ describe('CpsiMapview.controller.button.DigitizeButtonController', function () {
                     })
                 ];
 
-                ctrl.resultLayer.getSource().on('featuresupdated', function (evt) {
-                    var mods = evt.modifications;
-                    expect(mods.originalLength).to.be(0);
-                    expect(mods.newLength).to.be(10);
-                    expect(mods.newEdgeCount).to.be(1);
-                    expect(mods.originalSolverPoints.length).to.be(0);
-                    expect(mods.newSolverPoints.length).to.be(1);
-                    expect(mods.toolType).to.be('Point');
-                    done();
-                });
+                ctrl.resultLayer
+                    .getSource()
+                    .on('featuresupdated', function (evt) {
+                        const mods = evt.modifications;
+                        expect(mods.originalLength).to.be(0);
+                        expect(mods.newLength).to.be(10);
+                        expect(mods.newEdgeCount).to.be(1);
+                        expect(mods.originalSolverPoints.length).to.be(0);
+                        expect(mods.newSolverPoints.length).to.be(1);
+                        expect(mods.toolType).to.be('Point');
+                        done();
+                    });
 
                 ctrl.handleFinalResult(features);
             });

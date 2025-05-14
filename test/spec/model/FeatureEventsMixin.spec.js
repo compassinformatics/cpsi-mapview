@@ -1,17 +1,14 @@
 describe('CpsiMapview.model.FeatureEventsMixin', function () {
+    Ext.Loader.syncRequire([
+        'BasiGX.util.Layer',
+        'CpsiMapview.model.FeatureEventsMixin'
+    ]);
 
-    Ext.Loader.syncRequire(['BasiGX.util.Layer', 'CpsiMapview.model.FeatureEventsMixin']);
-
-    var map;
-    var layer1;
-    var layer2;
-    var layer3;
-    var getLayersByStub;
+    let layer1;
+    let layer2;
+    let getLayersByStub;
 
     beforeEach(function () {
-
-        map = new ol.Map();
-
         layer1 = new ol.layer.Vector({
             layerKey: 'MYKEY'
         });
@@ -20,22 +17,20 @@ describe('CpsiMapview.model.FeatureEventsMixin', function () {
             layerKey: 'MYKEY_WFS'
         });
 
-        layer3 = new ol.layer.Vector({
-            layerKey: 'MYKEY_WMS'
-        });
-
         // stub BasiGX.util.Layer.getLayersBy to return test data during these tests
-        getLayersByStub = sinon.stub(BasiGX.util.Layer, 'getLayersBy').callsFake(function (prop, key) {
-            switch (key) {
-                case 'MYKEY':
-                    return [layer1]
-                case 'MYKEY_WFS':
-                    return [layer2]
-                case 'MYKEY_WMS':
-                    // test for when a switch layer is used and the WMS layer has not yet been loaded
-                    return []
-            }
-        });
+        getLayersByStub = sinon
+            .stub(BasiGX.util.Layer, 'getLayersBy')
+            .callsFake(function (prop, key) {
+                switch (key) {
+                    case 'MYKEY':
+                        return [layer1];
+                    case 'MYKEY_WFS':
+                        return [layer2];
+                    case 'MYKEY_WMS':
+                        // test for when a switch layer is used and the WMS layer has not yet been loaded
+                        return [];
+                }
+            });
     });
 
     afterEach(function () {
@@ -47,8 +42,7 @@ describe('CpsiMapview.model.FeatureEventsMixin', function () {
     });
 
     it('run model saved', function () {
-
-        var mixin = Ext.create('CpsiMapview.model.FeatureEventsMixin', {
+        const mixin = Ext.create('CpsiMapview.model.FeatureEventsMixin', {
             syncLayerKeys: ['MYKEY', 'MYKEY_WFS', 'MYKEY_WMS']
         });
 
@@ -60,5 +54,4 @@ describe('CpsiMapview.model.FeatureEventsMixin', function () {
         // the above function has no return value for testing
         expect(mixin).not.to.be(undefined);
     });
-
 });
