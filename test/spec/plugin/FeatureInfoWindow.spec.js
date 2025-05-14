@@ -1,5 +1,4 @@
 describe('CpsiMapview.plugin.FeatureInfoWindow', function () {
-
     Ext.Loader.syncRequire(['CpsiMapview.plugin.FeatureInfoWindow']);
 
     it('is defined', function () {
@@ -7,8 +6,7 @@ describe('CpsiMapview.plugin.FeatureInfoWindow', function () {
     });
 
     it('can be instantiated', function () {
-        var inst = Ext.create('CpsiMapview.plugin.FeatureInfoWindow');
+        const inst = Ext.create('CpsiMapview.plugin.FeatureInfoWindow');
         expect(inst).to.be.a(CpsiMapview.plugin.FeatureInfoWindow);
     });
-
 });

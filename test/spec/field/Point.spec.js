@@ -3,9 +3,7 @@ Ext.define('CpsiMapview.model.PointFeatureExample', {
     mixins: {
         features: 'CpsiMapview.model.FeatureStoreMixin'
     },
-    requires: [
-        'CpsiMapview.field.Point'
-    ],
+    requires: ['CpsiMapview.field.Point'],
     fields: [
         {
             name: 'id',
@@ -25,15 +23,14 @@ Ext.define('CpsiMapview.model.PointFeatureExample', {
 });
 
 describe('CpsiMapview.field.Point', function () {
-
-    var model;
-    var fld;
-    var store;
-    var source;
+    let model;
+    let fld;
+    let store;
+    let source;
 
     beforeEach(function () {
-
-        var data = '{ "type": "Feature", "properties": null, "geometry":' +
+        const data =
+            '{ "type": "Feature", "properties": null, "geometry":' +
             '{ "type": "Point", "coordinates": [1, 1] }}';
 
         model = Ext.create('CpsiMapview.model.PointFeatureExample', {
@@ -56,24 +53,23 @@ describe('CpsiMapview.field.Point', function () {
     });
 
     it('can get geometry', function () {
-        var gj = fld.getPointGeometry(store.layer);
+        const gj = fld.getPointGeometry(store.layer);
         expect(gj).to.eql({ type: 'Point', coordinates: [1, 1] });
     });
 
     it('can serialize', function () {
-        var gj = fld.serialize(null, model);
+        const gj = fld.serialize(null, model);
         expect(gj).to.eql({ type: 'Point', coordinates: [1, 1] });
     });
 
     it('can create style', function () {
-        var style = fld.createStyle();
+        const style = fld.createStyle();
         expect(style.getStroke().getColor()).to.be('Maroon');
         expect(style.getImage().getFill().getColor()).to.be('DarkOrange');
     });
 
     it('can create select style', function () {
-        var style = fld.createSelectStyle();
+        const style = fld.createSelectStyle();
         expect(style).to.be(null);
     });
-
 });

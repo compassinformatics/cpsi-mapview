@@ -12,13 +12,14 @@ Ext.define('CpsiMapview.form.TestWindow', {
             }
         }
     ],
-    tools: [{
-        type: 'help'
-    }]
+    tools: [
+        {
+            type: 'help'
+        }
+    ]
 });
 
 describe('CpsiMapview.form.ViewMixin', function () {
-
     Ext.Loader.syncRequire(['CpsiMapview.form.ViewMixin']);
 
     it('is defined', function () {
@@ -26,17 +27,15 @@ describe('CpsiMapview.form.ViewMixin', function () {
     });
 
     it('can be instantiated', function () {
-        var inst = Ext.create('CpsiMapview.form.ViewMixin');
+        const inst = Ext.create('CpsiMapview.form.ViewMixin');
         expect(inst).to.be.a(CpsiMapview.form.ViewMixin);
     });
 
     describe('Functions', function () {
-
-        var editWindow;
-        var buttonBar;
+        let editWindow;
+        let buttonBar;
 
         beforeEach(function () {
-
             // create a new view with the mixin
             editWindow = Ext.create('CpsiMapview.form.TestWindow');
             editWindow.show(); // we need to show the window to create the tools
@@ -48,7 +47,7 @@ describe('CpsiMapview.form.ViewMixin', function () {
         });
 
         it('helpUrl is defined', function () {
-            var helpUrl = editWindow.getViewModel().get('helpUrl');
+            const helpUrl = editWindow.getViewModel().get('helpUrl');
             expect(helpUrl).to.be('');
         });
 

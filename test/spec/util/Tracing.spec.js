@@ -1,8 +1,7 @@
 describe('CpsiMapview.util.Tracing', function () {
-
     Ext.Loader.syncRequire(['CpsiMapview.util.Tracing']);
 
-    var util = CpsiMapview.util.Tracing;
+    const util = CpsiMapview.util.Tracing;
 
     describe('Basics', function () {
         it('is defined', function () {
@@ -11,67 +10,66 @@ describe('CpsiMapview.util.Tracing', function () {
     });
 
     describe('Functions Basics', function () {
-
         it('#computeModulo', function () {
-            var fn = util.computeModulo;
+            const fn = util.computeModulo;
             expect(fn).not.to.be(undefined);
         });
 
         it('#lineStringPopulated', function () {
-            var fn = util.lineStringPopulated;
+            const fn = util.lineStringPopulated;
             expect(fn).not.to.be(undefined);
         });
 
         it('#linesTouchAtStartEndPoint', function () {
-            var fn = util.linesTouchAtStartEndPoint;
+            const fn = util.linesTouchAtStartEndPoint;
             expect(fn).not.to.be(false);
         });
 
         it('#lineInteriorTouchesLineStartEnd', function () {
-            var fn = util.lineInteriorTouchesLineStartEnd;
+            const fn = util.lineInteriorTouchesLineStartEnd;
             expect(fn).not.to.be(undefined);
         });
 
         it('#lineStartEndTouchesLineInterior', function () {
-            var fn = util.lineStartEndTouchesLineInterior;
+            const fn = util.lineStartEndTouchesLineInterior;
             expect(fn).not.to.be(undefined);
         });
 
         it('#computeLength', function () {
-            var fn = util.computeLength;
+            const fn = util.computeLength;
             expect(fn).not.to.be(undefined);
         });
 
         it('#coordIsOnSegment', function () {
-            var fn = util.coordIsOnSegment;
+            const fn = util.coordIsOnSegment;
             expect(fn).not.to.be(undefined);
         });
 
         it('#concatLineCoords', function () {
-            var fn = util.concatLineCoords;
+            const fn = util.concatLineCoords;
             expect(fn).not.to.be(undefined);
         });
 
         it('#getPartialSegmentCoords', function () {
-            var fn = util.getPartialSegmentCoords;
+            const fn = util.getPartialSegmentCoords;
             expect(fn).not.to.be(undefined);
         });
     });
 
     describe('#concatLineCoords', function () {
-        var fn = util.concatLineCoords;
-        var aLineCoords;
-        var bLineCoords;
+        const fn = util.concatLineCoords;
+        let aLineCoords;
+        let bLineCoords;
 
-        var c = [0, 0];
-        var d = [0, 1];
-        var e = [1, 1];
-        var f = [1, 2];
-        var g = [2, 2];
-        var h = [2, 3];
-        var i = [3, 3];
-        var j = [3, 4];
-        var k = [4, 4];
+        const c = [0, 0];
+        const d = [0, 1];
+        const e = [1, 1];
+        const f = [1, 2];
+        const g = [2, 2];
+        const h = [2, 3];
+        const i = [3, 3];
+        const j = [3, 4];
+        const k = [4, 4];
 
         it('returns undefined on invalid input', function () {
             expect(fn(aLineCoords, bLineCoords)).to.be(undefined);
@@ -103,8 +101,8 @@ describe('CpsiMapview.util.Tracing', function () {
         });
 
         it('returns correct line on valid input', function () {
-            var result;
-            var expected = [c, d, e, f, g];
+            let result;
+            let expected = [c, d, e, f, g];
 
             // case: lastFirst
             result = fn([c, d, e], [e, f, g]);
@@ -130,8 +128,8 @@ describe('CpsiMapview.util.Tracing', function () {
     });
 
     describe('#lineStringPopulated', function () {
-        var fn = util.lineStringPopulated;
-        var feature = new ol.Feature({});
+        const fn = util.lineStringPopulated;
+        const feature = new ol.Feature({});
         it('returns undefined on empty feature', function () {
             expect(fn(feature)).to.be(undefined);
         });
@@ -147,14 +145,25 @@ describe('CpsiMapview.util.Tracing', function () {
         });
 
         it('returns true on valid LineString', function () {
-            feature.setGeometry(new ol.geom.LineString([[1, 2], [3, 4]]));
+            feature.setGeometry(
+                new ol.geom.LineString([
+                    [1, 2],
+                    [3, 4]
+                ])
+            );
             expect(fn(feature)).to.be(true);
         });
 
         it('returns undefined on valid Polygon', function () {
-            feature.setGeometry(new ol.geom.Polygon([[1, 2], [3, 4], [5, 6], [1, 2]]));
+            feature.setGeometry(
+                new ol.geom.Polygon([
+                    [1, 2],
+                    [3, 4],
+                    [5, 6],
+                    [1, 2]
+                ])
+            );
             expect(fn(feature)).to.be(undefined);
         });
     });
-
 });

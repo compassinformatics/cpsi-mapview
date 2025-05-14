@@ -9,7 +9,6 @@ Ext.define('CpsiMapview.form.TestViewModel', {
 });
 
 describe('CpsiMapview.form.ViewModelMixin', function () {
-
     Ext.Loader.syncRequire(['CpsiMapview.form.ViewModelMixin']);
 
     it('is defined', function () {
@@ -17,13 +16,12 @@ describe('CpsiMapview.form.ViewModelMixin', function () {
     });
 
     it('can be instantiated', function () {
-        var inst = Ext.create('CpsiMapview.form.ViewModelMixin');
+        const inst = Ext.create('CpsiMapview.form.ViewModelMixin');
         expect(inst).to.be.a(CpsiMapview.form.ViewModelMixin);
     });
 
     describe('Functions', function () {
-
-        var editForm, vm, currentRecord;
+        let editForm, vm, currentRecord;
 
         beforeEach(function () {
             // create a new view with the viewmodel and mixin
@@ -36,21 +34,21 @@ describe('CpsiMapview.form.ViewModelMixin', function () {
             vm = editForm.getViewModel();
             currentRecord = Ext.create('CpsiMapview.form.TestViewModelModel');
             vm.set('currentRecord', currentRecord);
-
         });
 
         it('timestamp is set', function () {
-            var timestamp = vm.get('timestamp');
+            const timestamp = vm.get('timestamp');
             expect(timestamp).not.to.be(undefined);
         });
 
         it('can get mocked featurestore', function () {
-
             currentRecord.featureStores = {
                 test: { key: 1 }
-            }
+            };
 
-            expect(vm.getFeatureStore(currentRecord, 'test')).to.eql({ key: 1 });
+            expect(vm.getFeatureStore(currentRecord, 'test')).to.eql({
+                key: 1
+            });
         });
 
         it('can destroy the viewmodel', function () {
@@ -58,5 +56,4 @@ describe('CpsiMapview.form.ViewModelMixin', function () {
             expect(currentRecord).not.to.be(undefined);
         });
     });
-
 });

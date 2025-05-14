@@ -10,7 +10,6 @@ Ext.define('CpsiMapview.form.TestController', {
 });
 
 describe('CpsiMapview.form.ControllerMixin', function () {
-
     Ext.Loader.syncRequire(['CpsiMapview.form.ControllerMixin']);
 
     it('is defined', function () {
@@ -18,17 +17,15 @@ describe('CpsiMapview.form.ControllerMixin', function () {
     });
 
     it('can be instantiated', function () {
-        var inst = Ext.create('CpsiMapview.form.ControllerMixin');
+        const inst = Ext.create('CpsiMapview.form.ControllerMixin');
         expect(inst).to.be.a(CpsiMapview.form.ControllerMixin);
     });
 
     describe('Functions', function () {
-
-        var editForm;
+        let editForm;
 
         beforeEach(function () {
-
-            var model = Ext.create('CpsiMapview.form.TestControllerModel');
+            const model = Ext.create('CpsiMapview.form.TestControllerModel');
 
             // create a new view with the controller and mixin
             editForm = Ext.create('Ext.window.Window', {
@@ -39,22 +36,21 @@ describe('CpsiMapview.form.ControllerMixin', function () {
                     type: 'TestController'
                 }
             });
-
         });
 
         it('#onFieldChanged is defined', function () {
-            var ctrl = editForm.getController();
-            var fn = ctrl.onFieldChanged;
+            const ctrl = editForm.getController();
+            const fn = ctrl.onFieldChanged;
             expect(fn).not.to.be(undefined);
         });
 
         it('#onDigitizingToolToggle flag and listeners are set', function () {
-            var ctrl = editForm.getController();
+            const ctrl = editForm.getController();
 
-            var source = new ol.source.Vector();
-            var resultLayer = new ol.layer.Vector({ source: source });
+            const source = new ol.source.Vector();
+            const resultLayer = new ol.layer.Vector({ source: source });
 
-            editForm.getViewModel().set('resultLayer', resultLayer)
+            editForm.getViewModel().set('resultLayer', resultLayer);
             expect(ctrl.toolListenerAdded).to.be(false);
             expect(source.getListeners('featuresupdated')).to.be(undefined);
             ctrl.onDigitizingToolToggle();
@@ -66,75 +62,70 @@ describe('CpsiMapview.form.ControllerMixin', function () {
         });
 
         describe('Digitizing', function () {
-
-            var polygonLayer;
+            let polygonLayer;
 
             beforeEach(function () {
-                var feature = new ol.Feature({ id: 'foo' });
+                const feature = new ol.Feature({ id: 'foo' });
                 polygonLayer = new ol.layer.Vector({
                     source: new ol.source.Vector({
                         features: new ol.Collection([feature])
                     })
                 });
 
-                editForm.getViewModel().set('polygonLayer', polygonLayer)
+                editForm.getViewModel().set('polygonLayer', polygonLayer);
             });
 
             it('#onEdgesModified polygons are removed when Point tool is used', function () {
+                const ctrl = editForm.getController();
 
-                var ctrl = editForm.getController();
-
-                var evt = {
+                const evt = {
                     modifications: {
                         newEdgeCount: 3,
                         toolType: 'Point'
                     }
-                }
+                };
 
                 ctrl.onEdgesModified(evt);
                 expect(polygonLayer.getSource().getFeatures().length).to.be(0);
             });
 
             it('#onEdgesModified polygons are not removed when no new edges have been added', function () {
+                const ctrl = editForm.getController();
 
-                var ctrl = editForm.getController();
-
-                var evt = {
+                const evt = {
                     modifications: {
                         newEdgeCount: 0,
                         toolType: 'Point'
                     }
-                }
+                };
 
                 ctrl.onEdgesModified(evt);
                 expect(polygonLayer.getSource().getFeatures().length).to.be(1);
             });
 
             it('#onEdgesModified polygons are not removed when Polygon tool is used', function () {
+                const ctrl = editForm.getController();
 
-                var ctrl = editForm.getController();
-
-                var evt = {
+                const evt = {
                     modifications: {
                         newEdgeCount: 3,
                         toolType: 'Polygon'
                     }
-                }
+                };
 
                 ctrl.onEdgesModified(evt);
                 expect(polygonLayer.getSource().getFeatures().length).to.be(1);
             });
 
             it('#onEdgesModified polygons are not removed when Circle tool is used', function () {
+                const ctrl = editForm.getController();
 
-                var ctrl = editForm.getController();
-
-                var evt = {
+                const evt = {
                     modifications: {
                         newEdgeCount: 3,
                         toolType: 'Circle'
                     }
-                }
+                };
 
                 ctrl.onEdgesModified(evt);
                 expect(polygonLayer.getSource().getFeatures().length).to.be(1);

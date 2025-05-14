@@ -1,7 +1,7 @@
 // This file was originally taken from GeoExt3, and has been modified
 // to include more helpers, like #ensureMapComponentAvailable, #setupTestObjects
 // and some more.
-(function(global) {
+(function (global) {
     /**
      * Ensures that the `BasiGX.view.component.Map` is available for
      * instantiation by calling `Ext.Loader.syncRequire` if needed.
@@ -9,8 +9,12 @@
      * @private
      */
     function ensureMapComponentAvailable() {
-        if (!BasiGX || !BasiGX.view || !BasiGX.view.component ||
-            !BasiGX.view.component.Map) {
+        if (
+            !BasiGX ||
+            !BasiGX.view ||
+            !BasiGX.view.component ||
+            !BasiGX.view.component.Map
+        ) {
             Ext.Loader.syncRequire(['BasiGX.view.component.Map']);
         }
     }
@@ -31,7 +35,7 @@
      * @return {HTMLDivElement} The created `<div>`.
      */
     function setupTestDiv() {
-        var div = document.createElement('div');
+        const div = document.createElement('div');
         div.style.position = 'absolute';
         div.style.top = 0;
         div.style.left = -500;
@@ -54,7 +58,7 @@
         if (!div) {
             return;
         }
-        var parent = div.parentNode;
+        const parent = div.parentNode;
         if (parent) {
             parent.removeChild(div);
         }
@@ -91,21 +95,29 @@
     function setupTestObjects(opts) {
         ensureMapComponentAvailable();
 
-        var options = opts || {};
-        var mapOpts = options.mapOpts || {};
-        var mapComponentOpts = options.mapComponentOpts || {};
+        const options = opts || {};
+        const mapOpts = options.mapOpts || {};
+        const mapComponentOpts = options.mapComponentOpts || {};
 
-        var mapDiv = setupTestDiv();
-        var mapComponentDiv = setupTestDiv();
+        const mapDiv = setupTestDiv();
+        const mapComponentDiv = setupTestDiv();
 
-        var view = new ol.View({
+        const view = new ol.View({
             center: [0, 0]
         });
-        var map = new ol.Map(Ext.apply({target: mapDiv, view: view}, mapOpts));
-        var mapComponent = Ext.create('BasiGX.view.component.Map', Ext.apply({
-            map: map,
-            renderTo: mapComponentDiv
-        }, mapComponentOpts));
+        const map = new ol.Map(
+            Ext.apply({ target: mapDiv, view: view }, mapOpts)
+        );
+        const mapComponent = Ext.create(
+            'BasiGX.view.component.Map',
+            Ext.apply(
+                {
+                    map: map,
+                    renderTo: mapComponentDiv
+                },
+                mapComponentOpts
+            )
+        );
 
         return {
             map: map,
@@ -145,7 +157,7 @@
      * possible to make tests fail.
      */
     function destroyAll() {
-        Ext.each(arguments, function(cmp) {
+        Ext.each(arguments, function (cmp) {
             if (cmp && cmp.destroy) {
                 try {
                     cmp.destroy();
@@ -154,8 +166,13 @@
                     throw e;
                 }
             } else {
-                var msg = 'Unexpected component passed for destroying: ' +
-                    '\'' + cmp + '\' (' + (typeof cmp) + ')';
+                const msg =
+                    'Unexpected component passed for destroying: ' +
+                    "'" +
+                    cmp +
+                    "' (" +
+                    typeof cmp +
+                    ')';
                 Ext.Logger.info(msg);
                 throw new Error(msg);
             }
@@ -164,12 +181,12 @@
 
     /**
      * A stored copy of `Ext.Logger.info`, when logging is turned off
-     * temporarilly via `disableLogging` or `null` when logging is enabled.
+     * temporarily via `disableLogging` or `null` when logging is enabled.
      *
      * @type {Function}
      * @private
      */
-    var originalLoggerLog = null;
+    let originalLoggerLog = null;
     /**
      * Disables logging via `Ext.Logger` methods like `info`, `warn` etc.
      */
@@ -199,4 +216,4 @@
         disableLogging: disableLogging,
         enableLogging: enableLogging
     };
-}(this));
+})(this);

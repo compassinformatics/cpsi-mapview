@@ -5,8 +5,8 @@ Ext.Loader.syncRequire([
     'CpsiMapview.data.model.LayerTreeNode'
 ]);
 
-var createNode = function(opts) {
-    var layerNode = Ext.create(
+const createNode = function (opts) {
+    const layerNode = Ext.create(
         'CpsiMapview.data.model.LayerTreeNode',
         new ol.layer.Vector({
             source: new ol.source.Vector(),
@@ -19,62 +19,70 @@ var createNode = function(opts) {
 };
 
 describe('CpsiMapview.util.LayerTreeFilter', function () {
-
     Ext.Loader.syncRequire(['CpsiMapview.util.LayerTreeFilter']);
 
-    var layerTreeFilterUtil = CpsiMapview.util.LayerTreeFilter;
+    const layerTreeFilterUtil = CpsiMapview.util.LayerTreeFilter;
 
-    describe('Basics', function() {
-        it('is defined', function() {
+    describe('Basics', function () {
+        it('is defined', function () {
             expect(layerTreeFilterUtil).not.to.be(undefined);
         });
     });
 
-    describe('#isLayerVisible', function() {
-
-        describe('layer', function() {
-
-            it('returns true, if layer is visible', function() {
-                var layerNode = createNode({visible: true});
-                var isVisible = layerTreeFilterUtil.isLayerVisible(layerNode, true);
+    describe('#isLayerVisible', function () {
+        describe('layer', function () {
+            it('returns true, if layer is visible', function () {
+                const layerNode = createNode({ visible: true });
+                const isVisible = layerTreeFilterUtil.isLayerVisible(
+                    layerNode,
+                    true
+                );
                 expect(isVisible).to.be(true);
             });
 
-            it('returns false, if layer is not visible', function() {
-                var layerNode = createNode({visible: false});
-                var isVisible = layerTreeFilterUtil.isLayerVisible(layerNode, true);
+            it('returns false, if layer is not visible', function () {
+                const layerNode = createNode({ visible: false });
+                const isVisible = layerTreeFilterUtil.isLayerVisible(
+                    layerNode,
+                    true
+                );
                 expect(isVisible).to.be(false);
             });
-
         });
 
-        describe('baseLayer', function() {
-
-            it('always returns true, if baseLayers should not be filtered', function() {
-                var visibleBaseLayer = createNode({visible: true, isBaseLayer: true});
-                var visibleBaseLayerIsVisible = layerTreeFilterUtil.isLayerVisible(
-                    visibleBaseLayer, false);
+        describe('baseLayer', function () {
+            it('always returns true, if baseLayers should not be filtered', function () {
+                const visibleBaseLayer = createNode({
+                    visible: true,
+                    isBaseLayer: true
+                });
+                const visibleBaseLayerIsVisible =
+                    layerTreeFilterUtil.isLayerVisible(visibleBaseLayer, false);
                 expect(visibleBaseLayerIsVisible).to.be(true);
 
-                var invisibleBaseLayer = createNode({visible: false, isBaseLayer: true});
-                var invisibleBaseLayerIsVisible = layerTreeFilterUtil.isLayerVisible(
-                    invisibleBaseLayer, false);
+                const invisibleBaseLayer = createNode({
+                    visible: false,
+                    isBaseLayer: true
+                });
+                const invisibleBaseLayerIsVisible =
+                    layerTreeFilterUtil.isLayerVisible(
+                        invisibleBaseLayer,
+                        false
+                    );
                 expect(invisibleBaseLayerIsVisible).to.be(true);
             });
         });
     });
 
-    describe('#isSearchTextInLayerName', function() {
+    describe('#isSearchTextInLayerName', function () {
+        describe('layers', function () {
+            it('returns true, if text was found', function () {
+                const searchText = 'foo';
+                const layerName = searchText;
 
-        describe('layers', function() {
+                const layerNode = createNode({ name: layerName });
 
-            it('returns true, if text was found', function() {
-                var searchText = 'foo';
-                var layerName = searchText;
-
-                var layerNode = createNode({name: layerName});
-
-                var result = layerTreeFilterUtil.isSearchTextInLayerName(
+                const result = layerTreeFilterUtil.isSearchTextInLayerName(
                     layerNode,
                     searchText,
                     true
@@ -83,13 +91,13 @@ describe('CpsiMapview.util.LayerTreeFilter', function () {
                 expect(result).to.be(true);
             });
 
-            it('returns true, if layer name contains search text', function() {
-                var searchText = 'foo';
-                var layerName = 'barfoobar';
+            it('returns true, if layer name contains search text', function () {
+                const searchText = 'foo';
+                const layerName = 'barfoobar';
 
-                var layerNode = createNode({name: layerName});
+                const layerNode = createNode({ name: layerName });
 
-                var result = layerTreeFilterUtil.isSearchTextInLayerName(
+                const result = layerTreeFilterUtil.isSearchTextInLayerName(
                     layerNode,
                     searchText,
                     true
@@ -98,13 +106,13 @@ describe('CpsiMapview.util.LayerTreeFilter', function () {
                 expect(result).to.be(true);
             });
 
-            it('returns false, if text was not found', function() {
-                var searchText = 'foo';
-                var layerName = 'bar';
+            it('returns false, if text was not found', function () {
+                const searchText = 'foo';
+                const layerName = 'bar';
 
-                var layerNode = createNode({name: layerName});
+                const layerNode = createNode({ name: layerName });
 
-                var result = layerTreeFilterUtil.isSearchTextInLayerName(
+                const result = layerTreeFilterUtil.isSearchTextInLayerName(
                     layerNode,
                     searchText,
                     true
@@ -114,67 +122,72 @@ describe('CpsiMapview.util.LayerTreeFilter', function () {
             });
         });
 
-        describe('baseLayers', function() {
+        describe('baseLayers', function () {
+            it('always returns true if baseLayers should not be filtered', function () {
+                const searchText = 'foo';
+                const layerName = 'bar';
 
-            it('always returns true if baseLayers should not be filtered', function() {
-                var searchText = 'foo';
-                var layerName = 'bar';
+                const matchingNode = createNode({
+                    name: searchText,
+                    isBaseLayer: true
+                });
+                const notMatchingNode = createNode({
+                    name: layerName,
+                    isBaseLayer: true
+                });
 
-                var matchingNode = createNode({name: searchText, isBaseLayer: true});
-                var notMatchingNode = createNode({name: layerName, isBaseLayer: true});
-
-                var matchingResult = layerTreeFilterUtil.isSearchTextInLayerName(
-                    matchingNode,
-                    searchText,
-                    false
-                );
+                const matchingResult =
+                    layerTreeFilterUtil.isSearchTextInLayerName(
+                        matchingNode,
+                        searchText,
+                        false
+                    );
                 expect(matchingResult).to.be(true);
 
-                var notMatchingResult = layerTreeFilterUtil.isSearchTextInLayerName(
-                    notMatchingNode,
-                    searchText,
-                    false
-                );
+                const notMatchingResult =
+                    layerTreeFilterUtil.isSearchTextInLayerName(
+                        notMatchingNode,
+                        searchText,
+                        false
+                    );
 
                 expect(notMatchingResult).to.be(true);
             });
         });
-
     });
 
-    describe('#createLayerTreeFilter', function() {
+    describe('#createLayerTreeFilter', function () {
+        let source;
+        let visibleLayer;
+        let invisibleLayer;
+        let layerGroup;
+        let olMap;
+        let div;
+        let store;
+        const filterId = 'test';
 
-        var source;
-        var visibleLayer;
-        var invisibleLayer;
-        var layerGroup;
-        var olMap;
-        var div;
-        var store;
-        var filterId = 'test';
-
-        var findVisibleLayer = function() {
-            var rec = store.findBy(function(rec) {
+        const findVisibleLayer = function () {
+            const rec = store.findBy(function (rec) {
                 return rec.get('text') === visibleLayer.get('name');
             });
             return rec !== -1;
         };
 
-        var findInvisibleLayer = function() {
-            var rec = store.findBy(function(rec) {
+        const findInvisibleLayer = function () {
+            const rec = store.findBy(function (rec) {
                 return rec.get('text') === invisibleLayer.get('name');
             });
             return rec !== -1;
         };
 
-        var findLayerGroup = function() {
-            var rec = store.findBy(function(rec) {
+        const findLayerGroup = function () {
+            const rec = store.findBy(function (rec) {
                 return rec.get('text') === layerGroup.get('name');
             });
             return rec !== -1;
         };
 
-        beforeEach(function() {
+        beforeEach(function () {
             source = new ol.source.Vector();
             visibleLayer = new ol.layer.Vector({
                 source: source,
@@ -212,34 +225,32 @@ describe('CpsiMapview.util.LayerTreeFilter', function () {
             });
             olMap.getLayerGroup().getLayers().insertAt(0, invisibleLayer);
             olMap.getLayerGroup().getLayers().insertAt(0, visibleLayer);
-
         });
 
-        afterEach(function() {
+        afterEach(function () {
             store.removeFilter(filterId);
             store.removeAll();
         });
 
-        it('finds visibleLayer', function() {
-            var foundVisibleLayer = findVisibleLayer();
+        it('finds visibleLayer', function () {
+            const foundVisibleLayer = findVisibleLayer();
             expect(foundVisibleLayer).to.be(true);
         });
 
-        it('finds invisibleLayer', function() {
-            var foundInvisibleLayer = findInvisibleLayer();
+        it('finds invisibleLayer', function () {
+            const foundInvisibleLayer = findInvisibleLayer();
             expect(foundInvisibleLayer).to.be(true);
-
         });
 
-        it('finds layerGroup', function() {
-            var foundLayerGroup = findLayerGroup();
+        it('finds layerGroup', function () {
+            const foundLayerGroup = findLayerGroup();
             expect(foundLayerGroup).to.be(true);
         });
 
-        it('filters by name', function() {
-            var searchText = visibleLayer.get('name');
+        it('filters by name', function () {
+            const searchText = visibleLayer.get('name');
 
-            var filter = layerTreeFilterUtil.createLayerTreeFilter(
+            const filter = layerTreeFilterUtil.createLayerTreeFilter(
                 filterId,
                 false,
                 searchText,
@@ -247,17 +258,17 @@ describe('CpsiMapview.util.LayerTreeFilter', function () {
             );
             store.addFilter(filter);
 
-            var foundVisibleLayer = findVisibleLayer();
-            var foundInvisibleLayer = findInvisibleLayer();
+            const foundVisibleLayer = findVisibleLayer();
+            const foundInvisibleLayer = findInvisibleLayer();
 
             expect(foundVisibleLayer).to.be(true);
             expect(foundInvisibleLayer).to.be(false);
         });
 
-        it('filters by visibility', function() {
-            var hideInvisibleLayers = true;
+        it('filters by visibility', function () {
+            const hideInvisibleLayers = true;
 
-            var filter = layerTreeFilterUtil.createLayerTreeFilter(
+            const filter = layerTreeFilterUtil.createLayerTreeFilter(
                 filterId,
                 hideInvisibleLayers,
                 '',
@@ -265,18 +276,18 @@ describe('CpsiMapview.util.LayerTreeFilter', function () {
             );
             store.addFilter(filter);
 
-            var foundVisibleLayer = findVisibleLayer();
-            var foundInvisibleLayer = findInvisibleLayer();
+            const foundVisibleLayer = findVisibleLayer();
+            const foundInvisibleLayer = findInvisibleLayer();
 
             expect(foundVisibleLayer).to.be(true);
             expect(foundInvisibleLayer).to.be(false);
         });
 
-        it('filters by visibility and name', function() {
-            var hideInvisibleLayers = true;
-            var searchText = invisibleLayer.get('name');
+        it('filters by visibility and name', function () {
+            const hideInvisibleLayers = true;
+            const searchText = invisibleLayer.get('name');
 
-            var filter = layerTreeFilterUtil.createLayerTreeFilter(
+            const filter = layerTreeFilterUtil.createLayerTreeFilter(
                 filterId,
                 hideInvisibleLayers,
                 searchText,
@@ -284,18 +295,18 @@ describe('CpsiMapview.util.LayerTreeFilter', function () {
             );
             store.addFilter(filter);
 
-            var foundVisibleLayer = findVisibleLayer();
-            var foundInvisibleLayer = findInvisibleLayer();
+            const foundVisibleLayer = findVisibleLayer();
+            const foundInvisibleLayer = findInvisibleLayer();
 
             expect(foundVisibleLayer).to.be(false);
             expect(foundInvisibleLayer).to.be(false);
         });
 
-        it('removes empty folders', function() {
-            var hideInvisibleLayers = true;
-            var searchText = invisibleLayer.get('name');
+        it('removes empty folders', function () {
+            const hideInvisibleLayers = true;
+            const searchText = invisibleLayer.get('name');
 
-            var filter = layerTreeFilterUtil.createLayerTreeFilter(
+            const filter = layerTreeFilterUtil.createLayerTreeFilter(
                 filterId,
                 hideInvisibleLayers,
                 searchText,
@@ -303,10 +314,8 @@ describe('CpsiMapview.util.LayerTreeFilter', function () {
             );
             store.addFilter(filter);
 
-            var foundLayerGroup = findLayerGroup();
+            const foundLayerGroup = findLayerGroup();
             expect(foundLayerGroup).to.be(false);
         });
-
     });
-
 });

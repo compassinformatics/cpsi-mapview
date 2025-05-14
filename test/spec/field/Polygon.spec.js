@@ -3,9 +3,7 @@ Ext.define('CpsiMapview.model.PolygonFeatureExample', {
     mixins: {
         features: 'CpsiMapview.model.FeatureStoreMixin'
     },
-    requires: [
-        'CpsiMapview.field.Polygon'
-    ],
+    requires: ['CpsiMapview.field.Polygon'],
     fields: [
         {
             name: 'id',
@@ -25,15 +23,14 @@ Ext.define('CpsiMapview.model.PolygonFeatureExample', {
 });
 
 describe('CpsiMapview.field.Polygon', function () {
-
-    var model;
-    var fld;
-    var store;
-    var source;
+    let model;
+    let fld;
+    let store;
+    let source;
 
     beforeEach(function () {
-
-        var data = '{ "type": "Feature", "properties": null, "geometry":' +
+        const data =
+            '{ "type": "Feature", "properties": null, "geometry":' +
             '{ "type": "Polygon", "coordinates": [[[0,0], [0,1], [1,1], [1,0], [0,0]]] }}';
 
         model = Ext.create('CpsiMapview.model.PolygonFeatureExample', {
@@ -56,35 +53,57 @@ describe('CpsiMapview.field.Polygon', function () {
     });
 
     it('can get geometry', function () {
-        var gj = fld.getPolygonGeometry(store.layer);
-        expect(gj).to.eql({ type: 'Polygon', coordinates: [[[0, 0], [0, 1], [1, 1], [1, 0], [0, 0]]] });
+        const gj = fld.getPolygonGeometry(store.layer);
+        expect(gj).to.eql({
+            type: 'Polygon',
+            coordinates: [
+                [
+                    [0, 0],
+                    [0, 1],
+                    [1, 1],
+                    [1, 0],
+                    [0, 0]
+                ]
+            ]
+        });
     });
 
     it('can serialize', function () {
-        var gj = fld.serialize(null, model);
-        expect(gj).to.eql({ type: 'Polygon', coordinates: [[[0, 0], [0, 1], [1, 1], [1, 0], [0, 0]]] });
+        const gj = fld.serialize(null, model);
+        expect(gj).to.eql({
+            type: 'Polygon',
+            coordinates: [
+                [
+                    [0, 0],
+                    [0, 1],
+                    [1, 1],
+                    [1, 0],
+                    [0, 0]
+                ]
+            ]
+        });
     });
 
     it('can serialize circle', function () {
-
         // replace the polygon geometry with a circle geometry
-        var circle = new ol.geom.Circle([0, 0], 1);
-        var feat = source.getFeatures()[0];
+        const circle = new ol.geom.Circle([0, 0], 1);
+        const feat = source.getFeatures()[0];
         feat.setGeometry(circle);
 
-        var gj = fld.serialize(null, model);
+        const gj = fld.serialize(null, model);
         expect(gj.coordinates[0].length).to.be(33); // ol makes an approximation of a circle using lots of coordinates
     });
 
     it('can create style', function () {
-        var style = fld.createStyle();
+        const style = fld.createStyle();
         expect(style.getStroke().getColor()).to.be('#3399CC');
-        expect(style.getImage().getFill().getColor()).to.be('rgba(255,255,255,0.4)');
+        expect(style.getImage().getFill().getColor()).to.be(
+            'rgba(255,255,255,0.4)'
+        );
     });
 
     it('can create select style', function () {
-        var style = fld.createSelectStyle();
+        const style = fld.createSelectStyle();
         expect(style).to.be(null);
     });
-
 });
