@@ -6,9 +6,7 @@
 Ext.define('CpsiMapview.view.menuitem.LayerRefresh', {
     extend: 'Ext.menu.Item',
     xtype: 'cmv_menuitem_layerrefresh',
-    requires: [
-        'CpsiMapview.util.Layer'
-    ],
+    requires: ['CpsiMapview.util.Layer'],
 
     /**
      * The connected layer for this item.
@@ -27,8 +25,8 @@ Ext.define('CpsiMapview.view.menuitem.LayerRefresh', {
      * @private
      */
     initComponent: function () {
-        var me = this;
-        var allowRefresh = false;
+        const me = this;
+        let allowRefresh = false;
 
         if (me.layer) {
             allowRefresh = me.layer.get('refreshLayerOption');
@@ -46,9 +44,9 @@ Ext.define('CpsiMapview.view.menuitem.LayerRefresh', {
      * Forces redraw of the connected layer.
      */
     handlerFunc: function () {
-        var me = this;
-        var layer = me.layer;
-        var layerUtil = CpsiMapview.util.Layer;
+        const me = this;
+        const layer = me.layer;
+        const layerUtil = CpsiMapview.util.Layer;
         layerUtil.layerRefresh(layer);
     }
 });

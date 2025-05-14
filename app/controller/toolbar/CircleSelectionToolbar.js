@@ -12,8 +12,8 @@ Ext.define('CpsiMapview.controller.toolbar.CircleSelectionToolbar', {
      * the toolbar
      */
     handleApply: function () {
-        var me = this;
-        var feat = me.getView().feature;
+        const me = this;
+        const feat = me.getView().feature;
         me.fireEvent('circleSelectApply', feat);
     },
 
@@ -23,7 +23,7 @@ Ext.define('CpsiMapview.controller.toolbar.CircleSelectionToolbar', {
      * the toolbar
      */
     handleCancel: function () {
-        var me = this;
+        const me = this;
         me.fireEvent('circleSelectCancel');
     },
 
@@ -32,23 +32,22 @@ Ext.define('CpsiMapview.controller.toolbar.CircleSelectionToolbar', {
      * handleApply when the Enter key is pressed
      */
     handleEnterKey: function (fld, e) {
-        var me = this;
+        const me = this;
 
         if (e.getCharCode() == Ext.EventObject.ENTER) {
             me.handleApply();
         }
-
     },
 
     /**
      * Gets the radius of the ol circle feature.
      */
     getCurrentRadius: function () {
-        var me = this;
-        var feat = me.getView().feature;
-        var radius;
+        const me = this;
+        const feat = me.getView().feature;
+        let radius;
         if (feat != null) {
-            var geom = feat.getGeometry();
+            const geom = feat.getGeometry();
             if (geom !== undefined) {
                 // geom.getRadius actually is the diameter
                 // therefore we have to divide by 2
@@ -65,10 +64,10 @@ Ext.define('CpsiMapview.controller.toolbar.CircleSelectionToolbar', {
      * @param {float} newVal new value of the numberField
      */
     onRadiusChange: function (numberField, newVal) {
-        var me = this;
-        var feat = me.getView().feature;
+        const me = this;
+        const feat = me.getView().feature;
         if (feat != null) {
-            var geom = me.getView().feature.getGeometry();
+            const geom = me.getView().feature.getGeometry();
             if (geom !== undefined) {
                 // geom.setRadius actually is the diameter
                 // therefore we have to multiply by 2
@@ -81,15 +80,17 @@ Ext.define('CpsiMapview.controller.toolbar.CircleSelectionToolbar', {
      * Sets the unit to the unit of the current projection
      */
     setCurrentUnit: function () {
-        var me = this;
-        var cmp = BasiGX.util.Map.getMapComponent();
+        const me = this;
+        const cmp = BasiGX.util.Map.getMapComponent();
 
         if (cmp) {
-            var map = cmp.map;
-            var unit = map.getView().getProjection().getUnits();
+            const map = cmp.map;
+            const unit = map.getView().getProjection().getUnits();
             me.getViewModel().set('unit', unit);
         } else {
-            Ext.log.warn('No map component found for the CircleSelectionToolbar');
+            Ext.log.warn(
+                'No map component found for the CircleSelectionToolbar'
+            );
         }
     },
 
@@ -98,10 +99,9 @@ Ext.define('CpsiMapview.controller.toolbar.CircleSelectionToolbar', {
      * to the current radius of the ol circle feature
      */
     init: function () {
-        var me = this;
-        var radius = me.getCurrentRadius();
+        const me = this;
+        const radius = me.getCurrentRadius();
         me.getViewModel().set('radius', radius);
         me.setCurrentUnit();
     }
-
 });

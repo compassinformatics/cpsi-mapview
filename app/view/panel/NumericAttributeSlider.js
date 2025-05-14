@@ -41,33 +41,43 @@ Ext.define('CpsiMapview.view.panel.NumericAttributeSlider', {
      *
      * @param {object} config The configuration object.
      */
-    constructor: function(config) {
-        var cfg = config || {};
-        var cfgEnabled = cfg.enabled;
-        var cfgDisabled = cfg.disabled;
+    constructor: function (config) {
+        const cfg = config || {};
+        const cfgEnabled = cfg.enabled;
+        const cfgDisabled = cfg.disabled;
         delete cfg.enabled;
         delete cfg.disabled;
 
-        var hasPassedCfgEnabled = Ext.isDefined(cfgEnabled);
-        var hasPassedCfgDisabled = Ext.isDefined(cfgDisabled);
+        const hasPassedCfgEnabled = Ext.isDefined(cfgEnabled);
+        const hasPassedCfgDisabled = Ext.isDefined(cfgDisabled);
 
-        var finalEnabled = cfgEnabled; // either undefined or user defined
+        let finalEnabled = cfgEnabled; // either undefined or user defined
 
         if (hasPassedCfgEnabled && hasPassedCfgDisabled) {
             // user passed both, ensure they make sense or warn
-            if (cfgEnabled !== !cfgDisabled) { // semantically not same
-                Ext.Logger.warn('Conflicting disabled/enabled configs found. '
-                    + 'NumericAttributeSlider will be using "enabled:'
-                    + finalEnabled + '".');
+            if (cfgEnabled !== !cfgDisabled) {
+                // semantically not same
+                Ext.Logger.warn(
+                    'Conflicting disabled/enabled configs found. ' +
+                        'NumericAttributeSlider will be using "enabled:' +
+                        finalEnabled +
+                        '".'
+                );
             }
         } else if (hasPassedCfgDisabled) {
             // user passed only disabled, warn and switch to enabled
             finalEnabled = !cfgDisabled;
-            Ext.Logger.info('Config option "disabled=' + cfgDisabled + '" passed,'
-                + ' transforming to option "enabled=' + finalEnabled + '".');
+            Ext.Logger.info(
+                'Config option "disabled=' +
+                    cfgDisabled +
+                    '" passed,' +
+                    ' transforming to option "enabled=' +
+                    finalEnabled +
+                    '".'
+            );
         } else if (!hasPassedCfgEnabled) {
             // reinitiate the default of this class
-            var clazz = CpsiMapview.view.panel.NumericAttributeSlider;
+            const clazz = CpsiMapview.view.panel.NumericAttributeSlider;
             finalEnabled = clazz.prototype.config.enabled;
         }
 
@@ -80,35 +90,37 @@ Ext.define('CpsiMapview.view.panel.NumericAttributeSlider', {
      * Initializes the numeric attribute slider.
      */
     initComponent: function () {
-        var me = this;
-        var values = [me.getCurrLowerValue(), me.getCurrUpperValue()];
-        me.items = [{
-            xtype: 'multislider',
-            name: 'slider',
-            labelAlign: 'right',
-            listeners: {
-                afterrender: 'initSlider',
-                changecomplete: 'applySliderEffects'
+        const me = this;
+        const values = [me.getCurrLowerValue(), me.getCurrUpperValue()];
+        me.items = [
+            {
+                xtype: 'multislider',
+                name: 'slider',
+                labelAlign: 'right',
+                listeners: {
+                    afterrender: 'initSlider',
+                    changecomplete: 'applySliderEffects'
+                },
+                constrainThumbs: false,
+                tipText: 'getTipText',
+                fieldLabel: me.getSliderLabel(),
+                width: 200,
+                values: values,
+                increment: me.getIncrement(),
+                minValue: me.getMinValue(),
+                maxValue: me.getMaxValue(),
+                disabled: !me.getEnabled()
             },
-            constrainThumbs: false,
-            tipText: 'getTipText',
-            fieldLabel: me.getSliderLabel(),
-            width: 200,
-            values: values,
-            increment: me.getIncrement(),
-            minValue: me.getMinValue(),
-            maxValue: me.getMaxValue(),
-            disabled: !me.getEnabled()
-        },
-        {
-            xtype: 'checkbox',
-            name: 'active',
-            boxLabel: me.getCheckboxLabel(),
-            checked: me.getEnabled(),
-            listeners: {
-                change: 'onCheckChange'
+            {
+                xtype: 'checkbox',
+                name: 'active',
+                boxLabel: me.getCheckboxLabel(),
+                checked: me.getEnabled(),
+                listeners: {
+                    change: 'onCheckChange'
+                }
             }
-        }];
+        ];
 
         me.callParent();
     },
@@ -120,14 +132,13 @@ Ext.define('CpsiMapview.view.panel.NumericAttributeSlider', {
      *
      * @param {boolean} newDisabled
      */
-    setDisabled: function(newDisabled) {
+    setDisabled: function (newDisabled) {
         // override the original method and
         // fast forward to checkbox check / uncheck
-        var newEnabled = !newDisabled;
+        const newEnabled = !newDisabled;
         this.setEnabled(newEnabled);
-        var cb = this.down('checkbox[name="active"]');
+        const cb = this.down('checkbox[name="active"]');
         cb.setValue(newEnabled);
         return this; // the original method is chainable
     }
-
 });

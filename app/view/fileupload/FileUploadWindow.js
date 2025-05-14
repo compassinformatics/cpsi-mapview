@@ -7,9 +7,7 @@
 Ext.define('CpsiMapview.view.fileupload.FileUploadWindow', {
     extend: 'Ext.window.Window',
     xtype: 'cmv_fileuploadwindow',
-    requires: [
-        'CpsiMapview.view.fileupload.FileUploadWindowController'
-    ],
+    requires: ['CpsiMapview.view.fileupload.FileUploadWindowController'],
     modal: true,
     layout: 'anchor',
     width: 500,

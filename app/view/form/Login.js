@@ -2,9 +2,7 @@ Ext.define('CpsiMapview.view.form.Login', {
     extend: 'Ext.window.Window',
     xtype: 'cmv_login_form',
 
-    requires: [
-        'CpsiMapview.controller.form.Login'
-    ],
+    requires: ['CpsiMapview.controller.form.Login'],
 
     viewModel: {
         serviceUrl: './WebServices/authorization/authenticate',
@@ -23,29 +21,36 @@ Ext.define('CpsiMapview.view.form.Login', {
     items: {
         xtype: 'form',
         border: false,
-        items: [{
-            xtype: 'textfield',
-            name: 'username',
-            fieldLabel: 'Username',
-            allowBlank: false
-        }, {
-            xtype: 'textfield',
-            name: 'password',
-            inputType: 'password',
-            fieldLabel: 'Password',
-            allowBlank: false,
-            listeners: {
-                specialkey: 'onSpecialKey'
+        items: [
+            {
+                xtype: 'textfield',
+                name: 'username',
+                fieldLabel: 'Username',
+                allowBlank: false
+            },
+            {
+                xtype: 'textfield',
+                name: 'password',
+                inputType: 'password',
+                fieldLabel: 'Password',
+                allowBlank: false,
+                listeners: {
+                    specialkey: 'onSpecialKey'
+                }
             }
-        }],
-        buttons: [{
-            xtype: 'label',
-            html: '<a href="/ManagementTool/Account/ForgotPassword" target="_blank">Forgotten Password?</a>'
-        }, '->', {
-            text: 'Login',
-            listeners: {
-                click: 'onLoginClick'
+        ],
+        buttons: [
+            {
+                xtype: 'label',
+                html: '<a href="/ManagementTool/Account/ForgotPassword" target="_blank">Forgotten Password?</a>'
+            },
+            '->',
+            {
+                text: 'Login',
+                listeners: {
+                    click: 'onLoginClick'
+                }
             }
-        }]
+        ]
     }
 });

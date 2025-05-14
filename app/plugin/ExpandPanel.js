@@ -24,8 +24,8 @@ Ext.define('CpsiMapview.plugin.ExpandPanel', {
     positionInParentPanel: 0,
 
     init: function () {
-        var me = this;
-        var cmp = me.getCmp();
+        const me = this;
+        const cmp = me.getCmp();
 
         me.maxTool = Ext.create('Ext.panel.Tool', {
             type: 'maximize',
@@ -43,22 +43,25 @@ Ext.define('CpsiMapview.plugin.ExpandPanel', {
      * Creates a maximized window containing the panel.
      */
     expand: function () {
-        var me = this;
-        var cmp = me.getCmp();
+        const me = this;
+        const cmp = me.getCmp();
 
         if (me.parentPanel === null) {
             me.parentPanel = cmp.up();
         }
 
         if (!me.parentPanel || !me.parentPanel.isXType('panel')) {
-            throw new Error('the property parentPanel has to be of xtype `panel`');
+            throw new Error(
+                'the property parentPanel has to be of xtype `panel`'
+            );
         }
 
         cmp.fireEvent('beforeexpand', cmp);
         me.parentPanel.fireEvent('beforeexpand', cmp);
 
-        var index = me.parentPanel.items.items.indexOf(cmp);
-        me.positionInParentPanel = index > -1 ? index : me.positionInParentPanel;
+        const index = me.parentPanel.items.items.indexOf(cmp);
+        me.positionInParentPanel =
+            index > -1 ? index : me.positionInParentPanel;
 
         me.maxedWin = Ext.create('Ext.window.Window', {
             maximized: true,
@@ -72,9 +75,7 @@ Ext.define('CpsiMapview.plugin.ExpandPanel', {
                 }
             ],
 
-            items: [
-                cmp
-            ]
+            items: [cmp]
         });
 
         me.maxedWin.show();
@@ -89,8 +90,8 @@ Ext.define('CpsiMapview.plugin.ExpandPanel', {
      * Reinserts the maximized panel it its original parent.
      */
     restore: function () {
-        var me = this;
-        var cmp = this.getCmp();
+        const me = this;
+        const cmp = this.getCmp();
 
         me.parentPanel.insert(me.positionInParentPanel, cmp);
         me.maxTool.show();
@@ -101,7 +102,5 @@ Ext.define('CpsiMapview.plugin.ExpandPanel', {
         setTimeout(function () {
             me.maxedWin.close();
         }, 0);
-
-
     }
 });

@@ -23,29 +23,33 @@ Ext.define('CpsiMapview.view.main.Main', {
 
     layout: 'border',
 
-    items: [{
-        xtype: 'cmv_map',
-        region: 'center'
-    }, {
-        title: 'Tools',
-        region: 'west',
-        width: 300,
-        collapsible: true,
-        resizable: true,
-        layout: {
-            type: 'vbox',
-            align: 'stretch'
+    items: [
+        {
+            xtype: 'cmv_map',
+            region: 'center'
         },
-        items: [
-            {
-                xtype: 'cmv_layertreefilter'
+        {
+            title: 'Tools',
+            region: 'west',
+            width: 300,
+            collapsible: true,
+            resizable: true,
+            layout: {
+                type: 'vbox',
+                align: 'stretch'
             },
-            {
-                xtype: 'cmv_layertree',
-                structureMode: 'BASELAYER_OVERLAY'
-            }
-        ]
-    }, {
-        xtype: 'cmv_header'
-    }]
+            items: [
+                {
+                    xtype: 'cmv_layertreefilter'
+                },
+                {
+                    xtype: 'cmv_layertree',
+                    structureMode: 'BASELAYER_OVERLAY'
+                }
+            ]
+        },
+        {
+            xtype: 'cmv_header'
+        }
+    ]
 });

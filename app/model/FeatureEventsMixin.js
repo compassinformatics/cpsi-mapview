@@ -40,28 +40,35 @@ Ext.define('CpsiMapview.model.FeatureEventsMixin', {
      * Note this will also be fired when a model is successfully deleted
      * */
     onModelSaved: function () {
-        var me = this;
-        var layerUtil = CpsiMapview.util.Layer;
+        const me = this;
+        const layerUtil = CpsiMapview.util.Layer;
 
         // update associated layers
         Ext.each(me.syncLayerKeys, function (k) {
-            var layers = BasiGX.util.Layer.getLayersBy('layerKey', k);
+            const layers = BasiGX.util.Layer.getLayersBy('layerKey', k);
             if (layers.length > 0) {
-                var layer = layers[0];
+                const layer = layers[0];
                 layerUtil.layerRefresh(layer);
             } else {
                 //<debug>
                 // if a switch layer is used then it may not yet have been created
                 // so we check for its twin layer
-                var switchLayerFound = false;
-                var type = k.endsWith('_WMS') ? '_WMS' : '_WFS';
-                var altType = k.endsWith('_WMS') ? '_WFS' : '_WMS';
-                var altLayerKey = k.replace(type, altType);
+                let switchLayerFound = false;
+                const type = k.endsWith('_WMS') ? '_WMS' : '_WFS';
+                const altType = k.endsWith('_WMS') ? '_WFS' : '_WMS';
+                const altLayerKey = k.replace(type, altType);
 
-                switchLayerFound = !Ext.isEmpty(BasiGX.util.Layer.getLayersBy('layerKey', altLayerKey));
+                switchLayerFound = !Ext.isEmpty(
+                    BasiGX.util.Layer.getLayersBy('layerKey', altLayerKey)
+                );
 
                 if (switchLayerFound === false) {
-                    Ext.log.error('layerKey "' + k + '" in syncLayerKeys invalid for ' + me.$className);
+                    Ext.log.error(
+                        'layerKey "' +
+                            k +
+                            '" in syncLayerKeys invalid for ' +
+                            me.$className
+                    );
                 }
                 //</debug>
             }
@@ -69,7 +76,7 @@ Ext.define('CpsiMapview.model.FeatureEventsMixin', {
 
         // update associated WFS stores (grid stores)
         Ext.each(me.syncStoreIds, function (k) {
-            var store = Ext.data.StoreManager.lookup(k);
+            const store = Ext.data.StoreManager.lookup(k);
             if (store) {
                 store.reload();
             } else {
@@ -77,8 +84,12 @@ Ext.define('CpsiMapview.model.FeatureEventsMixin', {
                 // store may not be found if it has not yet been created
                 // so check if it can be created by the supplied alias
                 if (!Ext.ClassManager.getByAlias('store.' + k)) {
-                    Ext.log.error('Store alias "' + k + '" in syncStoreIds not found for '
-                        + me.$className);
+                    Ext.log.error(
+                        'Store alias "' +
+                            k +
+                            '" in syncStoreIds not found for ' +
+                            me.$className
+                    );
                 }
                 //</debug>
             }
@@ -91,11 +102,15 @@ Ext.define('CpsiMapview.model.FeatureEventsMixin', {
      * Add the mixin `onModelSaved` function to any save success callbacks
      * */
     onSave: function (options) {
-        var me = this;
+        const me = this;
 
         if (options.success) {
             // last parameter sets the scope for the additional function
-            options.success = Ext.Function.createSequence(options.success, me.onModelSaved, me);
+            options.success = Ext.Function.createSequence(
+                options.success,
+                me.onModelSaved,
+                me
+            );
         } else {
             options.success = me.onModelSaved;
         }

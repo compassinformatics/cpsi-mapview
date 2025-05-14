@@ -20,7 +20,8 @@ Ext.define('CpsiMapview.view.toolbar.MapFooter', {
         },
         {
             xtype: 'basigx-combo-scale'
-        }, {
+        },
+        {
             xtype: 'basigx-panel-coordinatemouseposition',
             showMarker: true,
             markerStyle: CpsiMapview.util.Style.createRedPoiMarker(),
@@ -46,7 +47,8 @@ Ext.define('CpsiMapview.view.toolbar.MapFooter', {
             increment: 10,
             currLowerValue: 50,
             currUpperValue: 100
-        }, '->',
+        },
+        '->',
         {
             xtype: 'cmv_login_button'
         }

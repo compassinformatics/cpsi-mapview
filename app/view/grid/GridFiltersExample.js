@@ -2,8 +2,7 @@
  * Example classes for a CpsiMapview.view.grid.Grid grid
  */
 
-
-var storeConfig = {
+const storeConfig = {
     type: 'array',
     fields: ['name'],
     data: [
@@ -40,7 +39,6 @@ var storeConfig = {
         ['Wicklow']
     ]
 };
-
 
 // define the model
 Ext.define('CpsiMapview.model.GridFiltersExample', {
@@ -84,10 +82,12 @@ Ext.define('CpsiMapview.store.GridFiltersExample', {
         displayInLayerSwitcher: false,
         name: 'GridFiltersExampleLayer'
     },
-    sorters: [{
-        property: 'OBJECTID',
-        direction: 'ASC'
-    }]
+    sorters: [
+        {
+            property: 'OBJECTID',
+            direction: 'ASC'
+        }
+    ]
 });
 
 // create the view model
@@ -98,7 +98,8 @@ Ext.define('CpsiMapview.view.grid.GridFiltersExampleModel', {
         wmsLayerKey: 'LA_SITES',
         gridStoreType: 'GridFiltersExample',
         gridLayerName: 'GridFiltersExampleLayer', // TODO this is duplicated in layerOptions above
-        helpUrl: 'https://github.com/compassinformatics/cpsi-mapview/blob/master/app/view/grid/ExampleGrid.js'
+        helpUrl:
+            'https://github.com/compassinformatics/cpsi-mapview/blob/master/app/view/grid/ExampleGrid.js'
     }
 });
 

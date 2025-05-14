@@ -1,4 +1,4 @@
-﻿/**
+/**
  * When using the expander plugin the maximised window has sometimes been destroyed when this function is called
  * See https://forum.sencha.com/forum/showthread.php?469880-Cannot-read-property-viewModel-of-null for issue and override
  * Bug ID EXTJS-27586
@@ -6,8 +6,9 @@
  */
 Ext.override(Ext.Base, {
     getConfig: function (name, peek, ifInitialized) {
-        var me = this,
-            ret, cfg, propName;
+        const me = this;
+
+        let ret, cfg, propName;
         if (name) {
             cfg = me.self.$config.configs[name];
             if (cfg) {
@@ -18,12 +19,18 @@ Ext.override(Ext.Base, {
                 // This form is used by Bindable#updatePublishes to initially publish
                 // the properties it's being asked make publishable.
                 if (ifInitialized) {
-                    ret = Object.prototype.hasOwnProperty.call(propName) ? me[propName] : null;
+                    ret = Object.prototype.hasOwnProperty.call(propName)
+                        ? me[propName]
+                        : null;
                 } else if (peek) {
                     // Attempt to return the instantiated property on this instance first.
                     // Only return the config object if it has not yet been pulled through
                     // the applier into the instance.
-                    ret = Object.prototype.hasOwnProperty.call(propName) ? me[propName] : (me.config == null ? null : me.config[name]);
+                    ret = Object.prototype.hasOwnProperty.call(propName)
+                        ? me[propName]
+                        : me.config == null
+                          ? null
+                          : me.config[name];
                 } else {
                     ret = me[cfg.names.get]();
                 }

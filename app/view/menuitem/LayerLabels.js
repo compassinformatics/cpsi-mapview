@@ -7,9 +7,7 @@
 Ext.define('CpsiMapview.view.menuitem.LayerLabels', {
     extend: 'Ext.menu.CheckItem',
     xtype: 'cmv_menuitem_layerlabels',
-    requires: [
-        'CpsiMapview.util.WmsFilter'
-    ],
+    requires: ['CpsiMapview.util.WmsFilter'],
 
     /**
      * The connected layer for this item.
@@ -42,15 +40,16 @@ Ext.define('CpsiMapview.view.menuitem.LayerLabels', {
      * @private
      */
     initComponent: function () {
-        var me = this;
+        const me = this;
         if (me.layer && !(me.layer instanceof ol.layer.Group)) {
-            me.clientSideStyle = (
-                me.layer.getSource() instanceof ol.source.VectorTile
-                || me.layer.getSource() instanceof ol.source.Vector
-            );
+            me.clientSideStyle =
+                me.layer.getSource() instanceof ol.source.VectorTile ||
+                me.layer.getSource() instanceof ol.source.Vector;
             // try to detect the 'labelClassName' property of a WMS layer
-            if (me.layer.getSource() instanceof ol.source.TileWMS ||
-                me.layer.getSource() instanceof ol.source.ImageWMS) {
+            if (
+                me.layer.getSource() instanceof ol.source.TileWMS ||
+                me.layer.getSource() instanceof ol.source.ImageWMS
+            ) {
                 me.labelClassName = me.layer.get('labelClassName');
             }
         }
@@ -59,8 +58,8 @@ Ext.define('CpsiMapview.view.menuitem.LayerLabels', {
         if (me.clientSideStyle) {
             // for vector layers display the labels feature if
             // at least one style has a labelRule
-            var hideLabelsCheckbox = true;
-            var styles = me.layer.get('styles');
+            let hideLabelsCheckbox = true;
+            const styles = me.layer.get('styles');
             if (Ext.isEmpty(styles) === false) {
                 Ext.Array.each(styles, function (style) {
                     if (style.labelRule) {
@@ -85,7 +84,7 @@ Ext.define('CpsiMapview.view.menuitem.LayerLabels', {
      * @param  {Ext.menu.CheckItem} checkItem The menu item itself
      */
     onAfterrender: function (checkItem) {
-        var me = this;
+        const me = this;
         if (me.clientSideStyle) {
             me.onAfterrenderClientSide(checkItem);
         } else {
@@ -101,11 +100,11 @@ Ext.define('CpsiMapview.view.menuitem.LayerLabels', {
      * @param  {Ext.menu.CheckItem} checkItem The menu item itself
      */
     onAfterrenderClientSide: function (checkItem) {
-        var me = this;
-        var activatedStyle = me.layer.get('activatedStyle');
+        const me = this;
+        const activatedStyle = me.layer.get('activatedStyle');
 
-        var styles = me.layer.get('styles');
-        var selectedStyle = styles.find(function (style) {
+        const styles = me.layer.get('styles');
+        const selectedStyle = styles.find(function (style) {
             return style.name === activatedStyle;
         });
 
@@ -124,18 +123,21 @@ Ext.define('CpsiMapview.view.menuitem.LayerLabels', {
      * @param  {Ext.menu.CheckItem} checkItem The menu item itself
      */
     onAfterrenderServerSide: function (checkItem) {
-        var me = this;
+        const me = this;
         if (Ext.isEmpty(me.labelClassName)) {
             return;
         }
-        var wmsSource = me.layer.getSource();
-        var wmsParams = wmsSource.getParams();
+        const wmsSource = me.layer.getSource();
+        const wmsParams = wmsSource.getParams();
 
         // set the checkbox value, but no need to call onCheckChange again
-        var suppressEvents = true;
+        const suppressEvents = true;
 
-        if (wmsParams && !Ext.isEmpty(wmsParams.STYLES) &&
-            wmsParams.STYLES.indexOf(me.labelClassName) !== -1) {
+        if (
+            wmsParams &&
+            !Ext.isEmpty(wmsParams.STYLES) &&
+            wmsParams.STYLES.indexOf(me.labelClassName) !== -1
+        ) {
             checkItem.setChecked(true, suppressEvents);
         } else {
             checkItem.setChecked(false, suppressEvents);
@@ -149,7 +151,7 @@ Ext.define('CpsiMapview.view.menuitem.LayerLabels', {
      * @param  {Boolean}            checked   Current checked state
      */
     onCheckChange: function (checkItem, checked) {
-        var me = this;
+        const me = this;
         if (me.clientSideStyle) {
             me.addLabelStyle(checked);
         } else {
@@ -164,10 +166,10 @@ Ext.define('CpsiMapview.view.menuitem.LayerLabels', {
      * @param  {Boolean} addLabel Add or remove the label layer
      */
     addLabelStyle: function (addLabel) {
-        var me = this;
-        var layer = me.layer;
+        const me = this;
+        const layer = me.layer;
 
-        var originalValue = layer.get('labelsActive');
+        const originalValue = layer.get('labelsActive');
 
         // reload the SLD if the label values are changed
         if (originalValue !== addLabel) {
@@ -183,15 +185,15 @@ Ext.define('CpsiMapview.view.menuitem.LayerLabels', {
      * @param  {Boolean} addLabel Add or remove the label layer
      */
     addStyleParameters: function (addLabel) {
-        var me = this;
-        var layer = me.layer;
-        var labelClassName = me.labelClassName;
-        var wmsSource = layer.getSource();
-        var wmsParams = wmsSource.getParams();
-        var layers = wmsParams.LAYERS || [];
-        var styles = wmsParams.STYLES || '';
-        var layerList = Ext.isArray(layers) ? layers : layers.split(',');
-        var stylesList = Ext.isArray(styles) ? styles : styles.split(',');
+        const me = this;
+        const layer = me.layer;
+        const labelClassName = me.labelClassName;
+        const wmsSource = layer.getSource();
+        const wmsParams = wmsSource.getParams();
+        const layers = wmsParams.LAYERS || [];
+        const styles = wmsParams.STYLES || '';
+        let layerList = Ext.isArray(layers) ? layers : layers.split(',');
+        const stylesList = Ext.isArray(styles) ? styles : styles.split(',');
 
         if (addLabel) {
             if (layerList.length === 1) {
@@ -217,15 +219,16 @@ Ext.define('CpsiMapview.view.menuitem.LayerLabels', {
 
         // once the LAYERS parameter has been updated
         // ensure there is a filter for every layer listed in the WMS request (required by MapServer)
-        var wmsFilterUtil = CpsiMapview.util.WmsFilter;
-        var wmsFilterString = wmsFilterUtil.getWmsFilterString(wmsSource.getParams());
+        const wmsFilterUtil = CpsiMapview.util.WmsFilter;
+        const wmsFilterString = wmsFilterUtil.getWmsFilterString(
+            wmsSource.getParams()
+        );
 
-        var newParams = {
+        const newParams = {
             FILTER: wmsFilterString,
             STYLES: stylesList.join(',')
         };
 
         wmsSource.updateParams(newParams);
-
     }
 });

@@ -14,7 +14,7 @@
 Ext.override(Ext.form.field.Base, {
     bindOn: 'both',
     publishValue: function () {
-        var me = this;
+        const me = this;
 
         if (me.rendered) {
             switch (me.bindOn) {

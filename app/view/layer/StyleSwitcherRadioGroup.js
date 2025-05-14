@@ -41,15 +41,15 @@ Ext.define('CpsiMapview.view.layer.StyleSwitcherRadioGroup', {
      * @private
      */
     initComponent: function () {
-        var me = this;
-        var radioButtons = [];
-        var layerStyles = me.layer.get('styles');
-        var salt = Math.random();
+        const me = this;
+        const radioButtons = [];
+        const layerStyles = me.layer.get('styles');
+        const salt = Math.random();
 
         // create a 'radiofield' for each style connected to the layer
         Ext.each(layerStyles, function (layerStyle) {
-            var layerTitle = layerStyle['title'];
-            var layerName = layerStyle['name'];
+            const layerTitle = layerStyle['title'];
+            const layerName = layerStyle['name'];
 
             radioButtons.push({
                 name: 'sldstyle' + salt,
@@ -61,8 +61,7 @@ Ext.define('CpsiMapview.view.layer.StyleSwitcherRadioGroup', {
                     scope: me
                 }
             });
-        }
-        );
+        });
 
         me.items = radioButtons;
 
@@ -82,8 +81,11 @@ Ext.define('CpsiMapview.view.layer.StyleSwitcherRadioGroup', {
      * @return {Boolean}         Checked state
      */
     getCheckedState: function (sldStyle) {
-        var me = this;
-        if (me.layer.get('activatedStyle') && me.layer.get('activatedStyle') === sldStyle) {
+        const me = this;
+        if (
+            me.layer.get('activatedStyle') &&
+            me.layer.get('activatedStyle') === sldStyle
+        ) {
             return true;
         } else {
             return false;
@@ -99,28 +101,27 @@ Ext.define('CpsiMapview.view.layer.StyleSwitcherRadioGroup', {
      * @param  {Boolean} newVal   [description] The new value of the changed radio button
      */
     onStyleChange: function (radioBtn, newVal) {
-        var me = this;
-        var styleUtil = CpsiMapview.util.Style;
+        const me = this;
+        const styleUtil = CpsiMapview.util.Style;
 
         if (newVal === true) {
-            var layer = me.layer;
-            var newStyle = radioBtn.inputValue;
-            var layerTreePanel = Ext.ComponentQuery.query('cmv_layertree')[0];
+            const layer = me.layer;
+            let newStyle = radioBtn.inputValue;
+            const layerTreePanel = Ext.ComponentQuery.query('cmv_layertree')[0];
 
             // preserve active style as lookup
             layer.set('activatedStyle', newStyle);
 
             if (layer.get('isWms')) {
-
                 // check if a label STYLES parameter was added --> keep this
                 // the STYLES value (SLD) for the labels
-                var labelClassName = layer.get('labelClassName');
+                const labelClassName = layer.get('labelClassName');
                 if (layer.get('labelsActive') === true) {
                     newStyle += ',' + labelClassName;
                 }
 
                 // apply new style parameter and reload layer
-                var newParams = {
+                const newParams = {
                     STYLES: newStyle
                 };
                 layer.getSource().updateParams(newParams);
@@ -129,7 +130,6 @@ Ext.define('CpsiMapview.view.layer.StyleSwitcherRadioGroup', {
                     // force update of corresponding layer node UI (e.g. legend)
                     layerTreePanel.updateLayerNodeUi(layer);
                 }
-
             } else if (layer.get('isWfs') || layer.get('isVt')) {
                 // load and parse SLD and apply it to layer
                 LayerFactory.loadSld(layer);
@@ -138,13 +138,20 @@ Ext.define('CpsiMapview.view.layer.StyleSwitcherRadioGroup', {
                     // force update of corresponding layer node UI (e.g. legend)
                     layerTreePanel.updateLayerNodeUi(layer);
                 }
-
             } else {
-                Ext.Logger.info('Layer type not supported in StyleSwitcherRadioGroup');
+                Ext.Logger.info(
+                    'Layer type not supported in StyleSwitcherRadioGroup'
+                );
             }
 
-            var styleTitle = styleUtil.getLayerStyleTitle(newStyle, layer);
-            me.fireEvent('cmv-layer-style-change', me, newStyle, styleTitle, layer);
+            const styleTitle = styleUtil.getLayerStyleTitle(newStyle, layer);
+            me.fireEvent(
+                'cmv-layer-style-change',
+                me,
+                newStyle,
+                styleTitle,
+                layer
+            );
         }
     }
 });

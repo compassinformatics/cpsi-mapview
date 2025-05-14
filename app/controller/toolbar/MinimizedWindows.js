@@ -11,7 +11,7 @@ Ext.define('CpsiMapview.controller.toolbar.MinimizedWindows', {
      * @param {CpsiMapview.view.window.MinimizableWindow} minimizedWindow window to add
      */
     onAddMinimizedWindow: function (minimizedWindow) {
-        var me = this;
+        const me = this;
         me.addButtonForWindow(minimizedWindow);
         me.getView().setHidden(false);
     },
@@ -21,11 +21,11 @@ Ext.define('CpsiMapview.controller.toolbar.MinimizedWindows', {
      * @param {CpsiMapview.view.window.MinimizableWindow} minimizedWindow window to represent
      */
     addButtonForWindow: function (minimizedWindow) {
-        var me = this;
-        var windowId = minimizedWindow.getId();
-        var windowTitle = minimizedWindow.getTitle();
+        const me = this;
+        const windowId = minimizedWindow.getId();
+        const windowTitle = minimizedWindow.getTitle();
 
-        var button = Ext.create('Ext.button.Button', {
+        const button = Ext.create('Ext.button.Button', {
             text: windowTitle != null ? windowTitle : windowId,
             windowRef: windowId,
             listeners: {
@@ -41,8 +41,8 @@ Ext.define('CpsiMapview.controller.toolbar.MinimizedWindows', {
      * @param {Ext.button.Button} minimizedWindow
      */
     onRestoreFromButton: function (button) {
-        var me = this;
-        var windowRef = button.windowRef;
+        const me = this;
+        const windowRef = button.windowRef;
         me.restoreWindow(windowRef);
     },
 
@@ -51,8 +51,8 @@ Ext.define('CpsiMapview.controller.toolbar.MinimizedWindows', {
      * @param {CpsiMapview.view.window.MinimizableWindow} minimizedWindow
      */
     onRestoreFromWindow: function (minimizedWindow) {
-        var me = this;
-        var windowId = minimizedWindow.getId();
+        const me = this;
+        const windowId = minimizedWindow.getId();
         me.restoreWindow(windowId);
     },
 
@@ -61,21 +61,19 @@ Ext.define('CpsiMapview.controller.toolbar.MinimizedWindows', {
      * @param {String} windowRef reference to the minimized window
      */
     restoreWindow: function (windowRef) {
-        var me = this;
-        var minimizedWindow = Ext.ComponentQuery.query('#' + windowRef)[0];
+        const me = this;
+        const minimizedWindow = Ext.ComponentQuery.query('#' + windowRef)[0];
         minimizedWindow.setVisible(true);
         minimizedWindow.isMinimized = false;
 
         me.removeButtonFromToolbar(windowRef);
-
     },
 
     removeButtonFromToolbar: function (windowRef) {
+        const me = this;
 
-        var me = this;
-
-        var button = me.getView().items.findBy(function (item) {
-            return (item.getXType() === 'button') && (item.windowRef === windowRef);
+        const button = me.getView().items.findBy(function (item) {
+            return item.getXType() === 'button' && item.windowRef === windowRef;
         });
 
         if (button !== undefined) {
@@ -86,5 +84,4 @@ Ext.define('CpsiMapview.controller.toolbar.MinimizedWindows', {
             me.getView().setHidden(true);
         }
     }
-
 });

@@ -5,8 +5,7 @@
 Ext.define('CpsiMapview.view.layer.ToolTip', {
     extend: 'Ext.tip.Tip',
     xtype: 'cmv_layer_tooltip',
-    requires: [
-    ],
+    requires: [],
 
     /** @cfg The offset from the event's mouse x-position */
     offsetX: 10,
@@ -55,7 +54,7 @@ Ext.define('CpsiMapview.view.layer.ToolTip', {
          * Hides all layer tooltips.
          */
         clear: function () {
-            var ttips = Ext.ComponentQuery.query('cmv_layer_tooltip');
+            const ttips = Ext.ComponentQuery.query('cmv_layer_tooltip');
             Ext.each(ttips, function (tip) {
                 tip.hide();
             });
@@ -63,7 +62,7 @@ Ext.define('CpsiMapview.view.layer.ToolTip', {
     },
 
     constructor: function (config) {
-        var me = this;
+        const me = this;
 
         config.style = {
             backgroundColor: config.bgColor,
@@ -83,8 +82,8 @@ Ext.define('CpsiMapview.view.layer.ToolTip', {
      * @param {ol.MapBrowserEvent} evt The MapBrowserEvent event of OpenLayers
      */
     draw: function (feature, evt) {
-        var me = this;
-        var featureCluster = feature.getProperties().features;
+        const me = this;
+        const featureCluster = feature.getProperties().features;
 
         // care about clustered features
         if (featureCluster) {
@@ -98,7 +97,7 @@ Ext.define('CpsiMapview.view.layer.ToolTip', {
         }
 
         // check for layer's formatFunction
-        var html;
+        let html;
         if (me.layer && Ext.isFunction(me.layer.formatFunction)) {
             // the layer has its own formatFunction, do not use the default one
             html = me.layer.formatFunction(feature);
@@ -110,8 +109,8 @@ Ext.define('CpsiMapview.view.layer.ToolTip', {
         me.setHtml(html);
 
         // show tooltip near mouse pointer
-        var screenX = evt.originalEvent.pageX + me.offsetX;
-        var screenY = evt.originalEvent.pageY + me.offsetY;
+        const screenX = evt.originalEvent.pageX + me.offsetX;
+        const screenY = evt.originalEvent.pageY + me.offsetY;
         me.showAt([screenX, screenY]);
 
         // extjs has somehow problems with the very first render of the tooltip
@@ -133,21 +132,29 @@ Ext.define('CpsiMapview.view.layer.ToolTip', {
      * @return {String}             HTML code as text
      */
     formatFunction: function (feature) {
-        var me = this;
-        var htmlParts = [];
-        var htmlPart;
+        const me = this;
+        const htmlParts = [];
+        let htmlPart, value;
 
         Ext.each(me.toolTipConfig, function (tipConf) {
             if (tipConf.thumbnail && tipConf.property) {
-                var antiCache = new Date().getTime();
-                var onError = 'this.style.display =\'none\'';
-                var style = 'width:120px; height:90px;';
-                var url = Ext.String.format(tipConf.thumbnail, feature.get(tipConf.property));
-                htmlPart = Ext.String.format('<img src="{0}?_ac={1}" onerror="{2}" style="{3}"/>',
-                    url, antiCache, onError, style);
+                const antiCache = new Date().getTime();
+                const onError = "this.style.display ='none'";
+                const style = 'width:120px; height:90px;';
+                const url = Ext.String.format(
+                    tipConf.thumbnail,
+                    feature.get(tipConf.property)
+                );
+                htmlPart = Ext.String.format(
+                    '<img src="{0}?_ac={1}" onerror="{2}" style="{3}"/>',
+                    url,
+                    antiCache,
+                    onError,
+                    style
+                );
             } else {
-                var key = tipConf.alias || tipConf.property;
-                var value = feature.get(tipConf.property);
+                const key = tipConf.alias || tipConf.property;
+                value = feature.get(tipConf.property);
                 htmlPart = Ext.String.format('<b>{0}: </b>{1}', key, value);
             }
 

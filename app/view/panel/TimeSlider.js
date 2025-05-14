@@ -5,11 +5,7 @@ Ext.define('CpsiMapview.view.panel.TimeSlider', {
     extend: 'Ext.panel.Panel',
     xtype: 'cmv_timeslider',
 
-    requires: [
-        'Ext.slider.Multi',
-
-        'CpsiMapview.controller.panel.TimeSlider'
-    ],
+    requires: ['Ext.slider.Multi', 'CpsiMapview.controller.panel.TimeSlider'],
 
     controller: 'cmv_timeslider',
 
@@ -56,37 +52,38 @@ Ext.define('CpsiMapview.view.panel.TimeSlider', {
      *
      */
     initComponent: function () {
-        var me = this;
-        me.items = [{
-            xtype: 'multislider',
-            labelAlign: 'right',
-            listeners: {
-                beforerender: 'initTimeSlider',
-                changecomplete: 'onChangeComplete'
+        const me = this;
+        me.items = [
+            {
+                xtype: 'multislider',
+                labelAlign: 'right',
+                listeners: {
+                    beforerender: 'initTimeSlider',
+                    changecomplete: 'onChangeComplete'
+                },
+                constrainThumbs: false,
+                tipText: 'getTipText',
+                fieldLabel: 'Time',
+                width: 400,
+                values: [25, 75],
+                increment: 1,
+                minValue: 0,
+                maxValue: 100
             },
-            constrainThumbs: false,
-            tipText: 'getTipText',
-            fieldLabel: 'Time',
-            width: 400,
-            values: [25, 75],
-            increment: 1,
-            minValue: 0,
-            maxValue: 100
-        },
-        {
-            xtype: 'checkbox',
-            name: 'range',
-            fieldLabel: 'Time range',
-            labelAlign: 'right',
-            bind: {
-                value: '{isRange}'
-            },
-            listeners: {
-                change: 'onRangeClick'
+            {
+                xtype: 'checkbox',
+                name: 'range',
+                fieldLabel: 'Time range',
+                labelAlign: 'right',
+                bind: {
+                    value: '{isRange}'
+                },
+                listeners: {
+                    change: 'onRangeClick'
+                }
             }
-        }];
+        ];
 
         me.callParent();
     }
-
 });

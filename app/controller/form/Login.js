@@ -5,15 +5,13 @@
  */
 Ext.define('CpsiMapview.controller.form.Login', {
     extend: 'Ext.app.ViewController',
-    requires: [
-        'Ext.util.Cookies'
-    ],
+    requires: ['Ext.util.Cookies'],
     alias: 'controller.cmv_login_form',
 
     /**
-    * Attempt to login if the user presses the Enter key on
-    * the form
-    */
+     * Attempt to login if the user presses the Enter key on
+     * the form
+     */
     onSpecialKey: function (field, e) {
         if (e.getKey() === e.ENTER) {
             this.attemptLogin();
@@ -21,8 +19,8 @@ Ext.define('CpsiMapview.controller.form.Login', {
     },
 
     onLoginClick: function (btn) {
-        var form = btn.up('form');
-        var valid = true;
+        const form = btn.up('form');
+        let valid = true;
         Ext.each(form.down('textfield'), function (field) {
             valid = valid && !Ext.isEmpty(field.value);
         });
@@ -32,18 +30,17 @@ Ext.define('CpsiMapview.controller.form.Login', {
     },
 
     /**
-    * If a user still has a valid token, don't force them to log
-    * in again
-    * @param {string} token The toggle state of the button
-    */
+     * If a user still has a valid token, don't force them to log
+     * in again
+     * @param {string} token The toggle state of the button
+     */
     tryAutomaticLogin: function () {
+        const me = this;
+        const tokenName = me.getTokenName();
 
-        var me = this;
-        var tokenName = me.getTokenName();
-
-        var token = Ext.util.Cookies.get(tokenName);
-        var jsonData = {};
-        var serviceUrl = me.getViewModel().validateUrl;
+        const token = Ext.util.Cookies.get(tokenName);
+        let jsonData = {};
+        const serviceUrl = me.getViewModel().validateUrl;
 
         if (token) {
             jsonData[tokenName] = token;
@@ -55,8 +52,7 @@ Ext.define('CpsiMapview.controller.form.Login', {
     },
 
     getTokenName: function () {
-
-        var me = this;
+        const me = this;
         return me.getViewModel().tokenName;
     },
 
@@ -65,14 +61,13 @@ Ext.define('CpsiMapview.controller.form.Login', {
      * @param {any} response
      */
     login: function (response) {
+        const me = this;
+        const roles = response.userRoles; // this is an array e.g. ["UPL"]
 
-        var me = this;
-        var roles = response.userRoles; // this is an array e.g. ["UPL"]
-
-        var minimumRequiredRole = me.getViewModel().minimumRequiredRole;
+        const minimumRequiredRole = me.getViewModel().minimumRequiredRole;
 
         if (minimumRequiredRole) {
-            var hasRole = Ext.Array.contains(roles, minimumRequiredRole);
+            const hasRole = Ext.Array.contains(roles, minimumRequiredRole);
             if (hasRole === false) {
                 Ext.toast({
                     html: 'Your user does not have permissions to use the PMS browser application',
@@ -84,9 +79,9 @@ Ext.define('CpsiMapview.controller.form.Login', {
             }
         }
 
-        var tokenName = me.getTokenName();
+        const tokenName = me.getTokenName();
 
-        var loginData = {
+        const loginData = {
             roles: roles,
             username: Ext.util.Cookies.get('username')
         };
@@ -95,22 +90,20 @@ Ext.define('CpsiMapview.controller.form.Login', {
         me.updateCookie(loginData);
         Ext.GlobalEvents.fireEvent('login', loginData);
         return true;
-
     },
 
     /**
      * Clear the login cookie and fire a global logout event
      * */
     logout: function () {
-
         // issues with Cookies clear - http://www.sencha.com/forum/showthread.php?98070-CLOSED-Ext.util.Cookies.clear%28%29-not-working
         // only work when browser is restarted
         // so instead set them to null
 
-        var me = this;
-        var tokenName = me.getTokenName();
+        const me = this;
+        const tokenName = me.getTokenName();
 
-        var loginData = {
+        const loginData = {
             roles: '',
             username: ''
         };
@@ -122,20 +115,17 @@ Ext.define('CpsiMapview.controller.form.Login', {
     },
 
     updateCookie: function (loginData) {
-
-        var me = this;
-        var tokenName = me.getTokenName();
+        const me = this;
+        const tokenName = me.getTokenName();
 
         Ext.util.Cookies.set(tokenName, loginData[tokenName]);
         Ext.util.Cookies.set('roles', loginData.roles);
         Ext.util.Cookies.set('username', loginData.username);
-
     },
 
     callLoginService: function (jsonData, serviceUrl, showMask) {
-
-        var me = this;
-        var view = me.getView();
+        const me = this;
+        const view = me.getView();
 
         showMask = showMask && view.rendered;
 
@@ -153,7 +143,7 @@ Ext.define('CpsiMapview.controller.form.Login', {
             success: function (result) {
                 // successful HTTP connection, not necessarily the log in
                 // call was successful, we should now have a token in the response.data property
-                var response = Ext.decode(result.responseText);
+                const response = Ext.decode(result.responseText);
 
                 if (showMask) {
                     view.unmask();
@@ -165,8 +155,7 @@ Ext.define('CpsiMapview.controller.form.Login', {
                     } else {
                         view.show();
                     }
-                }
-                else {
+                } else {
                     //username / password login failure
                     Ext.toast({
                         html: response.message,
@@ -190,22 +179,23 @@ Ext.define('CpsiMapview.controller.form.Login', {
                 }
                 view.show();
             }
-
         });
     },
 
     attemptLogin: function () {
-
-        var me = this;
-        var view = me.getView();
-        var app = Ext.getApplication ? Ext.getApplication() : Ext.app.Application.instance;
-        var formValues = view.down('form').getForm().getValues();
+        const me = this;
+        const view = me.getView();
+        const app = Ext.getApplication
+            ? Ext.getApplication()
+            : Ext.app.Application.instance;
+        const formValues = view.down('form').getForm().getValues();
         Ext.util.Cookies.set('username', formValues.username);
 
-        var jsonData = Ext.JSON.encode(Ext.Object.merge({}, formValues, app.extraLoginParams));
+        const jsonData = Ext.JSON.encode(
+            Ext.Object.merge({}, formValues, app.extraLoginParams)
+        );
 
-        var serviceUrl = me.getViewModel().serviceUrl;
+        const serviceUrl = me.getViewModel().serviceUrl;
         me.callLoginService(jsonData, serviceUrl, true);
     }
-
 });

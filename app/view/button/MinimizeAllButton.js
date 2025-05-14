@@ -7,9 +7,7 @@ Ext.define('CpsiMapview.view.button.MinimizeAllButton', {
     extend: 'Ext.button.Button',
     xtype: 'cmv_minimize_all_button',
 
-    requires: [
-        'CpsiMapview.controller.button.MinimizeAllButtonController'
-    ],
+    requires: ['CpsiMapview.controller.button.MinimizeAllButtonController'],
 
     tooltip: 'Minimize all windows',
 

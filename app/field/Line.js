@@ -1,8 +1,8 @@
 /**
-* A custom field for storing line features
-* The field handles loading and serializing features to and from an associated store.
-* The linked map layer can have styling properties customized through field properties.
-*/
+ * A custom field for storing line features
+ * The field handles loading and serializing features to and from an associated store.
+ * The linked map layer can have styling properties customized through field properties.
+ */
 Ext.define('CpsiMapview.field.Line', {
     extend: 'CpsiMapview.field.Feature',
 
@@ -32,8 +32,8 @@ Ext.define('CpsiMapview.field.Line', {
      * Only display LineString and MultiLineStrings in the associated feature grid
      */
     defaultFeatureFilter: function (rec) {
-        var geomType = rec.getFeature().getGeometry().getType();
-        return (Ext.Array.contains(['LineString', 'MultiLineString'], geomType));
+        const geomType = rec.getFeature().getGeometry().getType();
+        return Ext.Array.contains(['LineString', 'MultiLineString'], geomType);
     },
 
     /**
@@ -44,9 +44,10 @@ Ext.define('CpsiMapview.field.Line', {
      * @param {any} rec
      */
     serialize: function (v, rec) {
-
-        var me = this;
-        var featureStore = rec.featureStores ? rec.featureStores[me.name] : null;
+        const me = this;
+        const featureStore = rec.featureStores
+            ? rec.featureStores[me.name]
+            : null;
         return me.getFeatureAttributes(featureStore);
     },
 
@@ -54,9 +55,8 @@ Ext.define('CpsiMapview.field.Line', {
      * Create an array containing feature properties
      */
     getFeatureAttributes: function (featureStore) {
-
-        var feats = featureStore.getRange();
-        var recs = [];
+        const feats = featureStore.getRange();
+        const recs = [];
 
         Ext.each(feats, function (f) {
             recs.push(f.data);
@@ -66,15 +66,14 @@ Ext.define('CpsiMapview.field.Line', {
     },
 
     /**
-    * Create a new ol style for points and lines in the layer associated with the store
-    *
-    * @return {ol.style.Style} The new style
-    */
+     * Create a new ol style for points and lines in the layer associated with the store
+     *
+     * @return {ol.style.Style} The new style
+     */
     createPointLineStyle: function (lineColor, pointColor) {
+        const me = this;
 
-        var me = this;
-
-        var style = new ol.style.Style({
+        const style = new ol.style.Style({
             image: new ol.style.Circle({
                 radius: me.styleDefaults.radius,
                 // point fill
@@ -97,40 +96,39 @@ Ext.define('CpsiMapview.field.Line', {
     },
 
     /**
-    * Create a new ol style. One of the ol.style.Style or OpenLayers style function
-    * will be returned.
-    *
-    * @return {ol.style.Style} The new style
-    */
+     * Create a new ol style. One of the ol.style.Style or OpenLayers style function
+     * will be returned.
+     *
+     * @return {ol.style.Style} The new style
+     */
     createStyle: function () {
-
-        var me = this;
-        var cfg = me.featureStoreConfig || {};
+        const me = this;
+        const cfg = me.featureStoreConfig || {};
 
         if (cfg && cfg.styleFn) {
             return cfg.styleFn;
         }
 
-        var lineColor = cfg.lineColor || me.styleDefaults.lineColor;
-        var pointColor = cfg.pointColor || me.styleDefaults.pointColor;
+        const lineColor = cfg.lineColor || me.styleDefaults.lineColor;
+        const pointColor = cfg.pointColor || me.styleDefaults.pointColor;
 
         return me.createPointLineStyle(lineColor, pointColor);
     },
 
     /**
-    * Create a new ol style for showing points and lines when selected
-    *
-    * @return {ol.style.Style} The new style
-    */
+     * Create a new ol style for showing points and lines when selected
+     *
+     * @return {ol.style.Style} The new style
+     */
     createSelectStyle: function () {
+        const me = this;
+        const cfg = me.featureStoreConfig || {};
 
-        var me = this;
-        var cfg = me.featureStoreConfig || {};
-
-        var lineColor = cfg.selectLineColor || me.selectStyleDefaults.lineColor;
-        var pointColor = cfg.selectPointColor || me.selectStyleDefaults.pointColor;
+        const lineColor =
+            cfg.selectLineColor || me.selectStyleDefaults.lineColor;
+        const pointColor =
+            cfg.selectPointColor || me.selectStyleDefaults.pointColor;
 
         return me.createPointLineStyle(lineColor, pointColor);
-
     }
 });

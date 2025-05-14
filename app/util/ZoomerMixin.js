@@ -7,9 +7,7 @@
 Ext.define('CpsiMapview.util.ZoomerMixin', {
     extend: 'Ext.Mixin',
 
-    requires: [
-        'BasiGX.util.Map'
-    ],
+    requires: ['BasiGX.util.Map'],
 
     zoomDefaults: {
         duration: 20 // ms
@@ -23,10 +21,9 @@ Ext.define('CpsiMapview.util.ZoomerMixin', {
      * @private
      */
     zoomToFeature: function (feature, map) {
+        const me = this;
 
-        var me = this;
-
-        var geom = feature.getGeometry();
+        const geom = feature.getGeometry();
 
         // check for null features
         if (!geom) {
@@ -34,20 +31,20 @@ Ext.define('CpsiMapview.util.ZoomerMixin', {
         }
 
         // TODO check for feature type when zooming
-        var extent = geom.getExtent();
-        var view = me.getView();
+        let extent = geom.getExtent();
+        const view = me.getView();
         // as this is a point then buffer it by the extentBuffer property
 
-        var extentBuffer = view.extentBuffer ? view.extentBuffer : 100;
+        const extentBuffer = view.extentBuffer ? view.extentBuffer : 100;
 
         extent = ol.extent.buffer(extent, extentBuffer);
 
-        var mapView = map.getView();
+        const mapView = map.getView();
 
-        var resolution = mapView.getResolutionForExtent(extent);
-        var zoom = mapView.getZoomForResolution(resolution);
-        var center = ol.extent.getCenter(extent);
-        var duration = 2000;
+        const resolution = mapView.getResolutionForExtent(extent);
+        const zoom = mapView.getZoomForResolution(resolution);
+        const center = ol.extent.getCenter(extent);
+        const duration = 2000;
 
         mapView.animate({
             center: center,
@@ -72,28 +69,26 @@ Ext.define('CpsiMapview.util.ZoomerMixin', {
      * for options
      */
     zoomMap: function (extent, options) {
-
-        var me = this;
+        const me = this;
         options = options || {};
 
         // apply zoom defaults if not supplied
 
         Ext.applyIf(options, me.zoomDefaults);
 
-        var mapCompenent = BasiGX.util.Map.getMapComponent();
+        const mapCompenent = BasiGX.util.Map.getMapComponent();
 
         if (!mapCompenent) {
             return false;
         }
 
-        var map = mapCompenent.map;
+        const map = mapCompenent.map;
 
         // only attempt a zoom if there is a map and a valid geometry or extent
 
-        if (map && (!ol.extent.isEmpty(extent))) {
+        if (map && !ol.extent.isEmpty(extent)) {
             map.getView().fit(extent);
         }
-
     },
 
     /**
@@ -102,12 +97,11 @@ Ext.define('CpsiMapview.util.ZoomerMixin', {
      * for options
      */
     zoomToRecordExtent: function (options) {
-
-        var me = this;
+        const me = this;
         // mixin will be added to the controller so needs getView()
-        var rec = me.getView().getViewModel().get('currentRecord');
+        const rec = me.getView().getViewModel().get('currentRecord');
         if (rec) {
-            var extent = rec.getRecordBounds();
+            const extent = rec.getRecordBounds();
             if (extent) {
                 me.zoomMap(extent, options);
             }
@@ -115,10 +109,9 @@ Ext.define('CpsiMapview.util.ZoomerMixin', {
     },
 
     /**
-    * Zoom using a bbox provided by the .NET services
-    **/
+     * Zoom using a bbox provided by the .NET services
+     **/
     zoomToExtentUsingService: function (url, id) {
-
         Ext.Ajax.request({
             url: Ext.String.format(url, id),
             method: 'GET',
@@ -138,7 +131,12 @@ Ext.define('CpsiMapview.util.ZoomerMixin', {
      * Zoom to extent using a JSON object with bbox in epsg:3857
      **/
     zoomToBounds: function (data) {
-        var bbox = [data.minX3857, data.minY3857, data.maxX3857, data.maxY3857];
+        const bbox = [
+            data.minX3857,
+            data.minY3857,
+            data.maxX3857,
+            data.maxY3857
+        ];
         this.zoomMap(bbox);
     }
 });

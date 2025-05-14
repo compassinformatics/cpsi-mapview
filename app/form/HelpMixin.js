@@ -14,16 +14,17 @@ Ext.define('CpsiMapview.form.HelpMixin', {
      * @return {String} Full URL to the help page*
      */
     onHelp: function () {
-
-        var me = this;
+        const me = this;
 
         // get the helpUrl from the viewmodel (if set)
-        var vm = me.getViewModel();
-        var helpUrl = vm ? vm.get('helpUrl') : '';
+        const vm = me.getViewModel();
+        const helpUrl = vm ? vm.get('helpUrl') : '';
 
         // unsure why Ext.getApplication is sometimes undefined
-        var app = Ext.getApplication ? Ext.getApplication() : Ext.app.Application.instance;
-        var rootUrl = app.rootHelpUrl;
+        const app = Ext.getApplication
+            ? Ext.getApplication()
+            : Ext.app.Application.instance;
+        const rootUrl = app.rootHelpUrl;
 
         if (!helpUrl && !rootUrl) {
             //<debug>
@@ -32,11 +33,14 @@ Ext.define('CpsiMapview.form.HelpMixin', {
             return;
         }
 
-        var fullUrl = me.buildHelpUrl(helpUrl, rootUrl);
-        var win = window.open(fullUrl, 'mapview-help'); // use '_blank' if we want a new window each time
+        const fullUrl = me.buildHelpUrl(helpUrl, rootUrl);
+        const win = window.open(fullUrl, 'mapview-help'); // use '_blank' if we want a new window each time
 
         if (!win) {
-            Ext.Msg.alert('Pop-up Blocked', 'The help page was blocked from opening. Please allow pop-ups for this site.');
+            Ext.Msg.alert(
+                'Pop-up Blocked',
+                'The help page was blocked from opening. Please allow pop-ups for this site.'
+            );
         } else {
             win.focus();
         }
@@ -45,19 +49,17 @@ Ext.define('CpsiMapview.form.HelpMixin', {
     },
 
     /**
-    * Build a URL based on root and page fragments
-    *
-    * @param {String} helpUrl A full URL or a relative link within the documentation
-    * @param {String} rootUrl A root/base URL for the documentation
-    * @return {String} Full URL to the help page
-    * @private
-    */
+     * Build a URL based on root and page fragments
+     *
+     * @param {String} helpUrl A full URL or a relative link within the documentation
+     * @param {String} rootUrl A root/base URL for the documentation
+     * @return {String} Full URL to the help page
+     * @private
+     */
     buildHelpUrl: function (helpUrl, rootUrl) {
+        let fullUrl;
 
-        var fullUrl;
-
-        if (rootUrl && (Ext.String.startsWith(helpUrl, 'http') === false)) {
-
+        if (rootUrl && Ext.String.startsWith(helpUrl, 'http') === false) {
             // trim any slashes from the URLs to avoid double slashes
             if (Ext.String.endsWith(rootUrl, '/')) {
                 rootUrl = rootUrl.slice(0, -1);
@@ -69,7 +71,6 @@ Ext.define('CpsiMapview.form.HelpMixin', {
 
             // now format the URLs with a single slash
             fullUrl = Ext.String.format('{0}/{1}', rootUrl, helpUrl);
-
         } else {
             // no rootUrl is set or the link URL is a direct http link
             fullUrl = helpUrl;

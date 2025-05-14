@@ -1,18 +1,15 @@
 Ext.define('CpsiMapview.controller.addArcGISRest.AddArcGISRestFormController', {
     extend: 'Ext.app.ViewController',
 
-    requires: [
-        'BasiGX.util.Map'
-    ],
+    requires: ['BasiGX.util.Map'],
 
     alias: 'controller.cmv_add_arcgisrest_form',
 
     onArcGISRestAdd: function (olLayer) {
-        var me = this;
-        var map = BasiGX.util.Map.getMapComponent().getMap();
+        const me = this;
+        const map = BasiGX.util.Map.getMapComponent().getMap();
 
         if (me.layerGroup === undefined) {
-
             // create a new layer group to hold the external layers
             me.layerGroup = new ol.layer.Group({
                 name: me.getView().layerGroupName,
@@ -21,13 +18,13 @@ Ext.define('CpsiMapview.controller.addArcGISRest.AddArcGISRestFormController', {
 
             // add the external group layer to the layerTreeRoot
             // so it appears in the layer tree
-            var layerTreeRoot = map.get('layerTreeRoot');
+            const layerTreeRoot = map.get('layerTreeRoot');
             layerTreeRoot.getLayers().push(me.layerGroup);
 
             setTimeout(function () {
-                var layerTrees = Ext.ComponentQuery.query('cmv_layertree');
+                const layerTrees = Ext.ComponentQuery.query('cmv_layertree');
                 layerTrees.forEach(function (layerTree) {
-                    var node = layerTree.getNodeForLayer(me.layerGroup);
+                    const node = layerTree.getNodeForLayer(me.layerGroup);
                     node.expand();
                 });
             }, 0);

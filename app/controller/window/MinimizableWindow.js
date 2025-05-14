@@ -9,12 +9,12 @@ Ext.define('CpsiMapview.controller.window.MinimizableWindow', {
     mixins: ['CpsiMapview.form.HelpMixin'],
 
     /**
-    * Trigger the windowClosed to remove any associated toolbar
-    * button if the window is closed
+     * Trigger the windowClosed to remove any associated toolbar
+     * button if the window is closed
      */
     onClose: function () {
-        var me = this;
-        var minimizeTo = me.getMinimizeToolbar();
+        const me = this;
+        const minimizeTo = me.getMinimizeToolbar();
         if (minimizeTo) {
             minimizeTo.fireEvent('windowClosed', me.getView());
         }
@@ -30,8 +30,8 @@ Ext.define('CpsiMapview.controller.window.MinimizableWindow', {
      * of the related MinimizedWindows toolbar.
      */
     onMinimize: function () {
-        var me = this;
-        var minimizeTo = me.getMinimizeToolbar();
+        const me = this;
+        const minimizeTo = me.getMinimizeToolbar();
         if (minimizeTo == null) {
             Ext.log({
                 msg: 'No cmv_minimized_windows_toolbar found. Window might just disappear.',
@@ -39,7 +39,7 @@ Ext.define('CpsiMapview.controller.window.MinimizableWindow', {
             });
         }
 
-        var win = me.getView();
+        const win = me.getView();
         win.isMinimized = true;
         win.setVisible(false);
         if (minimizeTo) {
@@ -54,10 +54,12 @@ Ext.define('CpsiMapview.controller.window.MinimizableWindow', {
      * toolbar found, returns undefined
      */
     getMinimizeToolbar: function () {
-        var me = this;
-        var minimizeTo = me.getView().minimizeTo;
+        const me = this;
+        let minimizeTo = me.getView().minimizeTo;
         if (minimizeTo == null) {
-            var toolbars = Ext.ComponentQuery.query('cmv_minimized_windows_toolbar');
+            const toolbars = Ext.ComponentQuery.query(
+                'cmv_minimized_windows_toolbar'
+            );
             if (toolbars.length > 0) {
                 minimizeTo = toolbars[0];
             }
@@ -69,9 +71,9 @@ Ext.define('CpsiMapview.controller.window.MinimizableWindow', {
      * Fires the restoreFromWindow event if window is currently minimized
      */
     onShow: function () {
-        var me = this;
+        const me = this;
         if (me.getView().isMinimized) {
-            var minimizeTo = me.getMinimizeToolbar();
+            const minimizeTo = me.getMinimizeToolbar();
             if (minimizeTo) {
                 minimizeTo.fireEvent('restoreFromWindow', me.getView());
             }

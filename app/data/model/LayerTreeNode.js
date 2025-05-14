@@ -6,9 +6,7 @@
 Ext.define('CpsiMapview.data.model.LayerTreeNode', {
     extend: 'GeoExt.data.model.LayerTreeNode',
 
-    requires: [
-        'CpsiMapview.util.Style'
-    ],
+    requires: ['CpsiMapview.util.Style'],
 
     /**
      * The layer property that will be used to hold a title for the description of the model in views.
@@ -22,8 +20,13 @@ Ext.define('CpsiMapview.data.model.LayerTreeNode', {
             name: 'qtitle',
             type: 'string',
             persist: false,
-            convert: function(v, record) {
-                return record.getOlLayerProp(record.descriptionTitleProperty, '') || record.get('text');
+            convert: function (v, record) {
+                return (
+                    record.getOlLayerProp(
+                        record.descriptionTitleProperty,
+                        ''
+                    ) || record.get('text')
+                );
             }
         },
         {
@@ -36,10 +39,10 @@ Ext.define('CpsiMapview.data.model.LayerTreeNode', {
             name: 'text',
             type: 'string',
             persist: false,
-            convert: function(v, record) {
+            convert: function (v, record) {
                 if (!v) {
                     // folders / LayerGroups
-                    var layerGroup = record.getOlLayer();
+                    const layerGroup = record.getOlLayer();
                     if (layerGroup) {
                         return record.getOlLayer().get('name');
                     }
@@ -47,17 +50,20 @@ Ext.define('CpsiMapview.data.model.LayerTreeNode', {
 
                 // add layer style to node text if we have the style chooser
                 // in the context menu and not as direct item under the node
-                var layerTree = Ext.ComponentQuery.query('cmv_layertree')[0];
+                const layerTree = Ext.ComponentQuery.query('cmv_layertree')[0];
                 if (layerTree && layerTree.styleSwitcherBelowNode === false) {
-
-                    var olLayer = record.getOlLayer();
+                    const olLayer = record.getOlLayer();
                     if (olLayer && olLayer.get('activatedStyle')) {
                         // get activated layer style
-                        var activatedStyle = olLayer.get('activatedStyle');
-                        var styleTitle = CpsiMapview.util.Style.getLayerStyleTitle(activatedStyle, olLayer);
+                        const activatedStyle = olLayer.get('activatedStyle');
+                        const styleTitle =
+                            CpsiMapview.util.Style.getLayerStyleTitle(
+                                activatedStyle,
+                                olLayer
+                            );
 
                         // apply node name + style name
-                        var treeNodeConf = olLayer.get('_origTreeConf');
+                        const treeNodeConf = olLayer.get('_origTreeConf');
                         if (treeNodeConf && treeNodeConf.text && styleTitle) {
                             return treeNodeConf.text + ' (' + styleTitle + ')';
                         }
@@ -75,7 +81,7 @@ Ext.define('CpsiMapview.data.model.LayerTreeNode', {
      * @param {any} evt
      */
     onLayerVisibleChange: function (evt) {
-        var layer = evt.target;
+        const layer = evt.target;
 
         if (!this.__updating) {
             this.set('checked', layer.get('visible'));

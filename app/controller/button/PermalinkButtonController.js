@@ -6,10 +6,9 @@ Ext.define('CpsiMapview.controller.button.PermalinkButtonController', {
 
     alias: 'controller.cmv_permalink_button',
     /**
-    * Zoom to a permalink
-    **/
+     * Zoom to a permalink
+     **/
     onPermalinkClick: function () {
-
         const me = this;
         const defaultValue = window.location.href;
         const dialogWidth = me.getView().dialogWidth;
@@ -21,9 +20,9 @@ Ext.define('CpsiMapview.controller.button.PermalinkButtonController', {
             buttons: Ext.Msg.OKCANCEL,
             callback: function (btn, text) {
                 if (btn == 'ok') {
-                    var map = me.getView().up('cmv_map');
-                    var parts = text.split('#map='); // only get the permalink from the URL
-                    var permalink = null;
+                    const map = me.getView().up('cmv_map');
+                    const parts = text.split('#map='); // only get the permalink from the URL
+                    let permalink = null;
 
                     if (parts.length === 2) {
                         permalink = parts[1];
@@ -39,6 +38,5 @@ Ext.define('CpsiMapview.controller.button.PermalinkButtonController', {
         };
 
         Ext.Msg.prompt(cfg);
-    },
-
+    }
 });

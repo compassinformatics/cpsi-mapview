@@ -25,8 +25,8 @@ Ext.define('CpsiMapview.controller.LayerTreeController', {
          * @param {Object} childNodeConf Conf to start with (root if not given)
          */
         getTreeNodeConf: function (layerKey, childNodeConf) {
-            var nodeConf = null;
-            var staticMe = CpsiMapview.controller.LayerTreeController;
+            let nodeConf = null;
+            const staticMe = CpsiMapview.controller.LayerTreeController;
             if (!childNodeConf) {
                 childNodeConf = CpsiMapview.treeConfig;
             }
@@ -39,8 +39,8 @@ Ext.define('CpsiMapview.controller.LayerTreeController', {
                     return null;
                 }
                 // iterate recursively over all child nodes
-                for (var i = 0; i < childNodeConf.children.length; i += 1) {
-                    var currentChild = childNodeConf.children[i];
+                for (let i = 0; i < childNodeConf.children.length; i += 1) {
+                    const currentChild = childNodeConf.children[i];
                     // Search in the current child
                     nodeConf = staticMe.getTreeNodeConf(layerKey, currentChild);
 
@@ -54,7 +54,6 @@ Ext.define('CpsiMapview.controller.LayerTreeController', {
             return nodeConf;
         }
     },
-
 
     /**
      * Mode in order to steer how the layers in tree will be structured.
@@ -84,9 +83,9 @@ Ext.define('CpsiMapview.controller.LayerTreeController', {
     treeConfDefaults: {},
 
     constructor: function () {
-        var me = this;
+        const me = this;
 
-        var mapPanel = CpsiMapview.view.main.Map.guess();
+        const mapPanel = CpsiMapview.view.main.Map.guess();
 
         mapPanel.on('cmv-init-layersadded', function () {
             me.initLayersAdded = true;
@@ -107,10 +106,9 @@ Ext.define('CpsiMapview.controller.LayerTreeController', {
      * could be guessed.
      */
     autoConnectToMap: function () {
+        const me = this;
 
-        var me = this;
-
-        var mapComp = BasiGX.util.Map.getMapComponent();
+        const mapComp = BasiGX.util.Map.getMapComponent();
         me.map = mapComp && mapComp.getMap();
 
         if (me.map) {
@@ -127,55 +125,61 @@ Ext.define('CpsiMapview.controller.LayerTreeController', {
      * (as defined in the tree structure JSON).
      */
     makeLayerStore: function () {
-        var me = this;
+        const me = this;
 
-        var treeJsonPromise = me.loadTreeStructure();
+        const treeJsonPromise = me.loadTreeStructure();
         treeJsonPromise.then(function (treeJson) {
             // save defaults for tree nodes from config
             me.treeConfDefaults = treeJson.defaults || {};
 
             // get the root layer group holding the grouped map layers
-            var rootLayerGroup = me.getGroupedLayers(treeJson.treeConfig);
+            const rootLayerGroup = me.getGroupedLayers(treeJson.treeConfig);
 
             me.map.set('layerTreeRoot', rootLayerGroup);
             me.map.getLayers().insertAt(0, rootLayerGroup);
 
             // create a new LayerStore from the grouped layers
-            var groupedLayerTreeStore = Ext.create('GeoExt.data.store.LayersTree', {
-                model: 'CpsiMapview.data.model.LayerTreeNode',
-                layerGroup: rootLayerGroup,
-                // filters are applied from bottom to top
-                // necessary for filtering empty layer groups
-                filterer: 'bottomup'
-            });
+            const groupedLayerTreeStore = Ext.create(
+                'GeoExt.data.store.LayersTree',
+                {
+                    model: 'CpsiMapview.data.model.LayerTreeNode',
+                    layerGroup: rootLayerGroup,
+                    // filters are applied from bottom to top
+                    // necessary for filtering empty layer groups
+                    filterer: 'bottomup'
+                }
+            );
             me.getView().setStore(groupedLayerTreeStore);
 
             // update possible switchlayers when collapsing their parent folder
             // otherwise the node text would be wrong/empty
-            me.getView().getRootNode().on(
-                'beforeexpand',
-                me.updateSwitchLayerNodes,
-                me
-            );
+            me.getView()
+                .getRootNode()
+                .on('beforeexpand', me.updateSwitchLayerNodes, me);
 
-            me.getView().getRootNode().cascade(function (node) {
-                // apply properties for tree node from corresponding tree-conf
-                if (node.getOlLayer()) {
-                    var origTreeNodeConf = node.getOlLayer().get('_origTreeConf') || {};
-                    me.applyTreeConfigsToNode(node, origTreeNodeConf);
+            me.getView()
+                .getRootNode()
+                .cascade(function (node) {
+                    // apply properties for tree node from corresponding tree-conf
+                    if (node.getOlLayer()) {
+                        const origTreeNodeConf =
+                            node.getOlLayer().get('_origTreeConf') || {};
+                        me.applyTreeConfigsToNode(node, origTreeNodeConf);
 
-                    // We are creating the gridWindow here already, to ensure that
-                    // any preset filter will be applied directly, without having to
-                    // open the gridWindow first.
-                    var gridWindow = CpsiMapview.util.Grid.getGridWindow(node.getOlLayer());
-                    if (gridWindow) {
-                        var grid = gridWindow.down('grid');
-                        if (grid) {
-                            grid.fireEvent('applypresetfilters');
+                        // We are creating the gridWindow here already, to ensure that
+                        // any preset filter will be applied directly, without having to
+                        // open the gridWindow first.
+                        const gridWindow = CpsiMapview.util.Grid.getGridWindow(
+                            node.getOlLayer()
+                        );
+                        if (gridWindow) {
+                            const grid = gridWindow.down('grid');
+                            if (grid) {
+                                grid.fireEvent('applypresetfilters');
+                            }
                         }
                     }
-                }
-            });
+                });
 
             // preserve tree config to access later on
             CpsiMapview.treeConfig = treeJson.treeConfig;
@@ -187,11 +191,14 @@ Ext.define('CpsiMapview.controller.LayerTreeController', {
         // fallback in case loading the JSON tree structure failed:
         // create a flat store holding all map layers at one hierarchy
         treeJsonPromise.catch(function () {
-            Ext.Logger.warn('Loading of JSON structure for LayerTree failed' +
-                '- creating flat layer hierarchy as fallback');
+            Ext.Logger.warn(
+                'Loading of JSON structure for LayerTree failed' +
+                    '- creating flat layer hierarchy as fallback'
+            );
 
-            var layerTreeStore = Ext.create('GeoExt.data.store.LayersTree', {
-                layerGroup: me.map.get('layerTreeRoot') || me.map.getLayerGroup()
+            const layerTreeStore = Ext.create('GeoExt.data.store.LayersTree', {
+                layerGroup:
+                    me.map.get('layerTreeRoot') || me.map.getLayerGroup()
             });
 
             me.getView().setStore(layerTreeStore);
@@ -207,14 +214,16 @@ Ext.define('CpsiMapview.controller.LayerTreeController', {
      * @return {Ext.Promise} Promise resolving once the JSON is loaded
      */
     loadTreeStructure: function () {
-        var app = Ext.getApplication ? Ext.getApplication() : Ext.app.Application.instance;
+        const app = Ext.getApplication
+            ? Ext.getApplication()
+            : Ext.app.Application.instance;
         return app.getResourcePaths().then(function (resourcePaths) {
             return new Ext.Promise(function (resolve, reject) {
                 Ext.Ajax.request({
                     url: resourcePaths.treeConfig,
                     method: 'GET',
                     success: function (response) {
-                        var respJson = Ext.decode(response.responseText);
+                        const respJson = Ext.decode(response.responseText);
                         resolve(respJson);
                     },
                     failure: function (response) {
@@ -225,21 +234,27 @@ Ext.define('CpsiMapview.controller.LayerTreeController', {
         });
     },
 
-
     /**
      * Ensures tree and map only contain layers for which
      * the user has the required roles to see.
      */
     filterLayersByRole: function () {
-        var me = this;
-        var store = me.getView().getStore();
-        if (!store){
+        const me = this;
+        const store = me.getView().getStore();
+        if (!store) {
             return;
         }
-        store.filterBy(function(record){
-            var requiredRoles = record.get('requiredRoles');
-            if (requiredRoles && Ext.isArray(requiredRoles) && requiredRoles.length){
-                var showNode = CpsiMapview.util.RoleManager.hasAtLeastOneRequiredRole(requiredRoles);
+        store.filterBy(function (record) {
+            const requiredRoles = record.get('requiredRoles');
+            if (
+                requiredRoles &&
+                Ext.isArray(requiredRoles) &&
+                requiredRoles.length
+            ) {
+                const showNode =
+                    CpsiMapview.util.RoleManager.hasAtLeastOneRequiredRole(
+                        requiredRoles
+                    );
                 return showNode;
             }
             return true;
@@ -256,10 +271,10 @@ Ext.define('CpsiMapview.controller.LayerTreeController', {
      * @return {ol.layer.Group}  Root layer group
      */
     getGroupedLayers: function (treeConfJson) {
-        var me = this;
+        const me = this;
 
         // wrapping all under the 'root' node aggregating all together
-        var rootLayerGroup = new ol.layer.Group({
+        const rootLayerGroup = new ol.layer.Group({
             name: 'root',
             layers: []
         });
@@ -278,34 +293,39 @@ Ext.define('CpsiMapview.controller.LayerTreeController', {
      * @param  {ol.layer.Group} parentGroup The parent group to put children (another groups / layers) into
      */
     createOlLayerGroups: function (treeNodeChilds, parentGroup) {
-        var me = this;
+        const me = this;
         // go over all passed in tree child nodes
         Ext.each(treeNodeChilds, function (child) {
             // apply defaults for tree nodes from config
-            var generalDefaults = me.treeConfDefaults.general || {};
+            const generalDefaults = me.treeConfDefaults.general || {};
             Ext.applyIf(child, generalDefaults);
 
             // respect "isLeaf" for legacy reasons (but recommended using "leaf")
-            var isLeaf = Ext.isDefined(child.isLeaf) ? child.isLeaf : child.leaf;
+            const isLeaf = Ext.isDefined(child.isLeaf)
+                ? child.isLeaf
+                : child.leaf;
             // layer groups --> folders in tree
             if (isLeaf !== true) {
                 // create empty layer group for this level
-                var layerGroup = new ol.layer.Group({
+                const layerGroup = new ol.layer.Group({
                     name: child.title,
-                    layers: [],
+                    layers: []
                 });
 
                 // preserve the original tree JSON config to re-use it later on
                 layerGroup.set('_origTreeConf', child);
 
-                var parentLayers = parentGroup.getLayers();
+                const parentLayers = parentGroup.getLayers();
                 parentLayers.insertAt(0, layerGroup);
 
                 // recursion
                 me.createOlLayerGroups(child.children, layerGroup);
             } else {
                 // layers --> leafs in tree
-                var mapLyr = BasiGX.util.Layer.getLayerBy('layerKey', child.id);
+                const mapLyr = BasiGX.util.Layer.getLayerBy(
+                    'layerKey',
+                    child.id
+                );
 
                 if (mapLyr) {
                     // apply tree config to OL layer
@@ -318,24 +338,34 @@ Ext.define('CpsiMapview.controller.LayerTreeController', {
                     // add OL layer to parent OL LayerGroup
                     me.map.removeLayer(mapLyr);
                     parentGroup.getLayers().insertAt(0, mapLyr);
-
                 } else {
                     //<debug>
 
                     // get the layers config object
-                    var app = Ext.getApplication ? Ext.getApplication() : Ext.app.Application.instance;
-                    var layerJson = app.layerJson;
-
+                    const app = Ext.getApplication
+                        ? Ext.getApplication()
+                        : Ext.app.Application.instance;
+                    const layerJson = app.layerJson;
 
                     // any switch layers not in the resolution when the app is loaded will be missing
                     // so we check for layer keys in the config JSON
 
-                    var childLayers = Ext.Array.pluck(layerJson.layers, 'layers').filter(Boolean);
-                    var allLayers = Ext.Array.merge(Ext.Array.flatten(childLayers), layerJson.layers);
-                    var layerKeys = Ext.Array.pluck(allLayers, 'layerKey');
+                    const childLayers = Ext.Array.pluck(
+                        layerJson.layers,
+                        'layers'
+                    ).filter(Boolean);
+                    const allLayers = Ext.Array.merge(
+                        Ext.Array.flatten(childLayers),
+                        layerJson.layers
+                    );
+                    const layerKeys = Ext.Array.pluck(allLayers, 'layerKey');
 
                     if (!Ext.Array.indexOf(layerKeys, child.id) === -1) {
-                        Ext.Logger.warn('Layer with layerKey ' + child.id + ' not found in map layers');
+                        Ext.Logger.warn(
+                            'Layer with layerKey ' +
+                                child.id +
+                                ' not found in map layers'
+                        );
                     }
                     //</debug>
                 }
@@ -370,7 +400,12 @@ Ext.define('CpsiMapview.controller.LayerTreeController', {
      */
     applyTreeConfigsToNode: function (node, treeNodeConf) {
         node.set('cls', treeNodeConf.cls);
-        node.set('expandable', Ext.isDefined(treeNodeConf.expandable) ? treeNodeConf.expandable : true);
+        node.set(
+            'expandable',
+            Ext.isDefined(treeNodeConf.expandable)
+                ? treeNodeConf.expandable
+                : true
+        );
         node.set('glyph', treeNodeConf.glyph);
         node.set('icon', treeNodeConf.icon);
         node.set('qshowDelay', treeNodeConf.qshowDelay);
@@ -397,10 +432,10 @@ Ext.define('CpsiMapview.controller.LayerTreeController', {
      *
      * @param {Ext.data.TreeModel} groupNode The folder node that is expanded
      */
-    updateSwitchLayerNodes: function(groupNode) {
-        var me = this;
-        groupNode.cascade(function(child){
-            var layer = child.getOlLayer();
+    updateSwitchLayerNodes: function (groupNode) {
+        const me = this;
+        groupNode.cascade(function (child) {
+            const layer = child.getOlLayer();
             if (!layer || !layer.get('isSwitchLayer')) {
                 // we only care about switch layers
                 return;
@@ -408,7 +443,8 @@ Ext.define('CpsiMapview.controller.LayerTreeController', {
             // the configuration for the tree node got lost during
             // the switch. We read it again from the layer and apply
             // it to the node.
-            var origTreeNodeConf = child.getOlLayer().get('_origTreeConf') || {};
+            const origTreeNodeConf =
+                child.getOlLayer().get('_origTreeConf') || {};
             me.applyTreeConfigsToNode(child, origTreeNodeConf);
         });
     },
@@ -419,7 +455,7 @@ Ext.define('CpsiMapview.controller.LayerTreeController', {
      * @param {boolean} pressed
      */
     onAddWmsToggle: function (button, pressed) {
-        var me = this;
+        const me = this;
 
         if (pressed) {
             if (!this.addWmsWindow) {
@@ -429,7 +465,6 @@ Ext.define('CpsiMapview.controller.LayerTreeController', {
                 });
             }
             this.addWmsWindow.show();
-
         } else if (this.addWmsWindow) {
             this.addWmsWindow.close();
         }
@@ -441,25 +476,26 @@ Ext.define('CpsiMapview.controller.LayerTreeController', {
      * @param {boolean} pressed
      */
     onAddArcGISRestToggle: function (button, pressed) {
-        var me = this;
+        const me = this;
 
         if (pressed) {
             if (!this.addArcGISRestWindow) {
-                this.addArcGISRestWindow = Ext.create(me.getView().addArcGISRestWindowConfig);
+                this.addArcGISRestWindow = Ext.create(
+                    me.getView().addArcGISRestWindowConfig
+                );
                 this.addArcGISRestWindow.on('close', function () {
                     button.setPressed(false);
                 });
             }
             this.addArcGISRestWindow.show();
-
         } else if (this.addArcGISRestWindow) {
             this.addArcGISRestWindow.close();
         }
     },
 
     /**
-    * Destroy any associated windows when this component gets destroyed
-    */
+     * Destroy any associated windows when this component gets destroyed
+     */
     onBeforeDestroy: function () {
         if (this.addWmsWindow) {
             this.addWmsWindow.destroy();
@@ -472,12 +508,12 @@ Ext.define('CpsiMapview.controller.LayerTreeController', {
     },
 
     /**
-    * Updates the UI of childNodes of an expanded item
-    * @param {CpsiMapview.data.model.LayerTreeNode} LayerTreeNode
-    */
+     * Updates the UI of childNodes of an expanded item
+     * @param {CpsiMapview.data.model.LayerTreeNode} LayerTreeNode
+     */
     updateExpandedItemChildNodesUI: function (layerTreeNode) {
         Ext.each(layerTreeNode.childNodes, function (node) {
-            var layer =  node.getOlLayer();
+            const layer = node.getOlLayer();
             if (layer.get('isWms') || layer.get('isWfs') || layer.get('isVt')) {
                 CpsiMapview.util.Layer.updateLayerNodeUI(layer, false);
             }

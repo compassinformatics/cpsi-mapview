@@ -1,20 +1,17 @@
 /**
-* This class is the controller for the button 'FeatureSelectionButton'
+ * This class is the controller for the button 'FeatureSelectionButton'
  */
 Ext.define('CpsiMapview.controller.button.FeatureSelectionButtonController', {
     extend: 'Ext.app.ViewController',
 
     alias: 'controller.cmv_feature_selection_btn',
 
-    requires: [
-        'Ext.window.Toast',
-        'BasiGX.util.Layer'
-    ],
+    requires: ['Ext.window.Toast', 'BasiGX.util.Layer'],
 
     /**
-    * The OpenLayers map. If not given, will be auto-detected.
-    * @cfg
-    */
+     * The OpenLayers map. If not given, will be auto-detected.
+     * @cfg
+     */
     map: null,
 
     /**
@@ -39,17 +36,17 @@ Ext.define('CpsiMapview.controller.button.FeatureSelectionButtonController', {
     fidsToFilter: [],
 
     constructor: function () {
-        var me = this;
+        const me = this;
         me.onMapClick = me.onMapClick.bind(me);
         me.callParent(arguments);
     },
 
     init: function () {
-        var me = this;
-        var ownerGrid = this.getView().up('grid');
+        const me = this;
+        const ownerGrid = this.getView().up('grid');
         if (ownerGrid) {
             // reset FIDs if grid clears its filters
-            ownerGrid.on('cmv-clear-filters', function() {
+            ownerGrid.on('cmv-clear-filters', function () {
                 me.fidsToFilter = [];
             });
         }
@@ -65,8 +62,8 @@ Ext.define('CpsiMapview.controller.button.FeatureSelectionButtonController', {
      * @param {Boolean} pressed The toggle state.
      */
     onBtnToggle: function (btn, pressed) {
-        var me = this;
-        var view = me.getView();
+        const me = this;
+        const view = me.getView();
 
         if (view.map && view.map instanceof ol.Map) {
             me.map = view.map;
@@ -89,14 +86,13 @@ Ext.define('CpsiMapview.controller.button.FeatureSelectionButtonController', {
             view.queryLayer.setVisible(false);
             me.map.un('click', me.onMapClick);
         }
-
     },
 
     /**
      * Adds the mode selector UI to the toolbar (if not existing) and shows it.
      */
     addModeSelectorUi: function () {
-        var me = this;
+        const me = this;
 
         if (!me.modeSelector) {
             me.modeSelector = Ext.create('Ext.button.Split', {
@@ -124,13 +120,13 @@ Ext.define('CpsiMapview.controller.button.FeatureSelectionButtonController', {
                                 me.filterMode = 'NEW_SELECTION';
                                 me.modeSelector.setText(menu.text);
                             }
-                        },
+                        }
                     ]
                 })
             });
 
-            var tb = me.getView().up('toolbar');
-            var btnGroup = me.getView().up('buttongroup');
+            const tb = me.getView().up('toolbar');
+            const btnGroup = me.getView().up('buttongroup');
             if (tb && btnGroup) {
                 btnGroup.add(me.modeSelector);
             }
@@ -144,21 +140,24 @@ Ext.define('CpsiMapview.controller.button.FeatureSelectionButtonController', {
      * yet defined.
      */
     findWfsLayer: function () {
-        var me = this;
-        var view = me.getView();
+        const me = this;
+        const view = me.getView();
         if (!view.queryLayer && view.vectorLayerKey) {
             view.queryLayer = BasiGX.util.Layer.getLayerBy(
-                'layerKey', view.vectorLayerKey
+                'layerKey',
+                view.vectorLayerKey
             );
         }
 
         if (!view.queryLayer) {
-            Ext.Logger.warn('No queryLayer found in the map for the FeaureSelectionButton with the name: ' + view.queryLayerName);
+            Ext.Logger.warn(
+                'No queryLayer found in the map for the FeaureSelectionButton with the name: ' +
+                    view.queryLayerName
+            );
         } else {
             // save the ID property name for future use
             me.idProperty = view.queryLayer.get('idProperty');
         }
-
     },
 
     /**
@@ -167,8 +166,8 @@ Ext.define('CpsiMapview.controller.button.FeatureSelectionButtonController', {
      * @param {ol.MapBrowserEvent} evt The OL event
      */
     onMapClick: function (evt) {
-        var me = this;
-        var view = me.getView();
+        const me = this;
+        const view = me.getView();
 
         // clear FIDs to filter when we have a new selection
         if (me.filterMode === 'NEW_SELECTION') {
@@ -176,14 +175,13 @@ Ext.define('CpsiMapview.controller.button.FeatureSelectionButtonController', {
         }
 
         // collect all IDs of clicked features
-        var clickedFeatureIds = [];
-        me.map.forEachFeatureAtPixel(evt.pixel, function(feature, layer) {
+        const clickedFeatureIds = [];
+        me.map.forEachFeatureAtPixel(evt.pixel, function (feature, layer) {
             // add check for correct layer
-            if (layer && view.queryLayer && (layer.id === view.queryLayer.id)) {
-
-                var source = view.queryLayer.getSource();
+            if (layer && view.queryLayer && layer.id === view.queryLayer.id) {
+                const source = view.queryLayer.getSource();
                 if (source instanceof ol.source.Cluster) {
-                    var origFeats = feature.get('features');
+                    const origFeats = feature.get('features');
                     if (Ext.isArray(origFeats)) {
                         // add all sub-feature due to clustering
                         Ext.each(origFeats, function (origFeat) {
@@ -210,11 +208,11 @@ Ext.define('CpsiMapview.controller.button.FeatureSelectionButtonController', {
         }
 
         // create ExtJS "IN" filter with unique values
-        var uniqueFids = Ext.Array.unique(me.fidsToFilter);
-        var extInFilter = new Ext.util.Filter({
+        const uniqueFids = Ext.Array.unique(me.fidsToFilter);
+        const extInFilter = new Ext.util.Filter({
             type: 'fid',
             property: me.idProperty,
-            value   : uniqueFids,
+            value: uniqueFids,
             operator: 'in'
         });
 
@@ -227,11 +225,10 @@ Ext.define('CpsiMapview.controller.button.FeatureSelectionButtonController', {
     },
 
     onBeforeDestroy: function () {
-        var me = this;
-        var btn = me.getView();
+        const me = this;
+        const btn = me.getView();
 
         // detoggle button
         me.onBtnToggle(btn, false);
     }
-
 });

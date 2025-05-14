@@ -15,6 +15,8 @@ Ext.define('CpsiMapview.view.fileupload.Report', {
         src: Ext.SSL_SECURE_URL
     },
     load: function (config) {
-        this.getEl().dom.src = config.url + (config.params ? '?' + Ext.urlEncode(config.params) : '');
+        this.getEl().dom.src =
+            config.url +
+            (config.params ? '?' + Ext.urlEncode(config.params) : '');
     }
 });

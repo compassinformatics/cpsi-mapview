@@ -34,14 +34,14 @@ Ext.define('CpsiMapview.view.menuitem.LayerGrid', {
      * @private
      */
     initComponent: function () {
-        var me = this;
+        const me = this;
 
         me.handler = me.handlerFunc;
 
         me.callParent();
 
         // check if layer has a grid
-        var hasGrid = false;
+        let hasGrid = false;
         if (me.layer.get('gridXType')) {
             hasGrid = true;
         }
@@ -58,14 +58,14 @@ Ext.define('CpsiMapview.view.menuitem.LayerGrid', {
      * Applies the preset filters to the grid.
      */
     handlerFunc: function () {
-        var me = this;
-        var gridWindow = CpsiMapview.util.Grid.getGridWindow(me.layer);
+        const me = this;
+        const gridWindow = CpsiMapview.util.Grid.getGridWindow(me.layer);
 
         if (me.titleOverride) {
             gridWindow.setTitle(me.titleOverride);
         }
 
-        var grid = gridWindow.down('grid');
+        const grid = gridWindow.down('grid');
         grid.fireEvent('applypresetfilters');
 
         gridWindow.show();

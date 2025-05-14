@@ -15,8 +15,7 @@ Ext.define('CpsiMapview.view.button.FeatureSelectionButton', {
         'CpsiMapview.controller.button.FeatureSelectionButtonController'
     ],
 
-    statics: {
-    },
+    statics: {},
 
     config: {
         /**
@@ -64,7 +63,7 @@ Ext.define('CpsiMapview.view.button.FeatureSelectionButton', {
      * to their corresponding controller methods
      */
     listeners: {
-        toggle: 'onBtnToggle',
+        toggle: 'onBtnToggle'
     },
 
     bind: {
@@ -72,13 +71,11 @@ Ext.define('CpsiMapview.view.button.FeatureSelectionButton', {
         tooltip: '{tooltip}'
     },
 
-
     /**
      * Initializes this component
      */
     initComponent: function () {
-        var me = this;
+        const me = this;
         me.callParent();
     }
-
 });

@@ -1,8 +1,8 @@
 /**
-* A custom field for storing polygon features.
-* The field handles loading and serializing features to and from an associated store.
-* The linked map layer can have styling properties customized through field properties.
-*/
+ * A custom field for storing polygon features.
+ * The field handles loading and serializing features to and from an associated store.
+ * The linked map layer can have styling properties customized through field properties.
+ */
 Ext.define('CpsiMapview.field.Polygon', {
     extend: 'CpsiMapview.field.Feature',
 
@@ -12,8 +12,8 @@ Ext.define('CpsiMapview.field.Polygon', {
      * Return a the geometry of a single polygon feature
      */
     serialize: function (v, rec) {
-        var me = this;
-        var featureStore = rec.featureStores[me.name];
+        const me = this;
+        const featureStore = rec.featureStores[me.name];
         return this.getPolygonGeometry(featureStore.layer);
     },
 
@@ -25,23 +25,27 @@ Ext.define('CpsiMapview.field.Polygon', {
      * @param {any} rec
      */
     getPolygonGeometry: function (polygonLayer) {
-
-        var feats, gj = null;
+        let feats,
+            gj = null;
 
         feats = polygonLayer.getSource().getFeatures();
 
         // filter out any non-polygon features
         feats = feats.filter(function (f) {
-            return f.getGeometry() instanceof ol.geom.Polygon || f.getGeometry() instanceof ol.geom.Circle;
+            return (
+                f.getGeometry() instanceof ol.geom.Polygon ||
+                f.getGeometry() instanceof ol.geom.Circle
+            );
         });
 
         if (feats.length >= 1) {
-
             if (feats.length > 1) {
-                Ext.log.warn('Multiple polygons found in the polygon feature layer');
+                Ext.log.warn(
+                    'Multiple polygons found in the polygon feature layer'
+                );
             }
-            var writer = new ol.format.GeoJSON();
-            var geom = feats[feats.length -1].getGeometry(); // get the last created feature
+            const writer = new ol.format.GeoJSON();
+            let geom = feats[feats.length - 1].getGeometry(); // get the last created feature
             if (geom.getType() === 'Circle') {
                 // ol.geom.Circle is not supported
                 // in GeoJSON https://stackoverflow.com/questions/16942697/geojson-circles-supported-or-not
@@ -55,22 +59,21 @@ Ext.define('CpsiMapview.field.Polygon', {
     },
 
     /**
-    * Create a new ol style
-    *
-    * @return {ol.style.Style} The new style
-    */
+     * Create a new ol style
+     *
+     * @return {ol.style.Style} The new style
+     */
     createStyle: function () {
-
-        var fill = new ol.style.Fill({
+        const fill = new ol.style.Fill({
             color: 'rgba(255,255,255,0.4)'
         });
 
-        var stroke = new ol.style.Stroke({
+        const stroke = new ol.style.Stroke({
             color: '#3399CC',
             width: 1.25
         });
 
-        var style = new ol.style.Style({
+        const style = new ol.style.Style({
             image: new ol.style.Circle({
                 fill: fill,
                 stroke: stroke,
@@ -84,10 +87,10 @@ Ext.define('CpsiMapview.field.Polygon', {
     },
 
     /**
-    * Create a new ol style for showing polygons when selected
-    *
-    * @return {ol.style.Style} The new style
-    */
+     * Create a new ol style for showing polygons when selected
+     *
+     * @return {ol.style.Style} The new style
+     */
     createSelectStyle: function () {
         return null;
     }

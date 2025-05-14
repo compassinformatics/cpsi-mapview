@@ -8,9 +8,7 @@ Ext.define('CpsiMapview.view.menuitem.LayerFilterReset', {
     extend: 'Ext.menu.Item',
     xtype: 'cmv_menuitem_layerfilterreset',
 
-    requires: [
-        'CpsiMapview.util.Grid'
-    ],
+    requires: ['CpsiMapview.util.Grid'],
 
     /**
      * The connected layer for this item
@@ -29,7 +27,7 @@ Ext.define('CpsiMapview.view.menuitem.LayerFilterReset', {
      * @private
      */
     initComponent: function () {
-        var me = this;
+        const me = this;
 
         me.handler = me.handlerFunc;
 
@@ -42,10 +40,10 @@ Ext.define('CpsiMapview.view.menuitem.LayerFilterReset', {
      * Executed when this menu item is clicked.
      */
     handlerFunc: function () {
-        var me = this;
-        var gridWindow = CpsiMapview.util.Grid.getGridWindow(me.layer);
+        const me = this;
+        const gridWindow = CpsiMapview.util.Grid.getGridWindow(me.layer);
 
-        var grid = gridWindow.down('grid');
+        const grid = gridWindow.down('grid');
         grid.fireEvent('clearfilters');
         grid.fireEvent('applypresetfilters');
     },
@@ -55,8 +53,8 @@ Ext.define('CpsiMapview.view.menuitem.LayerFilterReset', {
      *
      * @returns {Boolean} If menu item should be shown
      */
-    shallMenuItemBeShown: function(){
-        var me = this;
+    shallMenuItemBeShown: function () {
+        const me = this;
 
         // the menu can only be shown for layers that have a grid
         if (!me.layer.get('gridXType')) {
@@ -64,7 +62,7 @@ Ext.define('CpsiMapview.view.menuitem.LayerFilterReset', {
         }
 
         // check preset filters
-        var hasPresetFilters = false;
+        let hasPresetFilters = false;
         if (me.layer.get('gridFilters')) {
             hasPresetFilters = true;
         }
@@ -79,27 +77,27 @@ Ext.define('CpsiMapview.view.menuitem.LayerFilterReset', {
      *
      * @returns {Boolean} If grid is currently filtered
      */
-    isLayerCurrentlyFiltered: function() {
-        var me = this;
+    isLayerCurrentlyFiltered: function () {
+        const me = this;
 
         // retrieve store to check if it is filtered
-        var gridWindow = CpsiMapview.util.Grid.getGridWindow(me.layer);
-        var grid = gridWindow.down('grid');
-        var store = grid.getStore();
+        const gridWindow = CpsiMapview.util.Grid.getGridWindow(me.layer);
+        const grid = gridWindow.down('grid');
+        const store = grid.getStore();
         if (!store) {
             return false;
         }
 
         // check if common Ext filters (string, number, list, ...) are set
-        var filters = store.getFilters();
-        var hasGridFilters = false;
+        const filters = store.getFilters();
+        let hasGridFilters = false;
         if (filters) {
-            hasGridFilters = (filters.length > 0);
+            hasGridFilters = filters.length > 0;
         }
 
         // spatial filters can only be detected by a property in the controller
-        var spatialFilter = grid.getController().spatialFilter;
-        var hasSpatialFilter = false;
+        const spatialFilter = grid.getController().spatialFilter;
+        let hasSpatialFilter = false;
         if (spatialFilter) {
             hasSpatialFilter = true;
         }

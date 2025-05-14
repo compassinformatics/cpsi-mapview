@@ -1,12 +1,12 @@
 /**
-* A custom field for linking OpenLayers features
-* The field handles loading GeoJSON from a web service into a store associated with the field.
-* The field value itself will be set to an array of OpenLayers features.
-* The field value is set both in the convert function below, and also by
-* CpsiMapview.model.FeatureStoreMixin with the `add`, `clear`, and `remove`
-* listeners on the FeatureStore. This triggers any field validation which may be
-* set.
-*/
+ * A custom field for linking OpenLayers features
+ * The field handles loading GeoJSON from a web service into a store associated with the field.
+ * The field value itself will be set to an array of OpenLayers features.
+ * The field value is set both in the convert function below, and also by
+ * CpsiMapview.model.FeatureStoreMixin with the `add`, `clear`, and `remove`
+ * listeners on the FeatureStore. This triggers any field validation which may be
+ * set.
+ */
 Ext.define('CpsiMapview.field.Feature', {
     extend: 'Ext.data.field.Field',
 
@@ -22,17 +22,18 @@ Ext.define('CpsiMapview.field.Feature', {
      * Load GeoJSON features into the field's feature store
      */
     convert: function (data, rec) {
-
-        var me = this;
-        var features = null;
-        var featureStore = rec.featureStores ? rec.featureStores[me.name] : null;
+        const me = this;
+        let features = null;
+        const featureStore = rec.featureStores
+            ? rec.featureStores[me.name]
+            : null;
 
         if (featureStore && data) {
-            features = (new ol.format.GeoJSON().readFeatures(data));
+            features = new ol.format.GeoJSON().readFeatures(data);
             // wrap an edit session around updating the field when first loaded
             // to ensure the model is not marked as dirty
             rec.beginEdit();
-            var layerSource = featureStore.layer.getSource();
+            const layerSource = featureStore.layer.getSource();
             layerSource.getFeaturesCollection().clear();
             layerSource.addFeatures(features);
             rec.endEdit();
@@ -42,17 +43,16 @@ Ext.define('CpsiMapview.field.Feature', {
     },
 
     /**
-    * Create a default style for the layer associated with the feature field
-    *
-    * @template
-    */
+     * Create a default style for the layer associated with the feature field
+     *
+     * @template
+     */
     createStyle: Ext.emptyFn,
 
     /**
-    * Create a selection style for the layer associated with the feature field
-    *
-    * @template
-    */
+     * Create a selection style for the layer associated with the feature field
+     *
+     * @template
+     */
     createSelectStyle: Ext.emptyFn
-
 });

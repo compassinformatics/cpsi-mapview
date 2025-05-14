@@ -41,41 +41,43 @@ Ext.define('CpsiMapview.view.form.LayerTreeFilter', {
      */
     FILTER_ID: 'cpsi-tree-layer-filter',
 
-    items: [{
-        xtype: 'textfield',
-        hideTrigger: false,
-        anchor: '100%',
-        maxWidth: 250,
-        bind: {
-            emptyText: '{searchTextPlaceholder}',
-        },
-        triggers: {
-            clearTreeFilterText: {
-                cls: 'x-form-clear-trigger',
-                handler: 'clearText'
+    items: [
+        {
+            xtype: 'textfield',
+            hideTrigger: false,
+            anchor: '100%',
+            maxWidth: 250,
+            bind: {
+                emptyText: '{searchTextPlaceholder}'
+            },
+            triggers: {
+                clearTreeFilterText: {
+                    cls: 'x-form-clear-trigger',
+                    handler: 'clearText'
+                }
+            },
+            listeners: {
+                change: 'onSearchTextChange'
             }
         },
-        listeners: {
-            change: 'onSearchTextChange'
+        {
+            xtype: 'checkboxfield',
+            bind: {
+                boxLabel: '{hideInvisibleLayersLabel}'
+            },
+            listeners: {
+                change: 'onCheckboxChange'
+            }
         }
-    },
-    {
-        xtype: 'checkboxfield',
-        bind: {
-            boxLabel: '{hideInvisibleLayersLabel}',
-        },
-        listeners: {
-            change: 'onCheckboxChange'
-        }
-    }],
+    ],
 
     initComponent: function () {
-        var me = this;
+        const me = this;
         me.callParent(arguments);
 
-        var mapPanel = CpsiMapview.view.main.Map.guess();
+        const mapPanel = CpsiMapview.view.main.Map.guess();
         mapPanel.on('cmv-init-layersadded', function () {
-            var tree = Ext.ComponentQuery.query('cmv_layertree')[0];
+            const tree = Ext.ComponentQuery.query('cmv_layertree')[0];
             if (!tree) {
                 return;
             }
@@ -84,6 +86,5 @@ Ext.define('CpsiMapview.view.form.LayerTreeFilter', {
                 me.getController().updateFilter();
             });
         });
-
     }
 });

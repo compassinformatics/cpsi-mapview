@@ -11,16 +11,14 @@ Ext.define('CpsiMapview.form.RightInfoField', {
     xtype: 'cmv_rightinfofield',
     extend: 'Ext.form.FieldContainer',
 
-    requires: [
-        'Ext.tip.QuickTipManager'
-    ],
+    requires: ['Ext.tip.QuickTipManager'],
 
     /**
      * Setter method for the infoIconTooltip property
      * @param {any} tooltip
      */
     setInfoIconTooltip: function (tooltip) {
-        var me = this;
+        const me = this;
         me.toolTip = tooltip;
         me.updateTooltip();
     },
@@ -29,8 +27,7 @@ Ext.define('CpsiMapview.form.RightInfoField', {
      * Update the tooltip text
      */
     updateTooltip: function () {
-
-        var me = this;
+        const me = this;
 
         if (Ext.tip.QuickTipManager.isEnabled() === true) {
             Ext.tip.QuickTipManager.unregister(me.iconPanel);
@@ -43,11 +40,10 @@ Ext.define('CpsiMapview.form.RightInfoField', {
         } else {
             Ext.log.warn('Ext.tip.QuickTipManager is not enabled');
         }
-
     },
 
     constructor: function (config) {
-        var me = this;
+        const me = this;
 
         me.callParent(arguments);
 

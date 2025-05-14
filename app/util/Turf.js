@@ -17,23 +17,25 @@ Ext.define('CpsiMapview.util.Turf', {
      * @param {string} offsetUnit The unit of the offset.
      * @returns {ol.Feature} The parallel feature.
      */
-    createParallelFeature: function(map, feature, offset, offsetUnit) {
-        var mapProj = map.getView().getProjection().getCode();
-        var format = new ol.format.GeoJSON({
+    createParallelFeature: function (map, feature, offset, offsetUnit) {
+        const mapProj = map.getView().getProjection().getCode();
+        const format = new ol.format.GeoJSON({
             featureProjection: mapProj,
             dataProjection: 'EPSG:4326'
         });
-        var geojsonFeature = format.writeFeatureObject(feature);
-        var opts = undefined;
+        const geojsonFeature = format.writeFeatureObject(feature);
+        let opts = undefined;
         if (offsetUnit !== null && offsetUnit !== undefined) {
             opts = {
                 units: offsetUnit
             };
         }
-        var parallelGeojsonFeature = turf.lineOffset.lineOffset(
-            geojsonFeature.geometry, offset, opts
+        const parallelGeojsonFeature = turf.lineOffset.lineOffset(
+            geojsonFeature.geometry,
+            offset,
+            opts
         );
-        var parallelFeature = format.readFeature(parallelGeojsonFeature);
+        const parallelFeature = format.readFeature(parallelGeojsonFeature);
         return parallelFeature;
     }
 });

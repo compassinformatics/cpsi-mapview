@@ -1,8 +1,6 @@
 Ext.define('CpsiMapview.view.snappingExample.EdgeModel', {
     extend: 'Ext.data.Model',
-    requires: [
-        'CpsiMapview.field.Line'
-    ],
+    requires: ['CpsiMapview.field.Line'],
     mixins: {
         //eventsMixin: 'CpsiMapview.model.FeatureEventsMixin',
         features: 'CpsiMapview.model.FeatureStoreMixin'
@@ -66,7 +64,7 @@ Ext.define('CpsiMapview.view.snappingExample.EdgeModel', {
         {
             name: 'geometry',
             type: 'line'
-        },
+        }
     ]
 });
 
@@ -75,12 +73,18 @@ Ext.define('CpsiMapview.view.snappingExample.EdgeButton', {
     xtype: 'cmv_edgebutton',
     handler: function () {
         if (!this.window) {
-            var rec = Ext.create('CpsiMapview.view.snappingExample.EdgeModel', { edgeId: null });
-            this.window = Ext.create('CpsiMapview.view.snappingExample.EdgeWindow');
+            const rec = Ext.create(
+                'CpsiMapview.view.snappingExample.EdgeModel',
+                {
+                    edgeId: null
+                }
+            );
+            this.window = Ext.create(
+                'CpsiMapview.view.snappingExample.EdgeWindow'
+            );
 
-            var vm = this.window.getViewModel();
+            const vm = this.window.getViewModel();
             vm.set('currentRecord', rec);
-
         }
         this.window.show();
     }

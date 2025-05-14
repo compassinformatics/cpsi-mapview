@@ -25,13 +25,16 @@ Ext.define('CpsiMapview.view.main.Map', {
 
     controller: 'cmv_map',
 
-    dockedItems: [{
-        xtype: 'cmv_maptools',
-        dock: 'top',
-    }, {
-        xtype: 'cmv_mapfooter',
-        dock: 'bottom'
-    }],
+    dockedItems: [
+        {
+            xtype: 'cmv_maptools',
+            dock: 'top'
+        },
+        {
+            xtype: 'cmv_mapfooter',
+            dock: 'bottom'
+        }
+    ],
 
     plugins: [
         {
@@ -55,9 +58,9 @@ Ext.define('CpsiMapview.view.main.Map', {
     },
 
     /**
-    * See blog post https://www.sencha.com/blog/declarative-listeners-in-ext-js-5/
-    * Setting in initComponent sets scope to the parent (wrong) controller
-    * */
+     * See blog post https://www.sencha.com/blog/declarative-listeners-in-ext-js-5/
+     * Setting in initComponent sets scope to the parent (wrong) controller
+     * */
     listeners: {
         'cmv-mapclick': {
             fn: 'onMapClick',
@@ -111,7 +114,6 @@ Ext.define('CpsiMapview.view.main.Map', {
      */
     roundPermalinkCoords: true,
 
-
     /**
      * Remembers the last resolution before change.
      * Necessary for detecting resolution change events.
@@ -151,15 +153,14 @@ Ext.define('CpsiMapview.view.main.Map', {
      * @param {*} defaults
      */
     applyDefaultsToLayerConf: function (layerConf, defaults) {
-
-        var newLayerConf = {};
+        const newLayerConf = {};
 
         // general default
-        var generalDefaults = defaults ? defaults['general'] : {};
+        const generalDefaults = defaults ? defaults['general'] : {};
         Ext.Object.merge(newLayerConf, generalDefaults);
 
         // layer type default
-        var typeDefaults = defaults ? defaults[layerConf.layerType] : {};
+        const typeDefaults = defaults ? defaults[layerConf.layerType] : {};
         Ext.Object.merge(newLayerConf, typeDefaults);
 
         // actual config
@@ -173,25 +174,28 @@ Ext.define('CpsiMapview.view.main.Map', {
      * @param {*} layerJson
      */
     applyDefaultsToApplicationConf: function (layerJson) {
-        var me = this;
+        const me = this;
 
-        var defaults = layerJson.defaults;
+        const defaults = layerJson.defaults;
 
-        var newConfiguration = { 'layers': [] };
+        const newConfiguration = { layers: [] };
 
         // loop through layers and apply defaults
         Ext.each(layerJson.layers, function (layerConf) {
-
-            var newLayerConf = me.applyDefaultsToLayerConf(layerConf, defaults);
+            const newLayerConf = me.applyDefaultsToLayerConf(
+                layerConf,
+                defaults
+            );
 
             // additionally update sublayers of switch layers
             if (newLayerConf.layerType == 'switchlayer') {
-
-                var updatedSubLayers = [];
+                const updatedSubLayers = [];
                 // loop through sublayers and apply defaults
                 Ext.each(newLayerConf.layers, function (subLayerConf) {
-
-                    var newSubLayerConf = me.applyDefaultsToLayerConf(subLayerConf, defaults);
+                    const newSubLayerConf = me.applyDefaultsToLayerConf(
+                        subLayerConf,
+                        defaults
+                    );
                     updatedSubLayers.push(newSubLayerConf);
                 });
                 // replace old layers with updated layers
@@ -203,68 +207,82 @@ Ext.define('CpsiMapview.view.main.Map', {
         return newConfiguration;
     },
 
-
     /**
      * @private
      */
     initComponent: function () {
-
-        var me = this;
+        const me = this;
 
         // ensure custom projections are registered prior to creating the map
 
         proj4.defs('EPSG:4326', '+proj=longlat +datum=WGS84 +no_defs');
-        proj4.defs('EPSG:3857', '+proj=merc +a=6378137 +b=6378137 +lat_ts=0.0 +lon_0=0.0 +x_0=0.0 +y_0=0 +k=1.0 +units=m +nadgrids=@null +wktext  +no_defs');
-        proj4.defs('EPSG:2157', '+proj=tmerc +lat_0=53.5 +lon_0=-8 +k=0.99982 +x_0=600000 +y_0=750000 +ellps=GRS80 +towgs84=0,0,0,0,0,0,0 +units=m +no_defs');
-        proj4.defs('EPSG:29902', '+proj=tmerc +lat_0=53.5 +lon_0=-8 +k=1.000035 +x_0=200000 +y_0=250000 +ellps=mod_airy +towgs84=482.5,-130.6,564.6,-1.042,-0.214,-0.631,8.15 +units=m +no_defs');
+        proj4.defs(
+            'EPSG:3857',
+            '+proj=merc +a=6378137 +b=6378137 +lat_ts=0.0 +lon_0=0.0 +x_0=0.0 +y_0=0 +k=1.0 +units=m +nadgrids=@null +wktext  +no_defs'
+        );
+        proj4.defs(
+            'EPSG:2157',
+            '+proj=tmerc +lat_0=53.5 +lon_0=-8 +k=0.99982 +x_0=600000 +y_0=750000 +ellps=GRS80 +towgs84=0,0,0,0,0,0,0 +units=m +no_defs'
+        );
+        proj4.defs(
+            'EPSG:29902',
+            '+proj=tmerc +lat_0=53.5 +lon_0=-8 +k=1.000035 +x_0=200000 +y_0=250000 +ellps=mod_airy +towgs84=482.5,-130.6,564.6,-1.042,-0.214,-0.631,8.15 +units=m +no_defs'
+        );
 
         // support deprecated ESRI code for EPSG3857
         // see https://support.esri.com/en-us/knowledge-base/why-does-arcgis-online-use-a-deprecated-spatial-referen-000013950
-        proj4.defs('EPSG:102100', '+proj=merc +a=6378137 +b=6378137 +lat_ts=0.0 +lon_0=0.0 +x_0=0.0 +y_0=0 +k=1.0 +units=m +nadgrids=@null +wktext  +no_defs');
+        proj4.defs(
+            'EPSG:102100',
+            '+proj=merc +a=6378137 +b=6378137 +lat_ts=0.0 +lon_0=0.0 +x_0=0.0 +y_0=0 +k=1.0 +units=m +nadgrids=@null +wktext  +no_defs'
+        );
 
         ol.proj.proj4.register(proj4);
 
-        var projectionsStore = BasiGX.store.Projections;
+        const projectionsStore = BasiGX.store.Projections;
         // load proj4 settings into the global BasiGX.store.Projections store to avoid
         // calls to epsg.io by BasiGX.view.panel.CoordinateMousePositionPanel
         // see https://github.com/terrestris/BasiGX/pull/720
         // for the formats below see the JSON returned by https://epsg.io/?q=4326&format=json
         // however this will be deprecated on 1/2/2025, see https://github.com/terrestris/BasiGX/issues/753
-        projectionsStore.loadData([{
-            code: 4326,
-            name: 'WGS 84',
-            proj4: '+proj=longlat +datum=WGS84 +no_defs +type=crs',
-            unit: 'degree (supplier to define representation)',
-        }, {
-            code: 3857,
-            name: 'WGS 84 / Pseudo-Mercator',
-            proj4: '+proj=merc +a=6378137 +b=6378137 +lat_ts=0 +lon_0=0 +x_0=0 +y_0=0 +k=1 +units=m +nadgrids=@null +wktext +no_defs +type=crs',
-            unit: 'metre'
-        },
-        {
-            code: 29902,
-            name: 'TM65 / Irish Grid',
-            proj4: '+proj=tmerc +lat_0=53.5 +lon_0=-8 +k=1.000035 +x_0=200000 +y_0=250000 +a=6377340.189 +rf=299.3249646 +towgs84=482.5,-130.6,564.6,-1.042,-0.214,-0.631,8.15 +units=m +no_defs +type=crs',
-            unit: 'metre'
-        },
-        {
-            code: 2157,
-            name: 'IRENET95 / Irish Transverse Mercator',
-            proj4: '+proj=tmerc +lat_0=53.5 +lon_0=-8 +k=0.99982 +x_0=600000 +y_0=750000 +ellps=GRS80 +towgs84=0,0,0,0,0,0,0 +units=m +no_defs +type=crs',
-            unit: 'metre'
-        },
-        {
-            code: 27700,
-            name: 'OSGB36 / British National Grid',
-            proj4: '+proj=tmerc +lat_0=49 +lon_0=-2 +k=0.9996012717 +x_0=400000 +y_0=-100000 +ellps=airy +nadgrids=OSTN15_NTv2_OSGBtoETRS.gsb +units=m +no_defs +type=crs',
-            unit: 'metre'
-        }
+        projectionsStore.loadData([
+            {
+                code: 4326,
+                name: 'WGS 84',
+                proj4: '+proj=longlat +datum=WGS84 +no_defs +type=crs',
+                unit: 'degree (supplier to define representation)'
+            },
+            {
+                code: 3857,
+                name: 'WGS 84 / Pseudo-Mercator',
+                proj4: '+proj=merc +a=6378137 +b=6378137 +lat_ts=0 +lon_0=0 +x_0=0 +y_0=0 +k=1 +units=m +nadgrids=@null +wktext +no_defs +type=crs',
+                unit: 'metre'
+            },
+            {
+                code: 29902,
+                name: 'TM65 / Irish Grid',
+                proj4: '+proj=tmerc +lat_0=53.5 +lon_0=-8 +k=1.000035 +x_0=200000 +y_0=250000 +a=6377340.189 +rf=299.3249646 +towgs84=482.5,-130.6,564.6,-1.042,-0.214,-0.631,8.15 +units=m +no_defs +type=crs',
+                unit: 'metre'
+            },
+            {
+                code: 2157,
+                name: 'IRENET95 / Irish Transverse Mercator',
+                proj4: '+proj=tmerc +lat_0=53.5 +lon_0=-8 +k=0.99982 +x_0=600000 +y_0=750000 +ellps=GRS80 +towgs84=0,0,0,0,0,0,0 +units=m +no_defs +type=crs',
+                unit: 'metre'
+            },
+            {
+                code: 27700,
+                name: 'OSGB36 / British National Grid',
+                proj4: '+proj=tmerc +lat_0=49 +lon_0=-2 +k=0.9996012717 +x_0=400000 +y_0=-100000 +ellps=airy +nadgrids=OSTN15_NTv2_OSGBtoETRS.gsb +units=m +no_defs +type=crs',
+                unit: 'metre'
+            }
         ]);
 
         // use app settings when available for zoom and center
-        var viewConfig = {};
+        const viewConfig = {};
 
-        var app = Ext.getApplication ? Ext.getApplication() : Ext.app.Application.instance;
+        const app = Ext.getApplication
+            ? Ext.getApplication()
+            : Ext.app.Application.instance;
 
         if (app && app.zoom) {
             viewConfig.zoom = app.zoom;
@@ -277,38 +295,41 @@ Ext.define('CpsiMapview.view.main.Map', {
         // now apply any defaults if not set by the app
         Ext.applyIf(viewConfig, me.mapViewConfig);
 
-        var view = new ol.View(viewConfig);
+        const view = new ol.View(viewConfig);
 
         // create a default map if one has not already been created in a derived class
         if (!me.map) {
             me.map = new ol.Map({
                 // layers will be created from default.json later
                 layers: [],
-                controls: ol.control.defaults.defaults().extend([
-                    new ol.control.FullScreen()
-                ]),
-                interactions: ol.interaction.defaults.defaults().extend([
-                    new ol.interaction.DragRotateAndZoom()
-                ]),
+                controls: ol.control.defaults
+                    .defaults()
+                    .extend([new ol.control.FullScreen()]),
+                interactions: ol.interaction.defaults
+                    .defaults()
+                    .extend([new ol.interaction.DragRotateAndZoom()]),
                 view: view
             });
         }
 
         // create default items if not already been created in a derived class
         if (!me.items) {
-            me.items = [{
-                xtype: 'gx_map',
-                pointerRest: true,
-                pointerRestInterval: 500,
-                stateful: true,
-                stateId: 'cmv_mapstate',
-                map: me.map,
-                listeners: {
-                    afterrender: 'afterMapRender'
+            me.items = [
+                {
+                    xtype: 'gx_map',
+                    pointerRest: true,
+                    pointerRestInterval: 500,
+                    stateful: true,
+                    stateId: 'cmv_mapstate',
+                    map: me.map,
+                    listeners: {
+                        afterrender: 'afterMapRender'
+                    }
+                },
+                {
+                    xtype: 'cmv_minimized_windows_toolbar'
                 }
-            }, {
-                xtype: 'cmv_minimized_windows_toolbar'
-            }];
+            ];
         }
 
         // Load layer JSON configuration
@@ -316,11 +337,12 @@ Ext.define('CpsiMapview.view.main.Map', {
             Ext.Ajax.request({
                 url: resourcePaths.layerConfig,
                 success: function (response) {
-                    var layerJson = Ext.decode(response.responseText);
-                    var newConfiguration = me.applyDefaultsToApplicationConf(layerJson);
+                    const layerJson = Ext.decode(response.responseText);
+                    const newConfiguration =
+                        me.applyDefaultsToApplicationConf(layerJson);
 
                     Ext.each(newConfiguration.layers, function (layerConf) {
-                        var layer = LayerFactory.createLayer(layerConf);
+                        const layer = LayerFactory.createLayer(layerConf);
                         if (layer) {
                             me.olMap.addLayer(layer);
                         }
@@ -334,10 +356,12 @@ Ext.define('CpsiMapview.view.main.Map', {
                     // fire event to inform subscribers that all layers are loaded
                     me.fireEvent('cmv-init-layersadded', me);
 
-                    var timeSlider = me.down('cmv_timeslider');
+                    const timeSlider = me.down('cmv_timeslider');
                     if (timeSlider) {
-                        timeSlider.fireEvent('allLayersAdded',
-                            timeSlider.down('multislider'));
+                        timeSlider.fireEvent(
+                            'allLayersAdded',
+                            timeSlider.down('multislider')
+                        );
                     }
                 }
             });
@@ -351,11 +375,15 @@ Ext.define('CpsiMapview.view.main.Map', {
 
         if (me.enableMapClick) {
             me.olMap.on('singleclick', function (evt) {
-                var clickedFeatures = [];
-                me.olMap.forEachFeatureAtPixel(evt.pixel,
+                const clickedFeatures = [];
+                me.olMap.forEachFeatureAtPixel(
+                    evt.pixel,
                     function (feature, layer) {
                         // collect all clicked features and their layers
-                        clickedFeatures.push({ feature: feature, layer: layer });
+                        clickedFeatures.push({
+                            feature: feature,
+                            layer: layer
+                        });
                     },
                     {
                         hitTolerance: me.mapViewConfig.hitTolerance
@@ -369,11 +397,15 @@ Ext.define('CpsiMapview.view.main.Map', {
 
         if (me.enableMapHover) {
             me.mapCmp.on('pointerrest', function (evt) {
-                var hoveredFeatures = [];
-                me.olMap.forEachFeatureAtPixel(evt.pixel,
+                const hoveredFeatures = [];
+                me.olMap.forEachFeatureAtPixel(
+                    evt.pixel,
                     function (feature, layer) {
                         // collect all clicked features and their layers
-                        hoveredFeatures.push({ feature: feature, layer: layer });
+                        hoveredFeatures.push({
+                            feature: feature,
+                            layer: layer
+                        });
                     }
                 );
 
@@ -394,23 +426,23 @@ Ext.define('CpsiMapview.view.main.Map', {
             // because it fires too often
             // (see https://github.com/openlayers/openlayers/issues/7402)
             me.olMap.on('moveend', function (evt) {
-                var targetResolution = evt.target.getView().getResolution();
+                const targetResolution = evt.target.getView().getResolution();
                 if (targetResolution === me.lastResolution) {
                     // resolution has not changed
                     return;
                 }
                 me.lastResolution = targetResolution;
 
-                var switchLayerUtil = CpsiMapview.util.SwitchLayer;
-                switchLayerUtil.handleSwitchLayerOnResolutionChange(targetResolution);
-            }
-            );
+                const switchLayerUtil = CpsiMapview.util.SwitchLayer;
+                switchLayerUtil.handleSwitchLayerOnResolutionChange(
+                    targetResolution
+                );
+            });
         }
 
         if (me.enablePermalink) {
-
             // create permalink provider
-            var plProvider = Ext.create('GeoExt.state.PermalinkProvider');
+            const plProvider = Ext.create('GeoExt.state.PermalinkProvider');
             // set it in the state manager
             Ext.state.Manager.setProvider(plProvider);
 
@@ -428,7 +460,7 @@ Ext.define('CpsiMapview.view.main.Map', {
 
         Ext.GlobalEvents.fireEvent('cmv-mapready', me);
 
-        var grouping = this.getPlugin('cmv_feature_attribute_grouping');
+        const grouping = this.getPlugin('cmv_feature_attribute_grouping');
         if (grouping) {
             grouping.initGrouping(me.mapCmp, me.olMap);
         }
@@ -442,14 +474,17 @@ Ext.define('CpsiMapview.view.main.Map', {
      * @private
      */
     registerPermalinkEvents: function () {
-        var me = this;
+        const me = this;
 
         // update permalink when visible map state changes
-        me.permalinkProvider.on('statechange', function (stateProvider, stateId, state) {
-            if (stateId === 'cmv_mapstate') {
-                me.updatePermalink(state);
+        me.permalinkProvider.on(
+            'statechange',
+            function (stateProvider, stateId, state) {
+                if (stateId === 'cmv_mapstate') {
+                    me.updatePermalink(state);
+                }
             }
-        });
+        );
 
         // restore the view state when navigating through the history, see
         // https://developer.mozilla.org/en-US/docs/Web/API/WindowEventHandlers/onpopstate
@@ -471,7 +506,7 @@ Ext.define('CpsiMapview.view.main.Map', {
      * @private
      */
     updatePermalink: function (mapState) {
-        var me = this;
+        const me = this;
 
         if (!me.shouldUpdatePermalink) {
             // do not update the URL when the view was changed in the 'popstate'
@@ -481,11 +516,11 @@ Ext.define('CpsiMapview.view.main.Map', {
         }
 
         // check if we have to round the coords (if no coordinates in deegrees)
-        var doRound =
+        const doRound =
             me.roundPermalinkCoords &&
             me.olMap.getView().getProjection().getUnits() !== 'degrees';
 
-        var hash = me.permalinkProvider.getPermalinkHash(doRound);
+        const hash = me.permalinkProvider.getPermalinkHash(doRound);
 
         // push the state into the window history (to navigate with browser's
         // back and forward buttons)

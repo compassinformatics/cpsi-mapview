@@ -1,8 +1,8 @@
 /**
-* A custom field for storing point features.
-* The field handles loading and serializing features to and from an associated store.
-* The linked map layer can have styling properties customized through field properties.
-*/
+ * A custom field for storing point features.
+ * The field handles loading and serializing features to and from an associated store.
+ * The linked map layer can have styling properties customized through field properties.
+ */
 Ext.define('CpsiMapview.field.Point', {
     extend: 'CpsiMapview.field.Feature',
 
@@ -16,8 +16,8 @@ Ext.define('CpsiMapview.field.Point', {
      * @param {any} rec
      */
     serialize: function (v, rec) {
-        var me = this;
-        var featureStore = rec.featureStores[me.name];
+        const me = this;
+        const featureStore = rec.featureStores[me.name];
         return this.getPointGeometry(featureStore.layer);
     },
 
@@ -26,18 +26,18 @@ Ext.define('CpsiMapview.field.Point', {
      * @param {any} rec
      */
     getPointGeometry: function (pointLayer) {
+        let gj = null;
 
-        var feats, gj = null;
-
-        feats = pointLayer.getSource().getFeatures();
+        const feats = pointLayer.getSource().getFeatures();
 
         if (feats.length >= 1) {
-
             if (feats.length > 1) {
-                Ext.log.warn('Multiple points found in the point feature layer');
+                Ext.log.warn(
+                    'Multiple points found in the point feature layer'
+                );
             }
-            var writer = new ol.format.GeoJSON();
-            var geom = feats[feats.length - 1].getGeometry(); // get the last created feature
+            const writer = new ol.format.GeoJSON();
+            const geom = feats[feats.length - 1].getGeometry(); // get the last created feature
             gj = writer.writeGeometryObject(geom);
         }
 
@@ -45,21 +45,21 @@ Ext.define('CpsiMapview.field.Point', {
     },
 
     /**
-    * Create a new ol style
-    *
-    * @return {ol.style.Style} The new style
-    */
+     * Create a new ol style
+     *
+     * @return {ol.style.Style} The new style
+     */
     createStyle: function () {
-        var fill = new ol.style.Fill({
+        const fill = new ol.style.Fill({
             color: 'DarkOrange'
         });
 
-        var stroke = new ol.style.Stroke({
+        const stroke = new ol.style.Stroke({
             color: 'Maroon',
             width: 1.25
         });
 
-        var style = new ol.style.Style({
+        const style = new ol.style.Style({
             image: new ol.style.Circle({
                 fill: fill,
                 stroke: stroke,
@@ -73,10 +73,10 @@ Ext.define('CpsiMapview.field.Point', {
     },
 
     /**
-    * Create a new ol style for showing points when selected
-    *
-    * @return {ol.style.Style} The new style
-    */
+     * Create a new ol style for showing points when selected
+     *
+     * @return {ol.style.Style} The new style
+     */
     createSelectStyle: function () {
         return null;
     }

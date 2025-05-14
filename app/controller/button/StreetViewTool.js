@@ -6,10 +6,7 @@ Ext.define('CpsiMapview.controller.button.StreetViewTool', {
 
     alias: 'controller.cmv_streetview_tool',
 
-    requires: [
-        'CpsiMapview.view.window.MinimizableWindow',
-        'BasiGX.util.Map'
-    ],
+    requires: ['CpsiMapview.view.window.MinimizableWindow', 'BasiGX.util.Map'],
 
     /**
      * The OL map work / sync with this tool.
@@ -62,7 +59,7 @@ Ext.define('CpsiMapview.controller.button.StreetViewTool', {
     svPositionChangedListener: null,
 
     constructor: function () {
-        var me = this;
+        const me = this;
         me.onMapClick = me.onMapClick.bind(me);
         me.callParent(arguments);
     },
@@ -71,13 +68,15 @@ Ext.define('CpsiMapview.controller.button.StreetViewTool', {
      * @private
      */
     init: function () {
-        var me = this;
-        var view = me.getView();
+        const me = this;
+        const view = me.getView();
 
         // helper function to disable tool when GMaps API is not available
-        var reactOnMissingGmapsApi = function () {
-            Ext.Logger.warn('No Google Maps JS-API available. ' +
-                'The Street View tool will be deactivated.');
+        const reactOnMissingGmapsApi = function () {
+            Ext.Logger.warn(
+                'No Google Maps JS-API available. ' +
+                    'The Street View tool will be deactivated.'
+            );
             view.setDisabled(true);
             return;
         };
@@ -99,15 +98,15 @@ Ext.define('CpsiMapview.controller.button.StreetViewTool', {
 
         // create a vector layer for position if not passed in
         if (!me.vectorLayer) {
-
-            var style = view.vectorLayerStyle ||
+            const style =
+                view.vectorLayerStyle ||
                 new ol.style.Style({
-                    image: new ol.style.Icon(({
+                    image: new ol.style.Icon({
                         anchor: [0.5, 46],
                         anchorXUnits: 'fraction',
                         anchorYUnits: 'pixels',
                         src: view.vectorIcon
-                    }))
+                    })
                 });
 
             me.vectorLayer = new ol.layer.Vector({
@@ -129,7 +128,7 @@ Ext.define('CpsiMapview.controller.button.StreetViewTool', {
      * @private
      */
     onToggle: function (btn, pressed) {
-        var me = this;
+        const me = this;
 
         if (pressed) {
             // add layer and raise layer to top of stack
@@ -152,8 +151,8 @@ Ext.define('CpsiMapview.controller.button.StreetViewTool', {
      * Performs several cleanup steps.
      */
     onBeforeDestroy: function () {
-        var me = this;
-        var btn = me.getView();
+        const me = this;
+        const btn = me.getView();
 
         // detoggle button, forces clearing layer
         me.onToggle(btn, false);
@@ -171,8 +170,8 @@ Ext.define('CpsiMapview.controller.button.StreetViewTool', {
      *
      * @param  {Boolean} activate Flag to activate / deactivate the listeners
      */
-    registerMapListeners: function(activate) {
-        var me = this;
+    registerMapListeners: function (activate) {
+        const me = this;
 
         if (activate) {
             me.map.on('singleclick', me.onMapClick);
@@ -189,10 +188,10 @@ Ext.define('CpsiMapview.controller.button.StreetViewTool', {
      * @private
      */
     onMapClick: function (evt) {
-        var me = this;
-        var clickCoord = evt.coordinate;
+        const me = this;
+        const clickCoord = evt.coordinate;
 
-        var gmapsLatLng = me.olCoord2GmapsLatLng(clickCoord);
+        const gmapsLatLng = me.olCoord2GmapsLatLng(clickCoord);
         me.showStreetViewWindow(gmapsLatLng);
     },
 
@@ -204,78 +203,92 @@ Ext.define('CpsiMapview.controller.button.StreetViewTool', {
      * @private
      */
     showStreetViewWindow: function (latLng) {
-        var me = this;
-        var view = me.getView();
+        const me = this;
+        const view = me.getView();
 
         if (!me.streetViewWin) {
-            me.streetViewWin = Ext.create('CpsiMapview.view.window.MinimizableWindow', {
-                title: view.svWinTitlePrefix,
-                width: view.svWinWidth,
-                height: view.svWinHeight,
-                closeAction: 'destroy',
-                autoShow: false,
-                listeners: {
-                    afterrender: function (win) {
-                        // render SV panorama to body of the window
-                        me.svDiv = Ext.getDom(win.body);
-                    },
-                    resize: function () {
-                        // reload the panorama to fit the new window size
-                        if (me.svPanorama) {
-                            // for an open window use the current position
-                            me.showStreetViewWindow(me.svPanorama.getPosition());
-                        } else {
-                            // for a new window use the new position
-                            me.showStreetViewWindow(latLng);
+            me.streetViewWin = Ext.create(
+                'CpsiMapview.view.window.MinimizableWindow',
+                {
+                    title: view.svWinTitlePrefix,
+                    width: view.svWinWidth,
+                    height: view.svWinHeight,
+                    closeAction: 'destroy',
+                    autoShow: false,
+                    listeners: {
+                        afterrender: function (win) {
+                            // render SV panorama to body of the window
+                            me.svDiv = Ext.getDom(win.body);
+                        },
+                        resize: function () {
+                            // reload the panorama to fit the new window size
+                            if (me.svPanorama) {
+                                // for an open window use the current position
+                                me.showStreetViewWindow(
+                                    me.svPanorama.getPosition()
+                                );
+                            } else {
+                                // for a new window use the new position
+                                me.showStreetViewWindow(latLng);
+                            }
+                        },
+                        destroy: function () {
+                            me.unregisterGmapsEvents();
+                            me.svPanorama = null;
+                            me.streetViewWin = null;
+                            me.vectorLayer.getSource().clear();
                         }
-                    },
-                    destroy: function () {
-                        me.unregisterGmapsEvents();
-                        me.svPanorama = null;
-                        me.streetViewWin = null;
-                        me.vectorLayer.getSource().clear();
                     }
                 }
-            });
+            );
         }
 
         // load the panorama for the given position
-        me.streetViewService.getPanoramaByLocation(latLng, 50, function (data, status) {
-            if (status === google.maps.StreetViewStatus.OK) {
-                var win = me.streetViewWin;
-                var title = view.svWinTitlePrefix + view.svWinTitleDateLabel +
-                    data.imageDate;
+        me.streetViewService.getPanoramaByLocation(
+            latLng,
+            50,
+            function (data, status) {
+                if (status === google.maps.StreetViewStatus.OK) {
+                    const win = me.streetViewWin;
+                    const title =
+                        view.svWinTitlePrefix +
+                        view.svWinTitleDateLabel +
+                        data.imageDate;
 
-                win.setTitle(title);
-                win.show();
+                    win.setTitle(title);
+                    win.show();
 
-                // create new Street View panorama
-                var panoConf = {
-                    position: latLng,
-                    pov: view.svDefaultPov
-                };
-                me.svPanorama = new google.maps.StreetViewPanorama(me.svDiv);
-                me.svPanorama.setPov(panoConf.pov);
-                me.svPanorama.setPosition(panoConf.position);
+                    // create new Street View panorama
+                    const panoConf = {
+                        position: latLng,
+                        pov: view.svDefaultPov
+                    };
+                    me.svPanorama = new google.maps.StreetViewPanorama(
+                        me.svDiv
+                    );
+                    me.svPanorama.setPov(panoConf.pov);
+                    me.svPanorama.setPosition(panoConf.position);
 
-                // initially draw the position on the map and set heading
-                me.drawPositionFeature(me.gmapsLatLng2olCoord(latLng));
-                me.updatePositionFeature();
+                    // initially draw the position on the map and set heading
+                    me.drawPositionFeature(me.gmapsLatLng2olCoord(latLng));
+                    me.updatePositionFeature();
 
-                me.registerGmapsEvents();
+                    me.registerGmapsEvents();
+                } else {
+                    // inform subscribers that there was no panorama for clicked pos
+                    me.getView().fireEvent('missingpanorama', {
+                        msg: 'No StreetView panorama available at clicked location'
+                    });
 
-            } else {
-                // inform subscribers that there was no panorama for clicked pos
-                me.getView().fireEvent('missingpanorama', {
-                    msg: 'No StreetView panorama available at clicked location'
-                });
-
-                if (view.showNoPanoramaWarning) {
-                    Ext.MessageBox.alert(view.noPanoramaWarningTitle,
-                        view.noPanoramaWarningText);
+                    if (view.showNoPanoramaWarning) {
+                        Ext.MessageBox.alert(
+                            view.noPanoramaWarningTitle,
+                            view.noPanoramaWarningText
+                        );
+                    }
                 }
             }
-        });
+        );
     },
 
     /**
@@ -286,14 +299,14 @@ Ext.define('CpsiMapview.controller.button.StreetViewTool', {
      * @private
      */
     drawPositionFeature: function (coord) {
-        var me = this;
-        var vectorSource = me.vectorLayer.getSource();
+        const me = this;
+        const vectorSource = me.vectorLayer.getSource();
 
         // remove existing position feature
         vectorSource.clear();
         // add new position feature
-        var posFeat = new ol.Feature({
-            geometry: new ol.geom.Point(coord),
+        const posFeat = new ol.Feature({
+            geometry: new ol.geom.Point(coord)
         });
         vectorSource.addFeature(posFeat);
     },
@@ -303,16 +316,16 @@ Ext.define('CpsiMapview.controller.button.StreetViewTool', {
      * heading of the currently opened SV panorama.
      */
     updatePositionFeature: function () {
-        var me = this;
+        const me = this;
 
         if (!me.svPanorama) {
             return;
         }
 
-        var newHeading = me.getHeadingRad();
-        var newPosCoord = me.getPositionCoord();
-        var vectorSource = me.vectorLayer.getSource();
-        var feat = vectorSource.getFeatures()[0];
+        const newHeading = me.getHeadingRad();
+        const newPosCoord = me.getPositionCoord();
+        const vectorSource = me.vectorLayer.getSource();
+        const feat = vectorSource.getFeatures()[0];
 
         if (feat) {
             // move position feature to current position
@@ -330,7 +343,7 @@ Ext.define('CpsiMapview.controller.button.StreetViewTool', {
      * @private
      */
     handlePovChanged: function () {
-        var me = this;
+        const me = this;
         me.updatePositionFeature();
     },
 
@@ -341,7 +354,7 @@ Ext.define('CpsiMapview.controller.button.StreetViewTool', {
      * @private
      */
     handlePositionChanged: function () {
-        var me = this;
+        const me = this;
         me.updatePositionFeature();
     },
 
@@ -351,12 +364,12 @@ Ext.define('CpsiMapview.controller.button.StreetViewTool', {
      * @return {Number} Heading in radiant
      */
     getHeadingRad: function () {
-        var me = this;
-        var heading = me.svPanorama.getPov().heading;
+        const me = this;
+        let heading = me.svPanorama.getPov().heading;
 
         // normalize and convert to radiant
         heading = me.normaliseDegrees(heading);
-        heading = heading / 180 * Math.PI;
+        heading = (heading / 180) * Math.PI;
 
         return heading;
     },
@@ -367,8 +380,8 @@ Ext.define('CpsiMapview.controller.button.StreetViewTool', {
      * @return {ol.Coordinate} SV panorama position
      */
     getPositionCoord: function () {
-        var me = this;
-        var pos = me.svPanorama.getPosition();
+        const me = this;
+        const pos = me.svPanorama.getPosition();
         return me.gmapsLatLng2olCoord(pos);
     },
 
@@ -398,11 +411,11 @@ Ext.define('CpsiMapview.controller.button.StreetViewTool', {
      * @return {google.maps.LatLng}   Google Maps LatLng object
      */
     olCoord2GmapsLatLng: function (coords) {
-        var me = this;
-        var latLonProj = 'EPSG:4326';
-        var mapProj = me.map.getView().getProjection().getCode();
+        const me = this;
+        const latLonProj = 'EPSG:4326';
+        const mapProj = me.map.getView().getProjection().getCode();
 
-        var latLonCoord;
+        let latLonCoord;
         if (mapProj !== latLonProj) {
             latLonCoord = ol.proj.transform(coords, mapProj, latLonProj);
         } else {
@@ -420,12 +433,12 @@ Ext.define('CpsiMapview.controller.button.StreetViewTool', {
      * @return {ol.Coordinate}             OL coordinate in map projection
      */
     gmapsLatLng2olCoord: function (latLng) {
-        var me = this;
-        var latLonProj = 'EPSG:4326';
-        var mapProj = me.map.getView().getProjection().getCode();
-        var latLonCoord = [latLng.lng(), latLng.lat()];
+        const me = this;
+        const latLonProj = 'EPSG:4326';
+        const mapProj = me.map.getView().getProjection().getCode();
+        const latLonCoord = [latLng.lng(), latLng.lat()];
 
-        var mapCoord;
+        let mapCoord;
         if (mapProj !== latLonProj) {
             mapCoord = ol.proj.transform(latLonCoord, latLonProj, mapProj);
         } else {
@@ -440,11 +453,17 @@ Ext.define('CpsiMapview.controller.button.StreetViewTool', {
      * SV panorama.
      */
     registerGmapsEvents: function () {
-        var me = this;
+        const me = this;
         me.svPovChangedListener = google.maps.event.addListener(
-            me.svPanorama, 'pov_changed', me.handlePovChanged.bind(me));
+            me.svPanorama,
+            'pov_changed',
+            me.handlePovChanged.bind(me)
+        );
         me.svPositionChangedListener = google.maps.event.addListener(
-            me.svPanorama, 'position_changed', me.handlePositionChanged.bind(me));
+            me.svPanorama,
+            'position_changed',
+            me.handlePositionChanged.bind(me)
+        );
     },
 
     /**
@@ -452,7 +471,7 @@ Ext.define('CpsiMapview.controller.button.StreetViewTool', {
      * SV panorama.
      */
     unregisterGmapsEvents: function () {
-        var me = this;
+        const me = this;
         google.maps.event.removeListener(me.svPovChangedListener);
         google.maps.event.removeListener(me.svPositionChangedListener);
     }

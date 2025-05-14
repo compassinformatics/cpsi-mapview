@@ -22,9 +22,11 @@ Ext.define('CpsiMapview.util.SwitchLayer', {
      * @param {Number} resolution The new resolution
      */
     handleSwitchLayerOnResolutionChange: function (resolution) {
-        var staticMe = CpsiMapview.util.SwitchLayer;
+        const staticMe = CpsiMapview.util.SwitchLayer;
 
-        var layerCollection = BasiGX.util.Map.getMapComponent().getMap().getLayers();
+        const layerCollection = BasiGX.util.Map.getMapComponent()
+            .getMap()
+            .getLayers();
 
         staticMe.checkSwitchLayersRecursively(layerCollection, resolution);
     },
@@ -36,32 +38,40 @@ Ext.define('CpsiMapview.util.SwitchLayer', {
      * @param {Number} mapResolution the resolution of the map
      */
     checkSwitchLayersRecursively: function (layerCollection, mapResolution) {
-        var staticMe = CpsiMapview.util.SwitchLayer;
+        const staticMe = CpsiMapview.util.SwitchLayer;
 
         layerCollection.forEach(function (layerOrGroup, index) {
-
-            if (layerOrGroup instanceof ol.layer.Layer &&
-                layerOrGroup.get('isSwitchLayer')) {
-                var switchLayer = layerOrGroup;
-                var switchConfiguration = switchLayer.get('switchConfiguration');
+            if (
+                layerOrGroup instanceof ol.layer.Layer &&
+                layerOrGroup.get('isSwitchLayer')
+            ) {
+                const switchLayer = layerOrGroup;
+                const switchConfiguration = switchLayer.get(
+                    'switchConfiguration'
+                );
                 // get precomputed switch resolution from layer config
-                var switchResolution = switchConfiguration.switchResolution;
-                var currentSwitchType = switchLayer.get('currentSwitchType');
+                const switchResolution = switchConfiguration.switchResolution;
+                const currentSwitchType = switchLayer.get('currentSwitchType');
 
-                var switchNecessary = staticMe.isLayerSwitchNecessary(
+                const switchNecessary = staticMe.isLayerSwitchNecessary(
                     currentSwitchType,
                     switchResolution,
                     mapResolution
                 );
 
                 if (switchNecessary) {
-                    staticMe.changeInternalLayer(layerCollection, switchLayer, index);
+                    staticMe.changeInternalLayer(
+                        layerCollection,
+                        switchLayer,
+                        index
+                    );
                 }
-            }
-
-            else if (layerOrGroup instanceof ol.layer.Group) {
-                var newOverlayCollection = layerOrGroup.getLayers();
-                staticMe.checkSwitchLayersRecursively(newOverlayCollection, mapResolution);
+            } else if (layerOrGroup instanceof ol.layer.Group) {
+                const newOverlayCollection = layerOrGroup.getLayers();
+                staticMe.checkSwitchLayersRecursively(
+                    newOverlayCollection,
+                    mapResolution
+                );
             }
         });
     },
@@ -77,12 +87,12 @@ Ext.define('CpsiMapview.util.SwitchLayer', {
      * @param {Number} index the index of the switchLayer in the collection
      */
     changeInternalLayer: function (layerCollection, switchLayer, index) {
-        var staticMe = CpsiMapview.util.SwitchLayer;
+        const staticMe = CpsiMapview.util.SwitchLayer;
 
         // complete any load events for the layer so the BasiGX.view.MapLoadingStatusBar
         // decrements correctly
 
-        var originalSource = switchLayer.getSource();
+        const originalSource = switchLayer.getSource();
 
         if (originalSource instanceof ol.source.Image) {
             originalSource.dispatchEvent('imageloadend');
@@ -92,31 +102,39 @@ Ext.define('CpsiMapview.util.SwitchLayer', {
             originalSource.dispatchEvent('vectorloadend');
         }
 
-        var switchConfiguration = switchLayer.get('switchConfiguration');
+        const switchConfiguration = switchLayer.get('switchConfiguration');
         // restore current layer visibility
         switchConfiguration.visibility = switchLayer.getVisible();
         // also apply current filter and selected style
 
-        var noStyle = true;
-        var newLayer = LayerFactory.createSwitchLayer(switchConfiguration, noStyle);
+        const noStyle = true;
+        const newLayer = LayerFactory.createSwitchLayer(
+            switchConfiguration,
+            noStyle
+        );
 
         // add original tree config (from tree.json) to new layer
-        var origTreeNodeConf = newLayer.get('_origTreeConf');
+        let origTreeNodeConf = newLayer.get('_origTreeConf');
         if (!origTreeNodeConf) {
-            origTreeNodeConf = CpsiMapview.controller.LayerTreeController.getTreeNodeConf(newLayer.get('layerKey'));
+            origTreeNodeConf =
+                CpsiMapview.controller.LayerTreeController.getTreeNodeConf(
+                    newLayer.get('layerKey')
+                );
             newLayer.set('_origTreeConf', origTreeNodeConf);
         }
 
-        var newLayerSource = newLayer.getSource();
+        const newLayerSource = newLayer.getSource();
         // store filters for either layer type so they can be retrieved when switching
-        var filters = originalSource.get('additionalFilters');
+        const filters = originalSource.get('additionalFilters');
         newLayerSource.set('additionalFilters', filters);
 
-        var activatedStyle = switchLayer.get('activatedStyle');
+        let activatedStyle = switchLayer.get('activatedStyle');
 
         // TODO: fix this warning and ensure a style is set
         if (!activatedStyle) {
-            Ext.Logger.warn('activatedStyle not set for ' + switchLayer.get('layerKey'));
+            Ext.Logger.warn(
+                'activatedStyle not set for ' + switchLayer.get('layerKey')
+            );
             activatedStyle = '';
         }
 
@@ -125,24 +143,33 @@ Ext.define('CpsiMapview.util.SwitchLayer', {
         if (newLayer.get('isWms')) {
             // check if a label STYLES parameter was added --> keep this
             // the STYLES value (SLD) for the labels
-            var labelClassName = newLayer.get('labelClassName');
-            var wmsStyleList = activatedStyle;
+            const labelClassName = newLayer.get('labelClassName');
+            let wmsStyleList = activatedStyle;
 
             if (newLayer.get('labelsActive') === true) {
                 wmsStyleList += ',' + labelClassName;
             }
 
             if (filters && filters.length > 0) {
-                var ogcFilters = CpsiMapview.util.Layer.convertAndCombineFilters(filters);
-                newLayerSource.getParams().FILTER = GeoExt.util.OGCFilter.combineFilters(ogcFilters, 'And', true, '1.1.0');
+                const ogcFilters =
+                    CpsiMapview.util.Layer.convertAndCombineFilters(filters);
+                newLayerSource.getParams().FILTER =
+                    GeoExt.util.OGCFilter.combineFilters(
+                        ogcFilters,
+                        'And',
+                        true,
+                        '1.1.0'
+                    );
             }
 
             // ensure there is a filter for every layer listed in the WMS request (required by MapServer)
-            var wmsFilterUtil = CpsiMapview.util.WmsFilter;
-            var wmsFilterString = wmsFilterUtil.getWmsFilterString(newLayerSource.getParams());
+            const wmsFilterUtil = CpsiMapview.util.WmsFilter;
+            const wmsFilterString = wmsFilterUtil.getWmsFilterString(
+                newLayerSource.getParams()
+            );
 
             // apply new style parameter and reload layer
-            var newParams = {
+            const newParams = {
                 STYLES: wmsStyleList,
                 FILTER: wmsFilterString,
                 TIMESTAMP: Ext.Date.now()
@@ -154,7 +181,9 @@ Ext.define('CpsiMapview.util.SwitchLayer', {
                 LayerFactory.loadSld(newLayer);
             }
         } else {
-            Ext.Logger.info('Layer type not supported in StyleSwitcherRadioGroup');
+            Ext.Logger.info(
+                'Layer type not supported in StyleSwitcherRadioGroup'
+            );
         }
 
         // `overlayCollection.setAt(0, newLayer)` causes strange
@@ -170,8 +199,10 @@ Ext.define('CpsiMapview.util.SwitchLayer', {
 
         // the configuration for the tree node got lost during the
         // switch. We add them again.
-        var treePanel = Ext.ComponentQuery.query('treepanel')[0];
-        treePanel.getController().applyTreeConfigsToOlLayer(newLayer, origTreeNodeConf);
+        const treePanel = Ext.ComponentQuery.query('treepanel')[0];
+        treePanel
+            .getController()
+            .applyTreeConfigsToOlLayer(newLayer, origTreeNodeConf);
 
         staticMe.updateLayerTreeForSwitchLayers();
 
@@ -188,35 +219,42 @@ Ext.define('CpsiMapview.util.SwitchLayer', {
      *
      * @returns {Boolean} If layerswitch is necessary
      */
-    isLayerSwitchNecessary: function (currentSwitchType, switchResolution, resolution) {
-        var staticMe = CpsiMapview.util.SwitchLayer;
+    isLayerSwitchNecessary: function (
+        currentSwitchType,
+        switchResolution,
+        resolution
+    ) {
+        const staticMe = CpsiMapview.util.SwitchLayer;
         // logic that checks when a switch layer needs to be replaced
-        var mapviewBelowSwitchResolution = (resolution < switchResolution);
-        var mapViewAboveSwitchResolution = !mapviewBelowSwitchResolution;
+        const mapviewBelowSwitchResolution = resolution < switchResolution;
+        const mapViewAboveSwitchResolution = !mapviewBelowSwitchResolution;
 
-        var createCloseView = (mapviewBelowSwitchResolution && (currentSwitchType === staticMe.switchStates.ABOVE_SWITCH_RESOLUTION));
-        var createFarAwayView = (mapViewAboveSwitchResolution && (currentSwitchType === staticMe.switchStates.BELOW_SWITCH_RESOLUTION));
+        const createCloseView =
+            mapviewBelowSwitchResolution &&
+            currentSwitchType === staticMe.switchStates.ABOVE_SWITCH_RESOLUTION;
+        const createFarAwayView =
+            mapViewAboveSwitchResolution &&
+            currentSwitchType === staticMe.switchStates.BELOW_SWITCH_RESOLUTION;
 
         return createCloseView || createFarAwayView;
     },
-
 
     /**
      * Updates the switch layer items of the layer tree. This is
      * necessary when switch layers get replaced.
      */
     updateLayerTreeForSwitchLayers: function () {
-        var treePanel = Ext.ComponentQuery.query('treepanel')[0];
-        var treeStore = treePanel.getStore();
-        var treeNodes = treeStore.getData();
+        const treePanel = Ext.ComponentQuery.query('treepanel')[0];
+        const treeStore = treePanel.getStore();
+        const treeNodes = treeStore.getData();
 
         Ext.each(treeNodes.items, function (node) {
-            var switchConf = node.getOlLayer().get('switchConfiguration');
+            const switchConf = node.getOlLayer().get('switchConfiguration');
 
             // only change for switch layers
             if (switchConf) {
                 // apply tree node text from tree config
-                var origTreeNodeConf = node.getOlLayer().get('_origTreeConf');
+                const origTreeNodeConf = node.getOlLayer().get('_origTreeConf');
                 node.set('text', origTreeNodeConf.text);
                 // also set original iconCls
                 node.set('iconCls', origTreeNodeConf.iconCls);
@@ -226,4 +264,3 @@ Ext.define('CpsiMapview.util.SwitchLayer', {
         });
     }
 });
-

@@ -32,23 +32,33 @@ Ext.define('CpsiMapview.model.fileupload.Attachment', {
      * @param {any} parentUrl the service URL of the parent owner
      */
     updateAttachmentUrls: function (parentUrl) {
-
-        var me = this;
-        var thumbnailUrl = '';
-        var attachmentUrl = '';
+        const me = this;
+        let thumbnailUrl = '';
+        let attachmentUrl = '';
 
         if (me.get('isThumbnailAvailable') === true) {
             // if there are thumbnails then the attachment is an image
-            thumbnailUrl = Ext.String.format('{0}/attachment/{1}/thumbnail', parentUrl, me.getId());
+            thumbnailUrl = Ext.String.format(
+                '{0}/attachment/{1}/thumbnail',
+                parentUrl,
+                me.getId()
+            );
         }
 
-        attachmentUrl = Ext.String.format('{0}/attachment/{1}', parentUrl, me.getId());
+        attachmentUrl = Ext.String.format(
+            '{0}/attachment/{1}',
+            parentUrl,
+            me.getId()
+        );
 
-        me.set({
-            thumbnailUrl: thumbnailUrl,
-            attachmentUrl: attachmentUrl
-        }, {
-            dirty: false
-        });
+        me.set(
+            {
+                thumbnailUrl: thumbnailUrl,
+                attachmentUrl: attachmentUrl
+            },
+            {
+                dirty: false
+            }
+        );
     }
 });

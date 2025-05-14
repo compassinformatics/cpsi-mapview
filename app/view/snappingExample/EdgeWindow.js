@@ -54,130 +54,132 @@ Ext.define('CpsiMapview.view.snappingExample.EdgeWindow', {
         }
     ],
 
-    items: [{
-        xtype: 'tabpanel',
-        anchor: '100% 100%',
-        defaults: {
-            padding: '5 5 5 5'
-        },
-        items: [
-            {
-                tabConfig: {
-                    title: 'General'
-                },
-                layout: {
-                    type: 'anchor',
-                },
-                items: [
-                    {
-                        xtype: 'fieldset',
-                        title: 'Details',
-                        anchor: '100%',
-                        layout: {
-                            type: 'table',
-                            columns: 2
-                        },
-                        items: [{
-                            xtype: 'cmv_rightinfofield',
-                            colspan: 1,
-                            width: 300,
-                            field: {
-                                xtype: 'displayfield',
-                                labelWidth: 100,
-                                width: 200,
-                                fieldLabel: 'Start Node ID',
-                                infoIconTooltip: 'Database Identifier',
-                                bind: {
-                                    value: '{currentRecord.startNodeId}'
-                                }
-                            }
-                        },
+    items: [
+        {
+            xtype: 'tabpanel',
+            anchor: '100% 100%',
+            defaults: {
+                padding: '5 5 5 5'
+            },
+            items: [
+                {
+                    tabConfig: {
+                        title: 'General'
+                    },
+                    layout: {
+                        type: 'anchor'
+                    },
+                    items: [
                         {
-                            xtype: 'cmv_rightinfofield',
-                            colspan: 1,
-                            width: 300,
-                            field: {
-                                xtype: 'displayfield',
-                                labelWidth: 100,
-                                width: 200,
-                                fieldLabel: 'End Node ID',
-                                infoIconTooltip: 'Database Identifier',
-                                bind: {
-                                    value: '{currentRecord.endNodeId}'
+                            xtype: 'fieldset',
+                            title: 'Details',
+                            anchor: '100%',
+                            layout: {
+                                type: 'table',
+                                columns: 2
+                            },
+                            items: [
+                                {
+                                    xtype: 'cmv_rightinfofield',
+                                    colspan: 1,
+                                    width: 300,
+                                    field: {
+                                        xtype: 'displayfield',
+                                        labelWidth: 100,
+                                        width: 200,
+                                        fieldLabel: 'Start Node ID',
+                                        infoIconTooltip: 'Database Identifier',
+                                        bind: {
+                                            value: '{currentRecord.startNodeId}'
+                                        }
+                                    }
+                                },
+                                {
+                                    xtype: 'cmv_rightinfofield',
+                                    colspan: 1,
+                                    width: 300,
+                                    field: {
+                                        xtype: 'displayfield',
+                                        labelWidth: 100,
+                                        width: 200,
+                                        fieldLabel: 'End Node ID',
+                                        infoIconTooltip: 'Database Identifier',
+                                        bind: {
+                                            value: '{currentRecord.endNodeId}'
+                                        }
+                                    }
+                                },
+                                {
+                                    xtype: 'cmv_rightinfofield',
+                                    colspan: 1,
+                                    width: 300,
+                                    field: {
+                                        xtype: 'displayfield',
+                                        labelWidth: 100,
+                                        width: 200,
+                                        fieldLabel: 'Start Edge ID',
+                                        infoIconTooltip: 'Database Identifier',
+                                        bind: {
+                                            value: '{currentRecord.startEdgeId}'
+                                        }
+                                    }
+                                },
+                                {
+                                    xtype: 'cmv_rightinfofield',
+                                    colspan: 1,
+                                    width: 300,
+                                    field: {
+                                        xtype: 'displayfield',
+                                        labelWidth: 100,
+                                        width: 200,
+                                        fieldLabel: 'End Edge ID',
+                                        infoIconTooltip: 'Database Identifier',
+                                        bind: {
+                                            value: '{currentRecord.endEdgeId}'
+                                        }
+                                    }
+                                },
+                                {
+                                    xtype: 'cmv_rightinfofield',
+                                    colspan: 1,
+                                    width: 300,
+                                    field: {
+                                        xtype: 'displayfield',
+                                        labelWidth: 100,
+                                        width: 200,
+                                        fieldLabel: 'Start Polygon ID',
+                                        infoIconTooltip: 'Database Identifier',
+                                        bind: {
+                                            value: '{currentRecord.startPolygonId}'
+                                        }
+                                    }
+                                },
+                                {
+                                    xtype: 'cmv_rightinfofield',
+                                    colspan: 1,
+                                    width: 300,
+                                    field: {
+                                        xtype: 'displayfield',
+                                        labelWidth: 100,
+                                        width: 200,
+                                        fieldLabel: 'End Polygon ID',
+                                        infoIconTooltip: 'Database Identifier',
+                                        bind: {
+                                            value: '{currentRecord.endPolygonId}'
+                                        }
+                                    }
+                                },
+                                {
+                                    xtype: 'displayfield',
+                                    colspan: 2,
+                                    width: 300,
+                                    value: 'Hold down CTRL to modify vertices'
                                 }
-                            }
-                        },
-                        {
-                            xtype: 'cmv_rightinfofield',
-                            colspan: 1,
-                            width: 300,
-                            field: {
-                                xtype: 'displayfield',
-                                labelWidth: 100,
-                                width: 200,
-                                fieldLabel: 'Start Edge ID',
-                                infoIconTooltip: 'Database Identifier',
-                                bind: {
-                                    value: '{currentRecord.startEdgeId}'
-                                }
-                            }
-                        },
-                        {
-                            xtype: 'cmv_rightinfofield',
-                            colspan: 1,
-                            width: 300,
-                            field: {
-                                xtype: 'displayfield',
-                                labelWidth: 100,
-                                width: 200,
-                                fieldLabel: 'End Edge ID',
-                                infoIconTooltip: 'Database Identifier',
-                                bind: {
-                                    value: '{currentRecord.endEdgeId}'
-                                }
-                            }
-                        },
-                        {
-                            xtype: 'cmv_rightinfofield',
-                            colspan: 1,
-                            width: 300,
-                            field: {
-                                xtype: 'displayfield',
-                                labelWidth: 100,
-                                width: 200,
-                                fieldLabel: 'Start Polygon ID',
-                                infoIconTooltip: 'Database Identifier',
-                                bind: {
-                                    value: '{currentRecord.startPolygonId}'
-                                }
-                            }
-                        },
-                        {
-                            xtype: 'cmv_rightinfofield',
-                            colspan: 1,
-                            width: 300,
-                            field: {
-                                xtype: 'displayfield',
-                                labelWidth: 100,
-                                width: 200,
-                                fieldLabel: 'End Polygon ID',
-                                infoIconTooltip: 'Database Identifier',
-                                bind: {
-                                    value: '{currentRecord.endPolygonId}'
-                                }
-                            }
-                        },
-                        {
-                            xtype: 'displayfield',
-                            colspan: 2,
-                            width: 300,
-                            value: 'Hold down CTRL to modify vertices'
+                            ]
                         }
-                        ]
-                    }
-                ]
-            }
-        ]
-    }
+                    ]
+                }
+            ]
+        }
     ]
 });

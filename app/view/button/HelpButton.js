@@ -7,9 +7,7 @@ Ext.define('CpsiMapview.view.button.HelpButton', {
     extend: 'Ext.button.Button',
     xtype: 'cmv_help_button',
 
-    requires: [
-        'CpsiMapview.controller.button.HelpButtonController'
-    ],
+    requires: ['CpsiMapview.controller.button.HelpButtonController'],
 
     tooltip: 'Open the Help System',
 

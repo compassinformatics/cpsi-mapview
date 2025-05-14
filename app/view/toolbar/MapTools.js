@@ -50,13 +50,15 @@ Ext.define('CpsiMapview.view.toolbar.MapTools', {
                             tooltip: 'Zoom to Full Extent'
                         }
                     }
-                }, {
+                },
+                {
                     xtype: 'button',
                     toggleGroup: 'map',
                     name: 'pan',
                     tooltip: 'Pan the map',
                     iconCls: 'x-far fa-hand-paper'
-                }, {
+                },
+                {
                     xtype: 'button',
                     toggleGroup: 'map',
                     iconCls: 'x-fa fa-search-plus',
@@ -65,7 +67,8 @@ Ext.define('CpsiMapview.view.toolbar.MapTools', {
                             tooltip: 'Zoom In'
                         }
                     }
-                }, {
+                },
+                {
                     xtype: 'basigx-button-zoomout',
                     toggleGroup: 'map',
                     enableZoomOutWithBox: true,
@@ -75,7 +78,8 @@ Ext.define('CpsiMapview.view.toolbar.MapTools', {
                             tooltip: 'Zoom Out'
                         }
                     }
-                }, {
+                },
+                {
                     xtype: 'basigx-button-measure',
                     toggleGroup: 'map',
                     measureType: 'line',
@@ -85,7 +89,8 @@ Ext.define('CpsiMapview.view.toolbar.MapTools', {
                     listeners: {
                         afterrender: 'initializeMeasureBtn'
                     }
-                }, {
+                },
+                {
                     xtype: 'basigx-button-measure',
                     toggleGroup: 'map',
                     measureType: 'polygon',
@@ -95,123 +100,140 @@ Ext.define('CpsiMapview.view.toolbar.MapTools', {
                     listeners: {
                         afterrender: 'initializeMeasureBtn'
                     }
-                }, {
+                },
+                {
                     xtype: 'basigx-button-history',
                     direction: 'BACK',
                     iconCls: 'x-fa fa-angle-left'
-                }, {
+                },
+                {
                     xtype: 'basigx-button-history',
                     direction: 'FORWARD',
                     iconCls: 'x-fa fa-angle-right'
-                }]
+                }
+            ]
         },
         {
             xtype: 'buttongroup',
             title: 'Advanced Tools',
-            items: [{
-                xtype: 'cmv_digitize_button',
-                toggleGroup: 'map',
-                tooltip: 'Point',
-                iconCls: 'fg-multipoint',
-                apiUrl: '/pmspy/netsolver',
-                groups: true,
-                pointExtentBuffer: 50,
-                listeners: {
-                    responseFeatures: function () {
-                        this.getController().onResponseFeatures();
+            items: [
+                {
+                    xtype: 'cmv_digitize_button',
+                    toggleGroup: 'map',
+                    tooltip: 'Point',
+                    iconCls: 'fg-multipoint',
+                    apiUrl: '/pmspy/netsolver',
+                    groups: true,
+                    pointExtentBuffer: 50,
+                    listeners: {
+                        responseFeatures: function () {
+                            this.getController().onResponseFeatures();
+                        }
                     }
-                }
-            },
-            {
-                xtype: 'cmv_digitize_button',
-                toggleGroup: 'map',
-                type: 'LineString',
-                iconCls: 'fg-polyline-pt',
-                tooltip: 'Line'
-            },
-            {
-                xtype: 'cmv_digitize_button',
-                toggleGroup: 'map',
-                type: 'Polygon',
-                tooltip: 'Polygon',
-                iconCls: 'fg-polygon-pt',
-                apiUrl: '/WebServices/roadschedule/cutWithPolygon',
-                listeners: {
-                    responseFeatures: function () {
-                        this.getController().onResponseFeatures();
+                },
+                {
+                    xtype: 'cmv_digitize_button',
+                    toggleGroup: 'map',
+                    type: 'LineString',
+                    iconCls: 'fg-polyline-pt',
+                    tooltip: 'Line'
+                },
+                {
+                    xtype: 'cmv_digitize_button',
+                    toggleGroup: 'map',
+                    type: 'Polygon',
+                    tooltip: 'Polygon',
+                    iconCls: 'fg-polygon-pt',
+                    apiUrl: '/WebServices/roadschedule/cutWithPolygon',
+                    listeners: {
+                        responseFeatures: function () {
+                            this.getController().onResponseFeatures();
+                        }
                     }
-                }
-            },
-            {
-                xtype: 'cmv_digitize_button',
-                toggleGroup: 'map',
-                type: 'Circle',
-                tooltip: 'Circle',
-                apiUrl: '/WebServices/roadschedule/cutWithPolygon',
-                listeners: {
-                    responseFeatures: function () {
-                        this.getController().onResponseFeatures();
+                },
+                {
+                    xtype: 'cmv_digitize_button',
+                    toggleGroup: 'map',
+                    type: 'Circle',
+                    tooltip: 'Circle',
+                    apiUrl: '/WebServices/roadschedule/cutWithPolygon',
+                    listeners: {
+                        responseFeatures: function () {
+                            this.getController().onResponseFeatures();
+                        }
                     }
-                }
-            }, {
-                xtype: 'cmv_permalink_button',
-                dialogWidth: 500
-            }, {
-                xtype: 'cmv_streetview_tool',
-                toggleGroup: 'map',
-            }, {
-                xtype: 'cmv_line_slice_grid_button',
-                text: '',
-                tooltip: 'Linear Reference demo',
-                iconCls: 'fg-split-line'
-            }, {
-                xtype: 'cmv_edgebutton',
-                tooltip: 'Snapping demo',
-                iconCls: 'fg-snap'
-            }, {
-                iconCls: 'fg-copy-line',
-                tooltip: 'Draw Parallel Lines',
-                toggleGroup: 'map',
-                listeners: {
-                    toggle: function (btn, toggled) {
-                        var parallelLineWindow;
-                        if (toggled) {
-                            parallelLineWindow = Ext.create({
-                                xtype: 'cmv_parallel_line_window',
-                            });
-                            parallelLineWindow.show();
-                        } else {
-                            parallelLineWindow = Ext.ComponentQuery.query(
-                                'cmv_parallel_line_window')[0];
-                            if (parallelLineWindow) {
-                                parallelLineWindow.destroy();
+                },
+                {
+                    xtype: 'cmv_permalink_button',
+                    dialogWidth: 500
+                },
+                {
+                    xtype: 'cmv_streetview_tool',
+                    toggleGroup: 'map'
+                },
+                {
+                    xtype: 'cmv_line_slice_grid_button',
+                    text: '',
+                    tooltip: 'Linear Reference demo',
+                    iconCls: 'fg-split-line'
+                },
+                {
+                    xtype: 'cmv_edgebutton',
+                    tooltip: 'Snapping demo',
+                    iconCls: 'fg-snap'
+                },
+                {
+                    iconCls: 'fg-copy-line',
+                    tooltip: 'Draw Parallel Lines',
+                    toggleGroup: 'map',
+                    listeners: {
+                        toggle: function (btn, toggled) {
+                            let parallelLineWindow;
+                            if (toggled) {
+                                parallelLineWindow = Ext.create({
+                                    xtype: 'cmv_parallel_line_window'
+                                });
+                                parallelLineWindow.show();
+                            } else {
+                                parallelLineWindow = Ext.ComponentQuery.query(
+                                    'cmv_parallel_line_window'
+                                )[0];
+                                if (parallelLineWindow) {
+                                    parallelLineWindow.destroy();
+                                }
                             }
                         }
                     }
                 }
-            }]
+            ]
         },
         '->',
         {
             xtype: 'buttongroup',
             title: 'Global Timeslider',
-            items: [{
-                xtype: 'cmv_timeslider',
-                startDate: new Date(1946, 0, 1),
-                endDate: new Date(2020, 11, 30)
-            }]
-        }, {
+            items: [
+                {
+                    xtype: 'cmv_timeslider',
+                    startDate: new Date(1946, 0, 1),
+                    endDate: new Date(2020, 11, 30)
+                }
+            ]
+        },
+        {
             xtype: 'buttongroup',
             title: 'Gazetteers',
-            items: [{
-                xtype: 'gx_geocoder_combo'
-            }, {
-                xtype: 'cmv_gazetteer_combo', // custom CPSI gazetteer
-                url: '/WebServices/townland/gazetteer/',
-                proxyRootProperty: 'data',
-                displayValueMapping: 'name',
-                emptyText: 'Townland...'
-            }]
+            items: [
+                {
+                    xtype: 'gx_geocoder_combo'
+                },
+                {
+                    xtype: 'cmv_gazetteer_combo', // custom CPSI gazetteer
+                    url: '/WebServices/townland/gazetteer/',
+                    proxyRootProperty: 'data',
+                    displayValueMapping: 'name',
+                    emptyText: 'Townland...'
+                }
+            ]
         }
     ]
 });
