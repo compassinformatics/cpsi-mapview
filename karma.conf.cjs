@@ -1,12 +1,9 @@
-/* eslint-env node */
-/* eslint max-len: 0 */
+const commonConfig = require('./karma-conf.common.cjs');
 
-var commonConfig = require('./karma-conf.common.js');
-
-module.exports = function(config) {
+module.exports = function (config) {
     commonConfig(config); // apply shared configuration
 
-    var sourcePreprocessors = 'coverage';
+    let sourcePreprocessors = 'coverage';
     function isDebug(argument) {
         return argument === '--debug';
     }
