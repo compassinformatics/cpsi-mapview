@@ -30,8 +30,8 @@ export default [
                 GML_3_2_0: false,
                 Jsonix: false,
                 turf: false,
-                describe: false,
                 // for test suite
+                describe: false,
                 sinon: false,
                 it: false,
                 beforeEach: false,
