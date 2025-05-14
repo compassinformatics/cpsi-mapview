@@ -1,8 +1,5 @@
-/* eslint-env node */
-/* eslint max-len: 0 */
 module.exports = function (config) {
-
-    var files = [
+    const files = [
         'https://geoext.github.io/extjs-gpl/build/classic/theme-neptune/resources/theme-neptune-all_1.css',
         'https://geoext.github.io/extjs-gpl/build/classic/theme-neptune/resources/theme-neptune-all_2.css',
         'https://geoext.github.io/extjs-gpl/build/classic/theme-neptune/resources/theme-neptune-all.css',
@@ -70,7 +67,7 @@ module.exports = function (config) {
             '/spec': '/base/test/spec',
             '/BasiGX': '/base/node_modules/@terrestris/basigx/src',
             '/CpsiMapview': '/base/app',
-            '/GeoExt': '/base/src',
+            '/GeoExt': '/base/src'
         },
 
         // the following works to limit the tests run
@@ -87,20 +84,19 @@ module.exports = function (config) {
         frameworks: ['mocha', 'expect', 'sinon'],
 
         plugins: [
-            require("karma-mocha"),
-            require("karma-mocha-reporter"),
-            require("karma-coverage"),
-            require("karma-expect"),
-            require("karma-sinon"),
-            require("karma-chrome-launcher"),
+            require('karma-mocha'),
+            require('karma-mocha-reporter'),
+            require('karma-coverage'),
+            require('karma-expect'),
+            require('karma-sinon'),
+            require('karma-chrome-launcher')
         ],
 
         // list of files / patterns to load in the browser
         files: files,
 
         // list of files to exclude
-        exclude: [
-        ],
+        exclude: [],
 
         preprocessors: {
             'app/**/*.js': ['coverage']

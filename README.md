@@ -112,7 +112,7 @@ To open in a browser and leave the browser open (to review UI components, debug,
 `--auto-watch` prevents application JS files being cached.
 
 ```
-karma start --browsers Chrome --single-run=False --debug --auto-watch
+karma start karma-watch.conf.cjs --browsers Chrome --single-run=False --debug --auto-watch
 ```
 
 See also https://glebbahmutov.com/blog/debugging-karma-unit-tests/
@@ -120,8 +120,8 @@ See also https://glebbahmutov.com/blog/debugging-karma-unit-tests/
 To run for single test file you can use the `grep` option:
 
 ```
-karma start --single-run --grep 'CpsiMapview.factory.Layer'
-karma start --single-run --grep 'CpsiMapview.util.Turf' --debug
+karma start karma-watch.conf.cjs --single-run --grep 'CpsiMapview.factory.Layer'
+karma start karma-watch.conf.cjs --single-run --grep 'CpsiMapview.util.Turf' --debug
 ```
 
 ## Production Builds
