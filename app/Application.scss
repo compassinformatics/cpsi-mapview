@@ -15,7 +15,6 @@ $form-date-trigger-glyph: dynamic($fa-var-calendar 12px $font-icon-font-family);
 $spinner-trigger-up-glyph: dynamic($ext-var-spinner-up 12px ExtJS);
 $spinner-trigger-down-glyph: dynamic($ext-var-spinner-down 12px ExtJS);
 
-
 $fieldset-header-line-height: dynamic(0px);
 $fieldset-header-font-size: $font-size;
 
@@ -31,7 +30,8 @@ $grid-row-cell-line-height: dynamic(8px);
     padding-top: 10px;
 }
 
-.x-form-trigger-spinner-default, .x-form-spinner-default {
+.x-form-trigger-spinner-default,
+.x-form-spinner-default {
     width: 12px !important;
 }
 
@@ -54,7 +54,7 @@ $tab-padding: dynamic(3px 13px 0px 10px);
 // font-awesome is an ExtJS package located at ext-7.8.0/packages/font-awesome/sass/etc
 
 .x-tree-icon {
-    font-family: "Font Awesome 5 Free Regular"; // otherwise uses solid icons
+    font-family: 'Font Awesome 5 Free Regular'; // otherwise uses solid icons
 }
 
 .x-menu-item-unchecked .x-menu-item-icon-default.x-menu-item-checkbox {
@@ -62,7 +62,7 @@ $tab-padding: dynamic(3px 13px 0px 10px);
 }
 
 // BasiGX has a hard-coded glyph set to xf192@FontAwesome
-div[id^="basigx-panel-coordinatemouseposition-"] .x-btn .x-btn-icon-el:before {
-    font-family: "Font Awesome 5 Free Regular";
-    content: "\f192 "; /* new Unicode value for the icon */
+div[id^='basigx-panel-coordinatemouseposition-'] .x-btn .x-btn-icon-el:before {
+    font-family: 'Font Awesome 5 Free Regular';
+    content: '\f192 '; /* new Unicode value for the icon */
 }

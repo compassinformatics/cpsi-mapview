@@ -311,7 +311,9 @@ Ext.define('CpsiMapview.controller.button.DrawingButtonController', {
         const addUniqueFeaturesToCollection = function (collection, features) {
             Ext.Array.each(features, function (f) {
                 // eslint-disable-next-line
-                try { collection.push(f); } catch (e) { }
+                try {
+                    collection.push(f);
+                } catch (e) {}
             });
         };
 
