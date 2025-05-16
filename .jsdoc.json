@@ -12,5 +12,5 @@
         "recurse": true,
         "readme": "README.md"
     },
-    "plugins": [ "./jsdoc-ext-plugin.js" ]
+    "plugins": [ "./jsdoc-ext-plugin.cjs" ]
 }
