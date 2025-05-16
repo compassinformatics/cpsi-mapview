@@ -39,7 +39,7 @@ Ext.define('CpsiMapview.controller.toolbar.MinimizedWindows', {
      * @param {CpsiMapview.view.window.MinimizableWindow} minimizedWindow window to add
      */
     onAddMinimizedWindow: function (minimizedWindow) {
-        var me = this;
+        const me = this;
         me.addButtonForWindow(minimizedWindow);
         me.getView().setHidden(false);
     },
@@ -49,11 +49,11 @@ Ext.define('CpsiMapview.controller.toolbar.MinimizedWindows', {
      * @param {CpsiMapview.view.window.MinimizableWindow} minimizedWindow window to represent
      */
     addButtonForWindow: function (minimizedWindow) {
-        var me = this;
-        var windowId = minimizedWindow.getId();
-        var windowTitle = minimizedWindow.getTitle();
+        const me = this;
+        const windowId = minimizedWindow.getId();
+        const windowTitle = minimizedWindow.getTitle();
 
-        var button = Ext.create('Ext.button.Button', {
+        const button = Ext.create('Ext.button.Button', {
             text: windowTitle != null ? windowTitle : windowId,
             windowRef: windowId,
             listeners: {
@@ -69,8 +69,8 @@ Ext.define('CpsiMapview.controller.toolbar.MinimizedWindows', {
      * @param {Ext.button.Button} minimizedWindow
      */
     onRestoreFromButton: function (button) {
-        var me = this;
-        var windowRef = button.windowRef;
+        const me = this;
+        const windowRef = button.windowRef;
         me.restoreWindow(windowRef);
     },
 
@@ -79,8 +79,8 @@ Ext.define('CpsiMapview.controller.toolbar.MinimizedWindows', {
      * @param {CpsiMapview.view.window.MinimizableWindow} minimizedWindow
      */
     onRestoreFromWindow: function (minimizedWindow) {
-        var me = this;
-        var windowId = minimizedWindow.getId();
+        const me = this;
+        const windowId = minimizedWindow.getId();
         me.restoreWindow(windowId);
     },
 
@@ -89,21 +89,19 @@ Ext.define('CpsiMapview.controller.toolbar.MinimizedWindows', {
      * @param {String} windowRef reference to the minimized window
      */
     restoreWindow: function (windowRef) {
-        var me = this;
-        var minimizedWindow = Ext.ComponentQuery.query('#' + windowRef)[0];
+        const me = this;
+        const minimizedWindow = Ext.ComponentQuery.query('#' + windowRef)[0];
         minimizedWindow.setVisible(true);
         minimizedWindow.isMinimized = false;
 
         me.removeButtonFromToolbar(windowRef);
-
     },
 
     removeButtonFromToolbar: function (windowRef) {
+        const me = this;
 
-        var me = this;
-
-        var button = me.getView().items.findBy(function (item) {
-            return (item.getXType() === 'button') &amp;&amp; (item.windowRef === windowRef);
+        const button = me.getView().items.findBy(function (item) {
+            return item.getXType() === 'button' &amp;&amp; item.windowRef === windowRef;
         });
 
         if (button !== undefined) {
@@ -114,7 +112,6 @@ Ext.define('CpsiMapview.controller.toolbar.MinimizedWindows', {
             me.getView().setHidden(true);
         }
     }
-
 });
 </code></pre>
         </article>
@@ -130,13 +127,13 @@ Ext.define('CpsiMapview.controller.toolbar.MinimizedWindows', {
 Fires when all initial layers from the config have been created and added to the OL map.</a></li><li><a href="global.html#event:cmv-mapclickFireswhentheOLmapisclicked.">cmv-mapclick
 Fires when the OL map is clicked.</a></li><li><a href="global.html#event:parallelLineCreatedFires,whenanewparallellinewascreated.">parallelLineCreated
 Fires, when a new parallel line was created.</a></li></ul><h3>Global</h3><ul><li><a href="global.html#TemplatefunctioncalledbeforedoingtheGetFeatureInforequestReturnfalseifyoudon'twanttomaketheGetFeatureInforequest.">Template function called before doing the GetFeatureInfo request
-Return false if you don't want to make the GetFeatureInfo request.</a></li><li><a href="global.html#beforeSave">beforeSave</a></li><li><a href="global.html#getErrors">getErrors</a></li><li><a href="global.html#onAfterSaveSucceded">onAfterSaveSucceded</a></li><li><a href="global.html#onChange">onChange</a></li><li><a href="global.html#onFocus">onFocus</a></li><li><a href="global.html#onGroupEditToggle">onGroupEditToggle</a></li><li><a href="global.html#rawToValue">rawToValue</a></li><li><a href="global.html#setValue">setValue</a></li><li><a href="global.html#storeConfig">storeConfig</a></li><li><a href="global.html#validate">validate</a></li></ul>
+Return false if you don't want to make the GetFeatureInfo request.</a></li><li><a href="global.html#beforeSave">beforeSave</a></li><li><a href="global.html#onAfterSaveSucceded">onAfterSaveSucceded</a></li><li><a href="global.html#onGroupEditToggle">onGroupEditToggle</a></li><li><a href="global.html#setValue">setValue</a></li><li><a href="global.html#storeConfig">storeConfig</a></li><li><a href="global.html#validate">validate</a></li></ul>
 </nav>
 
 <br class="clear">
 
 <footer>
-    Documentation generated by <a href="https://github.com/jsdoc/jsdoc">JSDoc 4.0.4</a> on Tue May 13 2025 08:09:51 GMT+0000 (Coordinated Universal Time)
+    Documentation generated by <a href="https://github.com/jsdoc/jsdoc">JSDoc 4.0.4</a> on Fri May 16 2025 13:30:46 GMT+0000 (Coordinated Universal Time)
 </footer>
 
 <script> prettyPrint(); </script>

@@ -37,10 +37,10 @@
     // or the function won't be called
     listen: {
         component: {
-            'field': {
+            field: {
                 change: 'onFieldChanged' // listen to all field change events to update button
             },
-            'cmv_edgewindow': {
+            cmv_edgewindow: {
                 savesucceeded: 'onAfterSaveSucceded'
             }
         }
@@ -50,36 +50,51 @@
      * Function to call prior to saving - confirm with the user that they want to create new nodes
      * */
     beforeSave: function () {
+        const me = this;
+        const rec = me.getViewModel().get('currentRecord');
 
-        var me = this;
-        var rec = me.getViewModel().get('currentRecord');
+        let noStartFeature = false;
 
-        var noStartFeature = false;
-
-        if (!rec.get('startNodeId') &amp;&amp; !rec.get('startEdgeId') &amp;&amp; !rec.get('startPolygonId')) {
+        if (
+            !rec.get('startNodeId') &amp;&amp;
+            !rec.get('startEdgeId') &amp;&amp;
+            !rec.get('startPolygonId')
+        ) {
             noStartFeature = true;
-            Ext.Msg.confirm('Create new Source', 'No feature is connected at the start of the edge. Are you sure you want to create a new source?',
+            Ext.Msg.confirm(
+                'Create new Source',
+                'No feature is connected at the start of the edge. Are you sure you want to create a new source?',
                 function (buttonId) {
                     if (buttonId == 'yes') {
                         // call saveRecord directly as beforeSave returns a value instantly
                         me.saveRecord();
                     }
-                });
+                }
+            );
             return false;
         }
 
-        if (!rec.get('endNodeId') &amp;&amp; !rec.get('endEdgeId') &amp;&amp; !rec.get('endPolygonId')) {
-
+        if (
+            !rec.get('endNodeId') &amp;&amp;
+            !rec.get('endEdgeId') &amp;&amp;
+            !rec.get('endPolygonId')
+        ) {
             if (noStartFeature === true) {
-                Ext.Msg.alert('No Attached Features', 'No features are attached at the start or end of this line!');
+                Ext.Msg.alert(
+                    'No Attached Features',
+                    'No features are attached at the start or end of this line!'
+                );
             }
 
-            Ext.Msg.confirm('Create new Source', 'No feature is connected at the end of the edge. Are you sure you want to create a new source?',
+            Ext.Msg.confirm(
+                'Create new Source',
+                'No feature is connected at the end of the edge. Are you sure you want to create a new source?',
                 function (buttonId) {
                     if (buttonId == 'yes') {
                         me.saveRecord();
                     }
-                });
+                }
+            );
             return false;
         }
 
@@ -91,11 +106,12 @@
      * wiping out previous edges
      * */
     onAfterSaveSucceded: function () {
-        var me = this;
-        var win = me.getView();
+        const me = this;
+        const win = me.getView();
         win.close();
     }
-});</code></pre>
+});
+</code></pre>
         </article>
     </section>
 
@@ -109,13 +125,13 @@
 Fires when all initial layers from the config have been created and added to the OL map.</a></li><li><a href="global.html#event:cmv-mapclickFireswhentheOLmapisclicked.">cmv-mapclick
 Fires when the OL map is clicked.</a></li><li><a href="global.html#event:parallelLineCreatedFires,whenanewparallellinewascreated.">parallelLineCreated
 Fires, when a new parallel line was created.</a></li></ul><h3>Global</h3><ul><li><a href="global.html#TemplatefunctioncalledbeforedoingtheGetFeatureInforequestReturnfalseifyoudon'twanttomaketheGetFeatureInforequest.">Template function called before doing the GetFeatureInfo request
-Return false if you don't want to make the GetFeatureInfo request.</a></li><li><a href="global.html#beforeSave">beforeSave</a></li><li><a href="global.html#getErrors">getErrors</a></li><li><a href="global.html#onAfterSaveSucceded">onAfterSaveSucceded</a></li><li><a href="global.html#onChange">onChange</a></li><li><a href="global.html#onFocus">onFocus</a></li><li><a href="global.html#onGroupEditToggle">onGroupEditToggle</a></li><li><a href="global.html#rawToValue">rawToValue</a></li><li><a href="global.html#setValue">setValue</a></li><li><a href="global.html#storeConfig">storeConfig</a></li><li><a href="global.html#validate">validate</a></li></ul>
+Return false if you don't want to make the GetFeatureInfo request.</a></li><li><a href="global.html#beforeSave">beforeSave</a></li><li><a href="global.html#onAfterSaveSucceded">onAfterSaveSucceded</a></li><li><a href="global.html#onGroupEditToggle">onGroupEditToggle</a></li><li><a href="global.html#setValue">setValue</a></li><li><a href="global.html#storeConfig">storeConfig</a></li><li><a href="global.html#validate">validate</a></li></ul>
 </nav>
 
 <br class="clear">
 
 <footer>
-    Documentation generated by <a href="https://github.com/jsdoc/jsdoc">JSDoc 4.0.4</a> on Tue May 13 2025 08:09:51 GMT+0000 (Coordinated Universal Time)
+    Documentation generated by <a href="https://github.com/jsdoc/jsdoc">JSDoc 4.0.4</a> on Fri May 16 2025 13:30:46 GMT+0000 (Coordinated Universal Time)
 </footer>
 
 <script> prettyPrint(); </script>

@@ -68,28 +68,35 @@ Ext.define('CpsiMapview.model.FeatureEventsMixin', {
      * Note this will also be fired when a model is successfully deleted
      * */
     onModelSaved: function () {
-        var me = this;
-        var layerUtil = CpsiMapview.util.Layer;
+        const me = this;
+        const layerUtil = CpsiMapview.util.Layer;
 
         // update associated layers
         Ext.each(me.syncLayerKeys, function (k) {
-            var layers = BasiGX.util.Layer.getLayersBy('layerKey', k);
+            const layers = BasiGX.util.Layer.getLayersBy('layerKey', k);
             if (layers.length > 0) {
-                var layer = layers[0];
+                const layer = layers[0];
                 layerUtil.layerRefresh(layer);
             } else {
                 //&lt;debug>
                 // if a switch layer is used then it may not yet have been created
                 // so we check for its twin layer
-                var switchLayerFound = false;
-                var type = k.endsWith('_WMS') ? '_WMS' : '_WFS';
-                var altType = k.endsWith('_WMS') ? '_WFS' : '_WMS';
-                var altLayerKey = k.replace(type, altType);
+                let switchLayerFound = false;
+                const type = k.endsWith('_WMS') ? '_WMS' : '_WFS';
+                const altType = k.endsWith('_WMS') ? '_WFS' : '_WMS';
+                const altLayerKey = k.replace(type, altType);
 
-                switchLayerFound = !Ext.isEmpty(BasiGX.util.Layer.getLayersBy('layerKey', altLayerKey));
+                switchLayerFound = !Ext.isEmpty(
+                    BasiGX.util.Layer.getLayersBy('layerKey', altLayerKey)
+                );
 
                 if (switchLayerFound === false) {
-                    Ext.log.error('layerKey "' + k + '" in syncLayerKeys invalid for ' + me.$className);
+                    Ext.log.error(
+                        'layerKey "' +
+                            k +
+                            '" in syncLayerKeys invalid for ' +
+                            me.$className
+                    );
                 }
                 //&lt;/debug>
             }
@@ -97,7 +104,7 @@ Ext.define('CpsiMapview.model.FeatureEventsMixin', {
 
         // update associated WFS stores (grid stores)
         Ext.each(me.syncStoreIds, function (k) {
-            var store = Ext.data.StoreManager.lookup(k);
+            const store = Ext.data.StoreManager.lookup(k);
             if (store) {
                 store.reload();
             } else {
@@ -105,8 +112,12 @@ Ext.define('CpsiMapview.model.FeatureEventsMixin', {
                 // store may not be found if it has not yet been created
                 // so check if it can be created by the supplied alias
                 if (!Ext.ClassManager.getByAlias('store.' + k)) {
-                    Ext.log.error('Store alias "' + k + '" in syncStoreIds not found for '
-                        + me.$className);
+                    Ext.log.error(
+                        'Store alias "' +
+                            k +
+                            '" in syncStoreIds not found for ' +
+                            me.$className
+                    );
                 }
                 //&lt;/debug>
             }
@@ -119,11 +130,15 @@ Ext.define('CpsiMapview.model.FeatureEventsMixin', {
      * Add the mixin `onModelSaved` function to any save success callbacks
      * */
     onSave: function (options) {
-        var me = this;
+        const me = this;
 
         if (options.success) {
             // last parameter sets the scope for the additional function
-            options.success = Ext.Function.createSequence(options.success, me.onModelSaved, me);
+            options.success = Ext.Function.createSequence(
+                options.success,
+                me.onModelSaved,
+                me
+            );
         } else {
             options.success = me.onModelSaved;
         }
@@ -143,13 +158,13 @@ Ext.define('CpsiMapview.model.FeatureEventsMixin', {
 Fires when all initial layers from the config have been created and added to the OL map.</a></li><li><a href="global.html#event:cmv-mapclickFireswhentheOLmapisclicked.">cmv-mapclick
 Fires when the OL map is clicked.</a></li><li><a href="global.html#event:parallelLineCreatedFires,whenanewparallellinewascreated.">parallelLineCreated
 Fires, when a new parallel line was created.</a></li></ul><h3>Global</h3><ul><li><a href="global.html#TemplatefunctioncalledbeforedoingtheGetFeatureInforequestReturnfalseifyoudon'twanttomaketheGetFeatureInforequest.">Template function called before doing the GetFeatureInfo request
-Return false if you don't want to make the GetFeatureInfo request.</a></li><li><a href="global.html#beforeSave">beforeSave</a></li><li><a href="global.html#getErrors">getErrors</a></li><li><a href="global.html#onAfterSaveSucceded">onAfterSaveSucceded</a></li><li><a href="global.html#onChange">onChange</a></li><li><a href="global.html#onFocus">onFocus</a></li><li><a href="global.html#onGroupEditToggle">onGroupEditToggle</a></li><li><a href="global.html#rawToValue">rawToValue</a></li><li><a href="global.html#setValue">setValue</a></li><li><a href="global.html#storeConfig">storeConfig</a></li><li><a href="global.html#validate">validate</a></li></ul>
+Return false if you don't want to make the GetFeatureInfo request.</a></li><li><a href="global.html#beforeSave">beforeSave</a></li><li><a href="global.html#onAfterSaveSucceded">onAfterSaveSucceded</a></li><li><a href="global.html#onGroupEditToggle">onGroupEditToggle</a></li><li><a href="global.html#setValue">setValue</a></li><li><a href="global.html#storeConfig">storeConfig</a></li><li><a href="global.html#validate">validate</a></li></ul>
 </nav>
 
 <br class="clear">
 
 <footer>
-    Documentation generated by <a href="https://github.com/jsdoc/jsdoc">JSDoc 4.0.4</a> on Tue May 13 2025 08:09:51 GMT+0000 (Coordinated Universal Time)
+    Documentation generated by <a href="https://github.com/jsdoc/jsdoc">JSDoc 4.0.4</a> on Fri May 16 2025 13:30:46 GMT+0000 (Coordinated Universal Time)
 </footer>
 
 <script> prettyPrint(); </script>

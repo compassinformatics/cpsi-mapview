@@ -31,133 +31,140 @@
  *
  * @class CpsiMapview.view.fileupload.FileGrid
  */
-Ext.define('CpsiMapview.view.fileupload.FileGrid',
-    {
-        extend: 'Ext.grid.Panel',
-        xtype: 'cmv_filegrid',
-        requires: [
-            'CpsiMapview.view.grid.ItemDeleter',
-            'Ext.util.Format',
-            'CpsiMapview.view.fileupload.FileGridController'
-        ],
-        loadMask: true,
-        border: true,
-        anchor: '100% 100%',
-        multiSelect: true,
-        emptyText: 'No files to display',
-        reserveScrollOffset: true,
-        sortableColumns: false,
-        allowAddingAttachments: true,
-        controller: 'cmv_filegridcontroller',
-        listeners: {
-            itemdblclick: 'onDownloadFileClick'
+Ext.define('CpsiMapview.view.fileupload.FileGrid', {
+    extend: 'Ext.grid.Panel',
+    xtype: 'cmv_filegrid',
+    requires: [
+        'CpsiMapview.view.grid.ItemDeleter',
+        'Ext.util.Format',
+        'CpsiMapview.view.fileupload.FileGridController'
+    ],
+    loadMask: true,
+    border: true,
+    anchor: '100% 100%',
+    multiSelect: true,
+    emptyText: 'No files to display',
+    reserveScrollOffset: true,
+    sortableColumns: false,
+    allowAddingAttachments: true,
+    controller: 'cmv_filegridcontroller',
+    listeners: {
+        itemdblclick: 'onDownloadFileClick'
+    },
+    bind: {
+        store: '{files}',
+        serviceUrl: '{serviceUrl}'
+    },
+    config: {
+        serviceUrl: ''
+    },
+    columns: [
+        {
+            text: 'Name',
+            dataIndex: 'name',
+            flex: 2
         },
-        bind: {
-            store: '{files}',
-            serviceUrl: '{serviceUrl}'
+        {
+            text: 'Description',
+            dataIndex: 'description',
+            flex: 3
         },
-        config: {
-            serviceUrl: ''
-        },
-        columns: [
-            {
-                text: 'Name',
-                dataIndex: 'name',
-                flex: 2
-            }, {
-                text: 'Description',
-                dataIndex: 'description',
-                flex: 3
-            }, {
-                text: 'Thumbnail',
-                flex: 1,
-                dataIndex: 'thumbnailUrl',
-                renderer: function(url) {
-                    if(url){
-                        return Ext.String.format('&lt;img src="{0}" alt="thumbnail" height="32" width="32">', url);
-                    } else {
-                        return '';
-                    }
-                }
-            }, {
-                text: 'File',
-                dataIndex: 'fileName',
-                flex: 2,
-                hidden: true
-            }, {
-                text: 'Size',
-                dataIndex: 'fileSize',
-                align: 'right',
-                renderer: function (value) {
-                    return Ext.util.Format.number(value / 1024, '0,000 KB');
-                },
-                flex: 1,
-                hidden: true
-            },
-            {
-                xtype: 'datecolumn',
-                text: 'Last Updated',
-                dataIndex: 'lastUpdatedDateUtc',
-                format: 'd-m-Y',
-                width: 100
-            },
-            {
-                text: 'Attachment Id',
-                dataIndex: 'attachmentId',
-                hidden: true
-            },
-            {
-                text: 'Content Type',
-                dataIndex: 'contentType',
-                hidden: true
-            },
-            {
-                text: 'File Extension',
-                dataIndex: 'extension',
-                hidden: true
-            },
-            {
-                text: 'Default Image',
-                dataIndex: 'isDefaultImage',
-                hidden: true
-            },
-            {
-                text: 'Thumbnail Available',
-                dataIndex: 'isThumbnailAvailable',
-                hidden: true
-            },
-            {
-                xtype: 'cmv_itemdeleter',
-                itemId: 'itemDeleter',
-                avoidConfirmationRequest: false,
-                bind: {
-                    hidden: '{hideDeleteFileButton}',
-                    disabled: '{!canDeleteFiles}',
+        {
+            text: 'Thumbnail',
+            flex: 1,
+            dataIndex: 'thumbnailUrl',
+            renderer: function (url) {
+                if (url) {
+                    return Ext.String.format(
+                        '&lt;img src="{0}" alt="thumbnail" height="32" width="32">',
+                        url
+                    );
+                } else {
+                    return '';
                 }
             }
-        ],
-        tbar: [
-            {
-                xtype: 'button',
-                text: 'Add File',
-                itemId: 'addFileButton',
-                iconCls: 'add icon-add',
-                cls: 'bordered-button',
-                infoIconTooltip: this.addFileInfoIconTooltip,
-                listeners: {
-                    click: 'onAddFileClick'
-                },
-                style: {
-                    pointerEvents: 'all'
-                },
-                bind: {
-                    disabled: '{!canAddFiles}',
-                    tooltip:'Associate a File with the {parentType} - files can only be added after the {parentType} has been saved',
-                    hidden: '{hideAddFileButton}'
-                }
+        },
+        {
+            text: 'File',
+            dataIndex: 'fileName',
+            flex: 2,
+            hidden: true
+        },
+        {
+            text: 'Size',
+            dataIndex: 'fileSize',
+            align: 'right',
+            renderer: function (value) {
+                return Ext.util.Format.number(value / 1024, '0,000 KB');
+            },
+            flex: 1,
+            hidden: true
+        },
+        {
+            xtype: 'datecolumn',
+            text: 'Last Updated',
+            dataIndex: 'lastUpdatedDateUtc',
+            format: 'd-m-Y',
+            width: 100
+        },
+        {
+            text: 'Attachment Id',
+            dataIndex: 'attachmentId',
+            hidden: true
+        },
+        {
+            text: 'Content Type',
+            dataIndex: 'contentType',
+            hidden: true
+        },
+        {
+            text: 'File Extension',
+            dataIndex: 'extension',
+            hidden: true
+        },
+        {
+            text: 'Default Image',
+            dataIndex: 'isDefaultImage',
+            hidden: true
+        },
+        {
+            text: 'Thumbnail Available',
+            dataIndex: 'isThumbnailAvailable',
+            hidden: true
+        },
+        {
+            xtype: 'cmv_itemdeleter',
+            itemId: 'itemDeleter',
+            avoidConfirmationRequest: false,
+            bind: {
+                hidden: '{hideDeleteFileButton}',
+                disabled: '{!canDeleteFiles}'
             }
-        ]
-    });
+        }
+    ],
+    tbar: [
+        {
+            xtype: 'button',
+            text: 'Add File',
+            itemId: 'addFileButton',
+            iconCls: 'add icon-add',
+            cls: 'bordered-button',
+            infoIconTooltip: this.addFileInfoIconTooltip,
+            listeners: {
+                click: 'onAddFileClick'
+            },
+            style: {
+                pointerEvents: 'all'
+            },
+            bind: {
+                disabled: '{!canAddFiles}',
+                tooltip:
+                    'Associate a File with the {parentType} - files can only be added after the {parentType} has been saved',
+                hidden: '{hideAddFileButton}'
+            }
+        }
+    ]
+});
 </code></pre>
         </article>
     </section>
@@ -172,13 +179,13 @@ Ext.define('CpsiMapview.view.fileupload.FileGrid',
 Fires when all initial layers from the config have been created and added to the OL map.</a></li><li><a href="global.html#event:cmv-mapclickFireswhentheOLmapisclicked.">cmv-mapclick
 Fires when the OL map is clicked.</a></li><li><a href="global.html#event:parallelLineCreatedFires,whenanewparallellinewascreated.">parallelLineCreated
 Fires, when a new parallel line was created.</a></li></ul><h3>Global</h3><ul><li><a href="global.html#TemplatefunctioncalledbeforedoingtheGetFeatureInforequestReturnfalseifyoudon'twanttomaketheGetFeatureInforequest.">Template function called before doing the GetFeatureInfo request
-Return false if you don't want to make the GetFeatureInfo request.</a></li><li><a href="global.html#beforeSave">beforeSave</a></li><li><a href="global.html#getErrors">getErrors</a></li><li><a href="global.html#onAfterSaveSucceded">onAfterSaveSucceded</a></li><li><a href="global.html#onChange">onChange</a></li><li><a href="global.html#onFocus">onFocus</a></li><li><a href="global.html#onGroupEditToggle">onGroupEditToggle</a></li><li><a href="global.html#rawToValue">rawToValue</a></li><li><a href="global.html#setValue">setValue</a></li><li><a href="global.html#storeConfig">storeConfig</a></li><li><a href="global.html#validate">validate</a></li></ul>
+Return false if you don't want to make the GetFeatureInfo request.</a></li><li><a href="global.html#beforeSave">beforeSave</a></li><li><a href="global.html#onAfterSaveSucceded">onAfterSaveSucceded</a></li><li><a href="global.html#onGroupEditToggle">onGroupEditToggle</a></li><li><a href="global.html#setValue">setValue</a></li><li><a href="global.html#storeConfig">storeConfig</a></li><li><a href="global.html#validate">validate</a></li></ul>
 </nav>
 
 <br class="clear">
 
 <footer>
-    Documentation generated by <a href="https://github.com/jsdoc/jsdoc">JSDoc 4.0.4</a> on Tue May 13 2025 08:09:51 GMT+0000 (Coordinated Universal Time)
+    Documentation generated by <a href="https://github.com/jsdoc/jsdoc">JSDoc 4.0.4</a> on Fri May 16 2025 13:30:46 GMT+0000 (Coordinated Universal Time)
 </footer>
 
 <script> prettyPrint(); </script>

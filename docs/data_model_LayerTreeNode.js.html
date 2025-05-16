@@ -34,9 +34,7 @@
 Ext.define('CpsiMapview.data.model.LayerTreeNode', {
     extend: 'GeoExt.data.model.LayerTreeNode',
 
-    requires: [
-        'CpsiMapview.util.Style'
-    ],
+    requires: ['CpsiMapview.util.Style'],
 
     /**
      * The layer property that will be used to hold a title for the description of the model in views.
@@ -50,8 +48,13 @@ Ext.define('CpsiMapview.data.model.LayerTreeNode', {
             name: 'qtitle',
             type: 'string',
             persist: false,
-            convert: function(v, record) {
-                return record.getOlLayerProp(record.descriptionTitleProperty, '') || record.get('text');
+            convert: function (v, record) {
+                return (
+                    record.getOlLayerProp(
+                        record.descriptionTitleProperty,
+                        ''
+                    ) || record.get('text')
+                );
             }
         },
         {
@@ -64,10 +67,10 @@ Ext.define('CpsiMapview.data.model.LayerTreeNode', {
             name: 'text',
             type: 'string',
             persist: false,
-            convert: function(v, record) {
+            convert: function (v, record) {
                 if (!v) {
                     // folders / LayerGroups
-                    var layerGroup = record.getOlLayer();
+                    const layerGroup = record.getOlLayer();
                     if (layerGroup) {
                         return record.getOlLayer().get('name');
                     }
@@ -75,17 +78,20 @@ Ext.define('CpsiMapview.data.model.LayerTreeNode', {
 
                 // add layer style to node text if we have the style chooser
                 // in the context menu and not as direct item under the node
-                var layerTree = Ext.ComponentQuery.query('cmv_layertree')[0];
+                const layerTree = Ext.ComponentQuery.query('cmv_layertree')[0];
                 if (layerTree &amp;&amp; layerTree.styleSwitcherBelowNode === false) {
-
-                    var olLayer = record.getOlLayer();
+                    const olLayer = record.getOlLayer();
                     if (olLayer &amp;&amp; olLayer.get('activatedStyle')) {
                         // get activated layer style
-                        var activatedStyle = olLayer.get('activatedStyle');
-                        var styleTitle = CpsiMapview.util.Style.getLayerStyleTitle(activatedStyle, olLayer);
+                        const activatedStyle = olLayer.get('activatedStyle');
+                        const styleTitle =
+                            CpsiMapview.util.Style.getLayerStyleTitle(
+                                activatedStyle,
+                                olLayer
+                            );
 
                         // apply node name + style name
-                        var treeNodeConf = olLayer.get('_origTreeConf');
+                        const treeNodeConf = olLayer.get('_origTreeConf');
                         if (treeNodeConf &amp;&amp; treeNodeConf.text &amp;&amp; styleTitle) {
                             return treeNodeConf.text + ' (' + styleTitle + ')';
                         }
@@ -103,7 +109,7 @@ Ext.define('CpsiMapview.data.model.LayerTreeNode', {
      * @param {any} evt
      */
     onLayerVisibleChange: function (evt) {
-        var layer = evt.target;
+        const layer = evt.target;
 
         if (!this.__updating) {
             this.set('checked', layer.get('visible'));
@@ -124,13 +130,13 @@ Ext.define('CpsiMapview.data.model.LayerTreeNode', {
 Fires when all initial layers from the config have been created and added to the OL map.</a></li><li><a href="global.html#event:cmv-mapclickFireswhentheOLmapisclicked.">cmv-mapclick
 Fires when the OL map is clicked.</a></li><li><a href="global.html#event:parallelLineCreatedFires,whenanewparallellinewascreated.">parallelLineCreated
 Fires, when a new parallel line was created.</a></li></ul><h3>Global</h3><ul><li><a href="global.html#TemplatefunctioncalledbeforedoingtheGetFeatureInforequestReturnfalseifyoudon'twanttomaketheGetFeatureInforequest.">Template function called before doing the GetFeatureInfo request
-Return false if you don't want to make the GetFeatureInfo request.</a></li><li><a href="global.html#beforeSave">beforeSave</a></li><li><a href="global.html#getErrors">getErrors</a></li><li><a href="global.html#onAfterSaveSucceded">onAfterSaveSucceded</a></li><li><a href="global.html#onChange">onChange</a></li><li><a href="global.html#onFocus">onFocus</a></li><li><a href="global.html#onGroupEditToggle">onGroupEditToggle</a></li><li><a href="global.html#rawToValue">rawToValue</a></li><li><a href="global.html#setValue">setValue</a></li><li><a href="global.html#storeConfig">storeConfig</a></li><li><a href="global.html#validate">validate</a></li></ul>
+Return false if you don't want to make the GetFeatureInfo request.</a></li><li><a href="global.html#beforeSave">beforeSave</a></li><li><a href="global.html#onAfterSaveSucceded">onAfterSaveSucceded</a></li><li><a href="global.html#onGroupEditToggle">onGroupEditToggle</a></li><li><a href="global.html#setValue">setValue</a></li><li><a href="global.html#storeConfig">storeConfig</a></li><li><a href="global.html#validate">validate</a></li></ul>
 </nav>
 
 <br class="clear">
 
 <footer>
-    Documentation generated by <a href="https://github.com/jsdoc/jsdoc">JSDoc 4.0.4</a> on Tue May 13 2025 08:09:51 GMT+0000 (Coordinated Universal Time)
+    Documentation generated by <a href="https://github.com/jsdoc/jsdoc">JSDoc 4.0.4</a> on Fri May 16 2025 13:30:46 GMT+0000 (Coordinated Universal Time)
 </footer>
 
 <script> prettyPrint(); </script>

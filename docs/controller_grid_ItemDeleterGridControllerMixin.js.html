@@ -39,48 +39,96 @@
 Ext.define('CpsiMapview.controller.grid.ItemDeleterGridControllerMixin', {
     extend: 'Ext.Mixin',
 
-    beforeDelete: function (/*config*/) { return true; },
+    beforeDelete: function (/*config*/) {
+        return true;
+    },
     onRowDeleteFail: Ext.emptyFn,
     onRowDeleteSuccess: Ext.emptyFn,
     onRowDeleteCallback: Ext.emptyFn,
 
     /**
-    * Function to run when a user selects to delete a row. Override this as required.
-    */
+     * Function to run when a user selects to delete a row. Override this as required.
+     */
     onRowDelete: function (tableView, rowIndex, colIndex, item, e, record) {
         tableView.getStore().remove(record);
     },
 
     /**
-    * Function to run when delete is cancelled by the user or by business logic. Override this as required.
-    */
+     * Function to run when delete is cancelled by the user or by business logic. Override this as required.
+     */
     onRowDeleteCancelled: Ext.emptyFn,
 
-    onDeleteRowClick: function (tableView, rowIndex, colIndex, item, e, record, tableRow) {
-        var me = this;
-        var beforeDeleteConfig = { avoidConfirmationRequest: item.avoidConfirmationRequest || false, record: record };
-        var goAhead = (me.beforeDelete ? me.beforeDelete(beforeDeleteConfig) : true);
+    onDeleteRowClick: function (
+        tableView,
+        rowIndex,
+        colIndex,
+        item,
+        e,
+        record,
+        tableRow
+    ) {
+        const me = this;
+        const beforeDeleteConfig = {
+            avoidConfirmationRequest: item.avoidConfirmationRequest || false,
+            record: record
+        };
+        const goAhead = me.beforeDelete
+            ? me.beforeDelete(beforeDeleteConfig)
+            : true;
         if (goAhead) {
             if (beforeDeleteConfig.avoidConfirmationRequest) {
-                me.onRowDelete(tableView, rowIndex, colIndex, item, e, record, tableRow);
+                me.onRowDelete(
+                    tableView,
+                    rowIndex,
+                    colIndex,
+                    item,
+                    e,
+                    record,
+                    tableRow
+                );
             } else {
-                Ext.Msg.confirm('Delete', 'Are you sure you want to proceed with deletion?',
+                Ext.Msg.confirm(
+                    'Delete',
+                    'Are you sure you want to proceed with deletion?',
                     function (buttonId) {
                         if (buttonId == 'yes') {
-                            me.onRowDelete(tableView, rowIndex, colIndex, item, e, record, tableRow);
+                            me.onRowDelete(
+                                tableView,
+                                rowIndex,
+                                colIndex,
+                                item,
+                                e,
+                                record,
+                                tableRow
+                            );
                         } else {
-                            me.onRowDeleteCancelled(tableView, rowIndex, colIndex, item, e, record, tableRow);
+                            me.onRowDeleteCancelled(
+                                tableView,
+                                rowIndex,
+                                colIndex,
+                                item,
+                                e,
+                                record,
+                                tableRow
+                            );
                         }
                     }
                 );
             }
-        }
-        else {
-            me.onRowDeleteCancelled(tableView, rowIndex, colIndex, item, e, record, tableRow);
+        } else {
+            me.onRowDeleteCancelled(
+                tableView,
+                rowIndex,
+                colIndex,
+                item,
+                e,
+                record,
+                tableRow
+            );
         }
     }
-
-});</code></pre>
+});
+</code></pre>
         </article>
     </section>
 
@@ -94,13 +142,13 @@ Ext.define('CpsiMapview.controller.grid.ItemDeleterGridControllerMixin', {
 Fires when all initial layers from the config have been created and added to the OL map.</a></li><li><a href="global.html#event:cmv-mapclickFireswhentheOLmapisclicked.">cmv-mapclick
 Fires when the OL map is clicked.</a></li><li><a href="global.html#event:parallelLineCreatedFires,whenanewparallellinewascreated.">parallelLineCreated
 Fires, when a new parallel line was created.</a></li></ul><h3>Global</h3><ul><li><a href="global.html#TemplatefunctioncalledbeforedoingtheGetFeatureInforequestReturnfalseifyoudon'twanttomaketheGetFeatureInforequest.">Template function called before doing the GetFeatureInfo request
-Return false if you don't want to make the GetFeatureInfo request.</a></li><li><a href="global.html#beforeSave">beforeSave</a></li><li><a href="global.html#getErrors">getErrors</a></li><li><a href="global.html#onAfterSaveSucceded">onAfterSaveSucceded</a></li><li><a href="global.html#onChange">onChange</a></li><li><a href="global.html#onFocus">onFocus</a></li><li><a href="global.html#onGroupEditToggle">onGroupEditToggle</a></li><li><a href="global.html#rawToValue">rawToValue</a></li><li><a href="global.html#setValue">setValue</a></li><li><a href="global.html#storeConfig">storeConfig</a></li><li><a href="global.html#validate">validate</a></li></ul>
+Return false if you don't want to make the GetFeatureInfo request.</a></li><li><a href="global.html#beforeSave">beforeSave</a></li><li><a href="global.html#onAfterSaveSucceded">onAfterSaveSucceded</a></li><li><a href="global.html#onGroupEditToggle">onGroupEditToggle</a></li><li><a href="global.html#setValue">setValue</a></li><li><a href="global.html#storeConfig">storeConfig</a></li><li><a href="global.html#validate">validate</a></li></ul>
 </nav>
 
 <br class="clear">
 
 <footer>
-    Documentation generated by <a href="https://github.com/jsdoc/jsdoc">JSDoc 4.0.4</a> on Tue May 13 2025 08:09:51 GMT+0000 (Coordinated Universal Time)
+    Documentation generated by <a href="https://github.com/jsdoc/jsdoc">JSDoc 4.0.4</a> on Fri May 16 2025 13:30:46 GMT+0000 (Coordinated Universal Time)
 </footer>
 
 <script> prettyPrint(); </script>

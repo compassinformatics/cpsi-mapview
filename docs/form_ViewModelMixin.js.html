@@ -35,9 +35,7 @@
 Ext.define('CpsiMapview.form.ViewModelMixin', {
     extend: 'Ext.Mixin',
 
-    requires: [
-        'BasiGX.util.Map'
-    ],
+    requires: ['BasiGX.util.Map'],
 
     mixinConfig: {
         before: {
@@ -52,8 +50,8 @@ Ext.define('CpsiMapview.form.ViewModelMixin', {
      * Destroy the currently associated record
      * */
     destroyCurrentRecord: function () {
-        var me = this;
-        var rec = me.get('currentRecord');
+        const me = this;
+        const rec = me.get('currentRecord');
         rec.destroy();
     },
 
@@ -69,24 +67,21 @@ Ext.define('CpsiMapview.form.ViewModelMixin', {
     },
 
     onInitConfig: function () {
-        var me = this;
+        const me = this;
         // add the currentRecord property which is used for all data entry forms
         me.set({
-            'currentRecord': null,
-            'timestamp': Ext.Date.now()
+            currentRecord: null,
+            timestamp: Ext.Date.now()
         });
     },
 
     config: {
-
         formulas: {
-
             map: function () {
-                var cmp = BasiGX.util.Map.getMapComponent();
+                const cmp = BasiGX.util.Map.getMapComponent();
                 if (cmp) {
                     return cmp.getMap();
-                }
-                else {
+                } else {
                     return null;
                 }
             },
@@ -96,10 +91,10 @@ Ext.define('CpsiMapview.form.ViewModelMixin', {
                     currentRecord: '{currentRecord}'
                 },
                 get: function () {
-                    var me = this;
-                    var storeName = me.get('featureStoreName');
-                    var currentRecord = me.get('currentRecord');
-                    var fs = me.getFeatureStore(currentRecord, storeName);
+                    const me = this;
+                    const storeName = me.get('featureStoreName');
+                    const currentRecord = me.get('currentRecord');
+                    const fs = me.getFeatureStore(currentRecord, storeName);
                     if (fs) {
                         return fs.layer;
                     }
@@ -111,11 +106,10 @@ Ext.define('CpsiMapview.form.ViewModelMixin', {
                     currentRecord: '{currentRecord}'
                 },
                 get: function () {
-
-                    var me = this;
-                    var storeName = me.get('polygonStoreName');
-                    var currentRecord = me.get('currentRecord');
-                    var fs = me.getFeatureStore(currentRecord, storeName);
+                    const me = this;
+                    const storeName = me.get('polygonStoreName');
+                    const currentRecord = me.get('currentRecord');
+                    const fs = me.getFeatureStore(currentRecord, storeName);
                     if (fs) {
                         return fs.layer;
                     }
@@ -127,7 +121,7 @@ Ext.define('CpsiMapview.form.ViewModelMixin', {
                     resultLayer: '{resultLayer}'
                 },
                 get: function (data) {
-                    var layer = data.resultLayer;
+                    const layer = data.resultLayer;
                     if (layer) {
                         return layer.get('selectStyle');
                     } else {
@@ -137,8 +131,8 @@ Ext.define('CpsiMapview.form.ViewModelMixin', {
             },
 
             /**
-            * This is overwritten in most of the ViewModels that use this mixin
-            */
+             * This is overwritten in most of the ViewModels that use this mixin
+             */
             valid: function () {
                 return true;
             },
@@ -150,10 +144,15 @@ Ext.define('CpsiMapview.form.ViewModelMixin', {
                     isValid: '{valid}'
                 },
                 get: function (data) {
-                    var ret = data.isValid;
-                    ret = ret &amp;&amp; (data.isLocked !== true);
+                    let ret = data.isValid;
+                    ret = ret &amp;&amp; data.isLocked !== true;
                     if (this.getFormulas().belongsToRoleReadWrite) {
-                        ret = ret &amp;&amp; this.getFormulas().belongsToRoleReadWrite.call(this, this.getFormulaFn);
+                        ret =
+                            ret &amp;&amp;
+                            this.getFormulas().belongsToRoleReadWrite.call(
+                                this,
+                                this.getFormulaFn
+                            );
                     }
                     return ret;
                 }
@@ -165,9 +164,14 @@ Ext.define('CpsiMapview.form.ViewModelMixin', {
                     phantom: '{currentRecord.phantom}'
                 },
                 get: function (data) {
-                    var ret = (data.isLocked !== true) &amp;&amp; !data.phantom;
+                    let ret = data.isLocked !== true &amp;&amp; !data.phantom;
                     if (this.getFormulas().belongsToRoleReadWrite) {
-                        ret = ret &amp;&amp; this.getFormulas().belongsToRoleReadWrite.call(this, this.getFormulaFn);
+                        ret =
+                            ret &amp;&amp;
+                            this.getFormulas().belongsToRoleReadWrite.call(
+                                this,
+                                this.getFormulaFn
+                            );
                     }
                     return ret;
                 }
@@ -228,13 +232,13 @@ Ext.define('CpsiMapview.form.ViewModelMixin', {
 Fires when all initial layers from the config have been created and added to the OL map.</a></li><li><a href="global.html#event:cmv-mapclickFireswhentheOLmapisclicked.">cmv-mapclick
 Fires when the OL map is clicked.</a></li><li><a href="global.html#event:parallelLineCreatedFires,whenanewparallellinewascreated.">parallelLineCreated
 Fires, when a new parallel line was created.</a></li></ul><h3>Global</h3><ul><li><a href="global.html#TemplatefunctioncalledbeforedoingtheGetFeatureInforequestReturnfalseifyoudon'twanttomaketheGetFeatureInforequest.">Template function called before doing the GetFeatureInfo request
-Return false if you don't want to make the GetFeatureInfo request.</a></li><li><a href="global.html#beforeSave">beforeSave</a></li><li><a href="global.html#getErrors">getErrors</a></li><li><a href="global.html#onAfterSaveSucceded">onAfterSaveSucceded</a></li><li><a href="global.html#onChange">onChange</a></li><li><a href="global.html#onFocus">onFocus</a></li><li><a href="global.html#onGroupEditToggle">onGroupEditToggle</a></li><li><a href="global.html#rawToValue">rawToValue</a></li><li><a href="global.html#setValue">setValue</a></li><li><a href="global.html#storeConfig">storeConfig</a></li><li><a href="global.html#validate">validate</a></li></ul>
+Return false if you don't want to make the GetFeatureInfo request.</a></li><li><a href="global.html#beforeSave">beforeSave</a></li><li><a href="global.html#onAfterSaveSucceded">onAfterSaveSucceded</a></li><li><a href="global.html#onGroupEditToggle">onGroupEditToggle</a></li><li><a href="global.html#setValue">setValue</a></li><li><a href="global.html#storeConfig">storeConfig</a></li><li><a href="global.html#validate">validate</a></li></ul>
 </nav>
 
 <br class="clear">
 
 <footer>
-    Documentation generated by <a href="https://github.com/jsdoc/jsdoc">JSDoc 4.0.4</a> on Tue May 13 2025 08:09:51 GMT+0000 (Coordinated Universal Time)
+    Documentation generated by <a href="https://github.com/jsdoc/jsdoc">JSDoc 4.0.4</a> on Fri May 16 2025 13:30:46 GMT+0000 (Coordinated Universal Time)
 </footer>
 
 <script> prettyPrint(); </script>

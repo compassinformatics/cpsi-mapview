@@ -47,12 +47,11 @@ Ext.define('CpsiMapview.util.WmsFilter', {
      * @param {any} layer
      */
     getWmsParams: function (layer) {
-
-        var wmsParams;
-        var wmsSource = layer.getSource();
+        let wmsParams;
+        const wmsSource = layer.getSource();
 
         if (layer.get('isVt') === true) {
-            var urlParts = wmsSource.getUrls()[0].split('?');
+            const urlParts = wmsSource.getUrls()[0].split('?');
             wmsParams = Ext.Object.fromQueryString(urlParts[1]);
         } else {
             wmsParams = wmsSource.getParams();
@@ -66,28 +65,28 @@ Ext.define('CpsiMapview.util.WmsFilter', {
      * @param {any} wmsParams
      */
     getWmsFilters: function (wmsParams) {
-
-        var filters = wmsParams.FILTER || [];
+        const filters = wmsParams.FILTER || [];
         // split the list based on filters in brackets e.g. (filter1)(filter2)
-        return Ext.isArray(filters) ? filters : filters.split(/(\(.*?\))/).filter(Boolean);
+        return Ext.isArray(filters)
+            ? filters
+            : filters.split(/(\(.*?\))/).filter(Boolean);
     },
 
     /**
-    * Executed when this menu item is clicked.
-    * Forces redraw of the connected layer.
-    */
+     * Executed when this menu item is clicked.
+     * Forces redraw of the connected layer.
+     */
     getWmsFilterString: function (wmsParams) {
+        const layers = wmsParams.LAYERS || [];
+        const layerList = Ext.isArray(layers) ? layers : layers.split(',');
 
-        var layers = wmsParams.LAYERS || [];
-        var layerList = Ext.isArray(layers) ? layers : layers.split(',');
-
-        var wmsFilterUtil = CpsiMapview.util.WmsFilter;
-        var originalFilters = wmsFilterUtil.getWmsFilters(wmsParams);
+        const wmsFilterUtil = CpsiMapview.util.WmsFilter;
+        const originalFilters = wmsFilterUtil.getWmsFilters(wmsParams);
 
         // every layer item requires a filter - duplicate the first filter
         // for the layer labels
-        var firstFilter;
-        var finalFilters = [];
+        let firstFilter;
+        const finalFilters = [];
 
         if (originalFilters.length > 0) {
             firstFilter = originalFilters[0];
@@ -107,14 +106,18 @@ Ext.define('CpsiMapview.util.WmsFilter', {
         Ext.Assert.truthy(finalFilters.length &lt;= 2);
         //&lt;/debug>
 
-        var wmsFilterString = finalFilters.map(function (filter) {
-            // wrap each filter in brackets
-            if (Ext.String.startsWith(filter, '(') === false &amp;&amp;
-                Ext.String.endsWith(filter, ')') === false) {
-                filter = '(' + filter + ')';
-            }
-            return filter;
-        }).join('');
+        const wmsFilterString = finalFilters
+            .map(function (filter) {
+                // wrap each filter in brackets
+                if (
+                    Ext.String.startsWith(filter, '(') === false &amp;&amp;
+                    Ext.String.endsWith(filter, ')') === false
+                ) {
+                    filter = '(' + filter + ')';
+                }
+                return filter;
+            })
+            .join('');
 
         return wmsFilterString;
     }
@@ -133,13 +136,13 @@ Ext.define('CpsiMapview.util.WmsFilter', {
 Fires when all initial layers from the config have been created and added to the OL map.</a></li><li><a href="global.html#event:cmv-mapclickFireswhentheOLmapisclicked.">cmv-mapclick
 Fires when the OL map is clicked.</a></li><li><a href="global.html#event:parallelLineCreatedFires,whenanewparallellinewascreated.">parallelLineCreated
 Fires, when a new parallel line was created.</a></li></ul><h3>Global</h3><ul><li><a href="global.html#TemplatefunctioncalledbeforedoingtheGetFeatureInforequestReturnfalseifyoudon'twanttomaketheGetFeatureInforequest.">Template function called before doing the GetFeatureInfo request
-Return false if you don't want to make the GetFeatureInfo request.</a></li><li><a href="global.html#beforeSave">beforeSave</a></li><li><a href="global.html#getErrors">getErrors</a></li><li><a href="global.html#onAfterSaveSucceded">onAfterSaveSucceded</a></li><li><a href="global.html#onChange">onChange</a></li><li><a href="global.html#onFocus">onFocus</a></li><li><a href="global.html#onGroupEditToggle">onGroupEditToggle</a></li><li><a href="global.html#rawToValue">rawToValue</a></li><li><a href="global.html#setValue">setValue</a></li><li><a href="global.html#storeConfig">storeConfig</a></li><li><a href="global.html#validate">validate</a></li></ul>
+Return false if you don't want to make the GetFeatureInfo request.</a></li><li><a href="global.html#beforeSave">beforeSave</a></li><li><a href="global.html#onAfterSaveSucceded">onAfterSaveSucceded</a></li><li><a href="global.html#onGroupEditToggle">onGroupEditToggle</a></li><li><a href="global.html#setValue">setValue</a></li><li><a href="global.html#storeConfig">storeConfig</a></li><li><a href="global.html#validate">validate</a></li></ul>
 </nav>
 
 <br class="clear">
 
 <footer>
-    Documentation generated by <a href="https://github.com/jsdoc/jsdoc">JSDoc 4.0.4</a> on Tue May 13 2025 08:09:51 GMT+0000 (Coordinated Universal Time)
+    Documentation generated by <a href="https://github.com/jsdoc/jsdoc">JSDoc 4.0.4</a> on Fri May 16 2025 13:30:46 GMT+0000 (Coordinated Universal Time)
 </footer>
 
 <script> prettyPrint(); </script>

@@ -32,16 +32,14 @@
 Ext.define('CpsiMapview.controller.button.LoginButtonController', {
     extend: 'Ext.app.ViewController',
 
-    requires: [
-        'CpsiMapview.view.form.Login'
-    ],
+    requires: ['CpsiMapview.view.form.Login'],
 
     alias: 'controller.cmv_login_button',
 
     /**
-    * The prefix used in the cookie for any browser-based
-    * user roles
-    * */
+     * The prefix used in the cookie for any browser-based
+     * user roles
+     * */
     displayRolePrefixes: ['Browser_'],
 
     /**
@@ -49,14 +47,15 @@ Ext.define('CpsiMapview.controller.button.LoginButtonController', {
      * the login form
      * */
     onClick: function () {
-
-        var app = Ext.getApplication ? Ext.getApplication() : Ext.app.Application.instance;
-        var loginWin;
+        const app = Ext.getApplication
+            ? Ext.getApplication()
+            : Ext.app.Application.instance;
+        let loginWin;
 
         if (app &amp;&amp; app.loginWindow) {
             loginWin = app.loginWindow;
         } else {
-            var viewModel = {};
+            let viewModel = {};
             if (app) {
                 viewModel = {
                     tokenName: app.tokenName,
@@ -81,15 +80,17 @@ Ext.define('CpsiMapview.controller.button.LoginButtonController', {
      * and return as a formatted string
      * */
     getLoginDetails: function () {
-
-        var me = this;
-        var app = Ext.getApplication ? Ext.getApplication() : Ext.app.Application.instance;
-        var userName = Ext.util.Cookies.get('username');
-        var roles = Ext.util.Cookies.get('roles');
-        var displayRolePrefixes = (app &amp;&amp; app.displayRolePrefixes) || me.displayRolePrefixes;
+        const me = this;
+        const app = Ext.getApplication
+            ? Ext.getApplication()
+            : Ext.app.Application.instance;
+        const userName = Ext.util.Cookies.get('username');
+        let roles = Ext.util.Cookies.get('roles');
+        const displayRolePrefixes =
+            (app &amp;&amp; app.displayRolePrefixes) || me.displayRolePrefixes;
         if (roles) {
             roles = roles.split(',');
-            var displayRoles = [];
+            const displayRoles = [];
 
             Ext.Array.each(roles, function (r) {
                 Ext.Array.each(displayRolePrefixes, function (prefix) {
@@ -102,7 +103,11 @@ Ext.define('CpsiMapview.controller.button.LoginButtonController', {
             displayRoles.sort();
             roles = displayRoles.join('&lt;br />');
         }
-        return Ext.String.format('Username: &lt;b>{0}&lt;/b>&lt;br />User Roles: &lt;br />&lt;br />{1}', userName, roles);
+        return Ext.String.format(
+            'Username: &lt;b>{0}&lt;/b>&lt;br />User Roles: &lt;br />&lt;br />{1}',
+            userName,
+            roles
+        );
     },
 
     /**
@@ -111,8 +116,7 @@ Ext.define('CpsiMapview.controller.button.LoginButtonController', {
      * and {@link CpsiMapview.controller.form.Login#logout}
      * */
     init: function () {
-
-        var me = this;
+        const me = this;
 
         Ext.GlobalEvents.on('login', function () {
             me.getViewModel().set('loggedIn', true);
@@ -122,7 +126,6 @@ Ext.define('CpsiMapview.controller.button.LoginButtonController', {
             me.getViewModel().set('loggedIn', false);
         });
     }
-
 });
 </code></pre>
         </article>
@@ -138,13 +141,13 @@ Ext.define('CpsiMapview.controller.button.LoginButtonController', {
 Fires when all initial layers from the config have been created and added to the OL map.</a></li><li><a href="global.html#event:cmv-mapclickFireswhentheOLmapisclicked.">cmv-mapclick
 Fires when the OL map is clicked.</a></li><li><a href="global.html#event:parallelLineCreatedFires,whenanewparallellinewascreated.">parallelLineCreated
 Fires, when a new parallel line was created.</a></li></ul><h3>Global</h3><ul><li><a href="global.html#TemplatefunctioncalledbeforedoingtheGetFeatureInforequestReturnfalseifyoudon'twanttomaketheGetFeatureInforequest.">Template function called before doing the GetFeatureInfo request
-Return false if you don't want to make the GetFeatureInfo request.</a></li><li><a href="global.html#beforeSave">beforeSave</a></li><li><a href="global.html#getErrors">getErrors</a></li><li><a href="global.html#onAfterSaveSucceded">onAfterSaveSucceded</a></li><li><a href="global.html#onChange">onChange</a></li><li><a href="global.html#onFocus">onFocus</a></li><li><a href="global.html#onGroupEditToggle">onGroupEditToggle</a></li><li><a href="global.html#rawToValue">rawToValue</a></li><li><a href="global.html#setValue">setValue</a></li><li><a href="global.html#storeConfig">storeConfig</a></li><li><a href="global.html#validate">validate</a></li></ul>
+Return false if you don't want to make the GetFeatureInfo request.</a></li><li><a href="global.html#beforeSave">beforeSave</a></li><li><a href="global.html#onAfterSaveSucceded">onAfterSaveSucceded</a></li><li><a href="global.html#onGroupEditToggle">onGroupEditToggle</a></li><li><a href="global.html#setValue">setValue</a></li><li><a href="global.html#storeConfig">storeConfig</a></li><li><a href="global.html#validate">validate</a></li></ul>
 </nav>
 
 <br class="clear">
 
 <footer>
-    Documentation generated by <a href="https://github.com/jsdoc/jsdoc">JSDoc 4.0.4</a> on Tue May 13 2025 08:09:51 GMT+0000 (Coordinated Universal Time)
+    Documentation generated by <a href="https://github.com/jsdoc/jsdoc">JSDoc 4.0.4</a> on Fri May 16 2025 13:30:46 GMT+0000 (Coordinated Universal Time)
 </footer>
 
 <script> prettyPrint(); </script>

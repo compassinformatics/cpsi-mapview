@@ -27,10 +27,10 @@
     <section>
         <article>
             <pre class="prettyprint source linenums"><code>/**
-* A custom field for storing line features
-* The field handles loading and serializing features to and from an associated store.
-* The linked map layer can have styling properties customized through field properties.
-*/
+ * A custom field for storing line features
+ * The field handles loading and serializing features to and from an associated store.
+ * The linked map layer can have styling properties customized through field properties.
+ */
 Ext.define('CpsiMapview.field.Line', {
     extend: 'CpsiMapview.field.Feature',
 
@@ -60,8 +60,8 @@ Ext.define('CpsiMapview.field.Line', {
      * Only display LineString and MultiLineStrings in the associated feature grid
      */
     defaultFeatureFilter: function (rec) {
-        var geomType = rec.getFeature().getGeometry().getType();
-        return (Ext.Array.contains(['LineString', 'MultiLineString'], geomType));
+        const geomType = rec.getFeature().getGeometry().getType();
+        return Ext.Array.contains(['LineString', 'MultiLineString'], geomType);
     },
 
     /**
@@ -72,9 +72,10 @@ Ext.define('CpsiMapview.field.Line', {
      * @param {any} rec
      */
     serialize: function (v, rec) {
-
-        var me = this;
-        var featureStore = rec.featureStores ? rec.featureStores[me.name] : null;
+        const me = this;
+        const featureStore = rec.featureStores
+            ? rec.featureStores[me.name]
+            : null;
         return me.getFeatureAttributes(featureStore);
     },
 
@@ -82,9 +83,8 @@ Ext.define('CpsiMapview.field.Line', {
      * Create an array containing feature properties
      */
     getFeatureAttributes: function (featureStore) {
-
-        var feats = featureStore.getRange();
-        var recs = [];
+        const feats = featureStore.getRange();
+        const recs = [];
 
         Ext.each(feats, function (f) {
             recs.push(f.data);
@@ -94,15 +94,14 @@ Ext.define('CpsiMapview.field.Line', {
     },
 
     /**
-    * Create a new ol style for points and lines in the layer associated with the store
-    *
-    * @return {ol.style.Style} The new style
-    */
+     * Create a new ol style for points and lines in the layer associated with the store
+     *
+     * @return {ol.style.Style} The new style
+     */
     createPointLineStyle: function (lineColor, pointColor) {
+        const me = this;
 
-        var me = this;
-
-        var style = new ol.style.Style({
+        const style = new ol.style.Style({
             image: new ol.style.Circle({
                 radius: me.styleDefaults.radius,
                 // point fill
@@ -125,41 +124,40 @@ Ext.define('CpsiMapview.field.Line', {
     },
 
     /**
-    * Create a new ol style. One of the ol.style.Style or OpenLayers style function
-    * will be returned.
-    *
-    * @return {ol.style.Style} The new style
-    */
+     * Create a new ol style. One of the ol.style.Style or OpenLayers style function
+     * will be returned.
+     *
+     * @return {ol.style.Style} The new style
+     */
     createStyle: function () {
-
-        var me = this;
-        var cfg = me.featureStoreConfig || {};
+        const me = this;
+        const cfg = me.featureStoreConfig || {};
 
         if (cfg &amp;&amp; cfg.styleFn) {
             return cfg.styleFn;
         }
 
-        var lineColor = cfg.lineColor || me.styleDefaults.lineColor;
-        var pointColor = cfg.pointColor || me.styleDefaults.pointColor;
+        const lineColor = cfg.lineColor || me.styleDefaults.lineColor;
+        const pointColor = cfg.pointColor || me.styleDefaults.pointColor;
 
         return me.createPointLineStyle(lineColor, pointColor);
     },
 
     /**
-    * Create a new ol style for showing points and lines when selected
-    *
-    * @return {ol.style.Style} The new style
-    */
+     * Create a new ol style for showing points and lines when selected
+     *
+     * @return {ol.style.Style} The new style
+     */
     createSelectStyle: function () {
+        const me = this;
+        const cfg = me.featureStoreConfig || {};
 
-        var me = this;
-        var cfg = me.featureStoreConfig || {};
-
-        var lineColor = cfg.selectLineColor || me.selectStyleDefaults.lineColor;
-        var pointColor = cfg.selectPointColor || me.selectStyleDefaults.pointColor;
+        const lineColor =
+            cfg.selectLineColor || me.selectStyleDefaults.lineColor;
+        const pointColor =
+            cfg.selectPointColor || me.selectStyleDefaults.pointColor;
 
         return me.createPointLineStyle(lineColor, pointColor);
-
     }
 });
 </code></pre>
@@ -176,13 +174,13 @@ Ext.define('CpsiMapview.field.Line', {
 Fires when all initial layers from the config have been created and added to the OL map.</a></li><li><a href="global.html#event:cmv-mapclickFireswhentheOLmapisclicked.">cmv-mapclick
 Fires when the OL map is clicked.</a></li><li><a href="global.html#event:parallelLineCreatedFires,whenanewparallellinewascreated.">parallelLineCreated
 Fires, when a new parallel line was created.</a></li></ul><h3>Global</h3><ul><li><a href="global.html#TemplatefunctioncalledbeforedoingtheGetFeatureInforequestReturnfalseifyoudon'twanttomaketheGetFeatureInforequest.">Template function called before doing the GetFeatureInfo request
-Return false if you don't want to make the GetFeatureInfo request.</a></li><li><a href="global.html#beforeSave">beforeSave</a></li><li><a href="global.html#getErrors">getErrors</a></li><li><a href="global.html#onAfterSaveSucceded">onAfterSaveSucceded</a></li><li><a href="global.html#onChange">onChange</a></li><li><a href="global.html#onFocus">onFocus</a></li><li><a href="global.html#onGroupEditToggle">onGroupEditToggle</a></li><li><a href="global.html#rawToValue">rawToValue</a></li><li><a href="global.html#setValue">setValue</a></li><li><a href="global.html#storeConfig">storeConfig</a></li><li><a href="global.html#validate">validate</a></li></ul>
+Return false if you don't want to make the GetFeatureInfo request.</a></li><li><a href="global.html#beforeSave">beforeSave</a></li><li><a href="global.html#onAfterSaveSucceded">onAfterSaveSucceded</a></li><li><a href="global.html#onGroupEditToggle">onGroupEditToggle</a></li><li><a href="global.html#setValue">setValue</a></li><li><a href="global.html#storeConfig">storeConfig</a></li><li><a href="global.html#validate">validate</a></li></ul>
 </nav>
 
 <br class="clear">
 
 <footer>
-    Documentation generated by <a href="https://github.com/jsdoc/jsdoc">JSDoc 4.0.4</a> on Tue May 13 2025 08:09:51 GMT+0000 (Coordinated Universal Time)
+    Documentation generated by <a href="https://github.com/jsdoc/jsdoc">JSDoc 4.0.4</a> on Fri May 16 2025 13:30:46 GMT+0000 (Coordinated Universal Time)
 </footer>
 
 <script> prettyPrint(); </script>

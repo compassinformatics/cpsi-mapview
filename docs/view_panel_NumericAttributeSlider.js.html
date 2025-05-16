@@ -69,33 +69,43 @@ Ext.define('CpsiMapview.view.panel.NumericAttributeSlider', {
      *
      * @param {object} config The configuration object.
      */
-    constructor: function(config) {
-        var cfg = config || {};
-        var cfgEnabled = cfg.enabled;
-        var cfgDisabled = cfg.disabled;
+    constructor: function (config) {
+        const cfg = config || {};
+        const cfgEnabled = cfg.enabled;
+        const cfgDisabled = cfg.disabled;
         delete cfg.enabled;
         delete cfg.disabled;
 
-        var hasPassedCfgEnabled = Ext.isDefined(cfgEnabled);
-        var hasPassedCfgDisabled = Ext.isDefined(cfgDisabled);
+        const hasPassedCfgEnabled = Ext.isDefined(cfgEnabled);
+        const hasPassedCfgDisabled = Ext.isDefined(cfgDisabled);
 
-        var finalEnabled = cfgEnabled; // either undefined or user defined
+        let finalEnabled = cfgEnabled; // either undefined or user defined
 
         if (hasPassedCfgEnabled &amp;&amp; hasPassedCfgDisabled) {
             // user passed both, ensure they make sense or warn
-            if (cfgEnabled !== !cfgDisabled) { // semantically not same
-                Ext.Logger.warn('Conflicting disabled/enabled configs found. '
-                    + 'NumericAttributeSlider will be using "enabled:'
-                    + finalEnabled + '".');
+            if (cfgEnabled !== !cfgDisabled) {
+                // semantically not same
+                Ext.Logger.warn(
+                    'Conflicting disabled/enabled configs found. ' +
+                        'NumericAttributeSlider will be using "enabled:' +
+                        finalEnabled +
+                        '".'
+                );
             }
         } else if (hasPassedCfgDisabled) {
             // user passed only disabled, warn and switch to enabled
             finalEnabled = !cfgDisabled;
-            Ext.Logger.info('Config option "disabled=' + cfgDisabled + '" passed,'
-                + ' transforming to option "enabled=' + finalEnabled + '".');
+            Ext.Logger.info(
+                'Config option "disabled=' +
+                    cfgDisabled +
+                    '" passed,' +
+                    ' transforming to option "enabled=' +
+                    finalEnabled +
+                    '".'
+            );
         } else if (!hasPassedCfgEnabled) {
             // reinitiate the default of this class
-            var clazz = CpsiMapview.view.panel.NumericAttributeSlider;
+            const clazz = CpsiMapview.view.panel.NumericAttributeSlider;
             finalEnabled = clazz.prototype.config.enabled;
         }
 
@@ -108,35 +118,37 @@ Ext.define('CpsiMapview.view.panel.NumericAttributeSlider', {
      * Initializes the numeric attribute slider.
      */
     initComponent: function () {
-        var me = this;
-        var values = [me.getCurrLowerValue(), me.getCurrUpperValue()];
-        me.items = [{
-            xtype: 'multislider',
-            name: 'slider',
-            labelAlign: 'right',
-            listeners: {
-                afterrender: 'initSlider',
-                changecomplete: 'applySliderEffects'
+        const me = this;
+        const values = [me.getCurrLowerValue(), me.getCurrUpperValue()];
+        me.items = [
+            {
+                xtype: 'multislider',
+                name: 'slider',
+                labelAlign: 'right',
+                listeners: {
+                    afterrender: 'initSlider',
+                    changecomplete: 'applySliderEffects'
+                },
+                constrainThumbs: false,
+                tipText: 'getTipText',
+                fieldLabel: me.getSliderLabel(),
+                width: 200,
+                values: values,
+                increment: me.getIncrement(),
+                minValue: me.getMinValue(),
+                maxValue: me.getMaxValue(),
+                disabled: !me.getEnabled()
             },
-            constrainThumbs: false,
-            tipText: 'getTipText',
-            fieldLabel: me.getSliderLabel(),
-            width: 200,
-            values: values,
-            increment: me.getIncrement(),
-            minValue: me.getMinValue(),
-            maxValue: me.getMaxValue(),
-            disabled: !me.getEnabled()
-        },
-        {
-            xtype: 'checkbox',
-            name: 'active',
-            boxLabel: me.getCheckboxLabel(),
-            checked: me.getEnabled(),
-            listeners: {
-                change: 'onCheckChange'
+            {
+                xtype: 'checkbox',
+                name: 'active',
+                boxLabel: me.getCheckboxLabel(),
+                checked: me.getEnabled(),
+                listeners: {
+                    change: 'onCheckChange'
+                }
             }
-        }];
+        ];
 
         me.callParent();
     },
@@ -148,16 +160,15 @@ Ext.define('CpsiMapview.view.panel.NumericAttributeSlider', {
      *
      * @param {boolean} newDisabled
      */
-    setDisabled: function(newDisabled) {
+    setDisabled: function (newDisabled) {
         // override the original method and
         // fast forward to checkbox check / uncheck
-        var newEnabled = !newDisabled;
+        const newEnabled = !newDisabled;
         this.setEnabled(newEnabled);
-        var cb = this.down('checkbox[name="active"]');
+        const cb = this.down('checkbox[name="active"]');
         cb.setValue(newEnabled);
         return this; // the original method is chainable
     }
-
 });
 </code></pre>
         </article>
@@ -173,13 +184,13 @@ Ext.define('CpsiMapview.view.panel.NumericAttributeSlider', {
 Fires when all initial layers from the config have been created and added to the OL map.</a></li><li><a href="global.html#event:cmv-mapclickFireswhentheOLmapisclicked.">cmv-mapclick
 Fires when the OL map is clicked.</a></li><li><a href="global.html#event:parallelLineCreatedFires,whenanewparallellinewascreated.">parallelLineCreated
 Fires, when a new parallel line was created.</a></li></ul><h3>Global</h3><ul><li><a href="global.html#TemplatefunctioncalledbeforedoingtheGetFeatureInforequestReturnfalseifyoudon'twanttomaketheGetFeatureInforequest.">Template function called before doing the GetFeatureInfo request
-Return false if you don't want to make the GetFeatureInfo request.</a></li><li><a href="global.html#beforeSave">beforeSave</a></li><li><a href="global.html#getErrors">getErrors</a></li><li><a href="global.html#onAfterSaveSucceded">onAfterSaveSucceded</a></li><li><a href="global.html#onChange">onChange</a></li><li><a href="global.html#onFocus">onFocus</a></li><li><a href="global.html#onGroupEditToggle">onGroupEditToggle</a></li><li><a href="global.html#rawToValue">rawToValue</a></li><li><a href="global.html#setValue">setValue</a></li><li><a href="global.html#storeConfig">storeConfig</a></li><li><a href="global.html#validate">validate</a></li></ul>
+Return false if you don't want to make the GetFeatureInfo request.</a></li><li><a href="global.html#beforeSave">beforeSave</a></li><li><a href="global.html#onAfterSaveSucceded">onAfterSaveSucceded</a></li><li><a href="global.html#onGroupEditToggle">onGroupEditToggle</a></li><li><a href="global.html#setValue">setValue</a></li><li><a href="global.html#storeConfig">storeConfig</a></li><li><a href="global.html#validate">validate</a></li></ul>
 </nav>
 
 <br class="clear">
 
 <footer>
-    Documentation generated by <a href="https://github.com/jsdoc/jsdoc">JSDoc 4.0.4</a> on Tue May 13 2025 08:09:51 GMT+0000 (Coordinated Universal Time)
+    Documentation generated by <a href="https://github.com/jsdoc/jsdoc">JSDoc 4.0.4</a> on Fri May 16 2025 13:30:46 GMT+0000 (Coordinated Universal Time)
 </footer>
 
 <script> prettyPrint(); </script>

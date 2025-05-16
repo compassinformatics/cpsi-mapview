@@ -42,16 +42,17 @@ Ext.define('CpsiMapview.form.HelpMixin', {
      * @return {String} Full URL to the help page*
      */
     onHelp: function () {
-
-        var me = this;
+        const me = this;
 
         // get the helpUrl from the viewmodel (if set)
-        var vm = me.getViewModel();
-        var helpUrl = vm ? vm.get('helpUrl') : '';
+        const vm = me.getViewModel();
+        const helpUrl = vm ? vm.get('helpUrl') : '';
 
         // unsure why Ext.getApplication is sometimes undefined
-        var app = Ext.getApplication ? Ext.getApplication() : Ext.app.Application.instance;
-        var rootUrl = app.rootHelpUrl;
+        const app = Ext.getApplication
+            ? Ext.getApplication()
+            : Ext.app.Application.instance;
+        const rootUrl = app.rootHelpUrl;
 
         if (!helpUrl &amp;&amp; !rootUrl) {
             //&lt;debug>
@@ -60,11 +61,14 @@ Ext.define('CpsiMapview.form.HelpMixin', {
             return;
         }
 
-        var fullUrl = me.buildHelpUrl(helpUrl, rootUrl);
-        var win = window.open(fullUrl, 'mapview-help'); // use '_blank' if we want a new window each time
+        const fullUrl = me.buildHelpUrl(helpUrl, rootUrl);
+        const win = window.open(fullUrl, 'mapview-help'); // use '_blank' if we want a new window each time
 
         if (!win) {
-            Ext.Msg.alert('Pop-up Blocked', 'The help page was blocked from opening. Please allow pop-ups for this site.');
+            Ext.Msg.alert(
+                'Pop-up Blocked',
+                'The help page was blocked from opening. Please allow pop-ups for this site.'
+            );
         } else {
             win.focus();
         }
@@ -73,19 +77,17 @@ Ext.define('CpsiMapview.form.HelpMixin', {
     },
 
     /**
-    * Build a URL based on root and page fragments
-    *
-    * @param {String} helpUrl A full URL or a relative link within the documentation
-    * @param {String} rootUrl A root/base URL for the documentation
-    * @return {String} Full URL to the help page
-    * @private
-    */
+     * Build a URL based on root and page fragments
+     *
+     * @param {String} helpUrl A full URL or a relative link within the documentation
+     * @param {String} rootUrl A root/base URL for the documentation
+     * @return {String} Full URL to the help page
+     * @private
+     */
     buildHelpUrl: function (helpUrl, rootUrl) {
+        let fullUrl;
 
-        var fullUrl;
-
-        if (rootUrl &amp;&amp; (Ext.String.startsWith(helpUrl, 'http') === false)) {
-
+        if (rootUrl &amp;&amp; Ext.String.startsWith(helpUrl, 'http') === false) {
             // trim any slashes from the URLs to avoid double slashes
             if (Ext.String.endsWith(rootUrl, '/')) {
                 rootUrl = rootUrl.slice(0, -1);
@@ -97,7 +99,6 @@ Ext.define('CpsiMapview.form.HelpMixin', {
 
             // now format the URLs with a single slash
             fullUrl = Ext.String.format('{0}/{1}', rootUrl, helpUrl);
-
         } else {
             // no rootUrl is set or the link URL is a direct http link
             fullUrl = helpUrl;
@@ -105,7 +106,8 @@ Ext.define('CpsiMapview.form.HelpMixin', {
 
         return fullUrl;
     }
-});</code></pre>
+});
+</code></pre>
         </article>
     </section>
 
@@ -119,13 +121,13 @@ Ext.define('CpsiMapview.form.HelpMixin', {
 Fires when all initial layers from the config have been created and added to the OL map.</a></li><li><a href="global.html#event:cmv-mapclickFireswhentheOLmapisclicked.">cmv-mapclick
 Fires when the OL map is clicked.</a></li><li><a href="global.html#event:parallelLineCreatedFires,whenanewparallellinewascreated.">parallelLineCreated
 Fires, when a new parallel line was created.</a></li></ul><h3>Global</h3><ul><li><a href="global.html#TemplatefunctioncalledbeforedoingtheGetFeatureInforequestReturnfalseifyoudon'twanttomaketheGetFeatureInforequest.">Template function called before doing the GetFeatureInfo request
-Return false if you don't want to make the GetFeatureInfo request.</a></li><li><a href="global.html#beforeSave">beforeSave</a></li><li><a href="global.html#getErrors">getErrors</a></li><li><a href="global.html#onAfterSaveSucceded">onAfterSaveSucceded</a></li><li><a href="global.html#onChange">onChange</a></li><li><a href="global.html#onFocus">onFocus</a></li><li><a href="global.html#onGroupEditToggle">onGroupEditToggle</a></li><li><a href="global.html#rawToValue">rawToValue</a></li><li><a href="global.html#setValue">setValue</a></li><li><a href="global.html#storeConfig">storeConfig</a></li><li><a href="global.html#validate">validate</a></li></ul>
+Return false if you don't want to make the GetFeatureInfo request.</a></li><li><a href="global.html#beforeSave">beforeSave</a></li><li><a href="global.html#onAfterSaveSucceded">onAfterSaveSucceded</a></li><li><a href="global.html#onGroupEditToggle">onGroupEditToggle</a></li><li><a href="global.html#setValue">setValue</a></li><li><a href="global.html#storeConfig">storeConfig</a></li><li><a href="global.html#validate">validate</a></li></ul>
 </nav>
 
 <br class="clear">
 
 <footer>
-    Documentation generated by <a href="https://github.com/jsdoc/jsdoc">JSDoc 4.0.4</a> on Tue May 13 2025 08:09:51 GMT+0000 (Coordinated Universal Time)
+    Documentation generated by <a href="https://github.com/jsdoc/jsdoc">JSDoc 4.0.4</a> on Fri May 16 2025 13:30:46 GMT+0000 (Coordinated Universal Time)
 </footer>
 
 <script> prettyPrint(); </script>
