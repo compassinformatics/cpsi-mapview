@@ -29,7 +29,7 @@ Ext.define('CpsiMapview.view.button.SplitByClickButton', {
     /**
      * The icon (scissors) used for the button
      */
-    iconCls: 'x-fa fa-scissors',
+    iconCls: 'x-fas fa-cut',
 
     config: {
         /**
