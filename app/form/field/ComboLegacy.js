@@ -16,22 +16,22 @@ Ext.define('CpsiMapview.form.field.ComboLegacy', {
      * a user initiated change
      **/
     listeners: {
-        focus: function (combo) {            
+        focus: function (combo) {
             combo.__isUserInteracting = true;
-            combo.__isBlurPotentiallyTheSelectTrigger = false; 
+            combo.__isBlurPotentiallySelectTrigger = false; 
         },
         blur: function (combo) {
             if (combo.__isUserInteracting) {
-                // blur might happen before select when a user enter the text value and click away with his mouse:
-                combo.__isBlurPotentiallyTheSelectTrigger = true;   
+                // blur could happen before a select if a user enters a text value and then clicks elsewhere
+                combo.__isBlurPotentiallySelectTrigger = true;   
             }
             combo.__isUserInteracting = false;         
         },
         select: function (combo, record) {
-            if ((combo.__isUserInteracting || combo.__isBlurPotentiallyTheSelectTrigger) && record.get('isLegacy')) {
+            if ((combo.__isUserInteracting || combo.__isBlurPotentiallySelectTrigger) && record.get('isLegacy')) {
                 combo.clearValue();
             }
-            combo.__isBlurPotentiallyTheSelectTrigger = false;
+            combo.__isBlurPotentiallySelectTrigger = false;
         }
     },
 
