@@ -647,9 +647,9 @@ Ext.define('CpsiMapview.controller.grid.Grid', {
         }
 
         if (!layer) {
-            // Warn the user/developer that there is probably a configuration mismatch between a grid config and the layer tree layers.
+            // warn the developer of a configuration mismatch between the config for the grid and the layer tree
             Ext.log.warn(
-                '[CpsiMapview.controller.grid.Grid getOlLayer() ] - No layer found for a grid (' +
+                '[CpsiMapview.controller.grid.Grid getOlLayer() ] - No layer found for grid (' +
                 viewModel.type +
                 ') using one of these keys: wmsLayerKey / vectorLayerKey',
                 wmsLayerKey,
@@ -883,7 +883,7 @@ Ext.define('CpsiMapview.controller.grid.Grid', {
         const layer = me.getOlLayer();
 
         if (!layer) {
-            //No action taken in applyPresetFilters - no layer found that this grid might require.
+            // return if no layer found for the grid
             return;
         }
 
