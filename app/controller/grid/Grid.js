@@ -646,6 +646,17 @@ Ext.define('CpsiMapview.controller.grid.Grid', {
             layer = me.getLayerByKey(vectorLayerKey);
         }
 
+        if (!layer) {
+            // warn the developer of a configuration mismatch between the config for the grid and the layer tree
+            Ext.log.warn(
+                '[CpsiMapview.controller.grid.Grid getOlLayer() ] - No layer found for grid (' +
+                viewModel.type +
+                ') using one of these keys: wmsLayerKey / vectorLayerKey',
+                wmsLayerKey,
+                vectorLayerKey
+            );
+        }
+
         return layer;
     },
 
@@ -870,6 +881,12 @@ Ext.define('CpsiMapview.controller.grid.Grid', {
         const me = this;
 
         const layer = me.getOlLayer();
+
+        if (!layer) {
+            // return if no layer found for the grid
+            return;
+        }
+
         const gridFilters = layer.get('gridFilters');
 
         if (!gridFilters || !Ext.isArray(gridFilters)) {
