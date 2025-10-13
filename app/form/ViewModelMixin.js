@@ -24,7 +24,9 @@ Ext.define('CpsiMapview.form.ViewModelMixin', {
     destroyCurrentRecord: function () {
         const me = this;
         const rec = me.get('currentRecord');
-        rec.destroy();
+        if (rec) {
+            rec.destroy();
+        }
     },
 
     /**
