@@ -777,7 +777,9 @@ Ext.define('CpsiMapview.controller.button.DrawingButtonController', {
 
         // guess the map if not given
         if (!me.map) {
-            me.map = BasiGX.util.Map.getMapComponent().map;
+            me.map = BasiGX.util.Map.getMapComponent()
+                ? BasiGX.util.Map.getMapComponent().map
+                : new ol.Map();
         }
 
         // use draw layer set in the view

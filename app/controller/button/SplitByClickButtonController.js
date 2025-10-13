@@ -64,7 +64,9 @@ Ext.define('CpsiMapview.controller.button.SplitByClickButtonController', {
 
         // guess the map if not given
         if (!me.map) {
-            me.map = BasiGX.util.Map.getMapComponent().map;
+            me.map = BasiGX.util.Map.getMapComponent()
+                ? BasiGX.util.Map.getMapComponent().map
+                : new ol.Map();
         }
 
         // create a result layer unless one has already been set
