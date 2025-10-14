@@ -340,7 +340,9 @@ Ext.define('CpsiMapview.controller.button.DigitizeButtonController', {
 
         // guess the map if not given
         if (!me.map) {
-            me.map = BasiGX.util.Map.getMapComponent().map;
+            me.map = BasiGX.util.Map.getMapComponent()
+                ? BasiGX.util.Map.getMapComponent().map
+                : new ol.Map();
         }
 
         // use default cmv_map Ext.panel.Panel for circle toolbar if not defined
