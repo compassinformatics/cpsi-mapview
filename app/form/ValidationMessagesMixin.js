@@ -40,7 +40,7 @@ Ext.define('CpsiMapview.form.ValidationMessagesMixin', {
 
         const saveButton = view.down('#saveButton');
 
-        if (!saveButton) {
+        if (view.isVisible() && !saveButton) {
             //<debug>
             Ext.log.warn('No button with itemId #saveButton found');
             //</debug>
