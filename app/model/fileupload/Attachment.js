@@ -25,7 +25,7 @@ Ext.define('CpsiMapview.model.fileupload.Attachment', {
     ],
 
     /**
-     * Attachements are typically associated with a parent object (which has multiple
+     * Attachments are typically associated with a parent object (which has multiple
      * attachments)
      * This function allows full URLs to be created for downloading attachments and also
      * thumbnails if the attachment is an image file
