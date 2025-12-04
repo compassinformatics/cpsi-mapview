@@ -20,6 +20,9 @@ Ext.define('CpsiMapview.util.EditWindowOpenerMixin', {
             recordWindow = null;
 
         Ext.each(existingWindows, function (w) {
+            if (w.isDestroying === true) {
+                return false;
+            }
             rec = w.getViewModel().get('currentRecord');
             // if the window has been opened but the model failed to load
             // then rec can be null
