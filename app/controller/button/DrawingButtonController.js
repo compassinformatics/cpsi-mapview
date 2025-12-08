@@ -313,7 +313,7 @@ Ext.define('CpsiMapview.controller.button.DrawingButtonController', {
                 // eslint-disable-next-line
                 try {
                     collection.push(f);
-                } catch (e) {}
+                } catch (e) { }
             });
         };
 
@@ -784,7 +784,9 @@ Ext.define('CpsiMapview.controller.button.DrawingButtonController', {
 
         // use draw layer set in the view
         //<debug>
-        Ext.Assert.truthy(view.drawLayer);
+        if (pressed) {
+            Ext.Assert.isObject(view.drawLayer);
+        }
         //</debug>
         if (!me.drawLayer) {
             if (view.drawLayer) {
@@ -792,7 +794,7 @@ Ext.define('CpsiMapview.controller.button.DrawingButtonController', {
             }
         }
 
-        if (!me.defaultDrawStyle) {
+        if (me.drawLayer && !me.defaultDrawStyle) {
             me.prepareDrawingStyles();
             // set initial style for drawing features
             me.defaultDrawStyle = [
@@ -821,9 +823,9 @@ Ext.define('CpsiMapview.controller.button.DrawingButtonController', {
             document.addEventListener('keydown', me.handleKeyPress);
         } else {
             me.cleanupTracing();
-            me.drawInteraction.setActive(false);
-            me.modifyInteraction.setActive(false);
-            me.snapInteraction.setActive(false);
+            me.drawInteraction && me.drawInteraction.setActive(false);
+            me.modifyInteraction && me.modifyInteraction.setActive(false);
+            me.snapInteraction && me.snapInteraction.setActive(false);
             viewPort.removeEventListener('contextmenu', me.contextHandler);
             document.removeEventListener('keydown', me.handleKeyPress);
         }
