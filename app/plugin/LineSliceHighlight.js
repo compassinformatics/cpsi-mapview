@@ -64,9 +64,13 @@ Ext.define('CpsiMapview.plugin.LineSliceHighlight', {
      * @param {ol.geom.LineString} geometry
      * @param {number} start
      * @param {number} end
+     * @param {ol.map} map
      */
-    highlightSlice: function (geometry, start, end) {
-        const map = BasiGX.util.Map.getMapComponent().map;
+    highlightSlice: function (geometry, start, end, map) {
+
+        if (!map) {
+            map = BasiGX.util.Map.getMapComponent().map;
+        }
 
         if (!this.layer) {
             this.layer = new ol.layer.Vector({
