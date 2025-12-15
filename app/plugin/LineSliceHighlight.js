@@ -66,7 +66,6 @@ Ext.define('CpsiMapview.plugin.LineSliceHighlight', {
      * @param {number} end
      */
     highlightSlice: function (geometry, start, end, map) {
-
         if (!this.layer) {
             this.layer = new ol.layer.Vector({
                 style: this.style,
