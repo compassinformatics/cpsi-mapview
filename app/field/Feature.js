@@ -28,7 +28,7 @@ Ext.define('CpsiMapview.field.Feature', {
             ? rec.featureStores[me.name]
             : null;
 
-        if (featureStore && data) {
+        if (featureStore && Ext.isEmpty(data) === false) {
             features = new ol.format.GeoJSON().readFeatures(data);
             // wrap an edit session around updating the field when first loaded
             // to ensure the model is not marked as dirty
