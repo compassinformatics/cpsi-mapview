@@ -6,32 +6,39 @@ Ext.define('CpsiMapview.controller.grid.GroupEditMixin', {
             init: function () {
                 const me = this;
                 const view = this.getView();
-
-                view.on('beforerender', function (grid) {
-                    const dropdownMenu = grid.headerCt.getMenu();
-                    dropdownMenu.on({
-                        beforeshow: me.onHeaderMenuBeforeShow,
-                        scope: me
-                    });
-
-                    // Add custom menu items to the default grid menu
-                    dropdownMenu.insert(dropdownMenu.items.length - 2, [
-                        {
-                            itemId: 'groupEditorMenuItem',
-                            text: 'Group Edit',
-                            tooltip:
-                                'Group Edit mode must be enabled to use this menu. If you do not see the Group Edit button, you may not have sufficient permissions for grid editing.',
-                            bind: {
-                                disabled: '{!isGroupEditingEnabled}'
-                            }
-                        }
-                    ]);
+                view.on('afterrender', function (grid) {
+                    const menu = grid.headerCt.getMenu();
+                    if (!menu.__groupEditBound) {
+                        menu.__groupEditBound = true;
+                        menu.on({
+                            beforeshow: me.onHeaderMenuBeforeShow,
+                            scope: me
+                        });
+                    }
                 });
 
                 // Hide the checkbox selection column on initial load
                 view.on('render', function (grid) {
                     const c = grid.columnManager.getFirst();
                     if (c) c.hide();
+                });
+
+                view.on('columnmove', function (headerCt) {
+
+                    // Destroy existing menu
+                    if (headerCt.menu) {
+                        headerCt.menu.destroy();
+                        headerCt.menu = null;
+                    }
+
+                    // Create a new menu
+                    const menu = headerCt.getMenu();
+
+                    // Attach beforeshow handler
+                    if (menu && !menu.__groupEditBound) {
+                        menu.__groupEditBound = true;
+                        menu.on('beforeshow', me.onHeaderMenuBeforeShow, me);
+                    }
                 });
 
                 view.on('staterestore', function (grid, state) {
@@ -64,7 +71,21 @@ Ext.define('CpsiMapview.controller.grid.GroupEditMixin', {
 
     onHeaderMenuBeforeShow: function (menu) {
         const me = this;
-        const menuItem = menu.down('#groupEditorMenuItem');
+        let menuItem = menu.down('#groupEditorMenuItem');
+
+        if (!menuItem) {
+            // Add custom menu items to the default grid menu
+            menuItem = menu.insert(menu.items.length - 2, {
+                itemId: 'groupEditorMenuItem',
+                text: 'Group Edit',
+                tooltip:
+                    'Group Edit mode must be enabled to use this menu. ' +
+                    'If you do not see the Group Edit button, you may not have sufficient permissions for grid editing.',
+                bind: {
+                    disabled: '{!isGroupEditingEnabled}'
+                }
+            });
+        }
 
         // check if it is a column that can be bulk edited
         if (!menu.activeHeader.groupEditable) {
@@ -194,8 +215,8 @@ Ext.define('CpsiMapview.controller.grid.GroupEditMixin', {
             default:
                 Ext.log.error(
                     'Filter type "' +
-                        filterType.toLowerCase() +
-                        '" not supported'
+                    filterType.toLowerCase() +
+                    '" not supported'
                 );
                 break;
         }
