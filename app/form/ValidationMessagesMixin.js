@@ -18,7 +18,18 @@ Ext.define('CpsiMapview.form.ValidationMessagesMixin', {
             return true;
         }
 
-        me.updateValidationMessages(rec);
+        // Replace the single call to "updateValidationMessages" with a buffered call
+        // This prevents a repeated call in a short period of time - for example when triggered by adding multiple rows to a grid
+        me.updateValidationMessagesBuffered =
+            me.updateValidationMessagesBuffered ||
+            Ext.Function.createBuffered(
+                function (rec) {
+                    me.updateValidationMessages(rec);
+                },
+                100,
+                me
+            );
+        me.updateValidationMessagesBuffered(rec);
         return rec.isValid();
     },
 
