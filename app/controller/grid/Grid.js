@@ -651,7 +651,7 @@ Ext.define('CpsiMapview.controller.grid.Grid', {
             Ext.log.warn(
                 '[CpsiMapview.controller.grid.Grid getOlLayer() ] - No layer found for grid (' +
                 viewModel.type +
-                ') using one of these keys: wmsLayerKey / vectorLayerKey',
+                ') using one of these keys wmsLayerKey / vectorLayerKey: ',
                 wmsLayerKey,
                 vectorLayerKey
             );
