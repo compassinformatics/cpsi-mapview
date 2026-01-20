@@ -57,7 +57,6 @@ Ext.define('CpsiMapview.form.ViewModelMixin', {
         }
     },
 
-
     config: {
         formulas: {
             map: function () {
