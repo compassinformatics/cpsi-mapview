@@ -42,12 +42,16 @@ Ext.define('CpsiMapview.form.ViewModelMixin', {
 
     onInitConfig: function () {
         const me = this;
+
+        const currentRecord = me.get('currentRecord') ? me.get('currentRecord') : null;
+
         // add the currentRecord property which is used for all data entry forms
         me.set({
-            currentRecord: null,
+            currentRecord: currentRecord,
             timestamp: Ext.Date.now()
         });
     },
+
 
     config: {
         formulas: {
