@@ -9,13 +9,13 @@ Ext.define('CpsiMapview.form.ValidationMessagesMixin', {
 
     checkValid: function (rec) {
         const me = this;
-
+        const view = me.getView();
         if (!rec) {
             return false;
         }
 
-        if (me.getView().destroyed === true) {
-            return true;
+        if (view.destroyed === true) {
+            return rec.isValid();
         }
 
         // Replace the single call to "updateValidationMessages" with a buffered call
@@ -41,6 +41,12 @@ Ext.define('CpsiMapview.form.ValidationMessagesMixin', {
             // view destroyed while buffer was waiting
             return;
         }
+
+        if (!rec || rec.destroyed === true) {
+            // rec destroyed while buffer was waiting
+            return;
+        }
+
         // if a control is in a grid, or sub-component
         // ensure the parent window is set as the view
         if (view.isXType('window') === false) {
@@ -80,14 +86,18 @@ Ext.define('CpsiMapview.form.ValidationMessagesMixin', {
                 }
             });
 
-            saveButton.setIconCls('x-fa fa-exclamation-triangle');
-            // ensure tooltip is visible even when disabled
-            // https://forum.sencha.com/forum/showthread.php?302961-Tooltips-not-working-when-button-is-disabled-Intended/page2
-            saveButton.setStyle({ pointerEvents: 'all' });
-            saveButton.setTooltip(errors.join('<br />'));
+            if (saveButton) {
+                saveButton.setIconCls('x-fa fa-exclamation-triangle');
+                // ensure tooltip is visible even when disabled
+                // https://forum.sencha.com/forum/showthread.php?302961-Tooltips-not-working-when-button-is-disabled-Intended/page2
+                saveButton.setStyle({ pointerEvents: 'all' });
+                saveButton.setTooltip(errors.join('<br />'));
+            }
         } else {
-            saveButton.setIconCls('');
-            saveButton.setTooltip('');
+            if (saveButton) {
+                saveButton.setIconCls('');
+                saveButton.setTooltip('');
+            }
         }
     }
 });
