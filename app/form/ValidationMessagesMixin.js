@@ -37,6 +37,10 @@ Ext.define('CpsiMapview.form.ValidationMessagesMixin', {
         const me = this;
         let view = me.getView();
 
+        if (!view || view.destroyed === true) {
+            // view destroyed while buffer was waiting
+            return;
+        }
         // if a control is in a grid, or sub-component
         // ensure the parent window is set as the view
         if (view.isXType('window') === false) {
