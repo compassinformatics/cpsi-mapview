@@ -1,44 +1,25 @@
 Ext.define('CpsiMapview.controller.grid.GroupEditMixin', {
     extend: 'Ext.Mixin',
     requires: ['Ext.menu.Menu'],
+
     mixinConfig: {
         on: {
             init: function () {
                 const me = this;
-                const view = this.getView();
+                const view = me.getView();
+
                 view.on('afterrender', function (grid) {
                     const menu = grid.headerCt.getMenu();
-                    if (!menu.__groupEditBound) {
-                        menu.__groupEditBound = true;
-                        menu.on({
-                            beforeshow: me.onHeaderMenuBeforeShow,
-                            scope: me
-                        });
-                    }
+                    menu.on({
+                        beforeshow: me.onHeaderMenuBeforeShow,
+                        scope: me
+                    });
                 });
 
                 // Hide the checkbox selection column on initial load
                 view.on('render', function (grid) {
                     const c = grid.columnManager.getFirst();
                     if (c) c.hide();
-                });
-
-                view.on('columnmove', function (headerCt) {
-
-                    // Destroy existing menu
-                    if (headerCt.menu) {
-                        headerCt.menu.destroy();
-                        headerCt.menu = null;
-                    }
-
-                    // Create a new menu
-                    const menu = headerCt.getMenu();
-
-                    // Attach beforeshow handler
-                    if (menu && !menu.__groupEditBound) {
-                        menu.__groupEditBound = true;
-                        menu.on('beforeshow', me.onHeaderMenuBeforeShow, me);
-                    }
                 });
 
                 view.on('staterestore', function (grid, state) {
@@ -71,12 +52,10 @@ Ext.define('CpsiMapview.controller.grid.GroupEditMixin', {
 
     onHeaderMenuBeforeShow: function (menu) {
         const me = this;
-        let menuItem = menu.down('#groupEditorMenuItem');
+        // Add custom menu items to the default grid header menu
+        if (!menu.groupEditorMenuItem) {
 
-        if (!menuItem) {
-            // Add custom menu items to the default grid menu
-            menuItem = menu.insert(menu.items.length - 2, {
-                itemId: 'groupEditorMenuItem',
+            const groupEditorMenuItem = {
                 text: 'Group Edit',
                 tooltip:
                     'Group Edit mode must be enabled to use this menu. ' +
@@ -84,25 +63,24 @@ Ext.define('CpsiMapview.controller.grid.GroupEditMixin', {
                 bind: {
                     disabled: '{!isGroupEditingEnabled}'
                 }
-            });
+            };
+            menu.groupEditorMenuItem = menu.insert(menu.items.length - 2, groupEditorMenuItem);
         }
 
-        // check if it is a column that can be bulk edited
-        if (!menu.activeHeader.groupEditable) {
-            menuItem.hide(); // simply hide the menu if it is not editable
+        if (menu.groupEditorMenuItem.menu) {
+            menu.groupEditorMenuItem.menu.removeAll();
         } else {
-            let newMenu = menuItem.menu;
-
-            if (newMenu) {
-                newMenu.removeAll();
-            } else {
-                newMenu = menuItem.menu = Ext.create('Ext.menu.Menu');
-            }
-
-            const newMenuItems = me.createGroupEditMenuItems(menu);
-            newMenu.add(newMenuItems);
-            menuItem.show();
+            menu.groupEditorMenuItem.menu = Ext.create('Ext.menu.Menu');
         }
+
+        // check if it is a column that can be group edited
+        if (menu.activeHeader.groupEditable) {
+            const newMenuItems = me.createGroupEditMenuItems(menu);
+            menu.groupEditorMenuItem.menu.add(newMenuItems);
+        }
+
+        // hide/show the option depending on if the column is group editable
+        menu.groupEditorMenuItem.setVisible(!!menu.activeHeader.groupEditable);
     },
 
     createGroupEditMenuItems: function (menu) {
