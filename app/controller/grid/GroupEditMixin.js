@@ -52,35 +52,38 @@ Ext.define('CpsiMapview.controller.grid.GroupEditMixin', {
 
     onHeaderMenuBeforeShow: function (menu) {
         const me = this;
-        // Add custom menu items to the default grid header menu
-        if (!menu.groupEditorMenuItem) {
+        let groupEditorMenuItem = menu.down('#groupEditorMenuItem');
 
-            const groupEditorMenuItem = {
+        // Add custom menu items to the default grid header menu
+        if (!groupEditorMenuItem && menu.activeHeader.groupEditable) {
+            const groupEditorMenuItemConfig = {
                 text: 'Group Edit',
+                itemId: 'groupEditorMenuItem',
                 tooltip:
                     'Group Edit mode must be enabled to use this menu. ' +
                     'If you do not see the Group Edit button, you may not have sufficient permissions for grid editing.',
                 bind: {
                     disabled: '{!isGroupEditingEnabled}'
+                },
+                viewModel: {
+                    parent: me.getViewModel()
                 }
             };
-            menu.groupEditorMenuItem = menu.insert(menu.items.length - 2, groupEditorMenuItem);
-        }
-
-        if (menu.groupEditorMenuItem.menu) {
-            menu.groupEditorMenuItem.menu.removeAll();
-        } else {
-            menu.groupEditorMenuItem.menu = Ext.create('Ext.menu.Menu');
+            groupEditorMenuItem = menu.insert(menu.items.length - 2, groupEditorMenuItemConfig);
+            groupEditorMenuItem.setMenu(Ext.create('Ext.menu.Menu'));
         }
 
         // check if it is a column that can be group edited
-        if (menu.activeHeader.groupEditable) {
+        if (groupEditorMenuItem && menu.activeHeader.groupEditable) {
+            groupEditorMenuItem.getMenu().removeAll();
             const newMenuItems = me.createGroupEditMenuItems(menu);
-            menu.groupEditorMenuItem.menu.add(newMenuItems);
+            groupEditorMenuItem.menu.add(newMenuItems);
         }
 
         // hide/show the option depending on if the column is group editable
-        menu.groupEditorMenuItem.setVisible(!!menu.activeHeader.groupEditable);
+        if (groupEditorMenuItem) {
+            groupEditorMenuItem.setVisible(!!menu.activeHeader.groupEditable);
+        }
     },
 
     createGroupEditMenuItems: function (menu) {
