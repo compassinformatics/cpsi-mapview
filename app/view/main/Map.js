@@ -67,6 +67,9 @@ Ext.define('CpsiMapview.view.main.Map', {
             options: {
                 priority: 500
             }
+        },
+        'cmv-map-pointermove': {
+            fn: 'onPointerMove'
         }
     },
 
@@ -417,8 +420,8 @@ Ext.define('CpsiMapview.view.main.Map', {
                 me.fireEvent('cmv-map-pointerrestout');
             });
 
-            me.olMap.on('pointermove', function () {
-                me.fireEvent('cmv-map-pointermove');
+            me.olMap.on('pointermove', function (evt) {
+                me.fireEvent('cmv-map-pointermove', evt);
             });
 
             // event for resolution change

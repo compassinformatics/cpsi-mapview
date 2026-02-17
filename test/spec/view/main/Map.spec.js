@@ -23,4 +23,45 @@ describe('CpsiMapview.view.main.Map', function () {
             expect(inst).to.be.a(CpsiMapview.view.main.Map);
         });
     });
+
+    describe('interactivity', function () {
+        it('changes cursor to pointer when hovering over a clickable feature', function () {
+
+            const mapPanel = Ext.create('CpsiMapview.view.main.Map', {
+                clickableLayerConfigs: {
+                    EXAMPLE_VECTOR: {}
+                }
+            });
+
+            const map = mapPanel.olMap;
+
+            // mock the map and target element
+            const mockTargetEl = {
+                style: {
+                    cursor: ''
+                }
+            };
+
+            map.getTargetElement = function () {
+                return mockTargetEl;
+            };
+
+            map.hasFeatureAtPixel = function () {
+                return true;
+            };
+
+            const controller = mapPanel.getController();
+
+            // simulate pointer move event
+            controller.onPointerMove({ dragging: false, pixel: [100, 100] });
+            expect(mockTargetEl.style.cursor).to.be('pointer');
+
+            // simulate moving off the feature
+            map.hasFeatureAtPixel = function () {
+                return false;
+            };
+            controller.onPointerMove({ dragging: false, pixel: [200, 200] });
+            expect(mockTargetEl.style.cursor).to.be('');
+        });
+    });
 });
