@@ -43,6 +43,29 @@ Ext.define('CpsiMapview.controller.MapController', {
     clickableLayerConfigs: {},
 
     /**
+     * Change the mouse cursor to a pointer if hovering over a feature that can be clicked to open a form
+     * @param {any} evt
+     * @returns
+     */
+    onPointerMove: function (evt) {
+        const me = this;
+        const map = me.getView().map;
+        // the hover hitTolerance should match the click hitTolerance
+        const hitTolerance = me.getView().mapViewConfig.hitTolerance;
+
+        if (evt.dragging) return;
+        const hit = map.hasFeatureAtPixel(evt.pixel, {
+            hitTolerance: hitTolerance, // add a pixel-buffer
+            layerFilter: function (layer) {
+                const layerKey = layer.get('layerKey');
+                return layerKey && me.clickableLayerConfigs[layerKey];
+            }
+        });
+
+        map.getTargetElement().style.cursor = hit ? 'pointer' : '';
+    },
+
+    /**
      * Handle map clicks so data entry forms can be opened by clicking directly
      * on vector features
      * @param {any} clickedFeatures
@@ -133,6 +156,10 @@ Ext.define('CpsiMapview.controller.MapController', {
 
             // if the record is not already opened, create a new window and load the record
             if (win === null) {
+                const mainPanel = me.getView().up();
+                if (mainPanel && mainPanel.mask) {
+                    mainPanel.mask('Loading...');
+                }
                 modelPrototype.load(recId, {
                     success: function (rec) {
                         win = Ext.create(editWindowClass);
@@ -147,6 +174,12 @@ Ext.define('CpsiMapview.controller.MapController', {
                             width: 200,
                             align: 'br'
                         });
+                    },
+                    callback: function () {
+                        // remove the mask once loaded
+                        if (mainPanel && mainPanel.unmask) {
+                            mainPanel.unmask();
+                        }
                     }
                 });
             } else {
