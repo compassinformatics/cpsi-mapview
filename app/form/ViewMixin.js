@@ -140,7 +140,9 @@ Ext.define('CpsiMapview.form.ViewMixin', {
                 apiUrl: '{networkSolverUrl}',
                 disabled: '{isLocked}',
                 resultLayer: '{resultLayer}',
-                hidden: '{hideDigitiseSegmentButton}'
+                hidden: '{hideDigitiseSegmentButton}',
+                snappingLayerKeys: '{snappingLayerKeys}',
+                allowSnapToHiddenFeatures: '{allowSnapToHiddenFeatures}'
             }
         },
         {

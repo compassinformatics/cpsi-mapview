@@ -124,7 +124,20 @@ Ext.define('CpsiMapview.view.button.DigitizeButton', {
          * Should the results and draw layers be reset if the
          * tool is deactivated?
          */
-        resetOnToggle: true
+        resetOnToggle: true,
+
+        /**
+         * Allows consumer of component choice of snapping to only visible layer features
+         * defined in snappingLayerKeys, or snapping to layer features even if they
+         * are invisible.
+         */
+        allowSnapToHiddenFeatures: false,
+
+        /**
+         * The layerKey values for any vector layers the newly drawn lines should
+         * snap to e.g. ['EDGES_WFS']
+         */
+        snappingLayerKeys: [],
     },
 
     /**
