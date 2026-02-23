@@ -45,7 +45,6 @@ Ext.define('CpsiMapview.controller.MapController', {
     /**
      * Change the mouse cursor to a pointer if hovering over a feature that can be clicked to open a form
      * @param {any} evt
-     * @returns
      */
     onPointerMove: function (evt) {
         const me = this;

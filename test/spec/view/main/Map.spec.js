@@ -26,7 +26,6 @@ describe('CpsiMapview.view.main.Map', function () {
 
     describe('interactivity', function () {
         it('changes cursor to pointer when hovering over a clickable feature', function () {
-
             const mapPanel = Ext.create('CpsiMapview.view.main.Map', {
                 clickableLayerConfigs: {
                     EXAMPLE_VECTOR: {}

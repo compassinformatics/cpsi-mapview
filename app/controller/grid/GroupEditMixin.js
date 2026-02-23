@@ -69,7 +69,10 @@ Ext.define('CpsiMapview.controller.grid.GroupEditMixin', {
                     parent: me.getViewModel()
                 }
             };
-            groupEditorMenuItem = menu.insert(menu.items.length - 2, groupEditorMenuItemConfig);
+            groupEditorMenuItem = menu.insert(
+                menu.items.length - 2,
+                groupEditorMenuItemConfig
+            );
             groupEditorMenuItem.setMenu(Ext.create('Ext.menu.Menu'));
         }
 
@@ -196,8 +199,8 @@ Ext.define('CpsiMapview.controller.grid.GroupEditMixin', {
             default:
                 Ext.log.error(
                     'Filter type "' +
-                    filterType.toLowerCase() +
-                    '" not supported'
+                        filterType.toLowerCase() +
+                        '" not supported'
                 );
                 break;
         }

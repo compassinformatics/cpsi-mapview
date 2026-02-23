@@ -8,7 +8,7 @@
     },
     "scripts": {
         "start": "sencha app watch",
-        "format": "prettier --write app",
+        "format": "prettier --write \"app/**/*\"",
         "lint": "eslint app/**/*.js test/**/*.js app.js eslint.config.js jsdoc-ext-plugin.cjs  karma.conf.cjs karma-conf.common.cjs karma-watch.conf.cjs",
         "lintfix": "eslint app/**/*.js test/**/*.js app.js eslint.config.js jsdoc-ext-plugin.cjs karma.conf.cjs karma-conf.common.cjs karma-watch.conf.cjs --fix",
         "jsonlint": "jsonlint -q resources/data/layers/default.json && jsonlint -q resources/data/layers/tree.json",

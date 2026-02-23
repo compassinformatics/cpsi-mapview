@@ -19,9 +19,9 @@ Ext.define('CpsiMapview.controller.button.SnappingMixin', {
     listenerKeys: [],
 
     /**
-    * Set the snap interaction used to snap to features
-    * @param {any} drawLayer
-    */
+     * Set the snap interaction used to snap to features
+     * @param {any} drawLayer
+     */
     setSnapInteraction: function (drawLayer) {
         const me = this;
 
@@ -54,10 +54,11 @@ Ext.define('CpsiMapview.controller.button.SnappingMixin', {
         // any potential errors related to unique features are handled / suppressed.
         const addUniqueFeaturesToCollection = function (collection, features) {
             Ext.Array.each(features, function (f) {
-                // eslint-disable-next-line
                 try {
                     collection.push(f);
-                } catch (e) { }
+                } catch {
+                    // ol.Collection throws if a duplicate is added - this is expected and can be ignored
+                }
             });
         };
 
