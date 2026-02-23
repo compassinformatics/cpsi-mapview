@@ -56,8 +56,9 @@ Ext.define('CpsiMapview.controller.button.SnappingMixin', {
             Ext.Array.each(features, function (f) {
                 try {
                     collection.push(f);
-                } catch {
-                    // ol.Collection throws if a duplicate is added - this is expected and can be ignored
+                } catch (e) {
+                    // ol.Collection throws an error
+                    // if a duplicate is added - this is expected and can be ignored
                 }
             });
         };

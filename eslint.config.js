@@ -48,7 +48,8 @@ export default [
             ...js.configs.recommended.rules,
             'no-var': 'error',
             'prefer-const': 'warn',
-            'prettier/prettier': 'error'
+            'prettier/prettier': 'error',
+            'no-unused-vars': ['error', { caughtErrors: 'none' }]
         }
     }
 ];
