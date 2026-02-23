@@ -16,9 +16,7 @@ Ext.define('CpsiMapview.controller.button.DigitizeButtonController', {
 
     alias: 'controller.cmv_digitize_button',
 
-    mixins: [
-        'CpsiMapview.controller.button.SnappingMixin'
-    ],
+    mixins: ['CpsiMapview.controller.button.SnappingMixin'],
 
     /**
      * The OpenLayers map. If not given, will be auto-detected
@@ -619,7 +617,7 @@ Ext.define('CpsiMapview.controller.button.DigitizeButtonController', {
             default:
                 BasiGX.warn(
                     'Please implement your custom handler here for ' +
-                    view.getType()
+                        view.getType()
                 );
                 return;
         }

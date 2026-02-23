@@ -137,7 +137,7 @@ Ext.define('CpsiMapview.view.button.DigitizeButton', {
          * The layerKey values for any vector layers the newly drawn lines should
          * snap to e.g. ['EDGES_WFS']
          */
-        snappingLayerKeys: [],
+        snappingLayerKeys: []
     },
 
     /**
