@@ -10,10 +10,15 @@ Ext.define('CpsiMapview.controller.button.DigitizeButtonController', {
         'CpsiMapview.view.window.MinimizableWindow',
         'GeoExt.component.FeatureRenderer',
         'GeoExt.data.store.Features',
-        'CpsiMapview.view.toolbar.CircleSelectionToolbar'
+        'CpsiMapview.view.toolbar.CircleSelectionToolbar',
+        'CpsiMapview.controller.button.SnappingMixin'
     ],
 
     alias: 'controller.cmv_digitize_button',
+
+    mixins: [
+        'CpsiMapview.controller.button.SnappingMixin'
+    ],
 
     /**
      * The OpenLayers map. If not given, will be auto-detected
@@ -120,7 +125,8 @@ Ext.define('CpsiMapview.controller.button.DigitizeButtonController', {
         me.drawLayer = layer;
         me.setDrawInteraction(layer);
         me.setModifyInteraction(layer);
-        me.setSnapInteraction(layer);
+        me.setSelfSnapInteraction(layer);
+        me.setSnapInteraction();
     },
 
     /**
@@ -302,7 +308,7 @@ Ext.define('CpsiMapview.controller.button.DigitizeButtonController', {
      * already in the drawLayer
      * @param {any} layer
      */
-    setSnapInteraction: function (layer) {
+    setSelfSnapInteraction: function (layer) {
         const me = this;
         const view = me.getView();
         const type = view.getType();
@@ -390,7 +396,8 @@ Ext.define('CpsiMapview.controller.button.DigitizeButtonController', {
         me.setDrawInteraction(me.drawLayer);
         me.setModifyInteraction(me.drawLayer);
         me.setPointerInteraction();
-        me.setSnapInteraction(me.drawLayer);
+        me.setSelfSnapInteraction(me.drawLayer);
+        me.setSnapInteraction();
 
         if (pressed) {
             me.drawInteraction.setActive(true);
@@ -398,6 +405,7 @@ Ext.define('CpsiMapview.controller.button.DigitizeButtonController', {
                 me.modifyInteraction.setActive(true);
                 me.snapVertexInteraction.setActive(true);
                 me.snapEdgeInteraction.setActive(true);
+                me.snapInteraction.setActive(true);
             }
             if (type === 'Point') {
                 me.pointerInteraction.setActive(true);
@@ -412,6 +420,7 @@ Ext.define('CpsiMapview.controller.button.DigitizeButtonController', {
                 me.modifyInteraction.setActive(false);
                 me.snapVertexInteraction.setActive(false);
                 me.snapEdgeInteraction.setActive(false);
+                me.snapInteraction && me.snapInteraction.setActive(false);
             }
             if (type === 'Point') {
                 me.pointerInteraction.setActive(false);
@@ -610,7 +619,7 @@ Ext.define('CpsiMapview.controller.button.DigitizeButtonController', {
             default:
                 BasiGX.warn(
                     'Please implement your custom handler here for ' +
-                        view.getType()
+                    view.getType()
                 );
                 return;
         }
@@ -1147,6 +1156,10 @@ Ext.define('CpsiMapview.controller.button.DigitizeButtonController', {
 
         if (me.snapEdgeInteraction) {
             me.map.removeInteraction(me.snapEdgeInteraction);
+        }
+
+        if (me.snapInteraction) {
+            me.map.removeInteraction(me.snapInteraction);
         }
 
         if (me.drawLayer) {
