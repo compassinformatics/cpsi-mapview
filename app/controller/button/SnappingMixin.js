@@ -85,10 +85,9 @@ Ext.define('CpsiMapview.controller.button.SnappingMixin', {
         const layerKeys = view.getSnappingLayerKeys();
         const allowSnapToHiddenFeatures = view.getAllowSnapToHiddenFeatures();
 
-        const mapLayers = me.map.getLayers().getArray();
         const layers = Ext.Array.filter(
             Ext.Array.map(layerKeys, function (key) {
-                const foundLayers = BasiGX.util.Layer.getLayersBy('layerKey', key, mapLayers);
+                const foundLayers = BasiGX.util.Layer.getLayersBy('layerKey', key);
 
                 if (foundLayers.length === 1 && foundLayers[0]) {
                     return foundLayers[0];
