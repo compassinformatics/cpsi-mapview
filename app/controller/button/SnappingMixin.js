@@ -84,9 +84,21 @@ Ext.define('CpsiMapview.controller.button.SnappingMixin', {
         const view = me.getView();
         const layerKeys = view.getSnappingLayerKeys();
         const allowSnapToHiddenFeatures = view.getAllowSnapToHiddenFeatures();
-        const layers = Ext.Array.map(layerKeys, function (key) {
-            return BasiGX.util.Layer.getLayersBy('layerKey', key)[0];
-        });
+
+        const layers = Ext.Array.filter(
+            Ext.Array.map(layerKeys, function (key) {
+                const foundLayers = BasiGX.util.Layer.getLayersBy('layerKey', key);
+
+                if (foundLayers.length === 1 && foundLayers[0]) {
+                    return foundLayers[0];
+                }
+
+                return null;
+            }),
+            function (layer) {
+                return !!layer;
+            }
+        );
 
         Ext.Array.each(layers, function (layer) {
             const feats = layer.getSource().getFeatures(); // these are standard WFS layers so we use getSource without getFeaturesCollection here
