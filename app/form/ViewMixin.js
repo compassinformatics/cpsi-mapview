@@ -52,6 +52,7 @@ Ext.define('CpsiMapview.form.ViewMixin', {
         {
             xtype: 'button',
             itemId: 'deleteButton',
+            hidden: true,
             text: 'Delete',
             handler: 'onDeleteClick',
             tooltip: 'Permanently delete the record',
@@ -64,6 +65,7 @@ Ext.define('CpsiMapview.form.ViewMixin', {
         {
             xtype: 'button',
             itemId: 'rejectButton',
+            hidden: true,
             text: 'Reject',
             handler: 'onRejectClick',
             bind: {
@@ -74,6 +76,7 @@ Ext.define('CpsiMapview.form.ViewMixin', {
         {
             xtype: 'button',
             itemId: 'exportButton',
+            hidden: true,
             text: 'Export',
             handler: 'onExportClick',
             tooltip:
@@ -89,6 +92,7 @@ Ext.define('CpsiMapview.form.ViewMixin', {
         {
             xtype: 'button',
             itemId: 'zoomButton',
+            hidden: true,
             text: 'Zoom',
             handler: 'onZoomClick',
             tooltip: 'Zoom the map to the location of the record',
@@ -99,6 +103,7 @@ Ext.define('CpsiMapview.form.ViewMixin', {
         {
             xtype: 'button',
             itemId: 'refreshButton',
+            hidden: true,
             text: 'Refresh',
             handler: 'onRefreshClick',
             tooltip:
@@ -114,6 +119,7 @@ Ext.define('CpsiMapview.form.ViewMixin', {
         {
             xtype: 'cmv_digitize_button',
             itemId: 'segmentDigitiserButton',
+            hidden: true,
             type: 'Point',
             tooltip: 'Create features by clicking points on the road schedule',
             toggleGroup: 'map',
@@ -148,6 +154,7 @@ Ext.define('CpsiMapview.form.ViewMixin', {
         {
             xtype: 'cmv_digitize_button',
             itemId: 'areaDigitiserButton',
+            hidden: true,
             type: 'Polygon',
             tooltip:
                 'Create features by drawing polygons to select parts of the road schedule',
@@ -168,6 +175,7 @@ Ext.define('CpsiMapview.form.ViewMixin', {
         {
             xtype: 'cmv_digitize_button',
             itemId: 'lineDigitiserButton',
+            hidden: true,
             type: 'LineString',
             tooltip: 'Create features by drawing lines',
             toggleGroup: 'map',
@@ -183,6 +191,7 @@ Ext.define('CpsiMapview.form.ViewMixin', {
         {
             xtype: 'cmv_digitize_button',
             itemId: 'circleDigitiserButton',
+            hidden: true,
             type: 'Circle',
             tooltip:
                 'Create features by drawing circles to select parts of the road schedule',
@@ -203,6 +212,7 @@ Ext.define('CpsiMapview.form.ViewMixin', {
         {
             xtype: 'cmv_digitize_button',
             itemId: 'pointDigitiserButton',
+            hidden: true,
             type: 'Point',
             tooltip: 'Create points by clicking on the map',
             toggleGroup: 'map',
@@ -218,6 +228,7 @@ Ext.define('CpsiMapview.form.ViewMixin', {
         {
             xtype: 'cmv_split_by_click_button',
             itemId: 'splitByClickButton',
+            hidden: true,
             apiUrl: '/WebServices/roadschedule/publicprivatesplit/split',
             tooltip: 'Split a line by clicking on it',
             bind: {
@@ -230,6 +241,7 @@ Ext.define('CpsiMapview.form.ViewMixin', {
         {
             xtype: 'button',
             itemId: 'saveButton',
+            hidden: true,
             text: 'Save',
             handler: 'onSaveClick',
             // Save button tooltips are updated using CpsiMapview.form.ValidationMessagesMixin
@@ -243,6 +255,7 @@ Ext.define('CpsiMapview.form.ViewMixin', {
         {
             xtype: 'button',
             itemId: 'approveButton',
+            hidden: true,
             text: 'Approve',
             handler: 'onApproveClick',
             bind: {
@@ -253,6 +266,7 @@ Ext.define('CpsiMapview.form.ViewMixin', {
         {
             xtype: 'button',
             itemId: 'cancelButton',
+            hidden: true,
             text: 'Cancel',
             handler: 'onCancelClick',
             tooltip: 'Discard any changes without saving and close the window',
@@ -263,6 +277,7 @@ Ext.define('CpsiMapview.form.ViewMixin', {
         {
             xtype: 'button',
             itemId: 'closeButton',
+            hidden: true,
             text: 'Close',
             handler: 'onCloseClick',
             tooltip: 'Close the window',
