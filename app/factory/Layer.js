@@ -692,7 +692,7 @@ Ext.define('CpsiMapview.factory.Layer', {
 
         if (layerConf.tooltipsConfig) {
             // create a custom tooltip for this layer
-            LayerFactory.registerLayerTooltip(wfsLayer);
+            LayerFactory.registerLayerTooltip(wfsLayer, layerConf.layerKey);
         }
 
         return wfsLayer;
@@ -982,7 +982,7 @@ Ext.define('CpsiMapview.factory.Layer', {
 
         if (layerConf.tooltipsConfig) {
             // enable map tooltips for this layer
-            LayerFactory.registerLayerTooltip(vtLayer);
+            LayerFactory.registerLayerTooltip(vtLayer, layerConf.layerKey);
         }
 
         // workaround to apply an opacity for the vector tile layer
@@ -1358,7 +1358,7 @@ Ext.define('CpsiMapview.factory.Layer', {
      *
      * @param  {ol.layer.Vector | ol.layer.VectorTile} layer The layer to enable map tooltips for
      */
-    registerLayerTooltip: function (layer) {
+    registerLayerTooltip: function (layer, layerKey) {
         const mapPanel = CpsiMapview.view.main.Map.guess();
         // create a custom tooltip for this layer
         const toolTip = Ext.create('CpsiMapview.view.layer.ToolTip', {
@@ -1366,6 +1366,19 @@ Ext.define('CpsiMapview.factory.Layer', {
             layer: layer
         });
         layer.toolTip = toolTip;
+
+        // check if there are any registered custom functions to use for the tooltips
+        // and apply them to the layer (based on layerKey)
+        const mapController = mapPanel.getController();
+
+        if (
+            mapController &&
+            layerKey &&
+            mapController.tooltipLayerConfigs &&
+            mapController.tooltipLayerConfigs[layerKey]
+        ) {
+            layer.formatFunction = mapController.tooltipLayerConfigs[layerKey];
+        }
 
         // show / hide on appropriate events
         mapPanel.on('cmv-map-pointerrest', function (hoveredObjs, evt) {
