@@ -1371,7 +1371,12 @@ Ext.define('CpsiMapview.factory.Layer', {
         // and apply them to the layer (based on layerKey)
         const mapController = mapPanel.getController();
 
-        if (layerKey && mapController.tooltipLayerConfigs[layerKey]) {
+        if (
+            mapController &&
+            layerKey &&
+            mapController.tooltipLayerConfigs &&
+            mapController.tooltipLayerConfigs[layerKey]
+        ) {
             layer.formatFunction = mapController.tooltipLayerConfigs[layerKey];
         }
 
