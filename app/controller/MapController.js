@@ -43,6 +43,30 @@ Ext.define('CpsiMapview.controller.MapController', {
     clickableLayerConfigs: {},
 
     /**
+     * A configuration object to custom function for layers that use CpsiMapview.view.layer.ToolTip.
+     * This should be overridden in inherited projects and should be in the following form:
+     *
+     * {
+     *   layerKeyName: function (feat) {
+     *   const tpl = new Ext.XTemplate(
+     *       '<div>',
+     *           '<strong>Name:</strong> {name}<br/>',
+     *           '<strong>Status:</strong> {status}',
+     *       '</div>'
+     *   );
+     *
+     *   return function (feature) {
+     *       return tpl.apply({
+     *           name:   feature.get('name'),
+     *           status: feature.get('status')
+     *       });
+     *   };
+     * }
+     *
+     */
+    tooltipLayerConfigs: {},
+
+    /**
      * Change the mouse cursor to a pointer if hovering over a feature that can be clicked to open a form
      * @param {any} evt
      */

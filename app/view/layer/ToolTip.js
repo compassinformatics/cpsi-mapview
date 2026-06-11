@@ -124,7 +124,7 @@ Ext.define('CpsiMapview.view.layer.ToolTip', {
     },
 
     /**
-     * Tranforms the feature's attributes to the wanted HTML structure shown in
+     * Transforms the feature's attributes to the wanted HTML structure shown in
      * this tooltip.
      * This function can be overridden if different HTML is needed for a custom
      * layer.

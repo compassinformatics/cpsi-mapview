@@ -390,4 +390,122 @@ describe('CpsiMapview.factory.Layer', function () {
             });
         });
     });
+
+    describe('registerLayerTooltip', function () {
+        it('should assign formatFunction when layerKey matches a tooltipLayerConfig', function () {
+            const mockFormatFunction = function () {
+                return 'test';
+            };
+
+            const mockLayer = {
+                get: function (key) {
+                    if (key === 'toolTipConfig') return {};
+                },
+                id: 'test-layer-id'
+            };
+
+            const mockMapPanel = {
+                getController: function () {
+                    return {
+                        tooltipLayerConfigs: {
+                            MY_LAYER: mockFormatFunction
+                        }
+                    };
+                },
+                on: Ext.emptyFn
+            };
+
+            // Stub Map.guess to return our mock
+            const originalGuess = CpsiMapview.view.main.Map.guess;
+            CpsiMapview.view.main.Map.guess = function () {
+                return mockMapPanel;
+            };
+
+            // Stub Ext.create to avoid real ToolTip instantiation
+            const originalCreate = Ext.create;
+            Ext.create = function () {
+                return { hide: Ext.emptyFn };
+            };
+
+            layerFactory.registerLayerTooltip(mockLayer, 'MY_LAYER');
+
+            expect(mockLayer.formatFunction).to.be(mockFormatFunction);
+
+            // Restore stubs
+            CpsiMapview.view.main.Map.guess = originalGuess;
+            Ext.create = originalCreate;
+        });
+
+        it('should not assign formatFunction when layerKey has no matching tooltipLayerConfig', function () {
+            const mockLayer = {
+                get: function (key) {
+                    if (key === 'toolTipConfig') return {};
+                },
+                id: 'test-layer-id'
+            };
+
+            const mockMapPanel = {
+                getController: function () {
+                    return {
+                        tooltipLayerConfigs: {}
+                    };
+                },
+                on: Ext.emptyFn
+            };
+
+            const originalGuess = CpsiMapview.view.main.Map.guess;
+            CpsiMapview.view.main.Map.guess = function () {
+                return mockMapPanel;
+            };
+
+            const originalCreate = Ext.create;
+            Ext.create = function () {
+                return { hide: Ext.emptyFn };
+            };
+
+            layerFactory.registerLayerTooltip(mockLayer, 'UNKNOWN_LAYER');
+
+            expect(mockLayer.formatFunction).to.be(undefined);
+
+            CpsiMapview.view.main.Map.guess = originalGuess;
+            Ext.create = originalCreate;
+        });
+
+        it('should not assign formatFunction when layerKey is absent', function () {
+            const mockLayer = {
+                get: function (key) {
+                    if (key === 'toolTipConfig') return {};
+                },
+                id: 'test-layer-id'
+            };
+
+            const mockMapPanel = {
+                getController: function () {
+                    return {
+                        tooltipLayerConfigs: {
+                            MY_LAYER: function () {}
+                        }
+                    };
+                },
+                on: Ext.emptyFn
+            };
+
+            const originalGuess = CpsiMapview.view.main.Map.guess;
+            CpsiMapview.view.main.Map.guess = function () {
+                return mockMapPanel;
+            };
+
+            const originalCreate = Ext.create;
+            Ext.create = function () {
+                return { hide: Ext.emptyFn };
+            };
+
+            layerFactory.registerLayerTooltip(mockLayer, null);
+
+            expect(mockLayer.formatFunction).to.be(undefined);
+
+            CpsiMapview.view.main.Map.guess = originalGuess;
+            Ext.create = originalCreate;
+        });
+    });
 });
