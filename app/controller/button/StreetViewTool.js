@@ -134,9 +134,13 @@ Ext.define('CpsiMapview.controller.button.StreetViewTool', {
             // add layer and raise layer to top of stack
             me.map.addLayer(me.vectorLayer);
         } else {
-            me.map.removeLayer(me.vectorLayer);
+            if (me.map) {
+                me.map.removeLayer(me.vectorLayer);
+            }
             // cleanup
-            me.vectorLayer.getSource().clear();
+            if (me.vectorLayer) {
+                me.vectorLayer.getSource().clear();
+            }
             if (me.streetViewWin) {
                 me.streetViewWin.close();
             }
@@ -176,7 +180,9 @@ Ext.define('CpsiMapview.controller.button.StreetViewTool', {
         if (activate) {
             me.map.on('singleclick', me.onMapClick);
         } else {
-            me.map.un('singleclick', me.onMapClick);
+            if (me.map) {
+                me.map.un('singleclick', me.onMapClick);
+            }
         }
     },
 
@@ -472,7 +478,9 @@ Ext.define('CpsiMapview.controller.button.StreetViewTool', {
      */
     unregisterGmapsEvents: function () {
         const me = this;
-        google.maps.event.removeListener(me.svPovChangedListener);
-        google.maps.event.removeListener(me.svPositionChangedListener);
+        if (typeof google !== 'undefined') {
+            google.maps.event.removeListener(me.svPovChangedListener);
+            google.maps.event.removeListener(me.svPositionChangedListener);
+        }
     }
 });
