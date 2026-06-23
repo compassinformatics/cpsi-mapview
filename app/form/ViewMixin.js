@@ -166,6 +166,7 @@ Ext.define('CpsiMapview.form.ViewMixin', {
                 toggle: 'onDigitizingToolToggle'
             },
             bind: {
+                apiUrl: '{cutWithPolygonUrl}',
                 drawLayer: '{polygonLayer}',
                 disabled: '{isLocked}',
                 resultLayer: '{resultLayer}',
