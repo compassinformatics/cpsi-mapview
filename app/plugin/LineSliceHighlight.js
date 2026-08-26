@@ -11,13 +11,43 @@ Ext.define('CpsiMapview.plugin.LineSliceHighlight', {
      */
     style: null,
 
+    constructor: function (config) {
+        this.callParent([config]);
+        if (config && config.style) {
+            this.style = config.style;
+        }
+    },
+
     init: function () {
-        this.style = new ol.style.Style({
-            stroke: new ol.style.Stroke({
-                color: 'red',
-                width: 2
-            })
-        });
+        if (!this.style) {
+            this.style = new ol.style.Style({
+                stroke: new ol.style.Stroke({
+                    color: 'red',
+                    width: 2
+                })
+            });
+        }
+    },
+
+    /**
+     * Measure a segment in the units the chainages are expressed in.
+     *
+     * @param {ol.geom.LineString} segment
+     * @param {ol.proj.Projection} projection
+     * @returns {number} length in metres
+     */
+    getSegmentLength: function (segment, projection) {
+        if (projection && projection.getUnits() === 'degrees') {
+            return ol.sphere.getLength(segment, {
+                projection: projection.getCode()
+            });
+        }
+        if (projection && projection.getCode() === 'EPSG:3857') {
+            // Web Mercator grid distances are inflated by 1/cos(latitude),
+            // so planar length is not usable here
+            return ol.sphere.getLength(segment, { projection: 'EPSG:3857' });
+        }
+        return segment.getLength();
     },
 
     /**
@@ -25,14 +55,16 @@ Ext.define('CpsiMapview.plugin.LineSliceHighlight', {
      * @param {ol.geom.LineString} geometry
      * @param {number} start in m
      * @param {number} end in m
+     * @param {ol.proj.Projection} projection projection of the geometry
      * @returns {ol.geom.LineString}
      */
-    calculateSlice: function (geometry, start, end) {
+    calculateSlice: function (geometry, start, end, projection) {
+        const me = this;
         let length = 0;
         const coordinates = [];
         geometry.forEachSegment(function (a, b) {
             const segment = new ol.geom.LineString([a, b]);
-            const segmentLength = ol.sphere.getLength(segment);
+            const segmentLength = me.getSegmentLength(segment, projection);
             if (length <= start && start < length + segmentLength) {
                 // start is in this segment
                 coordinates.push(
@@ -44,7 +76,7 @@ Ext.define('CpsiMapview.plugin.LineSliceHighlight', {
                 length + segmentLength <= end
             ) {
                 // the endpoint of the segment is between start and end
-                // openlayers forEachSegment reuses the arrays for the coordinates so it needs to be cloned
+                // OpenLayers forEachSegment reuses the arrays for the coordinates so it needs to be cloned
                 coordinates.push(b.slice());
             }
             if (length <= end && end < length + segmentLength) {
@@ -64,9 +96,15 @@ Ext.define('CpsiMapview.plugin.LineSliceHighlight', {
      * @param {ol.geom.LineString} geometry
      * @param {number} start
      * @param {number} end
+     * @param {ol.Map} [map] defaults to the application's main map
      */
-    highlightSlice: function (geometry, start, end) {
-        const map = BasiGX.util.Map.getMapComponent().map;
+    highlightSlice: function (geometry, start, end, map) {
+        if (!map) {
+            map = BasiGX.util.Map.getMapComponent().map;
+        }
+
+        const projection = map.getView().getProjection();
+
         if (!this.layer) {
             this.layer = new ol.layer.Vector({
                 style: this.style,
@@ -78,7 +116,7 @@ Ext.define('CpsiMapview.plugin.LineSliceHighlight', {
         }
 
         const feature = new ol.Feature(
-            this.calculateSlice(geometry, start, end)
+            this.calculateSlice(geometry, start, end, projection)
         );
 
         this.layer.getSource().addFeature(feature);
