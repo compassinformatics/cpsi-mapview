@@ -13,10 +13,23 @@
     font-style: italic;
     font-weight: bold;
 
-    .x-tree-checkbox:after {
-        content: "\f0b0";
-        font-family: "Font Awesome 5 Free" !important;
+    .x-tree-checkbox {
+        position: relative; // anchor point for the badge
+        margin-right: 14px; // make room so the badge doesn't collide with .x-tree-icon
     }
+
+        .x-tree-checkbox:after {
+            content: "\f0b0";
+            position: absolute;
+            left: 100%; // immediately to the right of the checkbox box
+            top: 50%;
+            transform: translateY(-50%);
+            margin-left: 2px; // add small gap between checkbox and icon
+            font-family: 'Font Awesome 5 Free' !important; // Solid — \f0b0 has no Regular version
+            font-size: 12px; // smaller than the tree icon
+            line-height: 1;
+            pointer-events: none; // don't let it handle clicks meant for the checkbox
+        }
 }
 
 .cpsi-tree-node-baselayer {
