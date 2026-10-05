@@ -123,6 +123,21 @@ Ext.define('CpsiMapview.factory.Layer', {
             mapLayer.set('refreshLayerOption', allowRefresh);
             // indicator if a label option is drawn in layer context menu for wms layers
             mapLayer.set('labelClassName', layerConf.labelClassName);
+            // allow multiple label items
+            mapLayer.set('labels', layerConf.labels);
+
+            if (
+                !Ext.isEmpty(layerConf.labelClassName) &&
+                Ext.isArray(layerConf.labels) &&
+                layerConf.labels.length > 0
+            ) {
+                Ext.Logger.warn(
+                    'Layer "' +
+                        layerConf.layerKey +
+                        '" has both "labelClassName" and "labels" configured - ' +
+                        '"labels" takes priority and "labelClassName" will be ignored.'
+                );
+            }
             // indicator if an opacity slider is offered in layer context menu
             const allowOpacitySlider = layerConf.opacitySlider !== false;
             mapLayer.set('opacitySlider', allowOpacitySlider);

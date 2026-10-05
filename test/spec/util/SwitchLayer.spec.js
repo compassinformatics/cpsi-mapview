@@ -65,5 +65,43 @@ describe('CpsiMapview.util.SwitchLayer', function () {
             const fn = cmp.updateLayerTreeForSwitchLayers;
             expect(fn).not.to.be(undefined);
         });
+
+        it('#getActiveLabelStyleName', function () {
+            const fn = cmp.getActiveLabelStyleName;
+            expect(fn).not.to.be(undefined);
+
+            const layerWithActiveLabelName = new ol.layer.Image({
+                source: new ol.source.ImageWMS()
+            });
+
+            layerWithActiveLabelName.set('activeLabelName', 'LabelsRoads');
+            layerWithActiveLabelName.set('labelClassName', 'OtherLabels');
+
+            expect(fn(layerWithActiveLabelName)).to.be('LabelsRoads');
+
+            const layerWithLabelClassNameOnly = new ol.layer.Image({
+                source: new ol.source.ImageWMS()
+            });
+            layerWithLabelClassNameOnly.set('labelClassName', 'OtherLabels');
+            expect(fn(layerWithLabelClassNameOnly)).to.be('OtherLabels');
+
+            const layerWithNoLabelConfig = new ol.layer.Image({
+                source: new ol.source.ImageWMS()
+            });
+            expect(fn(layerWithNoLabelConfig)).to.be(null);
+        });
+
+        it('#buildWmsStyleList', function () {
+            const fn = cmp.buildWmsStyleList;
+            expect(fn).not.to.be(undefined);
+
+            expect(fn('DefaultStyle', true, 'LabelsRoads')).to.be(
+                'DefaultStyle,LabelsRoads'
+            );
+            expect(fn('DefaultStyle', false, 'LabelsRoads')).to.be(
+                'DefaultStyle'
+            );
+            expect(fn('DefaultStyle', true, null)).to.be('DefaultStyle');
+        });
     });
 });
