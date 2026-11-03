@@ -51,15 +51,6 @@
 <div class="description">
     MenuItem showing a checkbox in the layer context menu that allows
 a separate label layer to be displayed alongside the feature layer.
-
-Also supports a `labels` config array, similar to `styles`:
-
-    "labels": [
-        { "name": "LabelsName", "title": "Names" },
-        { "name": "LabelsCode", "title": "Codes" }
-    ]
-
-This configuration creates a submenu with a radio-style choice.
 </div>
 
 
@@ -159,7 +150,7 @@ This configuration creates a submenu with a radio-style choice.
 
 
 <div class="description">
-    The style name for the labels layer. Used for the single labels.
+    The style name for the labels layer.
 </div>
 
 
@@ -245,117 +236,7 @@ This configuration creates a submenu with a radio-style choice.
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="view_menuitem_LayerLabels.js.html">view/menuitem/LayerLabels.js</a>, <a href="view_menuitem_LayerLabels.js.html#line36">line 36</a>
-    </li></ul></dd>
-    
-
-    
-
-    
-
-    
-</dl>
-
-
-
-
-
-
-        
-            
-<h4 class="name" id=".labelOptions"><span class="type-signature">(static, readonly) </span>labelOptions<span class="type-signature"></span></h4>
-
-
-
-
-<div class="description">
-    Configured label style options read from the layer's `labels` config array.
-</div>
-
-
-
-
-
-
-
-    <h5 class="subsection-title">Properties:</h5>
-
-    
-
-<table class="props">
-    <thead>
-    <tr>
-        
-
-        <th>Type</th>
-
-        
-
-        
-
-        <th class="last">Description</th>
-    </tr>
-    </thead>
-
-    <tbody>
-    
-
-        <tr>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">Array.&lt;Object></span>
-
-
-            
-            </td>
-
-            
-
-            
-
-            <td class="description last"></td>
-        </tr>
-
-    
-    </tbody>
-</table>
-
-
-
-
-<dl class="details">
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-    <dt class="tag-source">Source:</dt>
-    <dd class="tag-source"><ul class="dummy"><li>
-        <a href="view_menuitem_LayerLabels.js.html">view/menuitem/LayerLabels.js</a>, <a href="view_menuitem_LayerLabels.js.html#line43">line 43</a>
+        <a href="view_menuitem_LayerLabels.js.html">view/menuitem/LayerLabels.js</a>, <a href="view_menuitem_LayerLabels.js.html#line28">line 28</a>
     </li></ul></dd>
     
 
@@ -417,7 +298,7 @@ This configuration creates a submenu with a radio-style choice.
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="view_menuitem_LayerLabels.js.html">view/menuitem/LayerLabels.js</a>, <a href="view_menuitem_LayerLabels.js.html#line23">line 23</a>
+        <a href="view_menuitem_LayerLabels.js.html">view/menuitem/LayerLabels.js</a>, <a href="view_menuitem_LayerLabels.js.html#line15">line 15</a>
     </li></ul></dd>
     
 
@@ -479,7 +360,7 @@ This configuration creates a submenu with a radio-style choice.
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="view_menuitem_LayerLabels.js.html">view/menuitem/LayerLabels.js</a>, <a href="view_menuitem_LayerLabels.js.html#line29">line 29</a>
+        <a href="view_menuitem_LayerLabels.js.html">view/menuitem/LayerLabels.js</a>, <a href="view_menuitem_LayerLabels.js.html#line21">line 21</a>
     </li></ul></dd>
     
 
@@ -609,7 +490,7 @@ SLD in the layer configuration.
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="view_menuitem_LayerLabels.js.html">view/menuitem/LayerLabels.js</a>, <a href="view_menuitem_LayerLabels.js.html#line327">line 327</a>
+        <a href="view_menuitem_LayerLabels.js.html">view/menuitem/LayerLabels.js</a>, <a href="view_menuitem_LayerLabels.js.html#line167">line 167</a>
     </li></ul></dd>
     
 
@@ -645,7 +526,7 @@ SLD in the layer configuration.
     
 
     
-    <h4 class="name" id=".addStyleParameters"><span class="type-signature">(static) </span>addStyleParameters<span class="signature">(addLabel, labelClassNameOverride<span class="signature-attributes">opt</span>)</span><span class="type-signature"></span></h4>
+    <h4 class="name" id=".addStyleParameters"><span class="type-signature">(static) </span>addStyleParameters<span class="signature">(addLabel)</span><span class="type-signature"></span></h4>
     
 
     
@@ -678,8 +559,6 @@ WMS LAYERS param with custom style.
         <th>Type</th>
 
         
-        <th>Attributes</th>
-        
 
         
 
@@ -705,53 +584,10 @@ WMS LAYERS param with custom style.
             </td>
 
             
-                <td class="attributes">
-                
-
-                
-
-                
-                </td>
-            
 
             
 
             <td class="description last">Add or remove the label layer</td>
-        </tr>
-
-    
-
-        <tr>
-            
-                <td class="name"><code>labelClassNameOverride</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">String</span>
-
-
-            
-            </td>
-
-            
-                <td class="attributes">
-                
-                    &lt;optional><br>
-                
-
-                
-
-                
-                </td>
-            
-
-            
-
-            <td class="description last">Label style name
-                  to use instead of `me.labelClassName`. Used when
-                  multiple `labels` options are configured.</td>
         </tr>
 
     
@@ -792,7 +628,7 @@ WMS LAYERS param with custom style.
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="view_menuitem_LayerLabels.js.html">view/menuitem/LayerLabels.js</a>, <a href="view_menuitem_LayerLabels.js.html#line349">line 349</a>
+        <a href="view_menuitem_LayerLabels.js.html">view/menuitem/LayerLabels.js</a>, <a href="view_menuitem_LayerLabels.js.html#line186">line 186</a>
     </li></ul></dd>
     
 
@@ -930,7 +766,7 @@ Checks / unchecks box dependent on if labels are displayed.
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="view_menuitem_LayerLabels.js.html">view/menuitem/LayerLabels.js</a>, <a href="view_menuitem_LayerLabels.js.html#line204">line 204</a>
+        <a href="view_menuitem_LayerLabels.js.html">view/menuitem/LayerLabels.js</a>, <a href="view_menuitem_LayerLabels.js.html#line85">line 85</a>
     </li></ul></dd>
     
 
@@ -1069,7 +905,7 @@ Checks / unchecks box dependent on if labels are displayed.
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="view_menuitem_LayerLabels.js.html">view/menuitem/LayerLabels.js</a>, <a href="view_menuitem_LayerLabels.js.html#line225">line 225</a>
+        <a href="view_menuitem_LayerLabels.js.html">view/menuitem/LayerLabels.js</a>, <a href="view_menuitem_LayerLabels.js.html#line101">line 101</a>
     </li></ul></dd>
     
 
@@ -1115,9 +951,7 @@ Checks / unchecks box dependent on if labels are displayed.
 <div class="description">
     Handles the 'afterrender' event of this menu item for server
 side labeling.
-Checks / unchecks box dependent on if labels are displayed, and
-(when multiple label options are configured) syncs the submenu
-to whichever configured label style is currently active.
+Checks / unchecks box dependent on if labels are displayed.
 </div>
 
 
@@ -1210,7 +1044,7 @@ to whichever configured label style is currently active.
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="view_menuitem_LayerLabels.js.html">view/menuitem/LayerLabels.js</a>, <a href="view_menuitem_LayerLabels.js.html#line250">line 250</a>
+        <a href="view_menuitem_LayerLabels.js.html">view/menuitem/LayerLabels.js</a>, <a href="view_menuitem_LayerLabels.js.html#line124">line 124</a>
     </li></ul></dd>
     
 
@@ -1370,7 +1204,7 @@ to whichever configured label style is currently active.
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="view_menuitem_LayerLabels.js.html">view/menuitem/LayerLabels.js</a>, <a href="view_menuitem_LayerLabels.js.html#line303">line 303</a>
+        <a href="view_menuitem_LayerLabels.js.html">view/menuitem/LayerLabels.js</a>, <a href="view_menuitem_LayerLabels.js.html#line152">line 152</a>
     </li></ul></dd>
     
 
@@ -1426,7 +1260,7 @@ Return false if you don't want to make the GetFeatureInfo request.</a></li><li><
 <br class="clear">
 
 <footer>
-    Documentation generated by <a href="https://github.com/jsdoc/jsdoc">JSDoc 4.0.4</a> on Tue Nov 03 2026 14:19:08 GMT+0000 (Coordinated Universal Time)
+    Documentation generated by <a href="https://github.com/jsdoc/jsdoc">JSDoc 4.0.4</a> on Tue Nov 03 2026 14:20:05 GMT+0000 (Coordinated Universal Time)
 </footer>
 
 <script> prettyPrint(); </script>
