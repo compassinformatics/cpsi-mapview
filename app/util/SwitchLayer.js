@@ -77,6 +77,40 @@ Ext.define('CpsiMapview.util.SwitchLayer', {
     },
 
     /**
+     * Get the active WMS label style for a layer
+     *
+     * @param  {ol.layer.Layer} layer The layer to check
+     * @return {String|null} The active label style name, or null if
+     *                        none is configured
+     */
+    getActiveLabelStyleName: function (layer) {
+        return (
+            layer.get('activeLabelName') || layer.get('labelClassName') || null
+        );
+    },
+
+    /**
+     * Builds the WMS STYLES parameter value for a layer, appending the
+     * label style (if any)
+     *
+     * @param  {String}  activatedStyle  The style name
+     * @param  {Boolean} labelsActive    Whether a label style should be
+     *                                   appended
+     * @param  {String}  activeLabelName The label style name to append
+     * @return {String} The combined STYLES parameter value
+     */
+    buildWmsStyleList: function (
+        activatedStyle,
+        labelsActive,
+        activeLabelName
+    ) {
+        if (labelsActive === true && activeLabelName) {
+            return activatedStyle + ',' + activeLabelName;
+        }
+        return activatedStyle;
+    },
+
+    /**
      * Changes a switchlayer from one internal layer to the other.
      *
      * Creates a new layer, copies the properties and add it to the layer
@@ -141,13 +175,19 @@ Ext.define('CpsiMapview.util.SwitchLayer', {
         newLayer.set('activatedStyle', activatedStyle);
 
         if (newLayer.get('isWms')) {
-            // check if a label STYLES parameter was added --> keep this
-            // the STYLES value (SLD) for the labels
-            const labelClassName = newLayer.get('labelClassName');
-            let wmsStyleList = activatedStyle;
+            const labelsActive = switchLayer.get('labelsActive') === true;
+            const activeLabelName =
+                staticMe.getActiveLabelStyleName(switchLayer);
+            const wmsStyleList = staticMe.buildWmsStyleList(
+                activatedStyle,
+                labelsActive,
+                activeLabelName
+            );
 
-            if (newLayer.get('labelsActive') === true) {
-                wmsStyleList += ',' + labelClassName;
+            if (labelsActive && activeLabelName) {
+                // copy the active label the new layer
+                newLayer.set('labelsActive', true);
+                newLayer.set('activeLabelName', activeLabelName);
             }
 
             if (filters && filters.length > 0) {

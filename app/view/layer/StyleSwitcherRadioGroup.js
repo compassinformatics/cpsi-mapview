@@ -115,9 +115,13 @@ Ext.define('CpsiMapview.view.layer.StyleSwitcherRadioGroup', {
             if (layer.get('isWms')) {
                 // check if a label STYLES parameter was added --> keep this
                 // the STYLES value (SLD) for the labels
-                const labelClassName = layer.get('labelClassName');
-                if (layer.get('labelsActive') === true) {
-                    newStyle += ',' + labelClassName;
+                // 'activeLabelName' is set by LayerLabels when multiple label
+                // options are configured,  'labelClassName' is used for
+                // the single label-style case.
+                const activeLabelName =
+                    layer.get('activeLabelName') || layer.get('labelClassName');
+                if (layer.get('labelsActive') === true && activeLabelName) {
+                    newStyle += ',' + activeLabelName;
                 }
 
                 // apply new style parameter and reload layer

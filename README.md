@@ -99,6 +99,13 @@ Navigate to the project folder and run the following:
 npm test
 ```
 
+To fix and linting issues:
+
+```
+npm run lintfix
+npm run format
+```
+
 Note - if there are errors such as `BasiGX not defined`, ensure that the submodules have been
 created using `git submodule update --init --recursive`.
 
