@@ -118,23 +118,10 @@ Ext.define('CpsiMapview.util.Layer', {
             Ext.log.warn('Layer type not recognized (updateLayerNodeUI)');
         }
 
-        const originalGlyph = layer.get('_origTreeConf')
-            ? layer.get('_origTreeConf').glyph
-            : null;
-        const expandedGlyph = 'f0b0';
         if (hasFilters) {
-            // only set the glyph and class if needed - better for performance
-            if (node.get('glyph') !== expandedGlyph) {
-                node.set('glyph', expandedGlyph);
-                node.addCls('cpsi-tree-node-filtered');
-            }
+            node.addCls('cpsi-tree-node-filtered');
         } else {
-            // only set the glyph and class if needed - better for performance
-            if (node.get('glyph') !== originalGlyph) {
-                // revert to the original glyph if set on the layer
-                node.set('glyph', originalGlyph);
-                node.removeCls('cpsi-tree-node-filtered');
-            }
+            node.removeCls('cpsi-tree-node-filtered');
         }
 
         if (triggerUIUpdate) {
