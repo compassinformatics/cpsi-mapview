@@ -215,6 +215,213 @@
     
 
     
+    <h4 class="name" id=".buildWmsStyleList"><span class="type-signature">(static) </span>buildWmsStyleList<span class="signature">(activatedStyle, labelsActive, activeLabelName)</span><span class="type-signature"> &rarr; {String}</span></h4>
+    
+
+    
+
+
+
+<div class="description">
+    Builds the WMS STYLES parameter value for a layer, appending the
+label style (if any)
+</div>
+
+
+
+
+
+
+
+
+
+    <h5>Parameters:</h5>
+    
+
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>activatedStyle</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">String</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">The style name</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>labelsActive</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">Boolean</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">Whether a label style should be
+                                  appended</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>activeLabelName</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">String</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">The label style name to append</td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="util_SwitchLayer.js.html">util/SwitchLayer.js</a>, <a href="util_SwitchLayer.js.html#line101">line 101</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<h5>Returns:</h5>
+
+        
+<div class="param-desc">
+    The combined STYLES parameter value
+</div>
+
+
+
+<dl>
+    <dt>
+        Type
+    </dt>
+    <dd>
+        
+<span class="param-type">String</span>
+
+
+    </dd>
+</dl>
+
+    
+
+
+
+
+
+        
+            
+
+    
+
+    
     <h4 class="name" id=".changeInternalLayer"><span class="type-signature">(static) </span>changeInternalLayer<span class="signature">(layerCollection, switchLayer, index)</span><span class="type-signature"></span></h4>
     
 
@@ -365,7 +572,7 @@ collection.
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="util_SwitchLayer.js.html">util/SwitchLayer.js</a>, <a href="util_SwitchLayer.js.html#line88">line 88</a>
+        <a href="util_SwitchLayer.js.html">util/SwitchLayer.js</a>, <a href="util_SwitchLayer.js.html#line122">line 122</a>
     </li></ul></dd>
     
 
@@ -551,6 +758,169 @@ changes switch layers if necessary
 
 
 
+
+
+
+
+
+        
+            
+
+    
+
+    
+    <h4 class="name" id=".getActiveLabelStyleName"><span class="type-signature">(static) </span>getActiveLabelStyleName<span class="signature">(layer)</span><span class="type-signature"> &rarr; {String|null}</span></h4>
+    
+
+    
+
+
+
+<div class="description">
+    Get the active WMS label style for a layer
+</div>
+
+
+
+
+
+
+
+
+
+    <h5>Parameters:</h5>
+    
+
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>layer</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">ol.layer.Layer</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">The layer to check</td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="util_SwitchLayer.js.html">util/SwitchLayer.js</a>, <a href="util_SwitchLayer.js.html#line85">line 85</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<h5>Returns:</h5>
+
+        
+<div class="param-desc">
+    The active label style name, or null if
+                       none is configured
+</div>
+
+
+
+<dl>
+    <dt>
+        Type
+    </dt>
+    <dd>
+        
+<span class="param-type">String</span>
+|
+
+<span class="param-type">null</span>
+
+
+    </dd>
+</dl>
+
+    
 
 
 
@@ -847,7 +1217,7 @@ and replaces them if required
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="util_SwitchLayer.js.html">util/SwitchLayer.js</a>, <a href="util_SwitchLayer.js.html#line221">line 221</a>
+        <a href="util_SwitchLayer.js.html">util/SwitchLayer.js</a>, <a href="util_SwitchLayer.js.html#line261">line 261</a>
     </li></ul></dd>
     
 
@@ -958,7 +1328,7 @@ necessary when switch layers get replaced.
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="util_SwitchLayer.js.html">util/SwitchLayer.js</a>, <a href="util_SwitchLayer.js.html#line245">line 245</a>
+        <a href="util_SwitchLayer.js.html">util/SwitchLayer.js</a>, <a href="util_SwitchLayer.js.html#line285">line 285</a>
     </li></ul></dd>
     
 
@@ -1014,7 +1384,7 @@ Return false if you don't want to make the GetFeatureInfo request.</a></li><li><
 <br class="clear">
 
 <footer>
-    Documentation generated by <a href="https://github.com/jsdoc/jsdoc">JSDoc 4.0.4</a> on Mon Oct 05 2026 09:54:23 GMT+0000 (Coordinated Universal Time)
+    Documentation generated by <a href="https://github.com/jsdoc/jsdoc">JSDoc 4.0.4</a> on Tue Nov 03 2026 14:19:08 GMT+0000 (Coordinated Universal Time)
 </footer>
 
 <script> prettyPrint(); </script>
