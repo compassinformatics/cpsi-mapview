@@ -78,13 +78,14 @@ Ext.define('CpsiMapview.controller.button.DigitizeButtonController', {
 
     /**
      * The index of the currently active group
-     * Only used when `useContextMenu` is true
+     * Only used when `groups` is true
      */
     activeGroupIdx: 0,
 
     /**
-     * The counter reflecting the number of groups
-     * the user has created through the context menu
+     * The highest group index in use, whether created through the
+     * context menu or loaded with existing features.
+     * "Start new Group" creates the next index after this one
      */
     contextMenuGroupsCounter: 0,
 
@@ -144,6 +145,7 @@ Ext.define('CpsiMapview.controller.button.DigitizeButtonController', {
         }
 
         me.resultLayer = layer;
+        me.applyGroupStyle();
     },
 
     /**
@@ -333,6 +335,61 @@ Ext.define('CpsiMapview.controller.button.DigitizeButtonController', {
     },
 
     /**
+     * Updates the result layer style so only the active group uses the
+     * configured style, other groups are drawn muted
+     */
+    applyGroupStyle: function () {
+        const me = this;
+        const layer = me.resultLayer;
+
+        if (!layer || layer.get('groupStyled') || !me.getView().getGroups()) {
+            return;
+        }
+
+        const source = layer.getSource();
+
+        // a new record: start from the default group again
+        source.on('clear', function () {
+            me.activeGroupIdx = 0;
+            me.contextMenuGroupsCounter = 0;
+        });
+
+        // features loaded or solved: make sure the active group is a real one
+        source.on(
+            'addfeature',
+            Ext.Function.createBuffered(me.syncGroupsFromResultLayer, 50, me)
+        );
+
+        const baseStyle = layer.getStyle();
+        const grey = 'rgba(110, 110, 110, 0.7)';
+        const inactiveStyle = new ol.style.Style({
+            stroke: new ol.style.Stroke({
+                color: grey,
+                width: 3,
+                lineDash: [8, 6]
+            }),
+            image: new ol.style.Circle({
+                radius: 4,
+                fill: new ol.style.Fill({ color: grey })
+            })
+        });
+
+        layer.setStyle(function (feature, resolution) {
+            if (
+                me.getView().pressed &&
+                feature.get('group') !== me.activeGroupIdx
+            ) {
+                return inactiveStyle;
+            }
+            return Ext.isFunction(baseStyle)
+                ? baseStyle(feature, resolution)
+                : baseStyle;
+        });
+
+        layer.set('groupStyled', true);
+    },
+
+    /**
      * Main handler which activates or deactivates the interactions and listeners
      * @param {Ext.button.Button} btn The button that has been pressed
      * @param {boolean} pressed The toggle state of the button
@@ -441,6 +498,9 @@ Ext.define('CpsiMapview.controller.button.DigitizeButtonController', {
                 me.contextMenuGroupsCounter = 0;
             }
         }
+
+        me.applyGroupStyle();
+        me.resultLayer.changed();
     },
 
     blockEventHandling: function () {
@@ -454,21 +514,6 @@ Ext.define('CpsiMapview.controller.button.DigitizeButtonController', {
     },
 
     /**
-     * Returns an Ext.form.field.Radio for the context menu
-     * @param {number} idx The index that is used as value and label of the radio
-     * @param {boolean} checked Boolean indicating if the radio shall be checked
-     * @returns {object} An config object to create an Ext.form.field.Radio
-     */
-    getRadioGroupItem: function (idx, checked) {
-        return {
-            boxLabel: 'Group ' + (idx + 1).toString(),
-            name: 'radiobutton',
-            inputValue: idx,
-            checked: checked
-        };
-    },
-
-    /**
      * Method shows the context menu on mouse right click
      * @param {Event} evt The browser event
      */
@@ -479,45 +524,25 @@ Ext.define('CpsiMapview.controller.button.DigitizeButtonController', {
         const me = this.scope;
         const view = me.getView();
 
-        const radioGroupItems = [];
-        if (me.contextMenuGroupsCounter === 0) {
-            radioGroupItems.push(me.getRadioGroupItem(0, true));
-        } else {
-            for (let i = 0; i <= me.contextMenuGroupsCounter; i++) {
-                radioGroupItems.push(
-                    me.getRadioGroupItem(i, me.activeGroupIdx === i)
-                );
-            }
-        }
-
         let menuItems;
         if (view.getGroups()) {
+            me.syncGroupsFromResultLayer();
+
             menuItems = [
                 {
                     text: 'Start new Group',
                     handler: function () {
                         me.contextMenuGroupsCounter++;
                         me.activeGroupIdx = me.contextMenuGroupsCounter;
+                        me.resultLayer.changed();
                     }
                 },
                 {
                     text: 'Active Group',
                     menu: {
                         name: 'active-group-submenu',
-                        items: [
-                            {
-                                xtype: 'radiogroup',
-                                columns: 1,
-                                vertical: true,
-                                items: radioGroupItems,
-                                listeners: {
-                                    change: function (radioGroup, newVal) {
-                                        me.activeGroupIdx = newVal.radiobutton;
-                                        me.updateDrawSource();
-                                    }
-                                }
-                            }
-                        ]
+                        plain: true,
+                        items: me.getActiveGroupMenuItems()
                     }
                 },
                 {
@@ -540,12 +565,104 @@ Ext.define('CpsiMapview.controller.button.DigitizeButtonController', {
         }
 
         const menu = Ext.create('Ext.menu.Menu', {
-            width: 100,
+            minWidth: 100,
             plain: true,
-            renderTo: Ext.getBody(),
-            items: menuItems
+            items: menuItems,
+            listeners: {
+                // avoid adding a new menu on every right click
+                hide: function (m) {
+                    Ext.defer(m.destroy, 1, m);
+                }
+            }
         });
         menu.showAt(evt.pageX, evt.pageY);
+    },
+
+    /**
+     * Builds the radio-style items of the "Active Group" submenu
+     * @return {Object[]} menucheckitem configs
+     */
+    getActiveGroupMenuItems: function () {
+        const me = this;
+
+        return me.getGroupIndexes().map(function (idx) {
+            return {
+                xtype: 'menucheckitem',
+                text: 'Group ' + idx,
+                group: 'active-group',
+                checked: me.activeGroupIdx === idx,
+                groupIdx: idx,
+                checkHandler: function (item, checked) {
+                    if (checked) {
+                        me.activeGroupIdx = item.groupIdx;
+                        me.updateDrawSource();
+                        me.resultLayer.changed();
+                    }
+                }
+            };
+        });
+    },
+
+    /**
+     * Returns the distinct group indexes of the features in the result layer
+     * @return {number[]}
+     */
+    getFeatureGroups: function () {
+        const me = this;
+        const groups = [];
+
+        if (me.resultLayer) {
+            Ext.Array.each(
+                me.resultLayer.getSource().getFeatures(),
+                function (feature) {
+                    const group = feature.get('group');
+                    if (Ext.isNumber(group)) {
+                        Ext.Array.include(groups, group);
+                    }
+                }
+            );
+        }
+
+        return groups;
+    },
+
+    /**
+     * Returns the sorted, distinct group indexes that have features
+     * in the result layer, always including the active group
+     * @return {number[]}
+     */
+    getGroupIndexes: function () {
+        const me = this;
+        const groups = me.getFeatureGroups();
+
+        Ext.Array.include(groups, me.activeGroupIdx);
+
+        return Ext.Array.sort(groups, Ext.Array.numericSortFn);
+    },
+
+    /**
+     * Makes sure the group counter covers all groups present in the result layer,
+     * e.g. after loading an existing record
+     */
+    syncGroupsFromResultLayer: function () {
+        const me = this;
+        const featureGroups = me.getFeatureGroups();
+
+        if (Ext.isEmpty(featureGroups)) {
+            return;
+        }
+
+        const maxGroup = Ext.Array.max(featureGroups);
+        if (maxGroup > me.contextMenuGroupsCounter) {
+            me.contextMenuGroupsCounter = maxGroup;
+        }
+
+        // the default group 0 is empty but the record has other groups: select the first one
+        if (me.activeGroupIdx === 0 && !Ext.Array.contains(featureGroups, 0)) {
+            me.activeGroupIdx = Ext.Array.min(featureGroups);
+            me.updateDrawSource();
+            me.resultLayer.changed();
+        }
     },
 
     /**
@@ -1061,10 +1178,10 @@ Ext.define('CpsiMapview.controller.button.DigitizeButtonController', {
         if (features) {
             const me = this;
 
+            // get the original solver points before they are removed
             const originalSolverPoints = me.getSolverPoints();
             const originalLength = me.getResultGeometryLength();
 
-            // get the original solver points before they are removed
             const resultSource = me.resultLayer.getSource();
             // remove all features from the current active group
             const allFeatures = me.resultLayer
@@ -1072,8 +1189,11 @@ Ext.define('CpsiMapview.controller.button.DigitizeButtonController', {
                 .getFeatures()
                 .slice(0);
             Ext.each(allFeatures, function (f) {
-                if (f.get('group') === me.activeGroupIdx || !f.get('group')) {
-                    if (!f.get('group')) {
+                const group = f.get('group');
+                const hasGroup = group !== undefined && group !== null;
+
+                if (group === me.activeGroupIdx || !hasGroup) {
+                    if (!hasGroup) {
                         // the property must be updated before removing the feature, or it is readded to the store
                         f.set('group', me.activeGroupIdx);
                     }
