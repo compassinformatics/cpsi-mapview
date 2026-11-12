@@ -312,6 +312,10 @@ Ext.define('CpsiMapview.controller.LayerTreeController', {
                     layers: []
                 });
 
+                // description gets transformed to qtip on the layer tree node,
+                // the same as for layers
+                layerGroup.set('description', child.qtip);
+
                 // preserve the original tree JSON config to re-use it later on
                 layerGroup.set('_origTreeConf', child);
 
@@ -360,7 +364,7 @@ Ext.define('CpsiMapview.controller.LayerTreeController', {
                     );
                     const layerKeys = Ext.Array.pluck(allLayers, 'layerKey');
 
-                    if (!Ext.Array.indexOf(layerKeys, child.id) === -1) {
+                    if (Ext.Array.indexOf(layerKeys, child.id) === -1) {
                         Ext.Logger.warn(
                             'Layer with layerKey ' +
                                 child.id +
