@@ -585,10 +585,11 @@ Ext.define('CpsiMapview.controller.button.DigitizeButtonController', {
     getActiveGroupMenuItems: function () {
         const me = this;
 
-        return me.getGroupIndexes().map(function (idx) {
+        return me.getGroupIndexes().map(function (idx, position) {
             return {
                 xtype: 'menucheckitem',
-                text: 'Group ' + idx,
+                text: 'Group ' + (position + 1),
+                tooltip: 'Stored group value: ' + idx,
                 group: 'active-group',
                 checked: me.activeGroupIdx === idx,
                 groupIdx: idx,
