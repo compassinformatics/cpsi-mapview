@@ -173,7 +173,7 @@ describe('CpsiMapview.controller.button.DigitizeButtonController', function () {
                 expect(ctrl.activeGroupIdx).to.be(0);
             });
 
-            it('#getActiveGroupMenuItems uses the group values as labels', function () {
+            it('#getActiveGroupMenuItems uses the position index as labels', function () {
                 addGroupFeatures([1, 4]);
                 ctrl.activeGroupIdx = 4;
 
@@ -182,7 +182,7 @@ describe('CpsiMapview.controller.button.DigitizeButtonController', function () {
                 expect(items.length).to.be(2);
                 expect(items[0].text).to.be('Group 1');
                 expect(items[0].checked).to.be(false);
-                expect(items[1].text).to.be('Group 4');
+                expect(items[1].text).to.be('Group 2');
                 expect(items[1].checked).to.be(true);
             });
 
