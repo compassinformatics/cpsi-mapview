@@ -361,16 +361,15 @@ Ext.define('CpsiMapview.controller.button.DigitizeButtonController', {
         );
 
         const baseStyle = layer.getStyle();
-        const grey = 'rgba(110, 110, 110, 0.7)';
+        const inactiveColor = 'rgba(205, 135, 60, 0.85)';
         const inactiveStyle = new ol.style.Style({
             stroke: new ol.style.Stroke({
-                color: grey,
-                width: 3,
-                lineDash: [8, 6]
+                color: inactiveColor,
+                width: 3
             }),
             image: new ol.style.Circle({
                 radius: 4,
-                fill: new ol.style.Fill({ color: grey })
+                fill: new ol.style.Fill({ color: inactiveColor })
             })
         });
 
