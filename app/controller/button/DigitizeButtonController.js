@@ -126,6 +126,24 @@ Ext.define('CpsiMapview.controller.button.DigitizeButtonController', {
         me.setModifyInteraction(layer);
         me.setSelfSnapInteraction(layer);
         me.setSnapInteraction();
+
+        // new interactions are active by default
+        // so set them to match the button state
+        const active = !!me.getView().pressed;
+        Ext.Array.each(
+            [
+                me.drawInteraction,
+                me.modifyInteraction,
+                me.snapVertexInteraction,
+                me.snapEdgeInteraction,
+                me.snapInteraction
+            ],
+            function (interaction) {
+                if (interaction) {
+                    interaction.setActive(active);
+                }
+            }
+        );
     },
 
     /**
@@ -734,7 +752,7 @@ Ext.define('CpsiMapview.controller.button.DigitizeButtonController', {
             default:
                 BasiGX.warn(
                     'Please implement your custom handler here for ' +
-                        view.getType()
+                    view.getType()
                 );
                 return;
         }
